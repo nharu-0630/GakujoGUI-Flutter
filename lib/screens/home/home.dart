@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:gakujo_task/screens/home/widgets/go_premium.dart';
 import 'package:gakujo_task/screens/home/widgets/tasks.dart';
 
 class HomePage extends StatelessWidget {
@@ -11,7 +10,7 @@ class HomePage extends StatelessWidget {
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          GoPremium(),
+          // GoPremium(),
           Container(
             padding: const EdgeInsets.all(15),
             child: const Text(
@@ -47,14 +46,14 @@ class HomePage extends StatelessWidget {
         Container(
           height: 45,
           width: 45,
-          margin: const EdgeInsets.only(left: 15),
+          // margin: const EdgeInsets.only(left: 15),
           child: ClipRRect(
             borderRadius: BorderRadius.circular(10),
-            child: Image.asset('assets/images/avatar.jpg'),
+            child: Image.asset('assets/images/avatar.png'),
           ),
         ),
         const SizedBox(width: 10),
-        const Text('Hi, Amanda!',
+        const Text('Hi, xyzyxJP!',
             style: TextStyle(
               color: Colors.black,
               fontSize: 26,

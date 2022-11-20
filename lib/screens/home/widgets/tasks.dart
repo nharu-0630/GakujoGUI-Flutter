@@ -1,6 +1,5 @@
 import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/src/widgets/framework.dart';
 import 'package:gakujo_task/models/task.dart';
 import 'package:gakujo_task/screens/detail/detail.dart';
 
@@ -52,7 +51,7 @@ class Tasks extends StatelessWidget {
             color: task.iconColor,
             size: 35,
           ),
-          const SizedBox(height: 30),
+          const SizedBox(height: 25),
           Text(
             task.title!,
             style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
