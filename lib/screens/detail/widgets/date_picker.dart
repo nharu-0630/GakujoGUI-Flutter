@@ -6,7 +6,7 @@ class DatePicker extends StatefulWidget {
 }
 
 class _DatePickerState extends State<DatePicker> {
-  final weekList = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', "Sat"];
+  final weekList = ['日', '月', '火', '水', '木', '金', "土"];
   final dayList = ['24', '25', '26', '27', '28', '29', '30'];
   var selected = 4;
 
@@ -27,7 +27,7 @@ class _DatePickerState extends State<DatePicker> {
                 onTap: () => setState(() => selected = index),
                 child: Container(
                   padding: const EdgeInsets.all(10),
-                  margin: const EdgeInsets.symmetric(horizontal: 4),
+                  margin: const EdgeInsets.symmetric(horizontal: 6),
                   decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(20),
                       color: selected == index
@@ -38,10 +38,11 @@ class _DatePickerState extends State<DatePicker> {
                       Text(
                         weekList[index],
                         style: TextStyle(
+                            fontSize: 12,
                             color:
                                 selected == index ? Colors.black : Colors.grey),
                       ),
-                      const SizedBox(height: 5),
+                      const SizedBox(height: 4),
                       Text(
                         dayList[index],
                         style: TextStyle(

@@ -14,7 +14,7 @@ class HomePage extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(15),
             child: const Text(
-              'Tasks',
+              'タスク',
               style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
             ),
           ),
@@ -31,7 +31,7 @@ class HomePage extends StatelessWidget {
         backgroundColor: Colors.black,
         onPressed: () {},
         child: const Icon(
-          Icons.add,
+          Icons.sync,
           size: 35,
         ),
       ),
@@ -60,13 +60,13 @@ class HomePage extends StatelessWidget {
               fontWeight: FontWeight.bold,
             ))
       ]),
-      actions: const [
-        Icon(
-          Icons.more_vert,
-          color: Colors.black,
-          size: 40,
-        )
-      ],
+      // actions: const [
+      //   Icon(
+      //     Icons.more_vert,
+      //     color: Colors.black,
+      //     size: 40,
+      //   )
+      // ],
     );
   }
 
@@ -81,30 +81,34 @@ class HomePage extends StatelessWidget {
                 spreadRadius: 5,
                 blurRadius: 10)
           ]),
-      child: ClipRRect(
-        borderRadius: const BorderRadius.only(
-            topLeft: Radius.circular(30), topRight: Radius.circular(30)),
-        child: BottomNavigationBar(
-            backgroundColor: Colors.white,
-            showSelectedLabels: false,
-            showUnselectedLabels: false,
-            selectedItemColor: Colors.blueAccent,
-            unselectedItemColor: Colors.grey.withOpacity(0.5),
-            items: const [
-              BottomNavigationBarItem(
-                  label: 'Home',
-                  icon: Icon(
-                    Icons.home_rounded,
-                    size: 30,
-                  )),
-              BottomNavigationBarItem(
-                  label: 'Person',
-                  icon: Icon(
-                    Icons.person_rounded,
-                    size: 30,
-                  )),
-            ]),
-      ),
+      child: Stack(children: [
+        ClipRRect(
+          borderRadius: const BorderRadius.only(
+              topLeft: Radius.circular(30), topRight: Radius.circular(30)),
+          child: BottomNavigationBar(
+              backgroundColor: Colors.white,
+              showSelectedLabels: false,
+              showUnselectedLabels: false,
+              selectedItemColor: Colors.blueAccent,
+              unselectedItemColor: Colors.grey.withOpacity(0.5),
+              items: const [
+                BottomNavigationBarItem(
+                    label: 'Home',
+                    icon: Icon(
+                      Icons.home_rounded,
+                      size: 30,
+                    )),
+                BottomNavigationBarItem(
+                    label: 'Settings',
+                    icon: Icon(
+                      Icons.settings_rounded,
+                      size: 30,
+                    )),
+              ]),
+        ),
+        const Positioned(
+            right: 10, bottom: 10, child: Text('Client Version: 1.0.0.0'))
+      ]),
     );
   }
 }

@@ -17,7 +17,10 @@ class TaskTimeline extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(detail['time']),
+            Padding(
+              padding: const EdgeInsets.only(top: 3),
+              child: Text(detail['time']),
+            ),
             detail['title'].isNotEmpty
                 ? _buildCard(detail['bgColor'], detail['title'], detail['slot'])
                 : _buildCard(Colors.white, '', '')
@@ -28,7 +31,7 @@ class TaskTimeline extends StatelessWidget {
   }
 
   Widget _buildTimeline(Color color) {
-    return Container(
+    return SizedBox(
       height: 80,
       width: 20,
       child: TimelineTile(
@@ -69,7 +72,7 @@ class TaskTimeline extends StatelessWidget {
             title,
             style: const TextStyle(fontWeight: FontWeight.bold),
           ),
-          const SizedBox(height: 10),
+          const SizedBox(height: 5),
           Text(
             slot,
             style: const TextStyle(color: Colors.grey),

@@ -12,20 +12,23 @@ class DetailPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final detailList = task.desc;
     return Scaffold(
-      backgroundColor: Colors.black,
+      backgroundColor: Colors.white,
       body: CustomScrollView(
         slivers: [
           _buildAppBar(context),
           SliverToBoxAdapter(
             child: Container(
-              decoration: const BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.only(
-                      topLeft: Radius.circular(30),
-                      topRight: Radius.circular(30))),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [DatePicker(), TaskTitle()],
+              color: Colors.black,
+              child: Container(
+                decoration: const BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.only(
+                        topLeft: Radius.circular(30),
+                        topRight: Radius.circular(30))),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [DatePicker(), TaskTitle()],
+                ),
               ),
             ),
           ),
@@ -35,7 +38,7 @@ class DetailPage extends StatelessWidget {
                       color: Colors.white,
                       child: const Center(
                           child: Text(
-                        'No task today',
+                        '今日のタスクはありません',
                         style: TextStyle(color: Colors.grey, fontSize: 18),
                       ))))
               : SliverList(
@@ -56,12 +59,12 @@ class DetailPage extends StatelessWidget {
         icon: const Icon(Icons.arrow_back_ios),
         iconSize: 20,
       ),
-      actions: const [
-        Icon(
-          Icons.more_vert,
-          size: 40,
-        )
-      ],
+      // actions: const [
+      //   Icon(
+      //     Icons.more_vert,
+      //     size: 40,
+      //   )
+      // ],
       flexibleSpace: FlexibleSpaceBar(
         title: Column(
           mainAxisAlignment: MainAxisAlignment.end,
@@ -71,9 +74,9 @@ class DetailPage extends StatelessWidget {
               '${task.title}',
               style: const TextStyle(fontWeight: FontWeight.bold),
             ),
-            const SizedBox(height: 5),
+            // const SizedBox(height: 5),
             Text(
-              'You have ${task.left} tasks for today!',
+              '今日のタスクは${task.left}件あります',
               style: TextStyle(fontSize: 12, color: Colors.grey[700]),
             )
           ],

@@ -60,10 +60,9 @@ class Tasks extends StatelessWidget {
           Row(
             children: [
               _buildTaskStatus(
-                  task.btnColor!, task.iconColor!, '${task.left} left'),
+                  task.btnColor!, task.iconColor!, '残り ${task.left}'),
               const SizedBox(width: 5),
-              _buildTaskStatus(
-                  Colors.white, task.iconColor!, '${task.done} done')
+              _buildTaskStatus(Colors.white, task.iconColor!, '完了 ${task.done}')
             ],
           )
         ]),
