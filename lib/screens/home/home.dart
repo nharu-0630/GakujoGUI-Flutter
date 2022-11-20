@@ -106,8 +106,13 @@ class HomePage extends StatelessWidget {
                     )),
               ]),
         ),
-        const Positioned(
-            right: 10, bottom: 10, child: Text('Client Version: 1.0.0.0'))
+        Positioned(
+            right: 10,
+            bottom: 10,
+            child: Text(
+              'Client Version: ',
+              style: TextStyle(color: Colors.grey[700]),
+            ))
       ]),
     );
   }
