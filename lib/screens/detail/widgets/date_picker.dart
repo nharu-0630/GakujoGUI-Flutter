@@ -6,8 +6,38 @@ class DatePicker extends StatefulWidget {
 }
 
 class _DatePickerState extends State<DatePicker> {
-  final weekList = ['日', '月', '火', '水', '木', '金', "土"];
-  final dayList = ['24', '25', '26', '27', '28', '29', '30'];
+  final weekList = [
+    '日',
+    '月',
+    '火',
+    '水',
+    '木',
+    '金',
+    '土',
+    '日',
+    '月',
+    '火',
+    '水',
+    '木',
+    '金',
+    '土'
+  ];
+  final dayList = [
+    '17',
+    '18',
+    '19',
+    '20',
+    '21',
+    '22',
+    '23',
+    '24',
+    '25',
+    '26',
+    '27',
+    '28',
+    '29',
+    '30'
+  ];
   var selected = 4;
 
   @override
@@ -22,6 +52,7 @@ class _DatePickerState extends State<DatePicker> {
         ),
       ),
       child: ListView.separated(
+          physics: const BouncingScrollPhysics(),
           scrollDirection: Axis.horizontal,
           itemBuilder: (context, index) => GestureDetector(
                 onTap: () => setState(() => selected = index),

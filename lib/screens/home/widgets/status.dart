@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-class GoPremium extends StatelessWidget {
+class Status extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -17,7 +17,7 @@ class GoPremium extends StatelessWidget {
                 decoration: BoxDecoration(
                     color: Colors.grey[800], shape: BoxShape.circle),
                 child: const Icon(
-                  Icons.star,
+                  Icons.school,
                   color: Colors.white,
                   size: 20,
                 ),
@@ -27,7 +27,7 @@ class GoPremium extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const Text(
-                    'Go Premium',
+                    'LiveCampus',
                     style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
@@ -35,7 +35,7 @@ class GoPremium extends StatelessWidget {
                   ),
                   const SizedBox(height: 10),
                   Text(
-                    'Get unlimited access\nto all our features!',
+                    '最終更新日時: ',
                     style: TextStyle(
                       fontSize: 16,
                       color: Colors.grey[700],

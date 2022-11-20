@@ -11,3 +11,8 @@ const Color kRedDark = Color(0xFFF08A8E);
 const Color kBlueLight = Color(0xFFEDF4FE);
 const Color kBlue = Color(0xFFE1EDFC);
 const Color kBlueDark = Color(0xFFC0D3F8);
+
+const Color kPrimaryLight = Color(0xFFEDEEE7);
+const Color kPrimary = Color(0xFF5B60BA);
+const Color kPrimaryDark = Color(0xFF000036);
+const Color kGreyLight = Color(0xFFB4B7BF);

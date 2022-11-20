@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:gakujo_task/screens/home/widgets/messages.dart';
+import 'package:gakujo_task/screens/home/widgets/recent_subjects.dart';
+import 'package:gakujo_task/screens/home/widgets/status.dart';
 import 'package:gakujo_task/screens/home/widgets/tasks.dart';
 
 class HomePage extends StatelessWidget {
@@ -10,7 +13,7 @@ class HomePage extends StatelessWidget {
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // GoPremium(),
+          Status(),
           Container(
             padding: const EdgeInsets.all(15),
             child: const Text(
@@ -18,9 +21,18 @@ class HomePage extends StatelessWidget {
               style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
             ),
           ),
-          Expanded(
-            child: Tasks(),
-          )
+          Flexible(child: Tasks()),
+          Container(
+            padding: const EdgeInsets.all(15),
+            child: const Text(
+              'メッセージ',
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 22),
+            ),
+          ),
+          SizedBox(height: 60, child: Expanded(child: RecentSubjects())),
+          Flexible(
+            child: Messages(),
+          ),
         ],
       ),
       bottomNavigationBar: _buildBottomNavigationBar(),
@@ -46,7 +58,6 @@ class HomePage extends StatelessWidget {
         Container(
           height: 45,
           width: 45,
-          // margin: const EdgeInsets.only(left: 15),
           child: ClipRRect(
             borderRadius: BorderRadius.circular(10),
             child: Image.asset('assets/images/avatar.png'),
@@ -60,13 +71,6 @@ class HomePage extends StatelessWidget {
               fontWeight: FontWeight.bold,
             ))
       ]),
-      // actions: const [
-      //   Icon(
-      //     Icons.more_vert,
-      //     color: Colors.black,
-      //     size: 40,
-      //   )
-      // ],
     );
   }
 

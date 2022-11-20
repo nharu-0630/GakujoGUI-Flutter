@@ -4,19 +4,21 @@ import 'package:gakujo_task/models/task.dart';
 import 'package:gakujo_task/screens/detail/detail.dart';
 
 class Tasks extends StatelessWidget {
-  final tasksList = Task.generateTasks();
+  final taskList = Task.generateTasks();
 
   @override
   Widget build(BuildContext context) {
     return Container(
         padding: const EdgeInsets.symmetric(horizontal: 15),
         child: GridView.builder(
-          itemCount: tasksList.length,
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          itemCount: taskList.length,
           gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
               crossAxisCount: 2, crossAxisSpacing: 10, mainAxisSpacing: 10),
-          itemBuilder: ((context, index) => tasksList[index].isLast
+          itemBuilder: ((context, index) => taskList[index].isLast
               ? _buildAddTasks()
-              : _buildTask(context, tasksList[index])),
+              : _buildTask(context, taskList[index])),
         ));
   }
 
