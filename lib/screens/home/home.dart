@@ -10,30 +10,30 @@ class HomePage extends StatelessWidget {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: _buildAppBar(),
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Status(),
-          Container(
-            padding: const EdgeInsets.all(15),
-            child: const Text(
-              'タスク',
-              style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+      body: SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Status(),
+            Container(
+              padding: const EdgeInsets.all(15),
+              child: const Text(
+                'タスク',
+                style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+              ),
             ),
-          ),
-          Flexible(child: Tasks()),
-          Container(
-            padding: const EdgeInsets.all(15),
-            child: const Text(
-              'メッセージ',
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 22),
+            Tasks(),
+            Container(
+              padding: const EdgeInsets.all(15),
+              child: const Text(
+                'メッセージ',
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 22),
+              ),
             ),
-          ),
-          SizedBox(height: 60, child: Expanded(child: RecentSubjects())),
-          Flexible(
-            child: Messages(),
-          ),
-        ],
+            SizedBox(height: 60, child: Expanded(child: RecentSubjects())),
+            Messages(),
+          ],
+        ),
       ),
       bottomNavigationBar: _buildBottomNavigationBar(),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,

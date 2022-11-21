@@ -1,4 +1,3 @@
-import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/material.dart';
 import 'package:gakujo_task/models/task.dart';
 import 'package:gakujo_task/screens/detail/detail.dart';
@@ -16,24 +15,8 @@ class Tasks extends StatelessWidget {
           itemCount: taskList.length,
           gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
               crossAxisCount: 2, crossAxisSpacing: 10, mainAxisSpacing: 10),
-          itemBuilder: ((context, index) => taskList[index].isLast
-              ? _buildAddTasks()
-              : _buildTask(context, taskList[index])),
-        ));
-  }
-
-  Widget _buildAddTasks() {
-    return DottedBorder(
-        borderType: BorderType.RRect,
-        radius: const Radius.circular(20),
-        dashPattern: const [10, 10],
-        color: Colors.grey,
-        strokeWidth: 2,
-        child: const Center(
-          child: Text(
-            '+ Add',
-            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-          ),
+          itemBuilder: ((context, index) =>
+              _buildTask(context, taskList[index])),
         ));
   }
 

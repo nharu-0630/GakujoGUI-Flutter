@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:intl/date_symbol_data_local.dart';
+import 'package:intl/intl.dart';
 
 class DatePicker extends StatefulWidget {
   @override
@@ -6,42 +8,17 @@ class DatePicker extends StatefulWidget {
 }
 
 class _DatePickerState extends State<DatePicker> {
-  final weekList = [
-    '日',
-    '月',
-    '火',
-    '水',
-    '木',
-    '金',
-    '土',
-    '日',
-    '月',
-    '火',
-    '水',
-    '木',
-    '金',
-    '土'
-  ];
-  final dayList = [
-    '17',
-    '18',
-    '19',
-    '20',
-    '21',
-    '22',
-    '23',
-    '24',
-    '25',
-    '26',
-    '27',
-    '28',
-    '29',
-    '30'
-  ];
-  var selected = 4;
+  var selected = 0;
 
   @override
   Widget build(BuildContext context) {
+    initializeDateFormatting('ja');
+    final startDate =
+        DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day);
+    final endDate = startDate.subtract(const Duration(days: 60));
+    final dateList = List<DateTime>.generate(
+        startDate.difference(endDate).inDays,
+        (i) => startDate.add(Duration(days: i)));
     return Container(
       height: 100,
       padding: const EdgeInsets.symmetric(vertical: 20),
@@ -67,27 +44,31 @@ class _DatePickerState extends State<DatePicker> {
                   child: Column(
                     children: [
                       Text(
-                        weekList[index],
+                        DateFormat.E('ja').format(dateList[index]),
                         style: TextStyle(
                             fontSize: 12,
-                            color:
-                                selected == index ? Colors.black : Colors.grey),
+                            color: (dateList[index].weekday == 6
+                                    ? Colors.blueAccent
+                                    : dateList[index].weekday == 7
+                                        ? Colors.redAccent
+                                        : Colors.black)
+                                .withOpacity(selected == index ? 1 : 0.3)),
                       ),
                       const SizedBox(height: 4),
                       Text(
-                        dayList[index],
+                        dateList[index].day.toString(),
                         style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
-                            color:
-                                selected == index ? Colors.black : Colors.grey),
+                            color: Colors.black
+                                .withOpacity(selected == index ? 1 : 0.3)),
                       )
                     ],
                   ),
                 ),
               ),
           separatorBuilder: ((_, index) => const SizedBox(width: 5)),
-          itemCount: weekList.length),
+          itemCount: dateList.length),
     );
   }
 }

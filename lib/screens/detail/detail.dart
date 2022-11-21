@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:gakujo_task/models/task.dart';
 import 'package:gakujo_task/screens/detail/widgets/date_picker.dart';
 import 'package:gakujo_task/screens/detail/widgets/task_timeline.dart';
-import 'package:gakujo_task/screens/detail/widgets/task_title.dart';
 
 class DetailPage extends StatelessWidget {
   final Task task;
@@ -27,7 +26,21 @@ class DetailPage extends StatelessWidget {
                         topRight: Radius.circular(30))),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [DatePicker(), TaskTitle()],
+                  children: [
+                    DatePicker(),
+                    Container(
+                      padding: const EdgeInsets.all(15),
+                      child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: const [
+                            Text(
+                              'タスク',
+                              style: TextStyle(
+                                  fontSize: 22, fontWeight: FontWeight.bold),
+                            ),
+                          ]),
+                    )
+                  ],
                 ),
               ),
             ),
