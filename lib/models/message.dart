@@ -1,31 +1,154 @@
-import 'package:gakujo_task/models/subject.dart';
+import 'dart:convert';
+
+import 'package:gakujo_task/api/parse.dart';
+import 'package:html/dom.dart';
 
 class Message {
-  String title;
-  String content;
-  String dateTime;
+  Message(
+    this.subject,
+    this.teacher,
+    this.title,
+    this.type,
+    this.targetDateTime,
+    this.contactDateTime,
+    this.content,
+    this.severity,
+    this.webReplyRequest, {
+    required this.isAcquired,
+    required this.isArchived,
+  });
 
-  Message(this.title, this.content, this.dateTime);
+  factory Message.fromJson(dynamic json) {
+    json = json as Map<String, dynamic>;
+    return Message(
+      json['subject'] as String,
+      json['teacher'] as String,
+      json['title'] as String,
+      json['type'] as String,
+      (json['targetDateTime'] as String).parseDateTime(),
+      (json['contactDateTime'] as String).parseDateTime(),
+      json['content'] as String,
+      json['severity'] as String,
+      json['webReplyRequest'] as String,
+      isAcquired: json['isAcquired'] as bool,
+      isArchived: json['isArchived'] as bool,
+    );
+  }
 
-  static Map<Subject, List<Message>> generateMessages() {
-    return {
-      subjects[0]: [
-        Message(
-            'タイトル',
-            'ビデオを使うと、伝えたい内容を明確に表現できます。[オンライン ビデオ] をクリックすると、追加したいビデオを、それに応じた埋め込みコードの形式で貼り付けできるようになります。キーワードを入力して、文書に最適なビデオをオンラインで検索することもできます。\nWord に用意されているヘッダー、フッター、表紙、テキスト ボックス デザインを組み合わせると、プロのようなできばえの文書を作成できます。たとえば、一致する表紙、ヘッダー、サイドバーを追加できます。[挿入] をクリックしてから、それぞれのギャラリーで目的の要素を選んでください。\nテーマとスタイルを使って、文書全体の統一感を出すこともできます。[デザイン] をクリックし新しいテーマを選ぶと、図やグラフ、SmartArt グラフィックが新しいテーマに合わせて変わります。スタイルを適用すると、新しいテーマに適合するように見出しが変更されます。\nWord では、必要に応じてその場に新しいボタンが表示されるため、効率よく操作を進めることができます。文書内に写真をレイアウトする方法を変更するには、写真をクリックすると、隣にレイアウト オプションのボタンが表示されます。表で作業している場合は、行または列を追加する場所をクリックして、プラス記号をクリックします。\n新しい閲覧ビューが導入され、閲覧もさらに便利になりました。文書の一部を折りたたんで、必要な箇所に集中することができます。最後まで読み終わる前に中止する必要がある場合、Word では、たとえ別のデバイスであっても、どこまで読んだかが記憶されます。',
-            '2022/11/21 12:19'),
-        Message(
-            'タイトル',
-            'ビデオを使うと、伝えたい内容を明確に表現できます。[オンライン ビデオ] をクリックすると、追加したいビデオを、それに応じた埋め込みコードの形式で貼り付けできるようになります。キーワードを入力して、文書に最適なビデオをオンラインで検索することもできます。\nWord に用意されているヘッダー、フッター、表紙、テキスト ボックス デザインを組み合わせると、プロのようなできばえの文書を作成できます。たとえば、一致する表紙、ヘッダー、サイドバーを追加できます。[挿入] をクリックしてから、それぞれのギャラリーで目的の要素を選んでください。\nテーマとスタイルを使って、文書全体の統一感を出すこともできます。[デザイン] をクリックし新しいテーマを選ぶと、図やグラフ、SmartArt グラフィックが新しいテーマに合わせて変わります。スタイルを適用すると、新しいテーマに適合するように見出しが変更されます。\nWord では、必要に応じてその場に新しいボタンが表示されるため、効率よく操作を進めることができます。文書内に写真をレイアウトする方法を変更するには、写真をクリックすると、隣にレイアウト オプションのボタンが表示されます。表で作業している場合は、行または列を追加する場所をクリックして、プラス記号をクリックします。\n新しい閲覧ビューが導入され、閲覧もさらに便利になりました。文書の一部を折りたたんで、必要な箇所に集中することができます。最後まで読み終わる前に中止する必要がある場合、Word では、たとえ別のデバイスであっても、どこまで読んだかが記憶されます。',
-            '2022/11/21 12:19')
-      ],
-      subjects[1]: [],
-      subjects[2]: [],
-      subjects[3]: [],
-      subjects[4]: [],
-      subjects[5]: []
-    };
+  factory Message.fromElement(Element element) {
+    final subject = element.querySelectorAll('td')[1].text.trimWhiteSpace();
+    final teacher = element.querySelectorAll('td')[2].text.trim();
+    final title =
+        element.querySelectorAll('td')[3].querySelector('a')!.text.trim();
+    final type = element.querySelectorAll('td')[4].text.trim();
+    final targetDateTime =
+        element.querySelectorAll('td')[5].text.trim().trimDateTime();
+    final contactDateTime =
+        element.querySelectorAll('td')[6].text.trim().trimDateTime();
+    final severity = element
+            .querySelectorAll('td')[3]
+            .querySelector('span')
+            ?.text
+            .replaceFirst('【', '')
+            .replaceFirst('】', '') ??
+        '通常';
+    return Message(
+      subject,
+      teacher,
+      title,
+      type,
+      targetDateTime,
+      contactDateTime,
+      '',
+      severity,
+      '',
+      isAcquired: false,
+      isArchived: false,
+    );
+  }
+
+  String subject = '';
+  String teacher = '';
+  String title = '';
+  String type = '';
+  DateTime targetDateTime = DateTime.fromMicrosecondsSinceEpoch(0);
+  DateTime contactDateTime = DateTime.fromMicrosecondsSinceEpoch(0);
+  String content = '';
+  String severity = '通常';
+  String webReplyRequest = '';
+  bool isAcquired = false;
+  bool isArchived = false;
+
+  static Map<String, dynamic> toMap(Message contact) => <String, dynamic>{
+        'subject': contact.subject,
+        'teacher': contact.teacher,
+        'title': contact.title,
+        'type': contact.type,
+        'targetDateTime': contact.targetDateTime.toIso8601String(),
+        'contactDateTime': contact.contactDateTime.toIso8601String(),
+        'content': contact.content,
+        'severity': contact.severity,
+        'webReplyRequest': contact.webReplyRequest,
+        'isAcquired': contact.isAcquired,
+        'isArchived': contact.isArchived,
+      };
+
+  static String encode(List<Message> contacts) => json.encode(
+        contacts.map<Map<String, dynamic>>(Message.toMap).toList(),
+      );
+
+  static List<Message> decode(String contacts) => json.decode(contacts) is List
+      ? (json.decode(contacts) as List).map<Message>(Message.fromJson).toList()
+      : [];
+
+  void toDetail(Document document) {
+    isAcquired = true;
+    if (document.querySelectorAll('table.ttb_entry > tbody > tr > td').length >
+        2) {
+      content = document
+          .querySelectorAll('table.ttb_entry > tbody > tr > td')[2]
+          .text
+          .trim();
+    }
+    if (document.querySelectorAll('table.ttb_entry > tbody > tr > td').length >
+        8) {
+      webReplyRequest = document
+          .querySelectorAll('table.ttb_entry > tbody > tr > td')[8]
+          .text
+          .trim();
+    }
+  }
+
+  bool contains(String value) =>
+      subject.toLowerCase().contains(value.toLowerCase()) ||
+      title.toLowerCase().contains(value.toLowerCase()) ||
+      content.toLowerCase().contains(value.toLowerCase());
+
+  @override
+  String toString() => '$subject $title';
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) {
+      return true;
+    }
+    if (other is Message) {
+      return subject == other.subject &&
+          title == other.title &&
+          contactDateTime == other.contactDateTime;
+    }
+    return false;
+  }
+
+  @override
+  int get hashCode =>
+      subject.hashCode ^ title.hashCode ^ contactDateTime.hashCode;
+
+  static List<Message> generateMessages() {
+    return [
+      Message('応用プログラミングA', '山田太郎', '課題', '課題', DateTime.now(), DateTime.now(),
+          '課題', '通常', '',
+          isAcquired: false, isArchived: false),
+    ];
   }
 }
-
-var subjects = Subject.generateSubjects();

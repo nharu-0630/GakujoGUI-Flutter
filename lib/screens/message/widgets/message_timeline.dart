@@ -44,7 +44,7 @@ class MessageTimeline extends StatelessWidget {
         Align(
           alignment: Alignment.centerRight,
           child: Text(
-            message.dateTime,
+            message.contactDateTime.toString(),
             style: const TextStyle(color: Colors.grey),
           ),
         ),

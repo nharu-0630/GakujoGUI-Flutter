@@ -23,7 +23,7 @@ class _DatePickerState extends State<DatePicker> {
         (i) => startDate.add(Duration(days: i)));
     return Container(
       height: 80,
-      padding: const EdgeInsets.only(top: 20),
+      padding: const EdgeInsets.only(top: 15),
       decoration: const BoxDecoration(
         borderRadius: BorderRadius.only(
           topLeft: Radius.circular(30),

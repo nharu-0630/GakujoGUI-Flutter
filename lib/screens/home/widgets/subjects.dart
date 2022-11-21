@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:gakujo_task/models/subject.dart';
 
 class RecentSubjects extends StatelessWidget {
-  final subjectList = Subject.generateSubjects();
+  final subjects = Subject.generateSubjects();
 
   RecentSubjects({Key? key}) : super(key: key);
 
@@ -14,13 +14,13 @@ class RecentSubjects extends StatelessWidget {
           shrinkWrap: true,
           physics: const BouncingScrollPhysics(),
           scrollDirection: Axis.horizontal,
-          itemCount: subjectList.length,
+          itemCount: subjects.length,
           gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
               crossAxisCount: 1, crossAxisSpacing: 10, mainAxisSpacing: 10),
           itemBuilder: ((context, index) => Container(
                 padding: const EdgeInsets.all(5),
                 decoration: BoxDecoration(
-                  color: subjectList[index].bgColor,
+                  color: subjects[index].bgColor,
                   shape: BoxShape.circle,
                 ),
                 child: Column(
@@ -28,7 +28,7 @@ class RecentSubjects extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
-                      '${subjectList[index].className.substring(0, 1)}\n${subjectList[index].className.substring(subjectList[index].className.length - 1)}',
+                      '${subjects[index].className.substring(0, 1)}\n${subjects[index].className.substring(subjects[index].className.length - 1)}',
                       textAlign: TextAlign.center,
                       style: const TextStyle(
                           fontWeight: FontWeight.bold, fontSize: 16),

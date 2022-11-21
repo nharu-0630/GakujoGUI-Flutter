@@ -38,6 +38,14 @@ dependencies:
   intl: ^0.17.0
   sticky_headers: "^0.3.0"
   package_info_plus: ^3.0.2
+  cookie_jar: ^3.0.1
+  dio: ^4.0.6
+  dio_cookie_manager: ^2.0.0
+  encrypted_shared_preferences: ^3.0.1
+  html: ^0.15.1
+  shared_preferences: ^2.0.15
+  wakelock: ^0.6.2
+  html_unescape: ^2.0.0
 
 dev_dependencies:
   flutter_test:

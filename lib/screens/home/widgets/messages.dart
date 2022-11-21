@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:gakujo_task/constants/colors.dart';
 import 'package:gakujo_task/models/message.dart';
+import 'package:gakujo_task/models/subject.dart';
 import 'package:gakujo_task/screens/message/message.dart';
 
 class Messages extends StatelessWidget {
-  final messageMap = Message.generateMessages();
+  final subjects = Subject.generateSubjects();
+  final messages = Message.generateMessages();
 
   Messages({Key? key}) : super(key: key);
 
@@ -16,7 +18,7 @@ class Messages extends StatelessWidget {
         child: GridView.builder(
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
-          itemCount: messageMap.length,
+          itemCount: messages.length,
           gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
               childAspectRatio: 6,
               crossAxisCount: 1,
@@ -27,12 +29,16 @@ class Messages extends StatelessWidget {
   }
 
   Widget _buildMessages(BuildContext context, int index) {
+    final subject = subjects[index];
+    final message = messages
+        .where(
+          (element) => element.subject == subject.className,
+        )
+        .toList();
     return GestureDetector(
         onTap: () {
           Navigator.of(context).push(MaterialPageRoute(
-              builder: (context) => MessagePage(
-                  messageMap.keys.elementAt(index),
-                  messageMap.values.elementAt(index))));
+              builder: (context) => MessagePage(subject, message)));
         },
         child: Container(
           margin: const EdgeInsets.only(top: 5),
@@ -44,15 +50,15 @@ class Messages extends StatelessWidget {
                 Padding(
                   padding: const EdgeInsets.symmetric(vertical: 5),
                   child: Text(
-                    messageMap.keys.elementAt(index).className,
+                    subject.className,
                     style: const TextStyle(
                         fontWeight: FontWeight.bold, fontSize: 16),
                   ),
                 ),
                 Align(
                     child: Text(
-                  messageMap.values.elementAt(index).isNotEmpty
-                      ? messageMap.values.elementAt(index).last.dateTime
+                  message.isNotEmpty
+                      ? message.last.contactDateTime.toLocal().toString()
                       : '',
                   style: const TextStyle(color: kGreyLight),
                 ))
@@ -62,12 +68,8 @@ class Messages extends StatelessWidget {
               width: 300,
               child: Flexible(
                   child: Text(
-                messageMap.values.elementAt(index).isNotEmpty
-                    ? messageMap.values
-                        .elementAt(index)
-                        .last
-                        .content
-                        .replaceAll('\n', ' ')
+                message.isNotEmpty
+                    ? message.last.content.replaceAll('\n', ' ')
                     : 'メッセージなし',
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
