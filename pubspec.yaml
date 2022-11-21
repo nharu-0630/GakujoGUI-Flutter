@@ -35,9 +35,9 @@ dependencies:
   cupertino_icons: ^1.0.2
   dotted_border: ^2.0.0+3
   timeline_tile: ^2.0.0
-  package_info: ^2.0.2
   intl: ^0.17.0
   sticky_headers: "^0.3.0"
+  package_info_plus: ^3.0.2
 
 dev_dependencies:
   flutter_test:

@@ -3,6 +3,7 @@ import 'package:gakujo_task/screens/home/widgets/messages.dart';
 import 'package:gakujo_task/screens/home/widgets/status.dart';
 import 'package:gakujo_task/screens/home/widgets/subjects.dart';
 import 'package:gakujo_task/screens/home/widgets/tasks.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:sticky_headers/sticky_headers.dart';
 
 class HomePage extends StatelessWidget {
@@ -139,12 +140,28 @@ class HomePage extends StatelessWidget {
               ]),
         ),
         Positioned(
-            right: 10,
-            bottom: 10,
-            child: Text(
-              'Client Version: \nAPI Version: ',
-              style: TextStyle(color: Colors.grey[700]),
-            )),
+          right: 10,
+          bottom: 10,
+          child: FutureBuilder(
+            future: PackageInfo.fromPlatform(),
+            builder: (context, AsyncSnapshot<PackageInfo> snapshot) {
+              if (!snapshot.hasData) {
+                return Text(
+                  'Client Version: \nAPI Version: ',
+                  style: TextStyle(color: Colors.grey[700]),
+                );
+              }
+              return Text(
+                'Client Version: ${snapshot.data!.version}\nAPI Version: ',
+                style: TextStyle(color: Colors.grey[700]),
+              );
+            },
+          ),
+          // Text(
+          //   'Client Version: \nAPI Version: ',
+          //   style: TextStyle(color: Colors.grey[700]),
+          // )
+        ),
       ]),
     );
   }
