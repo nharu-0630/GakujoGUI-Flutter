@@ -3,7 +3,7 @@ import 'package:gakujo_task/models/message.dart';
 
 class MessageTimeline extends StatelessWidget {
   final Message message;
-  MessageTimeline(this.message);
+  const MessageTimeline(this.message, {Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {

@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:gakujo_task/screens/home/widgets/messages.dart';
-import 'package:gakujo_task/screens/home/widgets/subjects.dart';
 import 'package:gakujo_task/screens/home/widgets/status.dart';
+import 'package:gakujo_task/screens/home/widgets/subjects.dart';
 import 'package:gakujo_task/screens/home/widgets/tasks.dart';
 import 'package:sticky_headers/sticky_headers.dart';
 
 class HomePage extends StatelessWidget {
+  const HomePage({Key? key}) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -15,7 +17,7 @@ class HomePage extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Status(),
+            const Status(),
             StickyHeader(
               header: Container(
                 width: double.infinity,
@@ -75,7 +77,7 @@ class HomePage extends StatelessWidget {
       backgroundColor: Colors.white,
       elevation: 0,
       title: Row(children: [
-        Container(
+        SizedBox(
           height: 45,
           width: 45,
           child: ClipRRect(
@@ -89,7 +91,7 @@ class HomePage extends StatelessWidget {
               color: Colors.black,
               fontSize: 26,
               fontWeight: FontWeight.bold,
-            ))
+            )),
       ]),
     );
   }
@@ -136,7 +138,7 @@ class HomePage extends StatelessWidget {
             child: Text(
               'Client Version: \nAPI Version: ',
               style: TextStyle(color: Colors.grey[700]),
-            ))
+            )),
       ]),
     );
   }

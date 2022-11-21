@@ -5,7 +5,7 @@ import 'package:gakujo_task/screens/task/widgets/task_timeline.dart';
 
 class TaskPage extends StatelessWidget {
   final Task task;
-  TaskPage(this.task);
+  const TaskPage(this.task, {Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -27,7 +27,7 @@ class TaskPage extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    DatePicker(),
+                    const DatePicker(),
                     Container(
                       padding: const EdgeInsets.all(15),
                       child: Row(

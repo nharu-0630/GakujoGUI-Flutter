@@ -5,6 +5,8 @@ import 'package:gakujo_task/screens/task/task.dart';
 class Tasks extends StatelessWidget {
   final taskList = Task.generateTasks();
 
+  Tasks({Key? key}) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
     return Container(

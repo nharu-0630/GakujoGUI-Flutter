@@ -6,6 +6,8 @@ import 'package:gakujo_task/screens/message/message.dart';
 class Messages extends StatelessWidget {
   final messageMap = Message.generateMessages();
 
+  Messages({Key? key}) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -49,7 +51,9 @@ class Messages extends StatelessWidget {
                 ),
                 Align(
                     child: Text(
-                  messageMap.values.elementAt(index).last.dateTime,
+                  messageMap.values.elementAt(index).isNotEmpty
+                      ? messageMap.values.elementAt(index).last.dateTime
+                      : '',
                   style: const TextStyle(color: kGreyLight),
                 ))
               ],
@@ -58,11 +62,13 @@ class Messages extends StatelessWidget {
               width: 300,
               child: Flexible(
                   child: Text(
-                messageMap.values
-                    .elementAt(index)
-                    .last
-                    .content
-                    .replaceAll('\n', ' '),
+                messageMap.values.elementAt(index).isNotEmpty
+                    ? messageMap.values
+                        .elementAt(index)
+                        .last
+                        .content
+                        .replaceAll('\n', ' ')
+                    : 'メッセージなし',
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
               )),

@@ -3,7 +3,7 @@ import 'package:timeline_tile/timeline_tile.dart';
 
 class TaskTimeline extends StatelessWidget {
   final Map<String, dynamic> detail;
-  TaskTimeline(this.detail);
+  const TaskTimeline(this.detail, {Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {

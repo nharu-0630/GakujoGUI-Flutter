@@ -6,7 +6,8 @@ import 'package:gakujo_task/screens/message/widgets/message_timeline.dart';
 class MessagePage extends StatelessWidget {
   final Subject subject;
   final List<Message> messageList;
-  MessagePage(this.subject, this.messageList);
+  const MessagePage(this.subject, this.messageList, {Key? key})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {

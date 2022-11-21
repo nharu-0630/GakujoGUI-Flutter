@@ -4,6 +4,8 @@ import 'package:gakujo_task/models/subject.dart';
 class RecentSubjects extends StatelessWidget {
   final subjectList = Subject.generateSubjects();
 
+  RecentSubjects({Key? key}) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -25,10 +27,12 @@ class RecentSubjects extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Text(subjectList[index].className.substring(0, 1)),
-                    Text(subjectList[index]
-                        .className
-                        .substring(subjectList[index].className.length - 1)),
+                    Text(
+                      '${subjectList[index].className.substring(0, 1)}\n${subjectList[index].className.substring(subjectList[index].className.length - 1)}',
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(
+                          fontWeight: FontWeight.bold, fontSize: 16),
+                    ),
                   ],
                 ),
               ))),

@@ -3,6 +3,8 @@ import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart';
 
 class DatePicker extends StatefulWidget {
+  const DatePicker({Key? key}) : super(key: key);
+
   @override
   State<DatePicker> createState() => _DatePickerState();
 }
