@@ -20,8 +20,8 @@ class _DatePickerState extends State<DatePicker> {
         startDate.difference(endDate).inDays,
         (i) => startDate.add(Duration(days: i)));
     return Container(
-      height: 100,
-      padding: const EdgeInsets.symmetric(vertical: 20),
+      height: 80,
+      padding: const EdgeInsets.only(top: 20),
       decoration: const BoxDecoration(
         borderRadius: BorderRadius.only(
           topLeft: Radius.circular(30),

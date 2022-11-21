@@ -72,12 +72,6 @@ class TaskPage extends StatelessWidget {
         icon: const Icon(Icons.arrow_back_ios),
         iconSize: 20,
       ),
-      // actions: const [
-      //   Icon(
-      //     Icons.more_vert,
-      //     size: 40,
-      //   )
-      // ],
       flexibleSpace: FlexibleSpaceBar(
         title: Column(
           mainAxisAlignment: MainAxisAlignment.end,
@@ -87,9 +81,8 @@ class TaskPage extends StatelessWidget {
               '${task.title}',
               style: const TextStyle(fontWeight: FontWeight.bold),
             ),
-            // const SizedBox(height: 5),
             Text(
-              '今日のタスクは${task.left}件あります',
+              '${task.left}件のタスク',
               style: TextStyle(fontSize: 12, color: Colors.grey[700]),
             )
           ],
