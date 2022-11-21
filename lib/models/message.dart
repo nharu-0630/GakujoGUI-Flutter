@@ -17,7 +17,10 @@ class Message {
             '2022/11/21 12:19')
       ],
       subjects[1]: [],
-      subjects[2]: []
+      subjects[2]: [],
+      subjects[3]: [],
+      subjects[4]: [],
+      subjects[5]: []
     };
   }
 }
