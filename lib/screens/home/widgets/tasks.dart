@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:gakujo_task/models/task.dart';
-import 'package:gakujo_task/screens/detail/detail.dart';
+import 'package:gakujo_task/screens/task/task.dart';
 
 class Tasks extends StatelessWidget {
   final taskList = Task.generateTasks();
@@ -24,7 +24,7 @@ class Tasks extends StatelessWidget {
     return GestureDetector(
       onTap: () {
         Navigator.of(context)
-            .push(MaterialPageRoute(builder: (context) => DetailPage(task)));
+            .push(MaterialPageRoute(builder: (context) => TaskPage(task)));
       },
       child: Container(
         padding: const EdgeInsets.all(15),

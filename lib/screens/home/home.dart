@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:gakujo_task/screens/home/widgets/messages.dart';
-import 'package:gakujo_task/screens/home/widgets/recent_subjects.dart';
+import 'package:gakujo_task/screens/home/widgets/subjects.dart';
 import 'package:gakujo_task/screens/home/widgets/status.dart';
 import 'package:gakujo_task/screens/home/widgets/tasks.dart';
 import 'package:sticky_headers/sticky_headers.dart';

@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:gakujo_task/models/task.dart';
-import 'package:gakujo_task/screens/detail/widgets/date_picker.dart';
-import 'package:gakujo_task/screens/detail/widgets/task_timeline.dart';
+import 'package:gakujo_task/screens/task/widgets/date_picker.dart';
+import 'package:gakujo_task/screens/task/widgets/task_timeline.dart';
 
-class DetailPage extends StatelessWidget {
+class TaskPage extends StatelessWidget {
   final Task task;
-  DetailPage(this.task);
+  TaskPage(this.task);
 
   @override
   Widget build(BuildContext context) {

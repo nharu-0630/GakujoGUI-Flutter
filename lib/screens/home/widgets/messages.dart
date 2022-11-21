@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gakujo_task/constants/colors.dart';
 import 'package:gakujo_task/models/message.dart';
 
 class Messages extends StatelessWidget {
@@ -14,7 +15,7 @@ class Messages extends StatelessWidget {
           physics: const NeverScrollableScrollPhysics(),
           itemCount: messageList.length,
           gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              childAspectRatio: 4,
+              childAspectRatio: 5,
               crossAxisCount: 1,
               crossAxisSpacing: 10,
               mainAxisSpacing: 10),
@@ -26,12 +27,23 @@ class Messages extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 5),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Padding(
-          padding: const EdgeInsets.symmetric(vertical: 5),
-          child: Text(
-            messageList[index].subject.className,
-            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-          ),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 5),
+              child: Text(
+                messageList[index].subject.className,
+                style:
+                    const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+              ),
+            ),
+            Align(
+                child: Text(
+              messageList[index].lastTime,
+              style: const TextStyle(color: kGreyLight),
+            ))
+          ],
         ),
         SizedBox(
           width: 300,
@@ -42,9 +54,6 @@ class Messages extends StatelessWidget {
             overflow: TextOverflow.ellipsis,
           )),
         ),
-        Align(
-            alignment: Alignment.centerRight,
-            child: Text(messageList[index].lastTime))
       ]),
     );
   }
