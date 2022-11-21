@@ -61,7 +61,8 @@ class MessagePage extends StatelessWidget {
               : SliverList(
                   delegate: SliverChildBuilderDelegate(
                       (_, index) => MessageTimeline(messageList[index]),
-                      childCount: messageList.length))
+                      childCount: messageList.length),
+                )
         ],
       ),
     );

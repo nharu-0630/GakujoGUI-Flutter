@@ -6,6 +6,8 @@ import 'package:gakujo_task/screens/home/widgets/tasks.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:sticky_headers/sticky_headers.dart';
 
+import '../../api/api.dart';
+
 class HomePage extends StatelessWidget {
   const HomePage({Key? key}) : super(key: key);
 
@@ -50,16 +52,20 @@ class HomePage extends StatelessWidget {
                                 fontSize: 22, fontWeight: FontWeight.bold),
                           ),
                         ),
-                        Container(
-                          padding: const EdgeInsets.symmetric(vertical: 5),
-                          child: SizedBox(
-                              height: 60,
-                              child: Expanded(child: RecentSubjects())),
+                        Align(
+                          alignment: Alignment.topLeft,
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(vertical: 5),
+                            child: SizedBox(
+                                height: 60,
+                                child: Expanded(child: RecentSubjects())),
+                          ),
                         ),
                       ],
                     ),
                   ),
                   content: Messages()),
+              const SizedBox(height: 15)
             ],
           ),
         ),
@@ -152,7 +158,7 @@ class HomePage extends StatelessWidget {
                 );
               }
               return Text(
-                'Client Version: ${snapshot.data!.version}\nAPI Version: ',
+                'Client Version: ${snapshot.data!.version}\nAPI Version: ${Api.version}',
                 style: TextStyle(color: Colors.grey[700]),
               );
             },

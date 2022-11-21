@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:gakujo_task/constants/colors.dart';
+import 'package:gakujo_task/models/quiz.dart';
+import 'package:gakujo_task/models/report.dart';
 
 class Task {
   IconData? iconData;
@@ -25,78 +26,28 @@ class Task {
 
   static List<Task> generateTasks() {
     return [
-      Task(
-          iconData: Icons.text_snippet_rounded,
-          title: 'レポート',
-          bgColor: kYellowLight,
-          iconColor: kYellowDark,
-          btnColor: kYellow,
-          left: 3,
-          done: 1,
-          desc: [
-            {
-              'time': '9:00',
-              'title': '第7回 レポート課題',
-              'slot': '応用プログラミングB',
-              'tlColor': kYellowDark,
-              'bgColor': kYellowLight,
-            },
-            {
-              'time': '10:00',
-              'title': 'オプション課題4',
-              'slot': '応用プログラミングB',
-              'tlColor': kYellowDark,
-              'bgColor': kYellowLight,
-            },
-            {
-              'time': '13:00',
-              'title': '第7回（11/16）お題',
-              'slot': 'コンパイラ',
-              'tlColor': kYellowDark,
-              'bgColor': kYellowLight,
-            },
-          ]),
-      Task(
-          iconData: Icons.quiz_rounded,
-          title: '小テスト',
-          bgColor: kRedLight,
-          iconColor: kRedDark,
-          btnColor: kRed,
-          left: 2,
-          done: 8,
-          desc: [
-            {
-              'time': '9:00',
-              'title': '第7回 レポート課題',
-              'slot': '応用プログラミングB',
-              'tlColor': kYellowDark,
-              'bgColor': kYellowLight,
-            },
-            {
-              'time': '10:00',
-              'title': 'オプション課題4',
-              'slot': '応用プログラミングB',
-              'tlColor': kYellowDark,
-              'bgColor': kYellowLight,
-            },
-            {
-              'time': '13:00',
-              'title': '第7回（11/16）お題',
-              'slot': 'コンパイラ',
-              'tlColor': kYellowDark,
-              'bgColor': kYellowLight,
-            },
-          ]),
-      // Task(
-      //   iconData: Icons.favorite_rounded,
-      //   title: 'Health',
-      //   bgColor: kBlueLight,
-      //   iconColor: kBlueDark,
-      //   btnColor: kBlue,
-      //   left: 1,
-      //   done: 1,
-      // ),
-      // Task(isLast: true)
+      Report.toTask([
+        Report('科目A', 'レポート1', '0', '2022', '0', '0', '', DateTime.now(),
+            DateTime.now(), '', '', DateTime.now(), '', '', '',
+            isAcquired: false, isArchived: false),
+        Report('科目B', 'レポート2', '0', '2022', '0', '0', '', DateTime.now(),
+            DateTime.now(), '', '', DateTime.now(), '', '', '',
+            isAcquired: false, isArchived: false),
+        Report('科目C', 'レポート3', '0', '2022', '0', '0', '', DateTime.now(),
+            DateTime.now(), '', '', DateTime.now(), '', '', '',
+            isAcquired: false, isArchived: false)
+      ]),
+      Quiz.toTask([
+        Quiz('科目A', '小テスト1', '0', '2022', '0', '0', '', DateTime.now(),
+            DateTime.now(), '', '', '', 0, '', '', '',
+            isAcquired: false, isArchived: false),
+        Quiz('科目B', '小テスト2', '0', '2022', '0', '0', '', DateTime.now(),
+            DateTime.now(), '', '', '', 0, '', '', '',
+            isAcquired: false, isArchived: false),
+        Quiz('科目C', '小テスト3', '0', '2022', '0', '0', '', DateTime.now(),
+            DateTime.now(), '', '', '', 0, '', '', '',
+            isAcquired: false, isArchived: false),
+      ])
     ];
   }
 }

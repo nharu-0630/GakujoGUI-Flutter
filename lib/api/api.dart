@@ -11,9 +11,12 @@ import 'package:gakujo_task/models/report.dart';
 // import 'package:flutter_app_badger/flutter_app_badger.dart';
 import 'package:html/dom.dart';
 import 'package:html/parser.dart' show parse;
+import 'package:version/version.dart';
 import 'package:wakelock/wakelock.dart';
 
-class GakujoApi {
+class Api {
+  static final Version version = Version(1, 0, 0);
+
   final int year;
   final int semester;
   final String username;
@@ -23,7 +26,7 @@ class GakujoApi {
   String _token = '';
   CookieJar _cookieJar = CookieJar();
 
-  GakujoApi(this.year, this.semester, this.username, this.password);
+  Api(this.year, this.semester, this.username, this.password);
 
   String get schoolYear => year.toString();
   String get semesterCode => (semester < 2 ? 1 : 2).toString();

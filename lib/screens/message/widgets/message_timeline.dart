@@ -21,24 +21,27 @@ class MessageTimeline extends StatelessWidget {
   Widget _buildCard(Message message) {
     return Column(
       children: [
-        Container(
-          decoration: BoxDecoration(
-            color: Colors.grey[300],
-            borderRadius: const BorderRadius.only(
-                topRight: Radius.circular(10),
-                bottomLeft: Radius.circular(10),
-                bottomRight: Radius.circular(10)),
-          ),
-          padding: const EdgeInsets.all(15),
-          margin: const EdgeInsets.all(5),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(message.title,
-                  style: const TextStyle(fontWeight: FontWeight.bold)),
-              const SizedBox(height: 5),
-              Text(message.content),
-            ],
+        Align(
+          alignment: Alignment.centerLeft,
+          child: Container(
+            decoration: BoxDecoration(
+              color: Colors.grey[300],
+              borderRadius: const BorderRadius.only(
+                  topRight: Radius.circular(10),
+                  bottomLeft: Radius.circular(10),
+                  bottomRight: Radius.circular(10)),
+            ),
+            padding: const EdgeInsets.all(15),
+            margin: const EdgeInsets.all(5),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(message.title,
+                    style: const TextStyle(fontWeight: FontWeight.bold)),
+                const SizedBox(height: 5),
+                Text(message.content),
+              ],
+            ),
           ),
         ),
         Align(

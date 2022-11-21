@@ -146,8 +146,14 @@ class Message {
 
   static List<Message> generateMessages() {
     return [
-      Message('応用プログラミングA', '山田太郎', '課題', '課題', DateTime.now(), DateTime.now(),
-          '課題', '通常', '',
+      Message('科目A', '教員1', 'メッセージ1', '', DateTime.now(), DateTime.now(),
+          'メッセージ1', '', '',
+          isAcquired: false, isArchived: false),
+      Message('科目B', '教員2', 'メッセージ2', '', DateTime.now(), DateTime.now(),
+          'メッセージ2', '', '',
+          isAcquired: false, isArchived: false),
+      Message('科目C', '教員3', 'メッセージ3', '', DateTime.now(), DateTime.now(),
+          'メッセージ3', '', '',
           isAcquired: false, isArchived: false),
     ];
   }

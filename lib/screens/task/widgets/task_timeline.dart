@@ -19,7 +19,7 @@ class TaskTimeline extends StatelessWidget {
           children: [
             Padding(
               padding: const EdgeInsets.only(top: 3),
-              child: Text(detail['time']),
+              child: Text(detail['time'].toString()),
             ),
             detail['title'].isNotEmpty
                 ? _buildCard(detail['bgColor'], detail['title'], detail['slot'])
