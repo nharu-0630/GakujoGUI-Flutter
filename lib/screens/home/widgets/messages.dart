@@ -18,7 +18,7 @@ class Messages extends StatelessWidget {
           physics: const NeverScrollableScrollPhysics(),
           itemCount: messageMap.length,
           gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              childAspectRatio: 5,
+              childAspectRatio: 6,
               crossAxisCount: 1,
               crossAxisSpacing: 10,
               mainAxisSpacing: 10),
@@ -35,7 +35,7 @@ class Messages extends StatelessWidget {
                   messageMap.values.elementAt(index))));
         },
         child: Container(
-          margin: const EdgeInsets.symmetric(vertical: 5),
+          margin: const EdgeInsets.only(top: 5),
           child:
               Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             Row(

@@ -13,49 +13,54 @@ class HomePage extends StatelessWidget {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: _buildAppBar(),
-      body: SingleChildScrollView(
-        physics: const BouncingScrollPhysics(),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Status(),
-            StickyHeader(
-              header: Container(
-                width: double.infinity,
-                color: Colors.white,
-                padding: const EdgeInsets.all(15),
-                child: const Text(
-                  'タスク',
-                  style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
-                ),
-              ),
-              content: Tasks(),
-            ),
-            StickyHeader(
+      body: RefreshIndicator(
+        onRefresh: () {
+          return Future.delayed(const Duration(seconds: 1));
+        },
+        child: SingleChildScrollView(
+          physics: const BouncingScrollPhysics(),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Status(),
+              StickyHeader(
                 header: Container(
+                  width: double.infinity,
                   color: Colors.white,
-                  child: Column(
-                    children: [
-                      Container(
-                        width: double.infinity,
-                        padding: const EdgeInsets.all(15),
-                        child: const Text(
-                          'メッセージ',
-                          style: TextStyle(
-                              fontSize: 22, fontWeight: FontWeight.bold),
-                        ),
-                      ),
-                      Container(
-                        padding: const EdgeInsets.symmetric(vertical: 5),
-                        child: SizedBox(
-                            height: 60,
-                            child: Expanded(child: RecentSubjects())),
-                      ),
-                    ],
+                  padding: const EdgeInsets.all(15),
+                  child: const Text(
+                    'タスク',
+                    style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
                   ),
                 ),
-                content: Messages()),
-          ],
+                content: Tasks(),
+              ),
+              StickyHeader(
+                  header: Container(
+                    color: Colors.white,
+                    child: Column(
+                      children: [
+                        Container(
+                          width: double.infinity,
+                          padding: const EdgeInsets.all(15),
+                          child: const Text(
+                            'メッセージ',
+                            style: TextStyle(
+                                fontSize: 22, fontWeight: FontWeight.bold),
+                          ),
+                        ),
+                        Container(
+                          padding: const EdgeInsets.symmetric(vertical: 5),
+                          child: SizedBox(
+                              height: 60,
+                              child: Expanded(child: RecentSubjects())),
+                        ),
+                      ],
+                    ),
+                  ),
+                  content: Messages()),
+            ],
+          ),
         ),
       ),
       bottomNavigationBar: _buildBottomNavigationBar(),

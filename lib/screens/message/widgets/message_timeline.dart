@@ -12,13 +12,13 @@ class MessageTimeline extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 15),
       child: Row(children: [
         Expanded(
-          child: _buildCard(message.content, message.dateTime),
+          child: _buildCard(message),
         )
       ]),
     );
   }
 
-  Widget _buildCard(String content, String dateTime) {
+  Widget _buildCard(Message message) {
     return Column(
       children: [
         Container(
@@ -34,21 +34,21 @@ class MessageTimeline extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                content,
-                style: const TextStyle(fontWeight: FontWeight.bold),
-              ),
+              Text(message.title,
+                  style: const TextStyle(fontWeight: FontWeight.bold)),
+              const SizedBox(height: 5),
+              Text(message.content),
             ],
           ),
         ),
         Align(
           alignment: Alignment.centerRight,
           child: Text(
-            dateTime,
+            message.dateTime,
             style: const TextStyle(color: Colors.grey),
           ),
         ),
-        const SizedBox(height: 10),
+        const SizedBox(height: 15),
       ],
     );
   }
