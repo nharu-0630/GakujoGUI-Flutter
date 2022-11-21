@@ -14,12 +14,38 @@ class Messages extends StatelessWidget {
           physics: const NeverScrollableScrollPhysics(),
           itemCount: messageList.length,
           gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 1, crossAxisSpacing: 10, mainAxisSpacing: 10),
-          itemBuilder: ((context, index) => _buildMessages()),
+              childAspectRatio: 4,
+              crossAxisCount: 1,
+              crossAxisSpacing: 10,
+              mainAxisSpacing: 10),
+          itemBuilder: ((context, index) => _buildMessages(index)),
         ));
   }
 
-  Widget _buildMessages() {
-    return const Text('data');
+  Widget _buildMessages(int index) {
+    return Container(
+      margin: const EdgeInsets.symmetric(vertical: 5),
+      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Padding(
+          padding: const EdgeInsets.symmetric(vertical: 5),
+          child: Text(
+            messageList[index].subject.className,
+            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+          ),
+        ),
+        SizedBox(
+          width: 300,
+          child: Flexible(
+              child: Text(
+            messageList[index].lastMessage.replaceAll('\n', ' '),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          )),
+        ),
+        Align(
+            alignment: Alignment.centerRight,
+            child: Text(messageList[index].lastTime))
+      ]),
+    );
   }
 }

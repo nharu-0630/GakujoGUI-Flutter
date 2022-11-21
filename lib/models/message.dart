@@ -11,7 +11,15 @@ class Message {
 
   static List<Message> generateMessages() {
     return [
-      Message(subjects[0], 'lastMessage', 'lastTime'),
+      Message(subjects[0], 'lastMessage\nlastMessagelastMessage\nlastMessage',
+          'lastTime'),
+      Message(subjects[1], 'lastMessage', 'lastTime'),
+      Message(subjects[2], 'lastMessage', 'lastTime'),
+      Message(subjects[3], 'lastMessage', 'lastTime'),
+      Message(subjects[4], 'lastMessage', 'lastTime'),
+      Message(subjects[5], 'lastMessage', 'lastTime'),
+      Message(subjects[0], 'lastMessage\nlastMessagelastMessage\nlastMessage',
+          'lastTime'),
       Message(subjects[1], 'lastMessage', 'lastTime'),
       Message(subjects[2], 'lastMessage', 'lastTime'),
       Message(subjects[3], 'lastMessage', 'lastTime'),
