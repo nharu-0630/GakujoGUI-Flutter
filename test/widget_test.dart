@@ -7,7 +7,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-
+import 'package:gakujo_task/api/api.dart';
 import 'package:gakujo_task/main.dart';
 
 void main() {
@@ -26,5 +26,14 @@ void main() {
     // Verify that our counter has incremented.
     expect(find.text('0'), findsNothing);
     expect(find.text('1'), findsOneWidget);
+  });
+
+  group('API test', () {
+    final api = Api(2022, 2, const String.fromEnvironment('STRING_VALUE'),
+        const String.fromEnvironment('STRING_VALUE'));
+
+    test("login", () {
+      expect(articleListForText.dataSource.length, 6);
+    });
   });
 }

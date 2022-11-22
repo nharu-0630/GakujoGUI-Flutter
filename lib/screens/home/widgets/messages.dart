@@ -20,11 +20,11 @@ class Messages extends StatelessWidget {
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
           itemCount: subjects.length,
-          itemBuilder: ((context, index) => _buildMessages(context, index)),
+          itemBuilder: ((context, index) => _buildMessage(context, index)),
         ));
   }
 
-  Widget _buildMessages(BuildContext context, int index) {
+  Widget _buildMessage(BuildContext context, int index) {
     final subject = subjects[index];
     final message = messages
         .where(

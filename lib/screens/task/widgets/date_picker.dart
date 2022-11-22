@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart';
 
 class DatePicker extends StatefulWidget {
@@ -14,7 +13,6 @@ class _DatePickerState extends State<DatePicker> {
 
   @override
   Widget build(BuildContext context) {
-    initializeDateFormatting('ja');
     final startDate =
         DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day);
     final endDate = startDate.subtract(const Duration(days: 60));
