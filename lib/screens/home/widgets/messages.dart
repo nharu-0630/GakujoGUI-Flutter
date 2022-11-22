@@ -19,7 +19,7 @@ class Messages extends StatelessWidget {
         child: ListView.builder(
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
-          itemCount: messages.length,
+          itemCount: subjects.length,
           itemBuilder: ((context, index) => _buildMessages(context, index)),
         ));
   }
