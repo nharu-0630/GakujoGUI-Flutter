@@ -10,15 +10,14 @@ class RecentSubjects extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 15),
-      child: GridView.builder(
+      child: ListView.builder(
           shrinkWrap: true,
           physics: const BouncingScrollPhysics(),
           scrollDirection: Axis.horizontal,
           itemCount: subjects.length,
-          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 1, crossAxisSpacing: 10, mainAxisSpacing: 10),
           itemBuilder: ((context, index) => Container(
-                padding: const EdgeInsets.all(5),
+                margin: const EdgeInsets.symmetric(horizontal: 5),
+                width: 60,
                 decoration: BoxDecoration(
                   color: subjects[index].bgColor,
                   shape: BoxShape.circle,

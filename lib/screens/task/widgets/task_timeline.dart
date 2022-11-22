@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:timeline_tile/timeline_tile.dart';
 
 class TaskTimeline extends StatelessWidget {
@@ -19,7 +20,10 @@ class TaskTimeline extends StatelessWidget {
           children: [
             Padding(
               padding: const EdgeInsets.only(top: 3),
-              child: Text(detail['time'].toString()),
+              child: Text(
+                DateFormat('yyyy/MM/dd\nHH:mm', 'ja')
+                    .format(detail['time'].toLocal()),
+              ),
             ),
             detail['title'].isNotEmpty
                 ? _buildCard(detail['bgColor'], detail['title'], detail['slot'])

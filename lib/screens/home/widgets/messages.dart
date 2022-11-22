@@ -3,6 +3,7 @@ import 'package:gakujo_task/constants/colors.dart';
 import 'package:gakujo_task/models/message.dart';
 import 'package:gakujo_task/models/subject.dart';
 import 'package:gakujo_task/screens/message/message.dart';
+import 'package:intl/intl.dart';
 
 class Messages extends StatelessWidget {
   final subjects = Subject.generateSubjects();
@@ -15,15 +16,10 @@ class Messages extends StatelessWidget {
     return Container(
         margin: const EdgeInsets.all(15),
         padding: const EdgeInsets.symmetric(horizontal: 15),
-        child: GridView.builder(
+        child: ListView.builder(
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
           itemCount: messages.length,
-          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              childAspectRatio: 6,
-              crossAxisCount: 1,
-              crossAxisSpacing: 10,
-              mainAxisSpacing: 10),
           itemBuilder: ((context, index) => _buildMessages(context, index)),
         ));
   }
@@ -41,7 +37,7 @@ class Messages extends StatelessWidget {
               builder: (context) => MessagePage(subject, message)));
         },
         child: Container(
-          margin: const EdgeInsets.only(top: 5),
+          margin: const EdgeInsets.symmetric(vertical: 10),
           child:
               Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             Row(
@@ -58,7 +54,8 @@ class Messages extends StatelessWidget {
                 Align(
                     child: Text(
                   message.isNotEmpty
-                      ? message.last.contactDateTime.toLocal().toString()
+                      ? DateFormat('yyyy/MM/dd HH:mm', 'ja')
+                          .format(message.last.contactDateTime.toLocal())
                       : '',
                   style: const TextStyle(color: kGreyLight),
                 ))

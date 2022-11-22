@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:gakujo_task/models/message.dart';
+import 'package:intl/intl.dart';
 
 class MessageTimeline extends StatelessWidget {
   final Message message;
@@ -47,7 +48,8 @@ class MessageTimeline extends StatelessWidget {
         Align(
           alignment: Alignment.centerRight,
           child: Text(
-            message.contactDateTime.toString(),
+            DateFormat('yyyy/MM/dd HH:mm', 'ja')
+                .format(message.contactDateTime.toLocal()),
             style: const TextStyle(color: Colors.grey),
           ),
         ),

@@ -54,12 +54,9 @@ class HomePage extends StatelessWidget {
                         ),
                         Align(
                           alignment: Alignment.topLeft,
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(vertical: 5),
-                            child: SizedBox(
-                                height: 60,
-                                child: Expanded(child: RecentSubjects())),
-                          ),
+                          child: SizedBox(
+                              height: 60,
+                              child: Expanded(child: RecentSubjects())),
                         ),
                       ],
                     ),
