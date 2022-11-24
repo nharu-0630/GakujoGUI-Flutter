@@ -47,6 +47,7 @@ dependencies:
   wakelock: ^0.6.2
   html_unescape: ^2.0.0
   version: ^3.0.0
+  flutter_dotenv: ^5.0.2
 
 dev_dependencies:
   flutter_test:
