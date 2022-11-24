@@ -303,6 +303,3 @@ fabric.properties
 !/gradle/wrapper/gradle-wrapper.jar
 
 # End of https://www.toptal.com/developers/gitignore/api/dart,macos,flutter,androidstudio,visualstudiocode,windows
-
-# environment variables file
-*.env*
