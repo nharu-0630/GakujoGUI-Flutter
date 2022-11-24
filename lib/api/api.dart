@@ -1,10 +1,6 @@
-import 'dart:developer';
-
 import 'package:cookie_jar/cookie_jar.dart';
 import 'package:dio/dio.dart';
 import 'package:dio_cookie_manager/dio_cookie_manager.dart';
-import 'package:flutter/foundation.dart';
-import 'package:gakujo_task/api/parse.dart';
 import 'package:gakujo_task/models/message.dart';
 import 'package:gakujo_task/models/quiz.dart';
 import 'package:gakujo_task/models/report.dart';
@@ -40,11 +36,10 @@ class Api {
                 .firstMatch(data.toString())
                 ?.group(0) ??
             _token;
-    if (kDebugMode) {
-      log(_token);
-    }
     return _token != '';
   }
+
+  bool hasToken() => _token != '';
 
   Future<bool> isConnected() async {
     await Wakelock.enable();
@@ -69,145 +64,142 @@ class Api {
     var response = await _client.getUri<dynamic>(
       Uri.https('gakujo.shizuoka.ac.jp', '/portal/'),
       options: Options(
-        validateStatus: (status) => status! == 200 || status == 500,
+        headers: <String, dynamic>{'User-Agent': 'Chrome/107.0.5304.110'},
       ),
     );
-    if (response.statusCode == 500) {
-      await Wakelock.disable();
-      return false;
-    }
-    response = await _client.postUri<dynamic>(
-      Uri.https('gakujo.shizuoka.ac.jp', '/portal/login/preLogin/preLogin'),
-      data: FormData.fromMap(<String, dynamic>{'mistakeChecker': '0'}),
-    );
-    response = await _client.getUri<dynamic>(
-      Uri.https('gakujo.shizuoka.ac.jp', '/UI/jsp/topPage/topPage.jsp'),
-    );
-    response = await _client.postUri<dynamic>(
-      Uri.https(
-        'gakujo.shizuoka.ac.jp',
-        '/portal/shibbolethlogin/shibbolethLogin/initLogin/sso',
-      ),
-      data: FormData.fromMap(<String, dynamic>{
-        'selectLocale': 'ja',
-        'mistakeChecker': '0',
-        'EXCLUDE_SET': ''
-      }),
-      options: Options(
-        followRedirects: false,
-        validateStatus: (status) => status! == 302,
-      ),
-    );
-    final samlRequest = Uri.decodeFull(
-      RegExp(r'(?<=SAMLRequest=).*(?=&amp;)')
-              .firstMatch(response.data.toString())
-              ?.group(0) ??
-          '',
-    );
-    var relayState = Uri.decodeFull(
-      RegExp(r'(?<=RelayState=).*(?=")')
-              .firstMatch(response.data.toString())
-              ?.group(0) ??
-          '',
-    ).replaceAll('&#x3a;', ':');
-    response = await _client.getUri<dynamic>(
-      Uri.https('idp.shizuoka.ac.jp',
-          '/idp/profile/SAML2/Redirect/SSO', <String, dynamic>{
-        'SAMLRequest': samlRequest,
-        'RelayState': relayState
-      }),
-      options: Options(
-        followRedirects: false,
-        validateStatus: (status) => status! == 302 || status == 200,
-      ),
-    );
-    if (response.statusCode != 200) {
-      response = await _client.getUri<dynamic>(
-        Uri.https(
-          'idp.shizuoka.ac.jp',
-          '/idp/profile/SAML2/Redirect/SSO',
-          <String, dynamic>{'execution': 'e1s1'},
-        ),
-      );
-      response = await _client.postUri<dynamic>(
-        Uri.https('idp.shizuoka.ac.jp',
-            '/idp/profile/SAML2/Redirect/SSO', <String, dynamic>{
-          'execution': 'e1s1',
-          'j_username': username,
-          'j_password': password,
-          '_eventId_proceed': ''
-        }),
-        options: Options(
-          validateStatus: (status) => status! == 302 || status == 200,
-        ),
-      );
-    }
-    if (response.statusCode == 302) {
-      await Wakelock.disable();
-      return false;
-    }
-    final samlResponse = Uri.decodeFull(
-      RegExp(r'(?<=SAMLResponse" value=").*(?=")')
-              .firstMatch(response.data.toString())
-              ?.group(0) ??
-          '',
-    );
-    relayState = Uri.decodeFull(
-      RegExp(r'(?<=RelayState" value=").*(?=")')
-              .firstMatch(response.data.toString())
-              ?.group(0) ??
-          '',
-    ).replaceAll('&#x3a;', ':');
-    response = await _client.postUri<dynamic>(
-      Uri.https(
-        'gakujo.shizuoka.ac.jp',
-        '/Shibboleth.sso/SAML2/POST',
-      ),
-      data: {'SAMLResponse': samlResponse, 'RelayState': relayState},
-      options: Options(
-        contentType: Headers.formUrlEncodedContentType,
-        followRedirects: false,
-        validateStatus: (status) => status! == 302,
-      ),
-    );
-    response = await _client.getUri<dynamic>(
-      Uri.https(
-        'gakujo.shizuoka.ac.jp',
-        '/portal/shibbolethlogin/shibbolethLogin/initLogin/sso',
-      ),
-      options: Options(
-        headers: <String, dynamic>{'Referer': 'https://idp.shizuoka.ac.jp/'},
-        followRedirects: false,
-        validateStatus: (status) => status! == 200 || status == 302,
-      ),
-    );
-    response = await _client.postUri<dynamic>(
-      Uri.https(
-        'gakujo.shizuoka.ac.jp',
-        '/portal/home/home/initialize',
-        <String, dynamic>{'EXCLUDE_SET': ''},
-      ),
-      options: Options(
-        headers: <String, dynamic>{'Referer': 'https://idp.shizuoka.ac.jp/'},
-      ),
-    );
-    final document = parse(response.data);
-    if (document.querySelector('table.ttb_sheet') != null) {
-      for (final row in document
-          .querySelector('table.ttb_sheet')!
-          .querySelectorAll('tr')
-          .skip(1)
-          .take(5)) {
-        for (final cell in row.querySelectorAll('td').take(5)) {
-          if (cell.text.trimWhiteSpace().isEmpty) {
-            continue;
-          }
-          // subjects.add(
-          //   cell.text.trim().replaceAll('\t', '').split('\n')[0].trimSubject(),
-          // );
-        }
-      }
-    }
+
+    // response = await _client.postUri<dynamic>(
+    //   Uri.https('gakujo.shizuoka.ac.jp', '/portal/login/preLogin/preLogin'),
+    //   data: FormData.fromMap(<String, dynamic>{'mistakeChecker': '0'}),
+    // );
+    // response = await _client.getUri<dynamic>(
+    //   Uri.https('gakujo.shizuoka.ac.jp', '/UI/jsp/topPage/topPage.jsp'),
+    // );
+    // response = await _client.postUri<dynamic>(
+    //   Uri.https(
+    //     'gakujo.shizuoka.ac.jp',
+    //     '/portal/shibbolethlogin/shibbolethLogin/initLogin/sso',
+    //   ),
+    //   data: FormData.fromMap(<String, dynamic>{
+    //     'selectLocale': 'ja',
+    //     'mistakeChecker': '0',
+    //     'EXCLUDE_SET': ''
+    //   }),
+    //   options: Options(
+    //     followRedirects: false,
+    //     validateStatus: (status) => status! == 302,
+    //   ),
+    // );
+    // final samlRequest = Uri.decodeFull(
+    //   RegExp(r'(?<=SAMLRequest=).*(?=&amp;)')
+    //           .firstMatch(response.data.toString())
+    //           ?.group(0) ??
+    //       '',
+    // );
+    // var relayState = Uri.decodeFull(
+    //   RegExp(r'(?<=RelayState=).*(?=")')
+    //           .firstMatch(response.data.toString())
+    //           ?.group(0) ??
+    //       '',
+    // ).replaceAll('&#x3a;', ':');
+    // response = await _client.getUri<dynamic>(
+    //   Uri.https('idp.shizuoka.ac.jp',
+    //       '/idp/profile/SAML2/Redirect/SSO', <String, dynamic>{
+    //     'SAMLRequest': samlRequest,
+    //     'RelayState': relayState
+    //   }),
+    //   options: Options(
+    //     followRedirects: false,
+    //     validateStatus: (status) => status! == 302 || status == 200,
+    //   ),
+    // );
+    // if (response.statusCode != 200) {
+    //   response = await _client.getUri<dynamic>(
+    //     Uri.https(
+    //       'idp.shizuoka.ac.jp',
+    //       '/idp/profile/SAML2/Redirect/SSO',
+    //       <String, dynamic>{'execution': 'e1s1'},
+    //     ),
+    //   );
+    //   response = await _client.postUri<dynamic>(
+    //     Uri.https('idp.shizuoka.ac.jp',
+    //         '/idp/profile/SAML2/Redirect/SSO', <String, dynamic>{
+    //       'execution': 'e1s1',
+    //       'j_username': username,
+    //       'j_password': password,
+    //       '_eventId_proceed': ''
+    //     }),
+    //     options: Options(
+    //       validateStatus: (status) => status! == 302 || status == 200,
+    //     ),
+    //   );
+    // }
+    // if (response.statusCode == 302) {
+    //   await Wakelock.disable();
+    //   return false;
+    // }
+    // final samlResponse = Uri.decodeFull(
+    //   RegExp(r'(?<=SAMLResponse" value=").*(?=")')
+    //           .firstMatch(response.data.toString())
+    //           ?.group(0) ??
+    //       '',
+    // );
+    // relayState = Uri.decodeFull(
+    //   RegExp(r'(?<=RelayState" value=").*(?=")')
+    //           .firstMatch(response.data.toString())
+    //           ?.group(0) ??
+    //       '',
+    // ).replaceAll('&#x3a;', ':');
+    // response = await _client.postUri<dynamic>(
+    //   Uri.https(
+    //     'gakujo.shizuoka.ac.jp',
+    //     '/Shibboleth.sso/SAML2/POST',
+    //   ),
+    //   data: {'SAMLResponse': samlResponse, 'RelayState': relayState},
+    //   options: Options(
+    //     contentType: Headers.formUrlEncodedContentType,
+    //     followRedirects: false,
+    //     validateStatus: (status) => status! == 302,
+    //   ),
+    // );
+    // response = await _client.getUri<dynamic>(
+    //   Uri.https(
+    //     'gakujo.shizuoka.ac.jp',
+    //     '/portal/shibbolethlogin/shibbolethLogin/initLogin/sso',
+    //   ),
+    //   options: Options(
+    //     headers: <String, dynamic>{'Referer': 'https://idp.shizuoka.ac.jp/'},
+    //     followRedirects: false,
+    //     validateStatus: (status) => status! == 200 || status == 302,
+    //   ),
+    // );
+    // response = await _client.postUri<dynamic>(
+    //   Uri.https(
+    //     'gakujo.shizuoka.ac.jp',
+    //     '/portal/home/home/initialize',
+    //     <String, dynamic>{'EXCLUDE_SET': ''},
+    //   ),
+    //   options: Options(
+    //     headers: <String, dynamic>{'Referer': 'https://idp.shizuoka.ac.jp/'},
+    //   ),
+    // );
+    // final document = parse(response.data);
+    // if (document.querySelector('table.ttb_sheet') != null) {
+    //   for (final row in document
+    //       .querySelector('table.ttb_sheet')!
+    //       .querySelectorAll('tr')
+    //       .skip(1)
+    //       .take(5)) {
+    //     for (final cell in row.querySelectorAll('td').take(5)) {
+    //       if (cell.text.trimWhiteSpace().isEmpty) {
+    //         continue;
+    //       }
+    //       // subjects.add(
+    //       //   cell.text.trim().replaceAll('\t', '').split('\n')[0].trimSubject(),
+    //       // );
+    //     }
+    //   }
+    // }
     await Wakelock.disable();
     return _updateToken(response.data);
   }

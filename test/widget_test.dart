@@ -5,35 +5,17 @@
 // gestures. You can also use WidgetTester to find child widgets in the widget
 // tree, read text, and verify that the values of widget properties are correct.
 
-import 'package:flutter/material.dart';
-import 'package:flutter_test/flutter_test.dart';
-import 'package:gakujo_task/api/api.dart';
-import 'package:gakujo_task/main.dart';
+void main() async {
+  // group('Api test', () {
+  //   dotenv.load(fileName: '.env');
+  //   final api = Api(2022, 2, dotenv.env['USERNAME']!, dotenv.env['PASSWORD']!);
 
-void main() {
-  testWidgets('Counter increments smoke test', (WidgetTester tester) async {
-    // Build our app and trigger a frame.
-    await tester.pumpWidget(const MyApp());
+  //   setUp(() {});
 
-    // Verify that our counter starts at 0.
-    expect(find.text('0'), findsOneWidget);
-    expect(find.text('1'), findsNothing);
-
-    // Tap the '+' icon and trigger a frame.
-    await tester.tap(find.byIcon(Icons.add));
-    await tester.pump();
-
-    // Verify that our counter has incremented.
-    expect(find.text('0'), findsNothing);
-    expect(find.text('1'), findsOneWidget);
-  });
-
-  group('API test', () {
-    final api = Api(2022, 2, const String.fromEnvironment('STRING_VALUE'),
-        const String.fromEnvironment('STRING_VALUE'));
-
-    test("login", () {
-      // expect(articleListForText.dataSource.length, 6);
-    });
-  });
+  //   test("login", () {
+  //     api.login();
+  //     pumpEventQueue();
+  //     expect(api.hasToken(), true);
+  //   });
+  // });
 }
