@@ -1,9 +1,6 @@
-import 'dart:developer';
-
 import 'package:cookie_jar/cookie_jar.dart';
 import 'package:dio/dio.dart';
 import 'package:dio_cookie_manager/dio_cookie_manager.dart';
-import 'package:flutter/foundation.dart';
 import 'package:gakujo_task/models/message.dart';
 import 'package:gakujo_task/models/quiz.dart';
 import 'package:gakujo_task/models/report.dart';
@@ -39,9 +36,6 @@ class Api {
                 .firstMatch(data.toString())
                 ?.group(0) ??
             _token;
-    if (kDebugMode) {
-      log(_token);
-    }
     return _token != '';
   }
 

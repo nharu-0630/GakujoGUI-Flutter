@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:gakujo_task/api/api.dart';
 import 'package:gakujo_task/screens/home/home.dart';
 import 'package:gakujo_task/screens/settings/settings.dart';
@@ -18,11 +19,14 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
+  var api;
   var _index = 0;
 
   @override
   Widget build(BuildContext context) {
     initializeDateFormatting('ja');
+    dotenv.load(fileName: '.env');
+    api = Api(2022, 2, dotenv.env['USERNAME']!, dotenv.env['PASSWORD']!);
     SystemChrome.setSystemUIOverlayStyle(
         const SystemUiOverlayStyle(statusBarColor: Colors.transparent));
     return MaterialApp(
