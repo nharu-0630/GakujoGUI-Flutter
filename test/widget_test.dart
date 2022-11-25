@@ -32,8 +32,9 @@ void main() {
     final api = Api(2022, 2, const String.fromEnvironment('STRING_VALUE'),
         const String.fromEnvironment('STRING_VALUE'));
 
-    test("login", () {
-      // expect(articleListForText.dataSource.length, 6);
+    test("login", () async {
+      bool result = await api.login();
+      expect(result, true);
     });
   });
 }

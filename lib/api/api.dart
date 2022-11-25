@@ -4,7 +4,6 @@ import 'package:cookie_jar/cookie_jar.dart';
 import 'package:dio/dio.dart';
 import 'package:dio_cookie_manager/dio_cookie_manager.dart';
 import 'package:flutter/foundation.dart';
-import 'package:gakujo_task/api/parse.dart';
 import 'package:gakujo_task/models/message.dart';
 import 'package:gakujo_task/models/quiz.dart';
 import 'package:gakujo_task/models/report.dart';
@@ -46,169 +45,95 @@ class Api {
     return _token != '';
   }
 
-  Future<bool> isConnected() async {
-    await Wakelock.enable();
-    final response = await _client.postUri<dynamic>(
-      Uri.https('gakujo.shizuoka.ac.jp',
-          '/portal/common/generalPurpose/', <String, dynamic>{
-        'org.apache.struts.taglib.html.TOKEN': _token,
-        'headTitle': '個人リンク一覧',
-        'menuCode': 'E05',
-        'nextPath': '/personallink/personalLinkList/initialize'
-      }),
-    );
-    await Wakelock.disable();
-    return _updateToken(response.data);
-  }
-
   Future<bool> login() async {
-    await Wakelock.enable();
     _client = Dio();
     _cookieJar = CookieJar();
     _client.interceptors.add(CookieManager(_cookieJar));
-    var response = await _client.getUri<dynamic>(
-      Uri.https('gakujo.shizuoka.ac.jp', '/portal/'),
-      options: Options(
-        validateStatus: (status) => status! == 200 || status == 500,
-      ),
+
+    var response = await _client.get<dynamic>(
+      'https://gakujo.shizuoka.ac.jp/portal/',
     );
-    if (response.statusCode == 500) {
-      await Wakelock.disable();
-      return false;
-    }
-    response = await _client.postUri<dynamic>(
-      Uri.https('gakujo.shizuoka.ac.jp', '/portal/login/preLogin/preLogin'),
-      data: FormData.fromMap(<String, dynamic>{'mistakeChecker': '0'}),
+
+    response = await _client.get<dynamic>(
+      'https://gakujo.shizuoka.ac.jp/UI/jsp/topPage/topPage.jsp',
     );
-    response = await _client.getUri<dynamic>(
-      Uri.https('gakujo.shizuoka.ac.jp', '/UI/jsp/topPage/topPage.jsp'),
-    );
-    response = await _client.postUri<dynamic>(
-      Uri.https(
-        'gakujo.shizuoka.ac.jp',
-        '/portal/shibbolethlogin/shibbolethLogin/initLogin/sso',
-      ),
+
+    response = await _client.post<dynamic>(
+      'https://gakujo.shizuoka.ac.jp/portal/shibbolethlogin/shibbolethLogin/initLogin/sso',
       data: FormData.fromMap(<String, dynamic>{
         'selectLocale': 'ja',
         'mistakeChecker': '0',
-        'EXCLUDE_SET': ''
+        'EXCLUDE_SET': '',
       }),
-      options: Options(
-        followRedirects: false,
-        validateStatus: (status) => status! == 302,
-      ),
-    );
-    final samlRequest = Uri.decodeFull(
-      RegExp(r'(?<=SAMLRequest=).*(?=&amp;)')
-              .firstMatch(response.data.toString())
-              ?.group(0) ??
-          '',
-    );
-    var relayState = Uri.decodeFull(
-      RegExp(r'(?<=RelayState=).*(?=")')
-              .firstMatch(response.data.toString())
-              ?.group(0) ??
-          '',
-    ).replaceAll('&#x3a;', ':');
-    response = await _client.getUri<dynamic>(
-      Uri.https('idp.shizuoka.ac.jp',
-          '/idp/profile/SAML2/Redirect/SSO', <String, dynamic>{
-        'SAMLRequest': samlRequest,
-        'RelayState': relayState
-      }),
-      options: Options(
-        followRedirects: false,
-        validateStatus: (status) => status! == 302 || status == 200,
-      ),
-    );
-    if (response.statusCode != 200) {
-      response = await _client.getUri<dynamic>(
-        Uri.https(
-          'idp.shizuoka.ac.jp',
-          '/idp/profile/SAML2/Redirect/SSO',
-          <String, dynamic>{'execution': 'e1s1'},
-        ),
-      );
-      response = await _client.postUri<dynamic>(
-        Uri.https('idp.shizuoka.ac.jp',
-            '/idp/profile/SAML2/Redirect/SSO', <String, dynamic>{
-          'execution': 'e1s1',
-          'j_username': username,
-          'j_password': password,
-          '_eventId_proceed': ''
-        }),
-        options: Options(
-          validateStatus: (status) => status! == 302 || status == 200,
-        ),
-      );
-    }
-    if (response.statusCode == 302) {
-      await Wakelock.disable();
-      return false;
-    }
-    final samlResponse = Uri.decodeFull(
-      RegExp(r'(?<=SAMLResponse" value=").*(?=")')
-              .firstMatch(response.data.toString())
-              ?.group(0) ??
-          '',
-    );
-    relayState = Uri.decodeFull(
-      RegExp(r'(?<=RelayState" value=").*(?=")')
-              .firstMatch(response.data.toString())
-              ?.group(0) ??
-          '',
-    ).replaceAll('&#x3a;', ':');
-    response = await _client.postUri<dynamic>(
-      Uri.https(
-        'gakujo.shizuoka.ac.jp',
-        '/Shibboleth.sso/SAML2/POST',
-      ),
-      data: {'SAMLResponse': samlResponse, 'RelayState': relayState},
       options: Options(
         contentType: Headers.formUrlEncodedContentType,
         followRedirects: false,
         validateStatus: (status) => status! == 302,
       ),
     );
-    response = await _client.getUri<dynamic>(
-      Uri.https(
-        'gakujo.shizuoka.ac.jp',
-        '/portal/shibbolethlogin/shibbolethLogin/initLogin/sso',
-      ),
+
+    response = await _client.get<dynamic>(
+      response.headers['Location']!.first,
       options: Options(
-        headers: <String, dynamic>{'Referer': 'https://idp.shizuoka.ac.jp/'},
         followRedirects: false,
-        validateStatus: (status) => status! == 200 || status == 302,
+        validateStatus: (status) => status! == 302,
       ),
     );
-    response = await _client.postUri<dynamic>(
-      Uri.https(
-        'gakujo.shizuoka.ac.jp',
-        '/portal/home/home/initialize',
-        <String, dynamic>{'EXCLUDE_SET': ''},
-      ),
+
+    response = await _client.get<dynamic>(
+      'https://idp.shizuoka.ac.jp/idp/profile/SAML2/Redirect/SSO?execution=e1s1',
       options: Options(
-        headers: <String, dynamic>{'Referer': 'https://idp.shizuoka.ac.jp/'},
+        followRedirects: false,
       ),
     );
-    final document = parse(response.data);
-    if (document.querySelector('table.ttb_sheet') != null) {
-      for (final row in document
-          .querySelector('table.ttb_sheet')!
-          .querySelectorAll('tr')
-          .skip(1)
-          .take(5)) {
-        for (final cell in row.querySelectorAll('td').take(5)) {
-          if (cell.text.trimWhiteSpace().isEmpty) {
-            continue;
-          }
-          // subjects.add(
-          //   cell.text.trim().replaceAll('\t', '').split('\n')[0].trimSubject(),
-          // );
-        }
-      }
-    }
-    await Wakelock.disable();
+
+    response = await _client.post<dynamic>(
+      'https://idp.shizuoka.ac.jp/idp/profile/SAML2/Redirect/SSO?execution=e1s1',
+      data: <String, dynamic>{
+        'j_username': username,
+        'j_password': password,
+        '_eventId_proceed': ''
+      },
+      options: Options(
+        contentType: Headers.formUrlEncodedContentType,
+        followRedirects: false,
+        validateStatus: (status) => status == 200,
+      ),
+    );
+
+    final samlResponse = Uri.decodeFull(
+      RegExp(r'(?<=SAMLResponse" value=").*(?=")')
+              .firstMatch(response.data.toString())
+              ?.group(0) ??
+          '',
+    );
+    final relayState = Uri.decodeFull(
+      RegExp(r'(?<=RelayState" value=").*(?=")')
+              .firstMatch(response.data.toString())
+              ?.group(0) ??
+          '',
+    ).replaceAll('&#x3a;', ':');
+
+    response = await _client.post<dynamic>(
+      'https://gakujo.shizuoka.ac.jp/Shibboleth.sso/SAML2/POST',
+      data: FormData.fromMap(<String, dynamic>{
+        'RelayState': relayState,
+        'SAMLResponse': samlResponse,
+      }),
+      options: Options(
+        contentType: Headers.formUrlEncodedContentType,
+        followRedirects: false,
+        validateStatus: (status) => status! == 302,
+      ),
+    );
+
+    response = await _client.get<dynamic>(
+      'https://gakujo.shizuoka.ac.jp/portal/shibbolethlogin/shibbolethLogin/initLogin/sso',
+      options: Options(
+        followRedirects: false,
+      ),
+    );
+
     return _updateToken(response.data);
   }
 
