@@ -7,7 +7,10 @@ import 'package:gakujo_task/screens/settings/settings.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 
-void main() {
+void main() async {
+  await dotenv.load(fileName: '.env');
+  var api = Api(2022, 2, dotenv.env['USERNAME']!, dotenv.env['PASSWORD']!);
+  api.login();
   runApp(const MyApp());
 }
 
@@ -19,14 +22,11 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  var api;
   var _index = 0;
 
   @override
   Widget build(BuildContext context) {
     initializeDateFormatting('ja');
-    dotenv.load(fileName: '.env');
-    api = Api(2022, 2, dotenv.env['USERNAME']!, dotenv.env['PASSWORD']!);
     SystemChrome.setSystemUIOverlayStyle(
         const SystemUiOverlayStyle(statusBarColor: Colors.transparent));
     return MaterialApp(
