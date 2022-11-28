@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:gakujo_task/models/task.dart';
-import 'package:gakujo_task/screens/task/task.dart';
+import 'package:gakujo_task/views/task/task.dart';
 
 class Tasks extends StatelessWidget {
   final tasks = Task.generateTasks();

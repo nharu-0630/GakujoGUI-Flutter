@@ -1,15 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:gakujo_task/constants/colors.dart';
-import 'package:gakujo_task/models/message.dart';
+import 'package:gakujo_task/models/contact.dart';
 import 'package:gakujo_task/models/subject.dart';
-import 'package:gakujo_task/screens/message/message.dart';
+import 'package:gakujo_task/views/contact/contact.dart';
 import 'package:intl/intl.dart';
 
-class Messages extends StatelessWidget {
-  final subjects = Subject.generateSubjects();
-  final messages = Message.generateMessages();
+class ContactTimeLine extends StatelessWidget {
+  final List<Subject> subjects;
+  final List<Contact> contacts;
 
-  Messages({Key? key}) : super(key: key);
+  ContactTimeLine({Key? key, required this.subjects, required this.contacts})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -26,15 +27,14 @@ class Messages extends StatelessWidget {
 
   Widget _buildMessage(BuildContext context, int index) {
     final subject = subjects[index];
-    final message = messages
-        .where(
-          (element) => element.subject == subject.className,
-        )
+    List<Contact> contact = contacts
+        .where((element) => element.subjects == subject.subjectsName)
         .toList();
+
     return GestureDetector(
         onTap: () {
           Navigator.of(context).push(MaterialPageRoute(
-              builder: (context) => MessagePage(subject, message)));
+              builder: (context) => ContactPage(subject, contact)));
         },
         child: Container(
           margin: const EdgeInsets.symmetric(vertical: 10),
@@ -46,16 +46,16 @@ class Messages extends StatelessWidget {
                 Padding(
                   padding: const EdgeInsets.symmetric(vertical: 5),
                   child: Text(
-                    subject.className,
+                    subject.subjectsName,
                     style: const TextStyle(
                         fontWeight: FontWeight.bold, fontSize: 16),
                   ),
                 ),
                 Align(
                     child: Text(
-                  message.isNotEmpty
+                  contact.isNotEmpty
                       ? DateFormat('yyyy/MM/dd HH:mm', 'ja')
-                          .format(message.last.contactDateTime.toLocal())
+                          .format(contact.last.contactDateTime.toLocal())
                       : '',
                   style: const TextStyle(color: kGreyLight),
                 ))
@@ -65,8 +65,8 @@ class Messages extends StatelessWidget {
               width: 300,
               child: Flexible(
                   child: Text(
-                message.isNotEmpty
-                    ? message.last.content.replaceAll('\n', ' ')
+                contact.isNotEmpty
+                    ? contact.last.content!.replaceAll('\n', ' ')
                     : 'メッセージなし',
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,

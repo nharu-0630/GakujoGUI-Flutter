@@ -1,27 +1,44 @@
-import 'package:flutter/material.dart';
+import 'dart:convert';
+import 'dart:ui';
+
+import 'package:crypto/crypto.dart';
+import 'package:html/dom.dart';
 
 class Subject {
-  String className;
-  Color bgColor;
+  String subjectsName;
+  String teacherName;
+  String classRoom;
+  Color subjectColor;
 
-  Subject(this.className, this.bgColor);
+  Subject(
+    this.subjectsName,
+    this.teacherName,
+    this.classRoom,
+    this.subjectColor,
+  );
 
-  static List<Subject> generateSubjects() {
-    return [
-      Subject('応用プログラミングA', const Color(0xFFFDBEC8)),
-      Subject('人工知能概論', const Color(0xFFFED6C4)),
-      Subject('計算機アーキテクチャⅠ', const Color(0xFFA8E4F2)),
-      Subject('情報と法', const Color(0xFFC3C1E6)),
-      Subject('物理の世界', const Color(0xFFFD95A2)),
-      Subject('データベースシステム論', const Color(0xFFFDBEC8)),
-      Subject('応用プログラミングB', const Color(0xFFFED6C4)),
-      Subject('符号理論', const Color(0xFFA8E4F2)),
-      Subject('科学と技術', const Color(0xFFC3C1E6)),
-      Subject('ライティングスキルズⅠ', const Color(0xFFFD95A2)),
-      Subject('コンパイラ', const Color(0xFFFDBEC8)),
-      Subject('計算理論', const Color(0xFFFED6C4)),
-      Subject('知的情報システム開発Ⅰ', const Color(0xFFA8E4F2)),
-      Subject('社会モデル', const Color(0xFFC3C1E6)),
-    ];
+  factory Subject.fromJson(Map<String, dynamic> json) => Subject(
+        json['subjectsName'] as String,
+        json['teacherName'] as String,
+        json['classRoom'] as String,
+        json['subjectColor'],
+      );
+
+  static Map<String, dynamic> toJson(Subject subject) => <String, dynamic>{
+        'subjectsName': subject.subjectsName,
+        'teacherName': subject.teacherName,
+        'classRoom': subject.classRoom,
+        'subjectColor': subject.subjectColor,
+      };
+
+  factory Subject.fromElement(Element element) {
+    var bytes =
+        md5.convert(utf8.encode(element.querySelectorAll('li')[0].text.trim()));
+    return Subject(
+      element.querySelectorAll('li')[0].text.trim(),
+      element.querySelectorAll('li')[1].text.trim(),
+      element.querySelectorAll('li')[2].text.trim(),
+      Color(int.parse('0xFF${bytes.toString().substring(0, 6)}')),
+    );
   }
 }

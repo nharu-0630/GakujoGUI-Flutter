@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:gakujo_task/models/message.dart';
+import 'package:gakujo_task/models/contact.dart';
 import 'package:gakujo_task/models/subject.dart';
-import 'package:gakujo_task/screens/message/message.dart';
+import 'package:gakujo_task/views/contact/contact.dart';
 
-class MessageIcons extends StatelessWidget {
-  final subjects = Subject.generateSubjects();
-  final messages = Message.generateMessages();
+class ContactIcons extends StatelessWidget {
+  final List<Subject> subjects;
+  final List<Contact> contacts;
 
-  MessageIcons({Key? key}) : super(key: key);
+  const ContactIcons({Key? key, required this.subjects, required this.contacts})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -24,21 +25,22 @@ class MessageIcons extends StatelessWidget {
 
   Widget _buildMessageIcon(BuildContext context, int index) {
     final subject = subjects[index];
-    final message = messages
-        .where(
-          (element) => element.subject == subject.className,
-        )
-        .toList();
+
     return GestureDetector(
       onTap: () {
         Navigator.of(context).push(MaterialPageRoute(
-            builder: (context) => MessagePage(subject, message)));
+            builder: (context) => ContactPage(
+                subject,
+                contacts
+                    .where(
+                        (element) => element.subjects == subject.subjectsName)
+                    .toList())));
       },
       child: Container(
         margin: const EdgeInsets.symmetric(horizontal: 5),
         width: 60,
         decoration: BoxDecoration(
-          color: subjects[index].bgColor,
+          color: subjects[index].subjectColor,
           shape: BoxShape.circle,
         ),
         child: Column(
@@ -46,7 +48,7 @@ class MessageIcons extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Text(
-              '${subjects[index].className.substring(0, 1)}\n${subjects[index].className.substring(subjects[index].className.length - 1)}',
+              '${subjects[index].subjectsName.substring(0, 1)}\n${subjects[index].subjectsName.substring(subjects[index].subjectsName.length - 1)}',
               textAlign: TextAlign.center,
               style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
             ),

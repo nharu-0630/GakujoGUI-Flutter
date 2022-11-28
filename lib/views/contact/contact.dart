@@ -1,15 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:gakujo_task/models/task.dart';
-import 'package:gakujo_task/screens/task/widgets/date_picker.dart';
-import 'package:gakujo_task/screens/task/widgets/task_timeline.dart';
+import 'package:gakujo_task/models/contact.dart';
+import 'package:gakujo_task/models/subject.dart';
+import 'package:gakujo_task/views/contact/widgets/contact_chat.dart';
 
-class TaskPage extends StatelessWidget {
-  final Task task;
-  const TaskPage(this.task, {Key? key}) : super(key: key);
+class ContactPage extends StatelessWidget {
+  final Subject subject;
+  final List<Contact> contactList;
+  const ContactPage(this.subject, this.contactList, {Key? key})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    final detailList = task.desc;
     return Scaffold(
       backgroundColor: Colors.white,
       body: CustomScrollView(
@@ -27,37 +28,41 @@ class TaskPage extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const DatePicker(),
                     Container(
                       padding: const EdgeInsets.all(15),
                       child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: const [
                             Text(
-                              'タスク',
+                              'メッセージ',
                               style: TextStyle(
                                   fontSize: 22, fontWeight: FontWeight.bold),
                             ),
+                            Icon(
+                              Icons.search,
+                              size: 30,
+                            )
                           ]),
-                    )
+                    ),
                   ],
                 ),
               ),
             ),
           ),
-          detailList == null
+          contactList.isEmpty
               ? SliverFillRemaining(
                   child: Container(
                       color: Colors.white,
                       child: const Center(
                           child: Text(
-                        '今日のタスクはありません',
+                        'メッセージはありません',
                         style: TextStyle(color: Colors.grey, fontSize: 18),
                       ))))
               : SliverList(
                   delegate: SliverChildBuilderDelegate(
-                      (_, index) => TaskTimeline(detailList[index]),
-                      childCount: detailList.length))
+                      (_, index) => ContactChat(contactList[index]),
+                      childCount: contactList.length),
+                )
         ],
       ),
     );
@@ -78,11 +83,11 @@ class TaskPage extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              '${task.title}',
+              subject.classRoom,
               style: const TextStyle(fontWeight: FontWeight.bold),
             ),
             Text(
-              '${task.left}件のタスク',
+              '${contactList.length}件のメッセージ',
               style: TextStyle(fontSize: 12, color: Colors.grey[700]),
             )
           ],

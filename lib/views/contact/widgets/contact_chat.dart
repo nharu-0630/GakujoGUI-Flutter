@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:gakujo_task/models/message.dart';
+import 'package:gakujo_task/models/contact.dart';
 import 'package:intl/intl.dart';
 
-class MessageTimeline extends StatelessWidget {
-  final Message message;
-  const MessageTimeline(this.message, {Key? key}) : super(key: key);
+class ContactChat extends StatelessWidget {
+  final Contact contact;
+  const ContactChat(this.contact, {Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -13,13 +13,13 @@ class MessageTimeline extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 15),
       child: Row(children: [
         Expanded(
-          child: _buildCard(message),
+          child: _buildCard(contact),
         )
       ]),
     );
   }
 
-  Widget _buildCard(Message message) {
+  Widget _buildCard(Contact contact) {
     return Column(
       children: [
         Align(
@@ -37,10 +37,10 @@ class MessageTimeline extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(message.title,
+                Text(contact.title,
                     style: const TextStyle(fontWeight: FontWeight.bold)),
                 const SizedBox(height: 5),
-                Text(message.content),
+                Text(contact.content!),
               ],
             ),
           ),
@@ -49,7 +49,7 @@ class MessageTimeline extends StatelessWidget {
           alignment: Alignment.centerRight,
           child: Text(
             DateFormat('yyyy/MM/dd HH:mm', 'ja')
-                .format(message.contactDateTime.toLocal()),
+                .format(contact.contactDateTime.toLocal()),
             style: const TextStyle(color: Colors.grey),
           ),
         ),

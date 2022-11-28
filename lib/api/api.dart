@@ -6,21 +6,18 @@ import 'package:dio/dio.dart';
 import 'package:dio_cookie_manager/dio_cookie_manager.dart';
 import 'package:dio_smart_retry/dio_smart_retry.dart';
 import 'package:flutter/foundation.dart';
-import 'package:gakujo_task/models/message.dart';
-import 'package:gakujo_task/models/quiz.dart';
-import 'package:gakujo_task/models/report.dart';
-// import 'package:flutter_app_badger/flutter_app_badger.dart';
+import 'package:gakujo_task/models/contact.dart';
+import 'package:gakujo_task/models/subject.dart';
 import 'package:html/dom.dart';
 import 'package:html/parser.dart' show parse;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uuid/uuid.dart';
 import 'package:version/version.dart';
-import 'package:wakelock/wakelock.dart';
 
 class Api {
   static final Version version = Version(1, 0, 1);
 
-  final Duration _interval = const Duration(milliseconds: 750);
+  final Duration _interval = const Duration(milliseconds: 2000);
 
   final int year;
   final int semester;
@@ -31,8 +28,6 @@ class Api {
   String _token = '';
   CookieJar _cookieJar = CookieJar();
 
-  dynamic _settings = {};
-
   Api(this.year, this.semester, this.username, this.password);
 
   String get schoolYear => year.toString();
@@ -41,7 +36,14 @@ class Api {
   String get reportDateEnd => '$schoolYear/${semester < 2 ? '09' : '03'}/01';
   String get suffix => '_${year}_$semesterCode';
 
+  dynamic _settings = {};
   dynamic get settings => _settings;
+
+  final List<Contact> _contacts = [];
+  List<Contact> get contacts => _contacts;
+
+  final List<Subject> _subjects = [];
+  List<Subject> get subjects => _subjects;
 
   bool _updateToken(dynamic data) {
     _token =
@@ -52,7 +54,7 @@ class Api {
     return _token != '';
   }
 
-  Future<void> _loadSettings() async {
+  Future<void> loadSettings() async {
     final prefs = await SharedPreferences.getInstance();
     if (prefs.getString('Settings') == null) {
       return;
@@ -69,7 +71,7 @@ class Api {
     }
   }
 
-  Future<void> _saveSettings() async {
+  Future<void> saveSettings() async {
     List<Cookie> cookies = (await _cookieJar
         .loadForRequest(Uri.https('gakujo.shizuoka.ac.jp', '/portal')));
     if (cookies
@@ -115,7 +117,7 @@ class Api {
 
   Future<bool> login() async {
     _initialize();
-    await _loadSettings();
+    await loadSettings();
 
     await _client.getUri<dynamic>(
       Uri.https(
@@ -304,11 +306,11 @@ class Api {
 
     var name =
         document.querySelector('#header-cog > li > a > span > span')?.text;
-    settings['FullName'] =
+    _settings['FullName'] =
         name?.substring(0, name.indexOf('さん')).replaceAll('　', '');
 
     _updateToken(response.data);
-    _saveSettings();
+    saveSettings();
 
     if (kDebugMode) {
       print('Token: $_token');
@@ -317,55 +319,59 @@ class Api {
     return true;
   }
 
-  Future<List<Message>> getMessages(List<Message> messages) async {
-    await Wakelock.enable();
+  Future<List<Contact>> fetchContacts() async {
     var response = await _client.postUri<dynamic>(
-      Uri.https('gakujo.shizuoka.ac.jp',
-          '/portal/common/generalPurpose/', <String, dynamic>{
+      Uri.https(
+        'gakujo.shizuoka.ac.jp',
+        '/portal/common/generalPurpose/',
+      ),
+      data: {
         'org.apache.struts.taglib.html.TOKEN': _token,
         'headTitle': '授業連絡一覧',
         'menuCode': 'A01',
         'nextPath': '/classcontact/classContactList/initialize'
-      }),
+      },
     );
     _updateToken(response.data);
+    await Future.delayed(_interval);
+
     response = await _client.postUri<dynamic>(
       Uri.https(
-          'gakujo.shizuoka.ac.jp',
-          '/portal/classcontact/classContactList/selectClassContactList',
-          <String, dynamic>{
-            'org.apache.struts.taglib.html.TOKEN': _token,
-            'teacherCode': '',
-            'schoolYear': schoolYear,
-            'semesterCode': semesterCode,
-            'subjectDispCode': '',
-            'searchKeyWord': '',
-            'checkSearchKeywordTeacherUserName': 'on',
-            'checkSearchKeywordSubjectNam': 'on',
-            'checkSearchKeywordTitle': 'on',
-            'contactKindCode': '',
-            'targetDateStart': '',
-            'targetDateEnd': '',
-            'reportDateStart': reportDateStart
-          }),
+        'gakujo.shizuoka.ac.jp',
+        '/portal/classcontact/classContactList/selectClassContactList',
+      ),
+      data: {
+        'org.apache.struts.taglib.html.TOKEN': _token,
+        'teacherCode': '',
+        'schoolYear': schoolYear,
+        'semesterCode': semesterCode,
+        'subjectDispCode': '',
+        'searchKeyWord': '',
+        'checkSearchKeywordTeacherUserName': 'on',
+        'checkSearchKeywordSubjectNam': 'on',
+        'checkSearchKeywordTitle': 'on',
+        'contactKindCode': '',
+        'targetDateStart': '',
+        'targetDateEnd': '',
+        'reportDateStart': reportDateStart
+      },
     );
     _updateToken(response.data);
+    await Future.delayed(_interval);
+
     final document = parse(response.data);
-    for (final contact in document
+
+    for (var element in document
         .querySelectorAll('#tbl_A01_01 > tbody > tr')
-        .map(Message.fromElement)) {
-      if (!messages.contains(contact)) {
-        messages.add(contact);
-      } else {
-        break;
-      }
+        .map(Contact.fromElement)
+        .toList()) {
+      if (!_contacts.contains(element)) _contacts.add(element);
     }
-    await Wakelock.disable();
-    return messages;
+    return contacts;
   }
 
-  Future<Message> getMessage(Message message, {bool bypass = false}) async {
-    await Wakelock.enable();
+  Future<Contact> fetchDetailContact(Contact contact,
+      {bool bypass = false}) async {
     Document document;
     var index = -1;
     if (!bypass) {
@@ -379,6 +385,8 @@ class Api {
         }),
       );
       _updateToken(response.data);
+      await Future.delayed(_interval);
+
       response = await _client.postUri<dynamic>(
         Uri.https(
             'gakujo.shizuoka.ac.jp',
@@ -400,15 +408,16 @@ class Api {
             }),
       );
       _updateToken(response.data);
+      await Future.delayed(_interval);
+
       final document = parse(response.data);
       index = document
           .querySelectorAll('#tbl_A01_01 > tbody > tr')
-          .map(Message.fromElement)
+          .map(Contact.fromElement)
           .toList()
-          .indexOf(message);
+          .indexOf(contact);
       if (index == -1) {
-        await Wakelock.disable();
-        return message;
+        return contact;
       }
     }
     final response = await _client.postUri<dynamic>(
@@ -437,279 +446,314 @@ class Api {
           }),
     );
     _updateToken(response.data);
+    await Future.delayed(_interval);
+
     document = parse(response.data);
-    message.toDetail(document);
-    await Wakelock.disable();
-    return message;
+    _contacts[index].toDetail(document);
+    return contacts[index];
   }
 
-  Future<List<Report>> getReports(List<Report> reports) async {
-    await Wakelock.enable();
+  Future<List<Subject>> fetchSubjects() async {
     var response = await _client.postUri<dynamic>(
       Uri.https('gakujo.shizuoka.ac.jp',
           '/portal/common/generalPurpose/', <String, dynamic>{
         'org.apache.struts.taglib.html.TOKEN': _token,
         'headTitle': '授業サポート',
-        'menuCode': 'A02',
-        'nextPath': '/report/student/searchList/initialize'
+        'menuCode': 'A00',
+        'nextPath': '/classsupporttop/classSupportTop/initialize'
       }),
     );
     _updateToken(response.data);
-    response = await _client.postUri<dynamic>(
-      Uri.https('gakujo.shizuoka.ac.jp',
-          '/portal/report/student/searchList/search', <String, dynamic>{
-        'org.apache.struts.taglib.html.TOKEN': _token,
-        'reportId': '',
-        'hidSchoolYear': '',
-        'hidSemesterCode': '',
-        'hidSubjectCode': '',
-        'hidClassCode': '',
-        'entranceDiv': '',
-        'backPath': '',
-        'listSchoolYear': '',
-        'listSubjectCode': '',
-        'listClassCode': '',
-        'schoolYear': schoolYear,
-        'semesterCode': semesterCode,
-        'subjectDispCode': '',
-        'operationFormat': ['1', '2'],
-        'searchList_length': '-1',
-        '_searchConditionDisp.accordionSearchCondition': 'true',
-        '_screenIdentifier': 'SC_A02_01_G',
-        '_screenInfoDisp': '',
-        '_scrollTop': '0'
-      }),
-    );
-    _updateToken(response.data);
-    final document = parse(response.data);
-    for (final report in document
-        .querySelectorAll('#searchList > tbody > tr')
-        .map(Report.fromElement)) {
-      if (!reports.contains(report)) {
-        reports.add(report);
-      } else {
-        reports.where((x) => x == report).forEach((x) => x.toRefresh(report));
-      }
-    }
-    await Wakelock.disable();
-    return reports;
-  }
+    await Future.delayed(_interval);
 
-  Future<Report> getReport(Report report, {bool bypass = false}) async {
-    await Wakelock.enable();
-    Document document;
-    if (!bypass) {
-      var response = await _client.postUri<dynamic>(
-        Uri.https('gakujo.shizuoka.ac.jp',
-            '/portal/common/generalPurpose/', <String, dynamic>{
-          'org.apache.struts.taglib.html.TOKEN': _token,
-          'headTitle': '授業サポート',
-          'menuCode': 'A02',
-          'nextPath': '/report/student/searchList/initialize'
-        }),
-      );
-      _updateToken(response.data);
-      response = await _client.postUri<dynamic>(
-        Uri.https('gakujo.shizuoka.ac.jp',
-            '/portal/report/student/searchList/search', <String, dynamic>{
-          'org.apache.struts.taglib.html.TOKEN': _token,
-          'reportId': '',
-          'hidSchoolYear': '',
-          'hidSemesterCode': '',
-          'hidSubjectCode': '',
-          'hidClassCode': '',
-          'entranceDiv': '',
-          'backPath': '',
-          'listSchoolYear': '',
-          'listSubjectCode': '',
-          'listClassCode': '',
-          'schoolYear': schoolYear,
-          'semesterCode': semesterCode,
-          'subjectDispCode': '',
-          'operationFormat': ['1', '2'],
-          'searchList_length': '-1',
-          '_searchConditionDisp.accordionSearchCondition': 'true',
-          '_screenIdentifier': 'SC_A02_01_G',
-          '_screenInfoDisp': '',
-          '_scrollTop': '0'
-        }),
-      );
-      _updateToken(response.data);
-      document = parse(response.data);
-      if (document
-          .querySelectorAll('#searchList > tbody > tr')
-          .map(Report.fromElement)
-          .where((x) => x == report)
-          .isEmpty) {
-        await Wakelock.disable();
-        return report;
-      }
-    }
-    final response = await _client.postUri<dynamic>(
+    response = await _client.postUri<dynamic>(
       Uri.https(
           'gakujo.shizuoka.ac.jp',
-          '/portal/report/student/searchList/forwardSubmitRef',
+          '/portal/portaltopcommon/timeTableForTop/searchTimeTable',
           <String, dynamic>{
             'org.apache.struts.taglib.html.TOKEN': _token,
-            'reportId': report.id,
-            'hidSchoolYear': '',
-            'hidSemesterCode': '',
-            'hidSubjectCode': '',
-            'hidClassCode': '',
-            'entranceDiv': '',
-            'backPath': '',
-            'listSchoolYear': schoolYear,
-            'listSubjectCode': report.subjectCode,
-            'listClassCode': report.classCode,
             'schoolYear': schoolYear,
             'semesterCode': semesterCode,
-            'subjectDispCode': '',
-            'operationFormat': ['1', '2'],
-            'searchList_length': '-1',
-            '_searchConditionDisp.accordionSearchCondition': 'true',
-            '_screenIdentifier': 'SC_A02_01_G',
-            '_screenInfoDisp': '',
-            '_scrollTop': '0'
           }),
     );
     _updateToken(response.data);
-    document = parse(response.data);
-    report.toDetail(document);
-    await Wakelock.disable();
-    return report;
-  }
+    await Future.delayed(_interval);
 
-  Future<List<Quiz>> getQuizzes(List<Quiz> quizzes) async {
-    await Wakelock.enable();
-    var response = await _client.postUri<dynamic>(
-      Uri.https('gakujo.shizuoka.ac.jp',
-          '/portal/common/generalPurpose/', <String, dynamic>{
-        'org.apache.struts.taglib.html.TOKEN': _token,
-        'headTitle': '小テスト一覧',
-        'menuCode': 'A03',
-        'nextPath': '/test/student/searchList/initialize'
-      }),
-    );
-    _updateToken(response.data);
-    response = await _client.postUri<dynamic>(
-      Uri.https('gakujo.shizuoka.ac.jp',
-          '/portal/test/student/searchList/search', <String, dynamic>{
-        'org.apache.struts.taglib.html.TOKEN': _token,
-        'testId': '',
-        'hidSchoolYear': '',
-        'hidSemesterCode': '',
-        'hidSubjectCode': '',
-        'hidClassCode': '',
-        'entranceDiv': '',
-        'backPath': '',
-        'listSchoolYear': '',
-        'listSubjectCode': '',
-        'listClassCode': '',
-        'schoolYear': schoolYear,
-        'semesterCode': semesterCode,
-        'subjectDispCode': '',
-        'operationFormat': ['1', '2'],
-        'searchList_length': '-1',
-        '_searchConditionDisp.accordionSearchCondition': 'true',
-        '_screenIdentifier': 'SC_A03_01_G',
-        '_screenInfoDisp': '',
-        '_scrollTop': '0'
-      }),
-    );
-    _updateToken(response.data);
     final document = parse(response.data);
-    for (final quiz in document
-        .querySelectorAll('#searchList > tbody > tr')
-        .map(Quiz.fromElement)) {
-      if (!quizzes.contains(quiz)) {
-        quizzes.add(quiz);
-      } else {
-        quizzes.where((x) => x == quiz).forEach((x) => x.toRefresh(quiz));
-      }
-    }
-    await Wakelock.disable();
-    return quizzes;
+
+    _subjects.clear();
+    _subjects.addAll(
+        document.querySelectorAll('#st1 > ul').map(Subject.fromElement));
+    return _subjects;
   }
 
-  Future<Quiz> getQuiz(Quiz quiz, {bool bypass = false}) async {
-    await Wakelock.enable();
-    Document document;
-    if (!bypass) {
-      var response = await _client.postUri<dynamic>(
-        Uri.https('gakujo.shizuoka.ac.jp',
-            '/portal/common/generalPurpose/', <String, dynamic>{
-          'org.apache.struts.taglib.html.TOKEN': _token,
-          'headTitle': '小テスト一覧',
-          'menuCode': 'A03',
-          'nextPath': '/test/student/searchList/initialize'
-        }),
-      );
-      _updateToken(response.data);
-      response = await _client.postUri<dynamic>(
-        Uri.https('gakujo.shizuoka.ac.jp',
-            '/portal/test/student/searchList/search', <String, dynamic>{
-          'org.apache.struts.taglib.html.TOKEN': _token,
-          'testId': '',
-          'hidSchoolYear': '',
-          'hidSemesterCode': '',
-          'hidSubjectCode': '',
-          'hidClassCode': '',
-          'entranceDiv': '',
-          'backPath': '',
-          'listSchoolYear': '',
-          'listSubjectCode': '',
-          'listClassCode': '',
-          'schoolYear': schoolYear,
-          'semesterCode': semesterCode,
-          'subjectDispCode': '',
-          'operationFormat': ['1', '2'],
-          'searchList_length': '-1',
-          '_searchConditionDisp.accordionSearchCondition': 'true',
-          '_screenIdentifier': 'SC_A03_01_G',
-          '_screenInfoDisp': '',
-          '_scrollTop': '0'
-        }),
-      );
-      _updateToken(response.data);
-      document = parse(response.data);
-      if (document
-          .querySelectorAll('#searchList > tbody > tr')
-          .map(Quiz.fromElement)
-          .where((x) => x == quiz)
-          .isEmpty) {
-        await Wakelock.disable();
-        return quiz;
-      }
-    }
-    final response = await _client.postUri<dynamic>(
-      Uri.https('gakujo.shizuoka.ac.jp',
-          '/portal/test/student/searchList/forwardSubmitRef', <String, dynamic>{
-        'org.apache.struts.taglib.html.TOKEN': _token,
-        'testId': quiz.id,
-        'hidSchoolYear': '',
-        'hidSemesterCode': '',
-        'hidSubjectCode': '',
-        'hidClassCode': '',
-        'entranceDiv': '',
-        'backPath': '',
-        'listSchoolYear': schoolYear,
-        'listSubjectCode': quiz.subjectCode,
-        'listClassCode': quiz.classCode,
-        'schoolYear': schoolYear,
-        'semesterCode': semesterCode,
-        'subjectDispCode': '',
-        'operationFormat': ['1', '2'],
-        'searchList_length': '-1',
-        '_searchConditionDisp.accordionSearchCondition': 'true',
-        '_screenIdentifier': 'SC_A03_01_G',
-        '_screenInfoDisp': '',
-        '_scrollTop': '0'
-      }),
-    );
-    _updateToken(response.data);
-    document = parse(response.data);
-    quiz.toDetail(document);
-    await Wakelock.disable();
-    return quiz;
-  }
+  // Future<List<Report>> getReports(List<Report> reports) async {
+  //   await Wakelock.enable();
+  //   var response = await _client.postUri<dynamic>(
+  //     Uri.https('gakujo.shizuoka.ac.jp',
+  //         '/portal/common/generalPurpose/', <String, dynamic>{
+  //       'org.apache.struts.taglib.html.TOKEN': _token,
+  //       'headTitle': '授業サポート',
+  //       'menuCode': 'A02',
+  //       'nextPath': '/report/student/searchList/initialize'
+  //     }),
+  //   );
+  //   _updateToken(response.data);
+  //   response = await _client.postUri<dynamic>(
+  //     Uri.https('gakujo.shizuoka.ac.jp',
+  //         '/portal/report/student/searchList/search', <String, dynamic>{
+  //       'org.apache.struts.taglib.html.TOKEN': _token,
+  //       'reportId': '',
+  //       'hidSchoolYear': '',
+  //       'hidSemesterCode': '',
+  //       'hidSubjectCode': '',
+  //       'hidClassCode': '',
+  //       'entranceDiv': '',
+  //       'backPath': '',
+  //       'listSchoolYear': '',
+  //       'listSubjectCode': '',
+  //       'listClassCode': '',
+  //       'schoolYear': schoolYear,
+  //       'semesterCode': semesterCode,
+  //       'subjectDispCode': '',
+  //       'operationFormat': ['1', '2'],
+  //       'searchList_length': '-1',
+  //       '_searchConditionDisp.accordionSearchCondition': 'true',
+  //       '_screenIdentifier': 'SC_A02_01_G',
+  //       '_screenInfoDisp': '',
+  //       '_scrollTop': '0'
+  //     }),
+  //   );
+  //   _updateToken(response.data);
+  //   final document = parse(response.data);
+  //   for (final report in document
+  //       .querySelectorAll('#searchList > tbody > tr')
+  //       .map(Report.fromElement)) {
+  //     if (!reports.contains(report)) {
+  //       reports.add(report);
+  //     } else {
+  //       reports.where((x) => x == report).forEach((x) => x.toRefresh(report));
+  //     }
+  //   }
+  //   await Wakelock.disable();
+  //   return reports;
+  // }
+
+  // Future<Report> getReport(Report report, {bool bypass = false}) async {
+  //   await Wakelock.enable();
+  //   Document document;
+  //   if (!bypass) {
+  //     var response = await _client.postUri<dynamic>(
+  //       Uri.https('gakujo.shizuoka.ac.jp',
+  //           '/portal/common/generalPurpose/', <String, dynamic>{
+  //         'org.apache.struts.taglib.html.TOKEN': _token,
+  //         'headTitle': '授業サポート',
+  //         'menuCode': 'A02',
+  //         'nextPath': '/report/student/searchList/initialize'
+  //       }),
+  //     );
+  //     _updateToken(response.data);
+  //     response = await _client.postUri<dynamic>(
+  //       Uri.https('gakujo.shizuoka.ac.jp',
+  //           '/portal/report/student/searchList/search', <String, dynamic>{
+  //         'org.apache.struts.taglib.html.TOKEN': _token,
+  //         'reportId': '',
+  //         'hidSchoolYear': '',
+  //         'hidSemesterCode': '',
+  //         'hidSubjectCode': '',
+  //         'hidClassCode': '',
+  //         'entranceDiv': '',
+  //         'backPath': '',
+  //         'listSchoolYear': '',
+  //         'listSubjectCode': '',
+  //         'listClassCode': '',
+  //         'schoolYear': schoolYear,
+  //         'semesterCode': semesterCode,
+  //         'subjectDispCode': '',
+  //         'operationFormat': ['1', '2'],
+  //         'searchList_length': '-1',
+  //         '_searchConditionDisp.accordionSearchCondition': 'true',
+  //         '_screenIdentifier': 'SC_A02_01_G',
+  //         '_screenInfoDisp': '',
+  //         '_scrollTop': '0'
+  //       }),
+  //     );
+  //     _updateToken(response.data);
+  //     document = parse(response.data);
+  //     if (document
+  //         .querySelectorAll('#searchList > tbody > tr')
+  //         .map(Report.fromElement)
+  //         .where((x) => x == report)
+  //         .isEmpty) {
+  //       await Wakelock.disable();
+  //       return report;
+  //     }
+  //   }
+  //   final response = await _client.postUri<dynamic>(
+  //     Uri.https(
+  //         'gakujo.shizuoka.ac.jp',
+  //         '/portal/report/student/searchList/forwardSubmitRef',
+  //         <String, dynamic>{
+  //           'org.apache.struts.taglib.html.TOKEN': _token,
+  //           'reportId': report.id,
+  //           'hidSchoolYear': '',
+  //           'hidSemesterCode': '',
+  //           'hidSubjectCode': '',
+  //           'hidClassCode': '',
+  //           'entranceDiv': '',
+  //           'backPath': '',
+  //           'listSchoolYear': schoolYear,
+  //           'listSubjectCode': report.subjectCode,
+  //           'listClassCode': report.classCode,
+  //           'schoolYear': schoolYear,
+  //           'semesterCode': semesterCode,
+  //           'subjectDispCode': '',
+  //           'operationFormat': ['1', '2'],
+  //           'searchList_length': '-1',
+  //           '_searchConditionDisp.accordionSearchCondition': 'true',
+  //           '_screenIdentifier': 'SC_A02_01_G',
+  //           '_screenInfoDisp': '',
+  //           '_scrollTop': '0'
+  //         }),
+  //   );
+  //   _updateToken(response.data);
+  //   document = parse(response.data);
+  //   report.toDetail(document);
+  //   await Wakelock.disable();
+  //   return report;
+  // }
+
+  // Future<List<Quiz>> getQuizzes(List<Quiz> quizzes) async {
+  //   await Wakelock.enable();
+  //   var response = await _client.postUri<dynamic>(
+  //     Uri.https('gakujo.shizuoka.ac.jp',
+  //         '/portal/common/generalPurpose/', <String, dynamic>{
+  //       'org.apache.struts.taglib.html.TOKEN': _token,
+  //       'headTitle': '小テスト一覧',
+  //       'menuCode': 'A03',
+  //       'nextPath': '/test/student/searchList/initialize'
+  //     }),
+  //   );
+  //   _updateToken(response.data);
+  //   response = await _client.postUri<dynamic>(
+  //     Uri.https('gakujo.shizuoka.ac.jp',
+  //         '/portal/test/student/searchList/search', <String, dynamic>{
+  //       'org.apache.struts.taglib.html.TOKEN': _token,
+  //       'testId': '',
+  //       'hidSchoolYear': '',
+  //       'hidSemesterCode': '',
+  //       'hidSubjectCode': '',
+  //       'hidClassCode': '',
+  //       'entranceDiv': '',
+  //       'backPath': '',
+  //       'listSchoolYear': '',
+  //       'listSubjectCode': '',
+  //       'listClassCode': '',
+  //       'schoolYear': schoolYear,
+  //       'semesterCode': semesterCode,
+  //       'subjectDispCode': '',
+  //       'operationFormat': ['1', '2'],
+  //       'searchList_length': '-1',
+  //       '_searchConditionDisp.accordionSearchCondition': 'true',
+  //       '_screenIdentifier': 'SC_A03_01_G',
+  //       '_screenInfoDisp': '',
+  //       '_scrollTop': '0'
+  //     }),
+  //   );
+  //   _updateToken(response.data);
+  //   final document = parse(response.data);
+  //   for (final quiz in document
+  //       .querySelectorAll('#searchList > tbody > tr')
+  //       .map(Quiz.fromElement)) {
+  //     if (!quizzes.contains(quiz)) {
+  //       quizzes.add(quiz);
+  //     } else {
+  //       quizzes.where((x) => x == quiz).forEach((x) => x.toRefresh(quiz));
+  //     }
+  //   }
+  //   await Wakelock.disable();
+  //   return quizzes;
+  // }
+
+  // Future<Quiz> getQuiz(Quiz quiz, {bool bypass = false}) async {
+  //   await Wakelock.enable();
+  //   Document document;
+  //   if (!bypass) {
+  //     var response = await _client.postUri<dynamic>(
+  //       Uri.https('gakujo.shizuoka.ac.jp',
+  //           '/portal/common/generalPurpose/', <String, dynamic>{
+  //         'org.apache.struts.taglib.html.TOKEN': _token,
+  //         'headTitle': '小テスト一覧',
+  //         'menuCode': 'A03',
+  //         'nextPath': '/test/student/searchList/initialize'
+  //       }),
+  //     );
+  //     _updateToken(response.data);
+  //     response = await _client.postUri<dynamic>(
+  //       Uri.https('gakujo.shizuoka.ac.jp',
+  //           '/portal/test/student/searchList/search', <String, dynamic>{
+  //         'org.apache.struts.taglib.html.TOKEN': _token,
+  //         'testId': '',
+  //         'hidSchoolYear': '',
+  //         'hidSemesterCode': '',
+  //         'hidSubjectCode': '',
+  //         'hidClassCode': '',
+  //         'entranceDiv': '',
+  //         'backPath': '',
+  //         'listSchoolYear': '',
+  //         'listSubjectCode': '',
+  //         'listClassCode': '',
+  //         'schoolYear': schoolYear,
+  //         'semesterCode': semesterCode,
+  //         'subjectDispCode': '',
+  //         'operationFormat': ['1', '2'],
+  //         'searchList_length': '-1',
+  //         '_searchConditionDisp.accordionSearchCondition': 'true',
+  //         '_screenIdentifier': 'SC_A03_01_G',
+  //         '_screenInfoDisp': '',
+  //         '_scrollTop': '0'
+  //       }),
+  //     );
+  //     _updateToken(response.data);
+  //     document = parse(response.data);
+  //     if (document
+  //         .querySelectorAll('#searchList > tbody > tr')
+  //         .map(Quiz.fromElement)
+  //         .where((x) => x == quiz)
+  //         .isEmpty) {
+  //       await Wakelock.disable();
+  //       return quiz;
+  //     }
+  //   }
+  //   final response = await _client.postUri<dynamic>(
+  //     Uri.https('gakujo.shizuoka.ac.jp',
+  //         '/portal/test/student/searchList/forwardSubmitRef', <String, dynamic>{
+  //       'org.apache.struts.taglib.html.TOKEN': _token,
+  //       'testId': quiz.id,
+  //       'hidSchoolYear': '',
+  //       'hidSemesterCode': '',
+  //       'hidSubjectCode': '',
+  //       'hidClassCode': '',
+  //       'entranceDiv': '',
+  //       'backPath': '',
+  //       'listSchoolYear': schoolYear,
+  //       'listSubjectCode': quiz.subjectCode,
+  //       'listClassCode': quiz.classCode,
+  //       'schoolYear': schoolYear,
+  //       'semesterCode': semesterCode,
+  //       'subjectDispCode': '',
+  //       'operationFormat': ['1', '2'],
+  //       'searchList_length': '-1',
+  //       '_searchConditionDisp.accordionSearchCondition': 'true',
+  //       '_screenIdentifier': 'SC_A03_01_G',
+  //       '_screenInfoDisp': '',
+  //       '_scrollTop': '0'
+  //     }),
+  //   );
+  //   _updateToken(response.data);
+  //   document = parse(response.data);
+  //   quiz.toDetail(document);
+  //   await Wakelock.disable();
+  //   return quiz;
+  // }
 }

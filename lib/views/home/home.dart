@@ -1,23 +1,23 @@
 import 'package:flutter/material.dart';
-import 'package:gakujo_task/api/api.dart';
-import 'package:gakujo_task/screens/home/widgets/message_icons.dart';
-import 'package:gakujo_task/screens/home/widgets/messages.dart';
-import 'package:gakujo_task/screens/home/widgets/status.dart';
-import 'package:gakujo_task/screens/home/widgets/tasks.dart';
+import 'package:gakujo_task/provide.dart';
+import 'package:gakujo_task/views/home/widgets/contact_icons.dart';
+import 'package:gakujo_task/views/home/widgets/contact_timeline.dart';
+import 'package:gakujo_task/views/home/widgets/status.dart';
+import 'package:gakujo_task/views/home/widgets/tasks.dart';
+import 'package:provider/provider.dart';
 import 'package:sticky_headers/sticky_headers.dart';
 
-class HomePage extends StatelessWidget {
-  Api api;
-
-  HomePage({Key? key, required this.api}) : super(key: key);
+class HomeWidget extends StatelessWidget {
+  const HomeWidget({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return RefreshIndicator(
         onRefresh: () async {
-          await api.login();
+          context.read<Provide>().fetchAll();
         },
         child: SingleChildScrollView(
+          physics: const AlwaysScrollableScrollPhysics(),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -54,14 +54,20 @@ class HomePage extends StatelessWidget {
                             margin: const EdgeInsets.only(bottom: 10),
                             child: SizedBox(
                                 height: 60,
-                                child: Expanded(child: MessageIcons())),
+                                child: ContactIcons(
+                                  subjects: context.watch<Provide>().subjects,
+                                  contacts: context.watch<Provide>().contacts,
+                                )),
                           ),
                         ),
                       ],
                     ),
                   ),
-                  content: Messages()),
-              const SizedBox(height: 15)
+                  content: ContactTimeLine(
+                    subjects: context.watch<Provide>().subjects,
+                    contacts: context.watch<Provide>().contacts,
+                  )),
+              const SizedBox(height: 15),
             ],
           ),
         ));

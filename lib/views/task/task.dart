@@ -1,16 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:gakujo_task/models/message.dart';
-import 'package:gakujo_task/models/subject.dart';
-import 'package:gakujo_task/screens/message/widgets/message_timeline.dart';
+import 'package:gakujo_task/models/task.dart';
+import 'package:gakujo_task/views/task/widgets/date_picker.dart';
+import 'package:gakujo_task/views/task/widgets/task_timeline.dart';
 
-class MessagePage extends StatelessWidget {
-  final Subject subject;
-  final List<Message> messageList;
-  const MessagePage(this.subject, this.messageList, {Key? key})
-      : super(key: key);
+class TaskPage extends StatelessWidget {
+  final Task task;
+  const TaskPage(this.task, {Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    final detailList = task.desc;
     return Scaffold(
       backgroundColor: Colors.white,
       body: CustomScrollView(
@@ -28,41 +27,37 @@ class MessagePage extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    const DatePicker(),
                     Container(
                       padding: const EdgeInsets.all(15),
                       child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: const [
                             Text(
-                              'メッセージ',
+                              'タスク',
                               style: TextStyle(
                                   fontSize: 22, fontWeight: FontWeight.bold),
                             ),
-                            Icon(
-                              Icons.search,
-                              size: 30,
-                            )
                           ]),
-                    ),
+                    )
                   ],
                 ),
               ),
             ),
           ),
-          messageList.isEmpty
+          detailList == null
               ? SliverFillRemaining(
                   child: Container(
                       color: Colors.white,
                       child: const Center(
                           child: Text(
-                        'メッセージはありません',
+                        '今日のタスクはありません',
                         style: TextStyle(color: Colors.grey, fontSize: 18),
                       ))))
               : SliverList(
                   delegate: SliverChildBuilderDelegate(
-                      (_, index) => MessageTimeline(messageList[index]),
-                      childCount: messageList.length),
-                )
+                      (_, index) => TaskTimeline(detailList[index]),
+                      childCount: detailList.length))
         ],
       ),
     );
@@ -83,11 +78,11 @@ class MessagePage extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              subject.className,
+              '${task.title}',
               style: const TextStyle(fontWeight: FontWeight.bold),
             ),
             Text(
-              '${messageList.length}件のメッセージ',
+              '${task.left}件のタスク',
               style: TextStyle(fontSize: 12, color: Colors.grey[700]),
             )
           ],
