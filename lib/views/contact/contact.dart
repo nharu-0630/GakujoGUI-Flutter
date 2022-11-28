@@ -83,7 +83,7 @@ class ContactPage extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              subject.classRoom,
+              subject.subjectsName,
               style: const TextStyle(fontWeight: FontWeight.bold),
             ),
             Text(

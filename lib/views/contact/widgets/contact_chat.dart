@@ -13,7 +13,7 @@ class ContactChat extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 15),
       child: Row(children: [
         Expanded(
-          child: _buildCard(contact),
+        child: _buildCard(contact),
         )
       ]),
     );

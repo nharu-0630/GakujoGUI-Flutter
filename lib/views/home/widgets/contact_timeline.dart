@@ -64,14 +64,13 @@ class ContactTimeLine extends StatelessWidget {
             ),
             SizedBox(
               width: 300,
-              child: Flexible(
-                  child: Text(
+              child: Text(
                 contact.isNotEmpty
                     ? contact.last.content!.replaceAll('\n', ' ')
                     : 'メッセージなし',
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
-              )),
+              ),
             ),
           ]),
         ));

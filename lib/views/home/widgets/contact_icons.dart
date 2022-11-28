@@ -40,7 +40,7 @@ class ContactIcons extends StatelessWidget {
         margin: const EdgeInsets.symmetric(horizontal: 5),
         width: 60,
         decoration: BoxDecoration(
-          color: subjects[index].subjectColor,
+          color: subjects[index].subjectColor.withOpacity(0.3),
           shape: BoxShape.circle,
         ),
         child: Column(
