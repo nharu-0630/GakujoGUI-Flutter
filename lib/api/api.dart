@@ -57,9 +57,6 @@ class Api {
       ),
     );
 
-    print(response.data);
-    print('GET gakujo.shizuoka.ac.jp /portal/ ${response.statusCode}');
-
     response = await _client.postUri<dynamic>(
       Uri.https(
         'gakujo.shizuoka.ac.jp',
@@ -67,17 +64,13 @@ class Api {
       ),
       data: 'mistakeChecker=0',
       options: Options(
+        followRedirects: false,
         headers: {
           'Origin': 'https://gakujo.shizuoka.ac.jp',
           'Referer': 'https://gakujo.shizuoka.ac.jp/portal/',
         },
       ),
     );
-
-    print(response.data);
-    print(
-        'POST gakujo.shizuoka.ac.jp /portal/login/preLogin/preLogin ${response.statusCode}');
-    await Future.delayed(const Duration(seconds: 5));
 
     response = await _client.postUri<dynamic>(
       Uri.https(
@@ -95,11 +88,6 @@ class Api {
       ),
     );
 
-    print(response.data);
-    print(
-        'POST gakujo.shizuoka.ac.jp /portal/shibbolethlogin/shibbolethLogin/initLogin/sso ${response.statusCode}');
-    await Future.delayed(Duration(seconds: 1));
-
     response = await _client.get<dynamic>(
       response.headers.value('location')!,
       options: Options(
@@ -111,11 +99,6 @@ class Api {
       ),
     );
 
-    print(response.data);
-    print(
-        'GET idp.shizuoka.ac.jp /idp/profile/SAML2/Redirect/SSO ${response.statusCode}');
-    await Future.delayed(Duration(seconds: 1));
-
     if (response.statusCode == 302) {
       response = await _client.getUri<dynamic>(
         Uri.https(
@@ -126,16 +109,12 @@ class Api {
           },
         ),
         options: Options(
+          followRedirects: false,
           headers: {
             'Referer': 'https://gakujo.shizuoka.ac.jp/portal/',
           },
         ),
       );
-
-      print(response.data);
-      print('GET idp.shizuoka.ac.jp /idp/profile/SAML2/Redirect/SSO '
-          '${response.statusCode}');
-      await Future.delayed(Duration(seconds: 1));
 
       response = await _client.postUri<dynamic>(
           Uri.https(
@@ -147,17 +126,13 @@ class Api {
           ),
           data: 'j_username=$username&j_password=$password&_eventId_proceed=',
           options: Options(
+            followRedirects: false,
             headers: {
               'Origin': 'https://idp.shizuoka.ac.jp',
               'Referer':
                   'https://idp.shizuoka.ac.jp/idp/profile/SAML2/Redirect/SSO?execution=e1s1',
             },
           ));
-
-      print(response.data);
-      print('POST idp.shizuoka.ac.jp /idp/profile/SAML2/Redirect/SSO '
-          '${response.statusCode}');
-      await Future.delayed(Duration(seconds: 1));
     }
     final samlResponse = Uri.decodeFull(
       RegExp(r'(?<=SAMLResponse" value=").*(?=")')
@@ -193,29 +168,62 @@ class Api {
       ),
     );
 
-    print(response.data);
-    print(
-        'POST gakujo.shizuoka.ac.jp /Shibboleth.sso/SAML2/POST ${response.statusCode}');
-    await Future.delayed(Duration(seconds: 1));
-
     response = await _client.getUri<dynamic>(
       Uri.https(
         'gakujo.shizuoka.ac.jp',
         '/portal/shibbolethlogin/shibbolethLogin/initLogin/sso',
       ),
       options: Options(
+        followRedirects: false,
         headers: {
+          'Accept':
+              'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
           'Referer': 'https://idp.shizuoka.ac.jp/',
         },
+        validateStatus: (status) => status! == 302 || status == 200,
       ),
     );
 
-    print(response.data);
-    print(
-        'GET gakujo.shizuoka.ac.jp /portal/shibbolethlogin/shibbolethLogin/initLogin/sso ${response.statusCode}');
-    await Future.delayed(Duration(seconds: 1));
+    if (response.statusCode == 302) {
+      response = await _client.get<dynamic>(
+        response.headers.value('location')!,
+      );
+    }
 
-    final document = parse(response.data);
+    _updateToken(response.data);
+    var document = parse(response.data);
+
+    print(response.data);
+
+    if (document
+        .querySelectorAll(
+            '#container > div > form > div:nth-child(2) > div.access_env > table > tbody > tr > td > input[type=text]')
+        .isNotEmpty) {
+      response = await _client.postUri<dynamic>(
+        Uri.https(
+          'gakujo.shizuoka.ac.jp',
+          '/portal/common/accessEnvironmentRegist/goHome/',
+        ),
+        data:
+            'org.apache.struts.taglib.html.TOKEN=$_token&accessEnvName=GakujoTask 1.0.0&newAccessKey=',
+        options: Options(),
+      );
+    }
+
+    print(response.data);
+
+    // response = await _client.postUri<dynamic>(
+    //   Uri.https(
+    //     'gakujo.shizuoka.ac.jp',
+    //     '/portal/home/home/initialize',
+    //   ),
+    //   data: 'EXCLUDE_SET=',
+    //   options: Options(),
+    // );
+
+    // _updateToken(response.data);
+    // document = parse(response.data);
+
     return _updateToken(response.data);
   }
 
