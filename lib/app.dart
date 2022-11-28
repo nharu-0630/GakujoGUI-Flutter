@@ -37,7 +37,7 @@ class _AppState extends State<App> {
           elevation: 0,
           backgroundColor: Colors.black,
           onPressed: () {
-            context.read<Provide>().login();
+            context.read<Provide>().fetchSubjects();
           },
           child: const Icon(
             Icons.sync,

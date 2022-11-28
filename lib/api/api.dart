@@ -25,7 +25,6 @@ class Api {
   final String password;
 
   Dio _client = Dio();
-  String _token = '';
   CookieJar _cookieJar = CookieJar();
 
   Api(this.year, this.semester, this.username, this.password);
@@ -35,6 +34,9 @@ class Api {
   String get reportDateStart => '$schoolYear/${semester < 2 ? '04' : '10'}/01';
   String get reportDateEnd => '$schoolYear/${semester < 2 ? '09' : '03'}/01';
   String get suffix => '_${year}_$semesterCode';
+
+  String _token = '';
+  String get token => _token;
 
   dynamic _settings = {};
   dynamic get settings => _settings;
@@ -51,6 +53,9 @@ class Api {
                 .firstMatch(data.toString())
                 ?.group(0) ??
             _token;
+    if (kDebugMode) {
+      print('Token: $_token');
+    }
     return _token != '';
   }
 
@@ -68,6 +73,14 @@ class Api {
         Cookie(_settings['AccessEnvironmentKey'],
             _settings['AccessEnvironmentValue'])
       ]);
+    }
+    if (prefs.getString('Subjects$suffix') != null) {
+      _subjects.clear();
+      _subjects.addAll(Subject.decode(prefs.getString('Subjects$suffix')!));
+    }
+    if (prefs.getString('Contacts$suffix') != null) {
+      _contacts.clear();
+      _contacts.addAll(Contact.decode(prefs.getString('Contacts$suffix')!));
     }
   }
 
@@ -90,6 +103,8 @@ class Api {
 
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString('Settings', json.encode(_settings));
+    await prefs.setString('Subjects$suffix', Subject.encode(_subjects));
+    await prefs.setString('Contacts$suffix', Contact.encode(_contacts));
   }
 
   void _initialize() {
@@ -311,11 +326,6 @@ class Api {
 
     _updateToken(response.data);
     saveSettings();
-
-    if (kDebugMode) {
-      print('Token: $_token');
-    }
-
     return true;
   }
 
@@ -482,8 +492,11 @@ class Api {
     final document = parse(response.data);
 
     _subjects.clear();
-    _subjects.addAll(
-        document.querySelectorAll('#st1 > ul').map(Subject.fromElement));
+    _subjects.addAll(document
+        .querySelector('#st1')!
+        .querySelectorAll('ul')
+        .map(Subject.fromElement));
+    saveSettings();
     return _subjects;
   }
 

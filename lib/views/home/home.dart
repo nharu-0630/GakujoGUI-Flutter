@@ -14,7 +14,7 @@ class HomeWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return RefreshIndicator(
         onRefresh: () async {
-          context.read<Provide>().fetchAll();
+          context.read<Provide>().login();
         },
         child: SingleChildScrollView(
           physics: const AlwaysScrollableScrollPhysics(),

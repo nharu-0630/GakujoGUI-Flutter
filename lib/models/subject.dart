@@ -17,18 +17,26 @@ class Subject {
     this.subjectColor,
   );
 
-  factory Subject.fromJson(Map<String, dynamic> json) => Subject(
+  static String encode(List<Subject> subjects) => json.encode(
+        subjects.map<Map<String, dynamic>>(Subject.toJson).toList(),
+      );
+
+  static List<Subject> decode(String subjects) => json.decode(subjects) is List
+      ? (json.decode(subjects) as List).map<Subject>(Subject.fromJson).toList()
+      : [];
+
+  factory Subject.fromJson(dynamic json) => Subject(
         json['subjectsName'] as String,
         json['teacherName'] as String,
         json['classRoom'] as String,
-        json['subjectColor'],
+        Color(json['subjectColor']),
       );
 
   static Map<String, dynamic> toJson(Subject subject) => <String, dynamic>{
         'subjectsName': subject.subjectsName,
         'teacherName': subject.teacherName,
         'classRoom': subject.classRoom,
-        'subjectColor': subject.subjectColor,
+        'subjectColor': subject.subjectColor.value,
       };
 
   factory Subject.fromElement(Element element) {

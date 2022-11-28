@@ -9,7 +9,8 @@ class ContactTimeLine extends StatelessWidget {
   final List<Subject> subjects;
   final List<Contact> contacts;
 
-  ContactTimeLine({Key? key, required this.subjects, required this.contacts})
+  const ContactTimeLine(
+      {Key? key, required this.subjects, required this.contacts})
       : super(key: key);
 
   @override

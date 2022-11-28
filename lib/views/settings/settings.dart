@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:gakujo_task/provide.dart';
+import 'package:provider/provider.dart';
 import 'package:sticky_headers/sticky_headers.dart';
 
 class SettingsPage extends StatelessWidget {
@@ -22,7 +24,14 @@ class SettingsPage extends StatelessWidget {
             ),
             content: const Text(''),
           ),
-          const SizedBox(height: 15)
+          // const SizedBox(height: 15),
+          Padding(
+            padding: const EdgeInsets.all(15.0),
+            child: Text(
+              'Token: ${context.watch<Provide>().token}\nContacts Items: ${context.watch<Provide>().contacts.length}\nSubjects Items: ${context.watch<Provide>().subjects.length}',
+              style: TextStyle(color: Colors.grey[700]),
+            ),
+          ),
         ],
       ),
     );

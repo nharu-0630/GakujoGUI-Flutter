@@ -36,7 +36,15 @@ class Contact {
       this.webReplyRequest,
       {required this.isAcquired});
 
-  factory Contact.fromJson(Map<String, dynamic> json) => Contact(
+  static String encode(List<Contact> contacts) => json.encode(
+        contacts.map<Map<String, dynamic>>(Contact.toJson).toList(),
+      );
+
+  static List<Contact> decode(String contacts) => json.decode(contacts) is List
+      ? (json.decode(contacts) as List).map<Contact>(Contact.fromJson).toList()
+      : [];
+
+  factory Contact.fromJson(dynamic json) => Contact(
       json['subjects'] as String,
       json['teacherName'] as String,
       json['contactType'] as String,
