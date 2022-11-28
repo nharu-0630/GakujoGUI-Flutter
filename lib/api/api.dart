@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:cookie_jar/cookie_jar.dart';
 import 'package:dio/dio.dart';
 import 'package:dio_cookie_manager/dio_cookie_manager.dart';
+import 'package:dio_smart_retry/dio_smart_retry.dart';
 import 'package:flutter/foundation.dart';
 import 'package:gakujo_task/models/message.dart';
 import 'package:gakujo_task/models/quiz.dart';
@@ -18,6 +19,8 @@ import 'package:wakelock/wakelock.dart';
 
 class Api {
   static final Version version = Version(1, 0, 1);
+
+  final Duration _interval = const Duration(milliseconds: 750);
 
   final int year;
   final int semester;
@@ -56,10 +59,14 @@ class Api {
     }
     _settings = json.decode(prefs.getString('Settings')!);
 
-    _cookieJar.saveFromResponse(Uri.https('gakujo.shizuoka.ac.jp', '/portal'), [
-      Cookie(_settings['AccessEnvironmentKey'],
-          _settings['AccessEnvironmentValue'])
-    ]);
+    if (_settings['AccessEnvironmentKey'] != null &&
+        _settings['AccessEnvironmentValue'] != null) {
+      _cookieJar.saveFromResponse(
+          Uri.https('gakujo.shizuoka.ac.jp', '/portal'), [
+        Cookie(_settings['AccessEnvironmentKey'],
+            _settings['AccessEnvironmentValue'])
+      ]);
+    }
   }
 
   Future<void> _saveSettings() async {
@@ -93,20 +100,32 @@ class Api {
     _token = '';
     _cookieJar = CookieJar();
     _client.interceptors.add(CookieManager(_cookieJar));
+    _client.interceptors.add(LogInterceptor());
+    _client.interceptors.add(RetryInterceptor(
+      dio: _client,
+      logPrint: print,
+      retries: 3,
+      retryDelays: const [
+        Duration(seconds: 3),
+        Duration(seconds: 3),
+        Duration(seconds: 3),
+      ],
+    ));
   }
 
   Future<bool> login() async {
     _initialize();
     await _loadSettings();
 
-    var response = await _client.getUri<dynamic>(
+    await _client.getUri<dynamic>(
       Uri.https(
         'gakujo.shizuoka.ac.jp',
         '/portal/',
       ),
     );
+    await Future.delayed(_interval);
 
-    response = await _client.postUri<dynamic>(
+    await _client.postUri<dynamic>(
       Uri.https(
         'gakujo.shizuoka.ac.jp',
         '/portal/login/preLogin/preLogin',
@@ -120,8 +139,9 @@ class Api {
         },
       ),
     );
+    await Future.delayed(_interval);
 
-    response = await _client.postUri<dynamic>(
+    var response = await _client.postUri<dynamic>(
       Uri.https(
         'gakujo.shizuoka.ac.jp',
         '/portal/shibbolethlogin/shibbolethLogin/initLogin/sso',
@@ -136,6 +156,7 @@ class Api {
         validateStatus: (status) => status! == 302,
       ),
     );
+    await Future.delayed(_interval);
 
     response = await _client.get<dynamic>(
       response.headers.value('location')!,
@@ -147,9 +168,10 @@ class Api {
         validateStatus: (status) => status! == 302 || status == 200,
       ),
     );
+    await Future.delayed(_interval);
 
     if (response.statusCode == 302) {
-      response = await _client.getUri<dynamic>(
+      await _client.getUri<dynamic>(
         Uri.https(
           'idp.shizuoka.ac.jp',
           '/idp/profile/SAML2/Redirect/SSO',
@@ -164,25 +186,29 @@ class Api {
           },
         ),
       );
+      await Future.delayed(_interval);
 
       response = await _client.postUri<dynamic>(
-          Uri.https(
-            'idp.shizuoka.ac.jp',
-            '/idp/profile/SAML2/Redirect/SSO',
-            {
-              'execution': 'e1s1',
-            },
-          ),
-          data: 'j_username=$username&j_password=$password&_eventId_proceed=',
-          options: Options(
-            followRedirects: false,
-            headers: {
-              'Origin': 'https://idp.shizuoka.ac.jp',
-              'Referer':
-                  'https://idp.shizuoka.ac.jp/idp/profile/SAML2/Redirect/SSO?execution=e1s1',
-            },
-          ));
+        Uri.https(
+          'idp.shizuoka.ac.jp',
+          '/idp/profile/SAML2/Redirect/SSO',
+          {
+            'execution': 'e1s1',
+          },
+        ),
+        data: 'j_username=$username&j_password=$password&_eventId_proceed=',
+        options: Options(
+          followRedirects: false,
+          headers: {
+            'Origin': 'https://idp.shizuoka.ac.jp',
+            'Referer':
+                'https://idp.shizuoka.ac.jp/idp/profile/SAML2/Redirect/SSO?execution=e1s1',
+          },
+        ),
+      );
+      await Future.delayed(_interval);
     }
+
     final samlResponse = Uri.decodeFull(
       RegExp(r'(?<=SAMLResponse" value=").*(?=")')
               .firstMatch(response.data.toString())
@@ -196,7 +222,12 @@ class Api {
           '',
     ).replaceAll('&#x3a;', ':');
 
-    response = await _client.postUri<dynamic>(
+    if (kDebugMode) {
+      print('SAMLResponse: ${samlResponse.substring(0, 10)} ...');
+      print('RelayState: ${relayState.substring(0, 10)} ...');
+    }
+
+    await _client.postUri<dynamic>(
       Uri.https(
         'gakujo.shizuoka.ac.jp',
         '/Shibboleth.sso/SAML2/POST',
@@ -216,6 +247,7 @@ class Api {
         validateStatus: (status) => status! == 302,
       ),
     );
+    await Future.delayed(_interval);
 
     response = await _client.getUri<dynamic>(
       Uri.https(
@@ -232,11 +264,13 @@ class Api {
         validateStatus: (status) => status! == 302 || status == 200,
       ),
     );
+    await Future.delayed(_interval);
 
     if (response.statusCode == 302) {
       response = await _client.get<dynamic>(
         response.headers.value('location')!,
       );
+      await Future.delayed(_interval);
     }
 
     _updateToken(response.data);
@@ -255,6 +289,7 @@ class Api {
             'org.apache.struts.taglib.html.TOKEN=$_token&accessEnvName=GakujoTask ${(const Uuid()).v4().substring(0, 8)}&newAccessKey=',
         options: Options(),
       );
+      await Future.delayed(_interval);
     }
 
     response = await _client.postUri<dynamic>(
@@ -265,16 +300,18 @@ class Api {
       data: 'EXCLUDE_SET=',
     );
     document = parse(response.data);
+    await Future.delayed(_interval);
 
     var name =
         document.querySelector('#header-cog > li > a > span > span')?.text;
-    settings['Name'] = name?.substring(0, name.indexOf('さん'));
+    settings['FullName'] =
+        name?.substring(0, name.indexOf('さん')).replaceAll('　', '');
 
     _updateToken(response.data);
     _saveSettings();
 
     if (kDebugMode) {
-      print(_token);
+      print('Token: $_token');
     }
 
     return true;

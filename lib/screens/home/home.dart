@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gakujo_task/api/api.dart';
 import 'package:gakujo_task/screens/home/widgets/message_icons.dart';
 import 'package:gakujo_task/screens/home/widgets/messages.dart';
 import 'package:gakujo_task/screens/home/widgets/status.dart';
@@ -6,13 +7,15 @@ import 'package:gakujo_task/screens/home/widgets/tasks.dart';
 import 'package:sticky_headers/sticky_headers.dart';
 
 class HomePage extends StatelessWidget {
-  const HomePage({Key? key}) : super(key: key);
+  Api api;
+
+  HomePage({Key? key, required this.api}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return RefreshIndicator(
-        onRefresh: () {
-          return Future.delayed(const Duration(seconds: 1));
+        onRefresh: () async {
+          await api.login();
         },
         child: SingleChildScrollView(
           child: Column(

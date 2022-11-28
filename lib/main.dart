@@ -9,8 +9,7 @@ import 'package:package_info_plus/package_info_plus.dart';
 
 void main() async {
   await dotenv.load(fileName: '.env');
-  var api = Api(2022, 2, dotenv.env['USERNAME']!, dotenv.env['PASSWORD']!);
-  api.login();
+  initializeDateFormatting('ja');
   runApp(const MyApp());
 }
 
@@ -22,11 +21,17 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
+  final _api = Api(2022, 2, dotenv.env['USERNAME']!, dotenv.env['PASSWORD']!);
   var _index = 0;
 
   @override
+  void initState() {
+    _api.login().then((value) => setState(() {}));
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    initializeDateFormatting('ja');
     SystemChrome.setSystemUIOverlayStyle(
         const SystemUiOverlayStyle(statusBarColor: Colors.transparent));
     return MaterialApp(
@@ -36,7 +41,7 @@ class _MyAppState extends State<MyApp> {
         backgroundColor: Colors.white,
         appBar: _buildAppBar(),
         body: [
-          const HomePage(),
+          HomePage(api: _api),
           const SettingsPage(),
         ][_index],
         bottomNavigationBar: _buildBottomNavigationBar(),
@@ -70,12 +75,21 @@ class _MyAppState extends State<MyApp> {
           ),
         ),
         const SizedBox(width: 10),
-        const Text('Hi, xyzyxJP!',
-            style: TextStyle(
-              color: Colors.black,
-              fontSize: 26,
-              fontWeight: FontWeight.bold,
-            )),
+        _api.settings['FullName'] == null
+            ? const Text(
+                'Hi!',
+                style: TextStyle(
+                  color: Colors.black,
+                  fontSize: 26,
+                  fontWeight: FontWeight.bold,
+                ),
+              )
+            : Text('Hi, ${_api.settings['FullName']}!',
+                style: const TextStyle(
+                  color: Colors.black,
+                  fontSize: 26,
+                  fontWeight: FontWeight.bold,
+                )),
       ]),
     );
   }
