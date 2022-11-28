@@ -1,17 +1,23 @@
+import 'dart:convert';
+import 'dart:io';
+
 import 'package:cookie_jar/cookie_jar.dart';
 import 'package:dio/dio.dart';
 import 'package:dio_cookie_manager/dio_cookie_manager.dart';
+import 'package:flutter/foundation.dart';
 import 'package:gakujo_task/models/message.dart';
 import 'package:gakujo_task/models/quiz.dart';
 import 'package:gakujo_task/models/report.dart';
 // import 'package:flutter_app_badger/flutter_app_badger.dart';
 import 'package:html/dom.dart';
 import 'package:html/parser.dart' show parse;
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:uuid/uuid.dart';
 import 'package:version/version.dart';
 import 'package:wakelock/wakelock.dart';
 
 class Api {
-  static final Version version = Version(1, 0, 0);
+  static final Version version = Version(1, 0, 1);
 
   final int year;
   final int semester;
@@ -22,6 +28,8 @@ class Api {
   String _token = '';
   CookieJar _cookieJar = CookieJar();
 
+  dynamic _settings = {};
+
   Api(this.year, this.semester, this.username, this.password);
 
   String get schoolYear => year.toString();
@@ -29,6 +37,8 @@ class Api {
   String get reportDateStart => '$schoolYear/${semester < 2 ? '04' : '10'}/01';
   String get reportDateEnd => '$schoolYear/${semester < 2 ? '09' : '03'}/01';
   String get suffix => '_${year}_$semesterCode';
+
+  dynamic get settings => _settings;
 
   bool _updateToken(dynamic data) {
     _token =
@@ -39,16 +49,55 @@ class Api {
     return _token != '';
   }
 
-  Future<bool> login() async {
+  Future<void> _loadSettings() async {
+    final prefs = await SharedPreferences.getInstance();
+    if (prefs.getString('Settings') == null) {
+      return;
+    }
+    _settings = json.decode(prefs.getString('Settings')!);
+
+    _cookieJar.saveFromResponse(Uri.https('gakujo.shizuoka.ac.jp', '/portal'), [
+      Cookie(_settings['AccessEnvironmentKey'],
+          _settings['AccessEnvironmentValue'])
+    ]);
+  }
+
+  Future<void> _saveSettings() async {
+    List<Cookie> cookies = (await _cookieJar
+        .loadForRequest(Uri.https('gakujo.shizuoka.ac.jp', '/portal')));
+    if (cookies
+        .where(
+          (element) => element.name.contains('Access-Environment-Cookie'),
+        )
+        .isNotEmpty) {
+      Cookie cookie = cookies
+          .where(
+            (element) => element.name.contains('Access-Environment-Cookie'),
+          )
+          .first;
+      _settings['AccessEnvironmentKey'] = cookie.name;
+      _settings['AccessEnvironmentValue'] = cookie.value;
+    }
+
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('Settings', json.encode(_settings));
+  }
+
+  void _initialize() {
     _client = Dio(BaseOptions(
       headers: {
-        'User-Agent': 'Chrome/105.0.5195.127 GakujoTask/1.0.0.0',
+        'User-Agent': 'Chrome/105.0.5195.127 GakujoTask/$version',
       },
       contentType: Headers.formUrlEncodedContentType,
     ));
-
+    _token = '';
     _cookieJar = CookieJar();
     _client.interceptors.add(CookieManager(_cookieJar));
+  }
+
+  Future<bool> login() async {
+    _initialize();
+    await _loadSettings();
 
     var response = await _client.getUri<dynamic>(
       Uri.https(
@@ -193,8 +242,6 @@ class Api {
     _updateToken(response.data);
     var document = parse(response.data);
 
-    print(response.data);
-
     if (document
         .querySelectorAll(
             '#container > div > form > div:nth-child(2) > div.access_env > table > tbody > tr > td > input[type=text]')
@@ -205,26 +252,29 @@ class Api {
           '/portal/common/accessEnvironmentRegist/goHome/',
         ),
         data:
-            'org.apache.struts.taglib.html.TOKEN=$_token&accessEnvName=GakujoTask 1.0.0&newAccessKey=',
+            'org.apache.struts.taglib.html.TOKEN=$_token&accessEnvName=GakujoTask ${(const Uuid()).v4().substring(0, 8)}&newAccessKey=',
         options: Options(),
       );
     }
 
-    print(response.data);
+    response = await _client.postUri<dynamic>(
+      Uri.https(
+        'gakujo.shizuoka.ac.jp',
+        '/portal/home/home/initialize',
+      ),
+      data: 'EXCLUDE_SET=',
+    );
 
-    // response = await _client.postUri<dynamic>(
-    //   Uri.https(
-    //     'gakujo.shizuoka.ac.jp',
-    //     '/portal/home/home/initialize',
-    //   ),
-    //   data: 'EXCLUDE_SET=',
-    //   options: Options(),
-    // );
+    _updateToken(response.data);
+    _saveSettings();
 
-    // _updateToken(response.data);
-    // document = parse(response.data);
+    document = parse(response.data);
 
-    return _updateToken(response.data);
+    if (kDebugMode) {
+      print(_token);
+    }
+
+    return true;
   }
 
   Future<List<Message>> getMessages(List<Message> messages) async {
