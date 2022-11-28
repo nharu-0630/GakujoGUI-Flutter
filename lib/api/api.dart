@@ -43,8 +43,8 @@ class Api {
     _client = Dio(BaseOptions(
       headers: {
         'User-Agent': 'Chrome/105.0.5195.127 GakujoTask/1.0.0.0',
-        'Content-Type': 'application/x-www-form-urlencoded',
       },
+      contentType: Headers.formUrlEncodedContentType,
     ));
 
     _cookieJar = CookieJar();
@@ -65,9 +65,7 @@ class Api {
         'gakujo.shizuoka.ac.jp',
         '/portal/login/preLogin/preLogin',
       ),
-      data: FormData.fromMap({
-        'mistakeChecker': '0',
-      }),
+      data: 'mistakeChecker=0',
       options: Options(
         headers: {
           'Origin': 'https://gakujo.shizuoka.ac.jp',
@@ -86,8 +84,7 @@ class Api {
         'gakujo.shizuoka.ac.jp',
         '/portal/shibbolethlogin/shibbolethLogin/initLogin/sso',
       ),
-      data: FormData.fromMap(
-          {'selectLocale': 'ja', 'mistakeChecker': '0', 'EXCLUDE_SET': ''}),
+      data: 'selectLocale=ja&mistakeChecker=0&EXCLUDE_SET=',
       options: Options(
         headers: {
           'Origin': 'https://gakujo.shizuoka.ac.jp',
@@ -146,11 +143,9 @@ class Api {
             '/idp/profile/SAML2/Redirect/SSO',
             {
               'execution': 'e1s1',
-              'j_username': username,
-              'j_password': password,
-              '_eventId_proceed': ''
             },
           ),
+          data: 'j_username=$username&j_password=$password&_eventId_proceed=',
           options: Options(
             headers: {
               'Origin': 'https://idp.shizuoka.ac.jp',
@@ -187,7 +182,6 @@ class Api {
         'SAMLResponse': samlResponse,
       },
       options: Options(
-        contentType: Headers.formUrlEncodedContentType,
         headers: {
           'Accept':
               'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
