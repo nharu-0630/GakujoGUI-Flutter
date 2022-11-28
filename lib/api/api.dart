@@ -264,11 +264,14 @@ class Api {
       ),
       data: 'EXCLUDE_SET=',
     );
+    document = parse(response.data);
+
+    var name =
+        document.querySelector('#header-cog > li > a > span > span')?.text;
+    settings['Name'] = name?.substring(0, name.indexOf('さん'));
 
     _updateToken(response.data);
     _saveSettings();
-
-    document = parse(response.data);
 
     if (kDebugMode) {
       print(_token);
