@@ -43,7 +43,11 @@ class Subject {
     var bytes =
         md5.convert(utf8.encode(element.querySelectorAll('li')[0].text.trim()));
     return Subject(
-      element.querySelectorAll('li')[0].text.trim(),
+      element
+          .querySelectorAll('li')[0]
+          .text
+          .trim()
+          .replaceAll(RegExp(r'（.*）(.*)'), ''),
       element.querySelectorAll('li')[1].text.trim(),
       element.querySelectorAll('li')[2].text.trim(),
       Color(int.parse('0xFF${bytes.toString().substring(0, 6)}')),

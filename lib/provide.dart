@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:gakujo_task/api/api.dart';
@@ -35,7 +34,11 @@ class Provide extends ChangeNotifier {
   void fetchSubjects() async {
     await _api.fetchSubjects().then((value) => notifyListeners());
     if (kDebugMode) {
-      print(_api.subjects);
+      print(_api.subjects.map((e) => e.subjectsName));
     }
+  }
+
+  void refresh() {
+    notifyListeners();
   }
 }

@@ -82,6 +82,8 @@ class Api {
       _contacts.clear();
       _contacts.addAll(Contact.decode(prefs.getString('Contacts$suffix')!));
     }
+
+    await saveSettings();
   }
 
   Future<void> saveSettings() async {

@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:gakujo_task/api/api.dart';
 import 'package:gakujo_task/provide.dart';
 import 'package:gakujo_task/views/home/home.dart';
 import 'package:gakujo_task/views/settings/settings.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:provider/provider.dart';
 
 class App extends StatefulWidget {
@@ -117,25 +119,25 @@ class _AppState extends State<App> {
                     )),
               ]),
         ),
-        // Positioned(
-        //   right: 10,
-        //   bottom: 10,
-        //   child: FutureBuilder(
-        //     future: PackageInfo.fromPlatform(),
-        //     builder: (context, AsyncSnapshot<PackageInfo> snapshot) {
-        //       if (!snapshot.hasData) {
-        //         return Text(
-        //           'Client Version: \nAPI Version: ',
-        //           style: TextStyle(color: Colors.grey[700]),
-        //         );
-        //       }
-        //       return Text(
-        //         'Client Version: ${snapshot.data!.version}\nAPI Version: ${Api.version}',
-        //         style: TextStyle(color: Colors.grey[700]),
-        //       );
-        //     },
-        //   ),
-        // ),
+        Positioned(
+          right: 10,
+          bottom: 10,
+          child: FutureBuilder(
+            future: PackageInfo.fromPlatform(),
+            builder: (context, AsyncSnapshot<PackageInfo> snapshot) {
+              if (!snapshot.hasData) {
+                return Text(
+                  'Client Version: \nAPI Version: ',
+                  style: TextStyle(color: Colors.grey[700]),
+                );
+              }
+              return Text(
+                'Client Version: ${snapshot.data!.version}\nAPI Version: ${Api.version}',
+                style: TextStyle(color: Colors.grey[700]),
+              );
+            },
+          ),
+        ),
       ]),
     );
   }
