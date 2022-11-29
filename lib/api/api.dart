@@ -15,7 +15,7 @@ import 'package:uuid/uuid.dart';
 import 'package:version/version.dart';
 
 class Api {
-  static final Version version = Version(1, 0, 1);
+  static final Version version = Version(1, 0, 2);
 
   final Duration _interval = const Duration(milliseconds: 2000);
 
@@ -52,11 +52,11 @@ class Api {
         RegExp(r'(?<="org.apache.struts.taglib.html.TOKEN" value=").*(?=")')
                 .firstMatch(data.toString())
                 ?.group(0) ??
-            _token;
+            '';
     if (kDebugMode) {
       print('Token: $_token');
     }
-    return _token != '';
+    return _token.isNotEmpty;
   }
 
   Future<void> loadSettings() async {
@@ -132,18 +132,19 @@ class Api {
     ));
   }
 
-  Future<bool> login() async {
+  Future<void> login() async {
     _initialize();
     await loadSettings();
 
-    await _client.getUri<dynamic>(
+    await Future.delayed(_interval);
+    _client.getUri<dynamic>(
       Uri.https(
         'gakujo.shizuoka.ac.jp',
         '/portal/',
       ),
     );
-    await Future.delayed(_interval);
 
+    await Future.delayed(_interval);
     await _client.postUri<dynamic>(
       Uri.https(
         'gakujo.shizuoka.ac.jp',
@@ -158,8 +159,8 @@ class Api {
         },
       ),
     );
-    await Future.delayed(_interval);
 
+    await Future.delayed(_interval);
     var response = await _client.postUri<dynamic>(
       Uri.https(
         'gakujo.shizuoka.ac.jp',
@@ -175,8 +176,8 @@ class Api {
         validateStatus: (status) => status! == 302,
       ),
     );
-    await Future.delayed(_interval);
 
+    await Future.delayed(_interval);
     response = await _client.get<dynamic>(
       response.headers.value('location')!,
       options: Options(
@@ -187,9 +188,9 @@ class Api {
         validateStatus: (status) => status! == 302 || status == 200,
       ),
     );
-    await Future.delayed(_interval);
 
     if (response.statusCode == 302) {
+      await Future.delayed(_interval);
       await _client.getUri<dynamic>(
         Uri.https(
           'idp.shizuoka.ac.jp',
@@ -205,8 +206,8 @@ class Api {
           },
         ),
       );
-      await Future.delayed(_interval);
 
+      await Future.delayed(_interval);
       response = await _client.postUri<dynamic>(
         Uri.https(
           'idp.shizuoka.ac.jp',
@@ -225,7 +226,6 @@ class Api {
           },
         ),
       );
-      await Future.delayed(_interval);
     }
 
     final samlResponse = Uri.decodeFull(
@@ -246,6 +246,11 @@ class Api {
       print('RelayState: ${relayState.substring(0, 10)} ...');
     }
 
+    if (samlResponse.isEmpty || relayState.isEmpty) {
+      throw Exception('SAMLResponse or RelayState is empty.');
+    }
+
+    await Future.delayed(_interval);
     await _client.postUri<dynamic>(
       Uri.https(
         'gakujo.shizuoka.ac.jp',
@@ -266,8 +271,8 @@ class Api {
         validateStatus: (status) => status! == 302,
       ),
     );
-    await Future.delayed(_interval);
 
+    await Future.delayed(_interval);
     response = await _client.getUri<dynamic>(
       Uri.https(
         'gakujo.shizuoka.ac.jp',
@@ -283,13 +288,12 @@ class Api {
         validateStatus: (status) => status! == 302 || status == 200,
       ),
     );
-    await Future.delayed(_interval);
 
     if (response.statusCode == 302) {
+      await Future.delayed(_interval);
       response = await _client.get<dynamic>(
         response.headers.value('location')!,
       );
-      await Future.delayed(_interval);
     }
 
     _updateToken(response.data);
@@ -299,6 +303,7 @@ class Api {
         .querySelectorAll(
             '#container > div > form > div:nth-child(2) > div.access_env > table > tbody > tr > td > input[type=text]')
         .isNotEmpty) {
+      await Future.delayed(_interval);
       response = await _client.postUri<dynamic>(
         Uri.https(
           'gakujo.shizuoka.ac.jp',
@@ -308,9 +313,9 @@ class Api {
             'org.apache.struts.taglib.html.TOKEN=$_token&accessEnvName=GakujoTask ${(const Uuid()).v4().substring(0, 8)}&newAccessKey=',
         options: Options(),
       );
-      await Future.delayed(_interval);
     }
 
+    await Future.delayed(_interval);
     response = await _client.postUri<dynamic>(
       Uri.https(
         'gakujo.shizuoka.ac.jp',
@@ -318,17 +323,19 @@ class Api {
       ),
       data: 'EXCLUDE_SET=',
     );
+
+    if (!_updateToken(response.data)) {
+      throw Exception('Failed to update token.');
+    }
+
     document = parse(response.data);
-    await Future.delayed(_interval);
 
     var name =
         document.querySelector('#header-cog > li > a > span > span')?.text;
     _settings['FullName'] =
         name?.substring(0, name.indexOf('さん')).replaceAll('　', '');
 
-    _updateToken(response.data);
     saveSettings();
-    return true;
   }
 
   Future<List<Contact>> fetchContacts() async {
@@ -344,7 +351,9 @@ class Api {
         'nextPath': '/classcontact/classContactList/initialize'
       },
     );
-    _updateToken(response.data);
+    if (!_updateToken(response.data)) {
+      throw Exception('Failed to update token.');
+    }
     await Future.delayed(_interval);
 
     response = await _client.postUri<dynamic>(

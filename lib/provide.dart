@@ -1,5 +1,7 @@
 import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:gakujo_task/api/api.dart';
 import 'package:gakujo_task/models/contact.dart';
 import 'package:gakujo_task/models/subject.dart';
@@ -24,7 +26,15 @@ class Provide extends ChangeNotifier {
   }
 
   void login() async {
-    await _api.login().then((value) => notifyListeners());
+    try {
+      await _api.login().then((value) => notifyListeners());
+    } catch (e) {
+      Fluttertoast.showToast(
+        msg: e.toString(),
+        toastLength: Toast.LENGTH_LONG,
+        timeInSecForIosWeb: 5,
+      );
+    }
   }
 
   void fetchContacts() async {

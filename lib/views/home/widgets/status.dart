@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class Status extends StatelessWidget {
   const Status({Key? key}) : super(key: key);
@@ -49,14 +50,19 @@ class Status extends StatelessWidget {
         Positioned(
           bottom: 15,
           right: 15,
-          child: Container(
-            padding: const EdgeInsets.all(10),
-            decoration: BoxDecoration(
-                color: Colors.blueAccent,
-                borderRadius: BorderRadius.circular(15)),
-            child: const Icon(
-              Icons.arrow_forward,
-              color: Colors.white,
+          child: GestureDetector(
+            onTap: () => launchUrl(
+                Uri.https('gakujo.shizuoka.ac.jp', '/portal/'),
+                mode: LaunchMode.externalApplication),
+            child: Container(
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                  color: Colors.blueAccent,
+                  borderRadius: BorderRadius.circular(15)),
+              child: const Icon(
+                Icons.arrow_forward,
+                color: Colors.white,
+              ),
             ),
           ),
         )

@@ -30,20 +30,20 @@ class _AppState extends State<App> {
           SettingsPage(),
         ][_index],
         bottomNavigationBar: _buildBottomNavigationBar(),
-        floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-        floatingActionButton: FloatingActionButton(
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-          elevation: 0,
-          backgroundColor: Colors.black,
-          onPressed: () {
-            context.read<Provide>().fetchSubjects();
-          },
-          child: const Icon(
-            Icons.sync,
-            size: 35,
-          ),
-        ),
+        // floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+        // floatingActionButton: FloatingActionButton(
+        //   shape:
+        //       RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+        //   elevation: 0,
+        //   backgroundColor: Colors.black,
+        //   onPressed: () {
+        //     context.read<Provide>().fetchSubjects();
+        //   },
+        //   child: const Icon(
+        //     Icons.sync,
+        //     size: 35,
+        //   ),
+        // ),
       ),
     );
   }
