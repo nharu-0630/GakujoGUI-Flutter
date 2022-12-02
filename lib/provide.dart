@@ -20,14 +20,14 @@ class Provide extends ChangeNotifier {
   }
 
   void fetchAll() async {
-    await _api.login().then((value) => notifyListeners());
+    await _api.fetchLogin().then((value) => notifyListeners());
     await _api.fetchContacts().then((value) => notifyListeners());
     await _api.fetchSubjects().then((value) => notifyListeners());
   }
 
   void login() async {
     try {
-      await _api.login().then((value) => notifyListeners());
+      await _api.fetchLogin().then((value) => notifyListeners());
     } catch (e) {
       Fluttertoast.showToast(
         msg: e.toString(),
