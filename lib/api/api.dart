@@ -48,6 +48,12 @@ class Api {
   final List<Subject> _subjects = [];
   List<Subject> get subjects => _subjects;
 
+  final List<Report> _reports = [];
+  List<Report> get reports => _reports;
+
+  final List<Quiz> _quizzes = [];
+  List<Quiz> get quizzes => _quizzes;
+
   bool _updateToken(dynamic data, {bool required = false}) {
     _token =
         RegExp(r'(?<="org.apache.struts.taglib.html.TOKEN" value=").*(?=")')
@@ -86,6 +92,14 @@ class Api {
       _contacts.clear();
       _contacts.addAll(Contact.decode(prefs.getString('Contacts$suffix')!));
     }
+    if (prefs.getString('Reports$suffix') != null) {
+      _reports.clear();
+      _reports.addAll(Report.decode(prefs.getString('Reports$suffix')!));
+    }
+    if (prefs.getString('Quizzes$suffix') != null) {
+      _quizzes.clear();
+      _quizzes.addAll(Quiz.decode(prefs.getString('Quizzes$suffix')!));
+    }
 
     await saveSettings();
   }
@@ -111,6 +125,8 @@ class Api {
     await prefs.setString('Settings', json.encode(_settings));
     await prefs.setString('Subjects$suffix', Subject.encode(_subjects));
     await prefs.setString('Contacts$suffix', Contact.encode(_contacts));
+    await prefs.setString('Reports$suffix', Report.encode(_reports));
+    await prefs.setString('Quizzes$suffix', Quiz.encode(_quizzes));
   }
 
   void _initialize() {
@@ -465,9 +481,9 @@ class Api {
           }),
     );
     _updateToken(response.data, required: true);
-
-    _contacts[index].toDetail(parse(response.data));
-    return contacts[index];
+    contact.toDetail(parse(response.data));
+    saveSettings();
+    return contact;
   }
 
   Future<List<Subject>> fetchSubjects() async {
@@ -507,7 +523,7 @@ class Api {
     return _subjects;
   }
 
-  Future<List<Report>> fetchReports(List<Report> reports) async {
+  Future<List<Report>> fetchReports() async {
     var response = await _client.postUri<dynamic>(
       Uri.https(
         'gakujo.shizuoka.ac.jp',
@@ -552,7 +568,6 @@ class Api {
       },
     );
     _updateToken(response.data, required: true);
-
     for (var element in parse(response.data)
         .querySelectorAll('#searchList > tbody > tr')
         .map(Report.fromElement)) {
@@ -562,6 +577,7 @@ class Api {
         reports.where((e) => e == element).forEach((e) => e.toRefresh(element));
       }
     }
+    saveSettings();
     return reports;
   }
 
@@ -650,12 +666,12 @@ class Api {
       },
     );
     _updateToken(response.data, required: true);
-
     report.toDetail(parse(response.data));
+    saveSettings();
     return report;
   }
 
-  Future<List<Quiz>> fetchQuizzes(List<Quiz> quizzes) async {
+  Future<List<Quiz>> fetchQuizzes() async {
     var response = await _client.postUri<dynamic>(
       Uri.https(
         'gakujo.shizuoka.ac.jp',
@@ -700,7 +716,6 @@ class Api {
       },
     );
     _updateToken(response.data, required: true);
-
     for (var element in parse(response.data)
         .querySelectorAll('#searchList > tbody > tr')
         .map(Quiz.fromElement)) {
@@ -710,6 +725,7 @@ class Api {
         quizzes.where((e) => e == element).forEach((e) => e.toRefresh(element));
       }
     }
+    saveSettings();
     return quizzes;
   }
 
@@ -796,6 +812,7 @@ class Api {
     );
     _updateToken(response.data, required: true);
     quiz.toDetail(parse(response.data));
+    saveSettings();
     return quiz;
   }
 }

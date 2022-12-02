@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:collection/collection.dart';
 import 'package:flutter/material.dart' show Icons;
 import 'package:gakujo_task/api/parse.dart';
 import 'package:gakujo_task/constants/colors.dart';
@@ -258,11 +259,11 @@ class Report implements Comparable<Report> {
 
   @override
   int compareTo(Report other) {
-    final compare1 = endDateTime.compareTo(other.endDateTime) * -1;
+    final compare1 = endDateTime.compareTo(other.endDateTime);
     if (compare1 != 0) {
       return compare1;
     }
-    final compare2 = startDateTime.compareTo(other.startDateTime) * -1;
+    final compare2 = startDateTime.compareTo(other.startDateTime);
     if (compare2 != 0) {
       return compare2;
     }
@@ -285,6 +286,7 @@ class Report implements Comparable<Report> {
           .length,
       done: reports.where((e) => e.isSubmitted).length,
       desc: reports
+          .sorted()
           .map((e) => {
                 'time': e.endDateTime,
                 'title': e.title,

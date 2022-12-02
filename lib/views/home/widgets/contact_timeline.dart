@@ -38,39 +38,37 @@ class ContactTimeLine extends StatelessWidget {
               builder: (context) => ContactPage(subject, contact)));
         },
         child: Container(
-          margin: const EdgeInsets.symmetric(vertical: 10),
+          margin: const EdgeInsets.symmetric(vertical: 15),
           child:
               Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 5),
+                Expanded(
                   child: Text(
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                     subject.subjectsName,
                     style: const TextStyle(
                         fontWeight: FontWeight.bold, fontSize: 16),
                   ),
                 ),
-                Align(
-                    child: Text(
+                Text(
                   contact.isNotEmpty
                       ? DateFormat('yyyy/MM/dd HH:mm', 'ja')
                           .format(contact.last.contactDateTime.toLocal())
                       : '',
                   style: const TextStyle(color: kGreyLight),
-                ))
+                )
               ],
             ),
-            SizedBox(
-              width: 300,
-              child: Text(
-                contact.isNotEmpty
-                    ? contact.last.content!.replaceAll('\n', ' ')
-                    : 'メッセージなし',
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-              ),
+            const SizedBox(height: 5),
+            Text(
+              contact.isNotEmpty
+                  ? contact.last.content!.replaceAll('\n', ' ')
+                  : 'メッセージなし',
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
             ),
           ]),
         ));

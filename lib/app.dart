@@ -62,7 +62,7 @@ class _AppState extends State<App> {
           ),
         ),
         const SizedBox(width: 10),
-        context.watch<Provide>().settings['FullName'] == null
+        context.watch<Provide>().api.settings['FullName'] == null
             ? const Text(
                 'Hi!',
                 style: TextStyle(
@@ -71,7 +71,7 @@ class _AppState extends State<App> {
                   fontWeight: FontWeight.bold,
                 ),
               )
-            : Text('Hi, ${context.watch<Provide>().settings['FullName']}!',
+            : Text('Hi, ${context.watch<Provide>().api.settings['FullName']}!',
                 style: const TextStyle(
                   color: Colors.black,
                   fontSize: 26,

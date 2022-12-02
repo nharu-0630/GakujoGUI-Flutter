@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'dart:ui';
 
-import 'package:crypto/crypto.dart';
+import 'package:crypto/crypto.dart' show md5;
 import 'package:html/dom.dart';
 
 class Subject {

@@ -1,14 +1,20 @@
 import 'package:flutter/material.dart';
+import 'package:gakujo_task/models/quiz.dart';
+import 'package:gakujo_task/models/report.dart';
 import 'package:gakujo_task/models/task.dart';
+import 'package:gakujo_task/provide.dart';
 import 'package:gakujo_task/views/task/task.dart';
+import 'package:provider/provider.dart';
 
 class Tasks extends StatelessWidget {
-  final tasks = Task.generateTasks();
-
-  Tasks({Key? key}) : super(key: key);
+  const Tasks({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    var tasks = [
+      Report.toTask(context.read<Provide>().api.reports),
+      Quiz.toTask(context.read<Provide>().api.quizzes)
+    ];
     return Container(
         padding: const EdgeInsets.symmetric(horizontal: 15),
         child: GridView.builder(

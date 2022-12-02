@@ -32,7 +32,7 @@ class HomeWidget extends StatelessWidget {
                     style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
                   ),
                 ),
-                content: Tasks(),
+                content: const Tasks(),
               ),
               StickyHeader(
                   header: Container(
@@ -55,8 +55,10 @@ class HomeWidget extends StatelessWidget {
                             child: SizedBox(
                                 height: 60,
                                 child: ContactIcons(
-                                  subjects: context.watch<Provide>().subjects,
-                                  contacts: context.watch<Provide>().contacts,
+                                  subjects:
+                                      context.watch<Provide>().api.subjects,
+                                  contacts:
+                                      context.watch<Provide>().api.contacts,
                                 )),
                           ),
                         ),
@@ -64,8 +66,8 @@ class HomeWidget extends StatelessWidget {
                     ),
                   ),
                   content: ContactTimeLine(
-                    subjects: context.watch<Provide>().subjects,
-                    contacts: context.watch<Provide>().contacts,
+                    subjects: context.watch<Provide>().api.subjects,
+                    contacts: context.watch<Provide>().api.contacts,
                   )),
               const SizedBox(height: 15),
             ],

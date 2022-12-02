@@ -34,7 +34,8 @@ class _DatePickerState extends State<DatePicker> {
           itemBuilder: (context, index) => GestureDetector(
                 onTap: () => setState(() => selected = index),
                 child: Container(
-                  padding: const EdgeInsets.all(10),
+                  padding:
+                      const EdgeInsets.symmetric(vertical: 10, horizontal: 14),
                   margin: const EdgeInsets.symmetric(horizontal: 6),
                   decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(20),

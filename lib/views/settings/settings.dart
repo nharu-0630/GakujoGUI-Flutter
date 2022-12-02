@@ -30,7 +30,7 @@ class SettingsPage extends StatelessWidget {
                   Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: Text(
-                      'Token: ${context.watch<Provide>().token}\nContacts Items: ${context.watch<Provide>().contacts.length}\nSubjects Items: ${context.watch<Provide>().subjects.length}',
+                      'Token: ${context.watch<Provide>().api.token} \nSubjects Items: ${context.watch<Provide>().api.subjects.length}\n Contacts Items: ${context.watch<Provide>().api.contacts.length}\n Reports Items: ${context.watch<Provide>().api.reports.length}\n Quizzes Items: ${context.watch<Provide>().api.quizzes.length}',
                       style: TextStyle(color: Colors.grey[700]),
                     ),
                   ),
@@ -56,6 +56,15 @@ class SettingsPage extends StatelessWidget {
                     padding: const EdgeInsets.all(8.0),
                     child: ElevatedButton(
                       onPressed: () {
+                        context.read<Provide>().fetchSubjects();
+                      },
+                      child: const Text('授業科目'),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: ElevatedButton(
+                      onPressed: () {
                         context.read<Provide>().fetchContacts();
                       },
                       child: const Text('授業連絡'),
@@ -65,9 +74,18 @@ class SettingsPage extends StatelessWidget {
                     padding: const EdgeInsets.all(8.0),
                     child: ElevatedButton(
                       onPressed: () {
-                        context.read<Provide>().fetchSubjects();
+                        context.read<Provide>().fetchReports();
                       },
-                      child: const Text('授業科目'),
+                      child: const Text('レポート'),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: ElevatedButton(
+                      onPressed: () {
+                        context.read<Provide>().fetchQuizzes();
+                      },
+                      child: const Text('小テスト'),
                     ),
                   ),
                   Padding(
