@@ -284,18 +284,17 @@ class Quiz implements Comparable<Quiz> {
       iconColor: kRedDark,
       btnColor: kRed,
       left: quizzes
-          .where((quiz) =>
-              !quiz.isSubmitted && quiz.endDateTime.isAfter(DateTime.now()))
+          .where((e) => !e.isSubmitted && e.endDateTime.isAfter(DateTime.now()))
           .length,
-      done: quizzes.where((quiz) => quiz.isSubmitted).length,
+      done: quizzes.where((e) => e.isSubmitted).length,
       desc: quizzes
           .sorted()
           .map((e) => {
                 'time': e.endDateTime,
                 'title': e.title,
                 'slot': e.subject,
-                'tlColor': kYellowDark,
-                'bgColor': kYellowLight,
+                'tlColor': kRedDark,
+                'bgColor': kRedLight,
               })
           .toList());
 }
