@@ -18,17 +18,14 @@ class _AppState extends State<App> {
 
   @override
   Widget build(BuildContext context) {
-    context.read<ApiProvider>().loadSettings();
     return MaterialApp(
-      themeMode: ThemeMode.light,
+      themeMode: ThemeMode.dark,
       theme: ThemeData(
         useMaterial3: true,
-        fontFamily: 'Murecho',
         brightness: Brightness.light,
       ),
       darkTheme: ThemeData(
         useMaterial3: true,
-        fontFamily: 'Murecho',
         brightness: Brightness.dark,
       ),
       debugShowCheckedModeBanner: false,
@@ -46,28 +43,18 @@ class _AppState extends State<App> {
 
   AppBar _buildAppBar() {
     return AppBar(
-      title: Row(
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: SizedBox(
-              height: 36.0,
-              width: 36.0,
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(12.0),
-                child: Image.asset('assets/images/avatar.png'),
-              ),
-            ),
-          ),
-          Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Text(
-                context.watch<ApiProvider>().api.settings['FullName'] == null
-                    ? 'Hi!'
-                    : 'Hi, ${context.watch<ApiProvider>().api.settings['FullName']}!',
-                style: Theme.of(context).textTheme.headlineSmall,
-              )),
-        ],
+      leading: Padding(
+        padding: const EdgeInsets.only(left: 16.0),
+        child: Image.asset('assets/images/avatar.png'),
+      ),
+      centerTitle: false,
+      title: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Text(
+          context.watch<ApiProvider>().api.settings['FullName'] == null
+              ? 'Hi!'
+              : 'Hi, ${context.watch<ApiProvider>().api.settings['FullName']}!',
+        ),
       ),
     );
   }

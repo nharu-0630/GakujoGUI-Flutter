@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:gakujo_task/provide.dart';
 import 'package:provider/provider.dart';
 import 'package:sticky_headers/sticky_headers.dart';
@@ -28,15 +27,6 @@ class SettingsWidget extends StatelessWidget {
                 padding: const EdgeInsets.all(8.0),
                 child: Text(
                   'Token: ${context.watch<ApiProvider>().api.token} \nSubjects Items: ${context.watch<ApiProvider>().api.subjects.length}\n Contacts Items: ${context.watch<ApiProvider>().api.contacts.length}\n Reports Items: ${context.watch<ApiProvider>().api.reports.length}\n Quizzes Items: ${context.watch<ApiProvider>().api.quizzes.length}',
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: ElevatedButton(
-                  onPressed: () {
-                    context.read<ApiProvider>().loadSettings();
-                  },
-                  child: const Text('読み込み'),
                 ),
               ),
               Padding(
@@ -88,13 +78,9 @@ class SettingsWidget extends StatelessWidget {
                 padding: const EdgeInsets.all(8.0),
                 child: ElevatedButton(
                   onPressed: () {
-                    Fluttertoast.showToast(
-                        msg: 'テスト',
-                        toastLength: Toast.LENGTH_LONG,
-                        timeInSecForIosWeb: 5,
-                        fontSize: 16.0);
+                    context.read<ApiProvider>().clearSettings();
                   },
-                  child: const Text('テスト'),
+                  child: const Text('初期化'),
                 ),
               ),
             ],

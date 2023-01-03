@@ -13,9 +13,12 @@ class StatusWidget extends StatelessWidget {
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Icon(
-                Icons.school,
-                size: 24.0,
+              const Padding(
+                padding: EdgeInsets.only(top: 4.0),
+                child: Icon(
+                  Icons.school,
+                  size: 24.0,
+                ),
               ),
               Padding(
                 padding: const EdgeInsets.only(left: 16.0),

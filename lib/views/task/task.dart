@@ -53,18 +53,26 @@ class TaskPage extends StatelessWidget {
 
   Widget _buildAppBar(BuildContext context) {
     return SliverAppBar(
-      leading: IconButton(
-        onPressed: () => Navigator.of(context).pop(),
-        icon: const Icon(Icons.arrow_back_ios_new),
-        iconSize: 24.0,
+      leading: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: IconButton(
+          onPressed: () => Navigator.of(context).pop(),
+          icon: const Icon(Icons.arrow_back_ios_new),
+        ),
       ),
       flexibleSpace: FlexibleSpaceBar(
-        title: Text(
-          '${task.title}',
-          style: Theme.of(context).textTheme.headlineSmall,
-        ),
-        centerTitle: true,
+        title: Text('${task.title}'),
+        centerTitle: false,
       ),
+      actions: [
+        Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: IconButton(
+            onPressed: (() {}),
+            icon: const Icon(Icons.search),
+          ),
+        ),
+      ],
     );
   }
 
@@ -77,23 +85,26 @@ class TaskPage extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  slot,
+                  style: Theme.of(context).textTheme.bodyMedium,
+                ),
+                Text(
+                  DateFormat('yyyy/MM/dd HH:mm', 'ja').format(date.toLocal()),
+                  style: Theme.of(context).textTheme.bodyMedium,
+                ),
+              ],
+            ),
+            const SizedBox(height: 8.0),
             Text(
               title,
               style: Theme.of(context)
                   .textTheme
                   .titleMedium
                   ?.copyWith(fontWeight: FontWeight.bold),
-            ),
-            Text(
-              slot,
-              style: Theme.of(context).textTheme.bodyMedium,
-            ),
-            Align(
-              alignment: Alignment.centerRight,
-              child: Text(
-                DateFormat('yyyy/MM/dd HH:mm', 'ja').format(date.toLocal()),
-                style: Theme.of(context).textTheme.bodyMedium,
-              ),
             ),
           ],
         ),

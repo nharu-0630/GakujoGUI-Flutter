@@ -47,7 +47,7 @@ class HomeWidget extends StatelessWidget {
                     ),
               ),
             ),
-            content: ContactWidget(),
+            content: const ContactWidget(),
           ),
           const SizedBox(height: 16.0),
         ],

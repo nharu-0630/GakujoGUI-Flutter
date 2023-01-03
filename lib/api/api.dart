@@ -39,20 +39,11 @@ class Api {
   String _token = '';
   String get token => _token;
 
-  dynamic _settings = {};
-  dynamic get settings => _settings;
-
-  final List<Contact> _contacts = [];
-  List<Contact> get contacts => _contacts;
-
-  final List<Subject> _subjects = [];
-  List<Subject> get subjects => _subjects;
-
-  final List<Report> _reports = [];
-  List<Report> get reports => _reports;
-
-  final List<Quiz> _quizzes = [];
-  List<Quiz> get quizzes => _quizzes;
+  dynamic settings = {};
+  List<Contact> contacts = [];
+  List<Subject> subjects = [];
+  List<Report> reports = [];
+  List<Quiz> quizzes = [];
 
   bool _updateToken(dynamic data, {bool required = false}) {
     _token =
@@ -74,34 +65,38 @@ class Api {
     if (prefs.getString('Settings') == null) {
       return;
     }
-    _settings = json.decode(prefs.getString('Settings')!);
+    settings = json.decode(prefs.getString('Settings')!);
 
-    if (_settings['AccessEnvironmentKey'] != null &&
-        _settings['AccessEnvironmentValue'] != null) {
+    if (settings['AccessEnvironmentKey'] != null &&
+        settings['AccessEnvironmentValue'] != null) {
       _cookieJar.saveFromResponse(
           Uri.https('gakujo.shizuoka.ac.jp', '/portal'), [
-        Cookie(_settings['AccessEnvironmentKey'],
-            _settings['AccessEnvironmentValue'])
+        Cookie(settings['AccessEnvironmentKey'],
+            settings['AccessEnvironmentValue'])
       ]);
     }
     if (prefs.getString('Subjects$suffix') != null) {
-      _subjects.clear();
-      _subjects.addAll(Subject.decode(prefs.getString('Subjects$suffix')!));
+      subjects = Subject.decode(prefs.getString('Subjects$suffix')!);
     }
     if (prefs.getString('Contacts$suffix') != null) {
-      _contacts.clear();
-      _contacts.addAll(Contact.decode(prefs.getString('Contacts$suffix')!));
+      contacts = Contact.decode(prefs.getString('Contacts$suffix')!);
     }
     if (prefs.getString('Reports$suffix') != null) {
-      _reports.clear();
-      _reports.addAll(Report.decode(prefs.getString('Reports$suffix')!));
+      reports = Report.decode(prefs.getString('Reports$suffix')!);
     }
     if (prefs.getString('Quizzes$suffix') != null) {
-      _quizzes.clear();
-      _quizzes.addAll(Quiz.decode(prefs.getString('Quizzes$suffix')!));
+      quizzes = Quiz.decode(prefs.getString('Quizzes$suffix')!);
     }
-
     await saveSettings();
+  }
+
+  Future<void> clearSettings() async {
+    var prefs = await SharedPreferences.getInstance();
+    await prefs.setString('Settings', json.encode({}));
+    await prefs.setString('Subjects$suffix', Subject.encode([]));
+    await prefs.setString('Contacts$suffix', Contact.encode([]));
+    await prefs.setString('Reports$suffix', Report.encode([]));
+    await prefs.setString('Quizzes$suffix', Quiz.encode([]));
   }
 
   Future<void> saveSettings() async {
@@ -117,16 +112,16 @@ class Api {
             (element) => element.name.contains('Access-Environment-Cookie'),
           )
           .first;
-      _settings['AccessEnvironmentKey'] = cookie.name;
-      _settings['AccessEnvironmentValue'] = cookie.value;
+      settings['AccessEnvironmentKey'] = cookie.name;
+      settings['AccessEnvironmentValue'] = cookie.value;
     }
 
     var prefs = await SharedPreferences.getInstance();
-    await prefs.setString('Settings', json.encode(_settings));
-    await prefs.setString('Subjects$suffix', Subject.encode(_subjects));
-    await prefs.setString('Contacts$suffix', Contact.encode(_contacts));
-    await prefs.setString('Reports$suffix', Report.encode(_reports));
-    await prefs.setString('Quizzes$suffix', Quiz.encode(_quizzes));
+    await prefs.setString('Settings', json.encode(settings));
+    await prefs.setString('Subjects$suffix', Subject.encode(subjects));
+    await prefs.setString('Contacts$suffix', Contact.encode(contacts));
+    await prefs.setString('Reports$suffix', Report.encode(reports));
+    await prefs.setString('Quizzes$suffix', Quiz.encode(quizzes));
   }
 
   void _initialize() {
@@ -348,13 +343,13 @@ class Api {
     var name = parse(response.data)
         .querySelector('#header-cog > li > a > span > span')
         ?.text;
-    _settings['FullName'] =
+    settings['FullName'] =
         name?.substring(0, name.indexOf('さん')).replaceAll('　', '');
 
-    saveSettings();
+    await saveSettings();
   }
 
-  Future<List<Contact>> fetchContacts() async {
+  Future<void> fetchContacts() async {
     var response = await _client.postUri<dynamic>(
       Uri.https(
         'gakujo.shizuoka.ac.jp',
@@ -397,9 +392,10 @@ class Api {
         .querySelectorAll('#tbl_A01_01 > tbody > tr')
         .map(Contact.fromElement)
         .toList()) {
-      if (!_contacts.contains(element)) _contacts.add(element);
+      if (!contacts.contains(element)) contacts.add(element);
     }
-    return contacts;
+
+    await saveSettings();
   }
 
   Future<Contact> fetchDetailContact(Contact contact,
@@ -486,7 +482,7 @@ class Api {
     return contact;
   }
 
-  Future<List<Subject>> fetchSubjects() async {
+  Future<void> fetchSubjects() async {
     var response = await _client.postUri<dynamic>(
       Uri.https(
         'gakujo.shizuoka.ac.jp',
@@ -514,16 +510,15 @@ class Api {
     );
     _updateToken(response.data, required: true);
 
-    _subjects.clear();
-    _subjects.addAll(parse(response.data)
+    subjects.clear();
+    subjects.addAll(parse(response.data)
         .querySelector('#st1')!
         .querySelectorAll('ul')
         .map(Subject.fromElement));
     saveSettings();
-    return _subjects;
   }
 
-  Future<List<Report>> fetchReports() async {
+  Future<void> fetchReports() async {
     var response = await _client.postUri<dynamic>(
       Uri.https(
         'gakujo.shizuoka.ac.jp',
@@ -578,7 +573,6 @@ class Api {
       }
     }
     saveSettings();
-    return reports;
   }
 
   Future<Report> fetchDetailReport(Report report, {bool bypass = false}) async {
@@ -671,7 +665,7 @@ class Api {
     return report;
   }
 
-  Future<List<Quiz>> fetchQuizzes() async {
+  Future<void> fetchQuizzes() async {
     var response = await _client.postUri<dynamic>(
       Uri.https(
         'gakujo.shizuoka.ac.jp',
@@ -726,7 +720,6 @@ class Api {
       }
     }
     saveSettings();
-    return quizzes;
   }
 
   Future<Quiz> fetchDetailQuiz(Quiz quiz, {bool bypass = false}) async {

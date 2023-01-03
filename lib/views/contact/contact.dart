@@ -53,26 +53,24 @@ class ContactPage extends StatelessWidget {
 
   Widget _buildAppBar(BuildContext context) {
     return SliverAppBar(
-      leading: IconButton(
-        onPressed: () => Navigator.of(context).pop(),
-        icon: const Icon(Icons.arrow_back_ios_new),
-        iconSize: 24.0,
+      leading: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: IconButton(
+            onPressed: () => Navigator.of(context).pop(),
+            icon: const Icon(Icons.arrow_back_ios_new)),
       ),
       flexibleSpace: FlexibleSpaceBar(
-        title: Text(
-          subject.subjectsName,
-          style: Theme.of(context).textTheme.headlineSmall,
-        ),
-        centerTitle: true,
+        title: Text(subject.subjectsName),
+        centerTitle: false,
       ),
-      actions: const [
+      actions: [
         Padding(
-          padding: EdgeInsets.only(right: 16.0),
-          child: Icon(
-            Icons.search,
-            size: 32.0,
+          padding: const EdgeInsets.all(8.0),
+          child: IconButton(
+            onPressed: (() {}),
+            icon: const Icon(Icons.search),
           ),
-        )
+        ),
       ],
     );
   }
@@ -89,7 +87,7 @@ class ContactPage extends StatelessWidget {
               contact.title,
               style: Theme.of(context)
                   .textTheme
-                  .titleLarge
+                  .titleMedium
                   ?.copyWith(fontWeight: FontWeight.bold),
             ),
             Text(
