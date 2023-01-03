@@ -1,67 +1,50 @@
 import 'package:flutter/material.dart';
 import 'package:gakujo_task/models/contact.dart';
 import 'package:gakujo_task/models/subject.dart';
-import 'package:gakujo_task/views/contact/widgets/contact_chat.dart';
+import 'package:intl/intl.dart';
 
 class ContactPage extends StatelessWidget {
   final Subject subject;
-  final List<Contact> contactList;
-  const ContactPage(this.subject, this.contactList, {Key? key})
-      : super(key: key);
+  final List<Contact> contacts;
+  const ContactPage(this.subject, this.contacts, {Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
       body: CustomScrollView(
         slivers: [
           _buildAppBar(context),
-          SliverToBoxAdapter(
-            child: Container(
-              color: Colors.black,
-              child: Container(
-                decoration: const BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.only(
-                        topLeft: Radius.circular(30),
-                        topRight: Radius.circular(30))),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.all(15),
-                      child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: const [
-                            Text(
-                              'メッセージ',
-                              style: TextStyle(
-                                  fontSize: 22, fontWeight: FontWeight.bold),
-                            ),
-                            Icon(
-                              Icons.search,
-                              size: 30,
-                            )
-                          ]),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
-          contactList.isEmpty
+          contacts.isEmpty
               ? SliverFillRemaining(
-                  child: Container(
-                      color: Colors.white,
-                      child: const Center(
-                          child: Text(
-                        'メッセージはありません',
-                        style: TextStyle(color: Colors.grey, fontSize: 18),
-                      ))))
-              : SliverList(
-                  delegate: SliverChildBuilderDelegate(
-                      (_, index) => ContactChat(contactList[index]),
-                      childCount: contactList.length),
+                  child: Center(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Padding(
+                          padding: EdgeInsets.all(8.0),
+                          child: Icon(
+                            Icons.speaker_notes_off_rounded,
+                            size: 48.0,
+                          ),
+                        ),
+                        Text(
+                          'メッセージはありません',
+                          style: Theme.of(context).textTheme.titleMedium,
+                        ),
+                      ],
+                    ),
+                  ),
+                )
+              : SliverPadding(
+                  padding: const EdgeInsets.all(8.0),
+                  sliver: SliverList(
+                    delegate: SliverChildBuilderDelegate(
+                        (_, index) => _buildCard(
+                              context,
+                              contacts[index],
+                            ),
+                        childCount: contacts.length),
+                  ),
                 )
         ],
       ),
@@ -70,26 +53,57 @@ class ContactPage extends StatelessWidget {
 
   Widget _buildAppBar(BuildContext context) {
     return SliverAppBar(
-      expandedHeight: 90,
-      backgroundColor: Colors.black,
       leading: IconButton(
         onPressed: () => Navigator.of(context).pop(),
-        icon: const Icon(Icons.arrow_back_ios),
-        iconSize: 20,
+        icon: const Icon(Icons.arrow_back_ios_new),
+        iconSize: 24.0,
       ),
       flexibleSpace: FlexibleSpaceBar(
-        title: Column(
-          mainAxisAlignment: MainAxisAlignment.end,
+        title: Text(
+          subject.subjectsName,
+          style: Theme.of(context).textTheme.headlineSmall,
+        ),
+        centerTitle: true,
+      ),
+      actions: const [
+        Padding(
+          padding: EdgeInsets.only(right: 16.0),
+          child: Icon(
+            Icons.search,
+            size: 32.0,
+          ),
+        )
+      ],
+    );
+  }
+
+  Widget _buildCard(BuildContext context, Contact contact) {
+    return Card(
+      child: Container(
+        padding: const EdgeInsets.all(8.0),
+        margin: const EdgeInsets.all(8.0),
+        child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              subject.subjectsName,
-              style: const TextStyle(fontWeight: FontWeight.bold),
+              contact.title,
+              style: Theme.of(context)
+                  .textTheme
+                  .titleLarge
+                  ?.copyWith(fontWeight: FontWeight.bold),
             ),
             Text(
-              '${contactList.length}件のメッセージ',
-              style: TextStyle(fontSize: 12, color: Colors.grey[700]),
-            )
+              contact.content == null ? '未取得' : contact.content!,
+              style: Theme.of(context).textTheme.bodyText1,
+            ),
+            Align(
+              alignment: Alignment.centerRight,
+              child: Text(
+                DateFormat('yyyy/MM/dd HH:mm', 'ja')
+                    .format(contact.contactDateTime.toLocal()),
+                style: Theme.of(context).textTheme.bodyText1,
+              ),
+            ),
           ],
         ),
       ),

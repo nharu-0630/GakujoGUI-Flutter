@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:gakujo_task/models/task.dart';
-import 'package:gakujo_task/views/task/widgets/date_picker.dart';
-import 'package:gakujo_task/views/task/widgets/task_timeline.dart';
+import 'package:intl/intl.dart';
 
 class TaskPage extends StatelessWidget {
   final Task task;
@@ -9,55 +8,44 @@ class TaskPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final detailList = task.desc;
     return Scaffold(
-      backgroundColor: Colors.white,
       body: CustomScrollView(
         slivers: [
           _buildAppBar(context),
-          SliverToBoxAdapter(
-            child: Container(
-              color: Colors.black,
-              child: Container(
-                decoration: const BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.only(
-                        topLeft: Radius.circular(30),
-                        topRight: Radius.circular(30))),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const DatePicker(),
-                    Container(
-                      padding: const EdgeInsets.all(15),
-                      child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: const [
-                            Text(
-                              'タスク',
-                              style: TextStyle(
-                                  fontSize: 22, fontWeight: FontWeight.bold),
-                            ),
-                          ]),
-                    )
-                  ],
-                ),
-              ),
-            ),
-          ),
-          detailList == null
+          task.desc == null || task.desc!.isEmpty
               ? SliverFillRemaining(
-                  child: Container(
-                      color: Colors.white,
-                      child: const Center(
-                          child: Text(
-                        '今日のタスクはありません',
-                        style: TextStyle(color: Colors.grey, fontSize: 18),
-                      ))))
-              : SliverList(
-                  delegate: SliverChildBuilderDelegate(
-                      (_, index) => TaskTimeline(detailList[index]),
-                      childCount: detailList.length))
+                  child: Center(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Padding(
+                          padding: EdgeInsets.all(8.0),
+                          child: Icon(
+                            Icons.beach_access_rounded,
+                            size: 48.0,
+                          ),
+                        ),
+                        Text(
+                          'タスクはありません',
+                          style: Theme.of(context).textTheme.titleMedium,
+                        ),
+                      ],
+                    ),
+                  ),
+                )
+              : SliverPadding(
+                  padding: const EdgeInsets.all(8.0),
+                  sliver: SliverList(
+                    delegate: SliverChildBuilderDelegate(
+                        (_, index) => _buildCard(
+                              context,
+                              task.desc![index]['title'],
+                              task.desc![index]['slot'],
+                              task.desc![index]['time'],
+                            ),
+                        childCount: task.desc!.length),
+                  ),
+                )
         ],
       ),
     );
@@ -65,26 +53,48 @@ class TaskPage extends StatelessWidget {
 
   Widget _buildAppBar(BuildContext context) {
     return SliverAppBar(
-      expandedHeight: 90,
-      backgroundColor: Colors.black,
       leading: IconButton(
         onPressed: () => Navigator.of(context).pop(),
-        icon: const Icon(Icons.arrow_back_ios),
-        iconSize: 20,
+        icon: const Icon(Icons.arrow_back_ios_new),
+        iconSize: 24.0,
       ),
       flexibleSpace: FlexibleSpaceBar(
-        title: Column(
-          mainAxisAlignment: MainAxisAlignment.end,
+        title: Text(
+          '${task.title}',
+          style: Theme.of(context).textTheme.headlineSmall,
+        ),
+        centerTitle: true,
+      ),
+    );
+  }
+
+  Widget _buildCard(
+      BuildContext context, String title, String slot, DateTime date) {
+    return Card(
+      child: Container(
+        padding: const EdgeInsets.all(8.0),
+        margin: const EdgeInsets.all(8.0),
+        child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              '${task.title}',
-              style: const TextStyle(fontWeight: FontWeight.bold),
+              title,
+              style: Theme.of(context)
+                  .textTheme
+                  .titleMedium
+                  ?.copyWith(fontWeight: FontWeight.bold),
             ),
             Text(
-              '${task.left}件のタスク',
-              style: TextStyle(fontSize: 12, color: Colors.grey[700]),
-            )
+              slot,
+              style: Theme.of(context).textTheme.bodyMedium,
+            ),
+            Align(
+              alignment: Alignment.centerRight,
+              child: Text(
+                DateFormat('yyyy/MM/dd HH:mm', 'ja').format(date.toLocal()),
+                style: Theme.of(context).textTheme.bodyMedium,
+              ),
+            ),
           ],
         ),
       ),

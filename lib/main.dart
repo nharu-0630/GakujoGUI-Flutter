@@ -7,6 +7,10 @@ import 'package:intl/date_symbol_data_local.dart';
 import 'package:provider/provider.dart';
 
 void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  SystemChrome.setPreferredOrientations([
+    DeviceOrientation.portraitUp,
+  ]);
   await dotenv.load(fileName: '.env');
   initializeDateFormatting('ja');
   runApp(const MyApp());
@@ -30,7 +34,7 @@ class _MyAppState extends State<MyApp> {
     SystemChrome.setSystemUIOverlayStyle(
         const SystemUiOverlayStyle(statusBarColor: Colors.transparent));
     return ChangeNotifierProvider(
-      create: (_) => Provide(),
+      create: (_) => ApiProvider(),
       child: const App(),
     );
   }

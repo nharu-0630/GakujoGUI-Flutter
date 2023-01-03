@@ -1,72 +1,43 @@
 import 'package:flutter/material.dart';
-import 'package:url_launcher/url_launcher.dart';
 
-class Status extends StatelessWidget {
-  const Status({Key? key}) : super(key: key);
+class StatusWidget extends StatelessWidget {
+  const StatusWidget({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      children: [
-        Container(
-          margin: const EdgeInsets.all(15),
-          padding: const EdgeInsets.all(20),
-          decoration: BoxDecoration(
-              color: Colors.black, borderRadius: BorderRadius.circular(20)),
-          child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Container(
-              padding: const EdgeInsets.all(5),
-              decoration: BoxDecoration(
-                  color: Colors.grey[800], shape: BoxShape.circle),
-              child: const Icon(
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: Card(
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Icon(
                 Icons.school,
-                color: Colors.white,
-                size: 20,
+                size: 24.0,
               ),
-            ),
-            const SizedBox(width: 15),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text(
-                  'LiveCampus',
-                  style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white),
+              Padding(
+                padding: const EdgeInsets.only(left: 16.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'LiveCampus',
+                      style: Theme.of(context).textTheme.titleLarge,
+                    ),
+                    const SizedBox(height: 8.0),
+                    Text(
+                      '最終更新日時: ',
+                      style: Theme.of(context).textTheme.titleMedium,
+                    )
+                  ],
                 ),
-                const SizedBox(height: 10),
-                Text(
-                  '最終更新日時: ',
-                  style: TextStyle(
-                    fontSize: 16,
-                    color: Colors.grey[700],
-                  ),
-                )
-              ],
-            )
-          ]),
-        ),
-        Positioned(
-          bottom: 15,
-          right: 15,
-          child: GestureDetector(
-            onTap: () => launchUrl(
-                Uri.https('gakujo.shizuoka.ac.jp', '/portal/'),
-                mode: LaunchMode.externalApplication),
-            child: Container(
-              padding: const EdgeInsets.all(10),
-              decoration: BoxDecoration(
-                  color: Colors.blueAccent,
-                  borderRadius: BorderRadius.circular(15)),
-              child: const Icon(
-                Icons.arrow_forward,
-                color: Colors.white,
-              ),
-            ),
+              )
+            ],
           ),
-        )
-      ],
+        ),
+      ),
     );
   }
 }

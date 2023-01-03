@@ -3,14 +3,14 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:gakujo_task/api/api.dart';
 
-class Provide extends ChangeNotifier {
+class ApiProvider extends ChangeNotifier {
   final api = Api(2022, 2, dotenv.env['USERNAME']!, dotenv.env['PASSWORD']!);
 
   void loadSettings() {
     api.loadSettings().then((value) => notifyListeners());
   }
 
-  void login() async {
+  void fetchLogin() async {
     try {
       await api.fetchLogin().then((value) => notifyListeners());
     } catch (e) {
@@ -68,9 +68,5 @@ class Provide extends ChangeNotifier {
         timeInSecForIosWeb: 5,
       );
     }
-  }
-
-  void refresh() {
-    notifyListeners();
   }
 }
