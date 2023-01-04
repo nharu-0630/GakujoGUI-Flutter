@@ -236,10 +236,6 @@ class Quiz implements Comparable<Quiz> {
       message.toLowerCase().contains(value.toLowerCase());
 
   @override
-  String toString() =>
-      '[$status $submissionStatus] $subject $title -> $endDateTime';
-
-  @override
   bool operator ==(Object other) {
     if (identical(this, other)) {
       return true;

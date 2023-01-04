@@ -92,8 +92,7 @@ class _ReportPageState extends State<ReportPage> {
                       .read<ApiProvider>()
                       .api
                       .reports
-                      .where((e) =>
-                          e.title.contains(value) || e.subject.contains(value))
+                      .where((e) => e.contains(value))
                       .toList();
                 });
               },
@@ -162,7 +161,8 @@ class _ReportPageState extends State<ReportPage> {
         motion: const DrawerMotion(),
         children: [
           SlidableAction(
-            onPressed: ((context) {}),
+            onPressed: (context) async =>
+                context.read<ApiProvider>().fetchDetailReport(report),
             backgroundColor: const Color(0xFF0392CF),
             foregroundColor: Colors.white,
             icon: Icons.sync,
@@ -176,7 +176,12 @@ class _ReportPageState extends State<ReportPage> {
           shape: const RoundedRectangleBorder(
               borderRadius: BorderRadius.vertical(top: Radius.circular(16.0))),
           context: context,
-          builder: (context) => _buildModal(report),
+          builder: (context) => DraggableScrollableSheet(
+            expand: false,
+            builder: (context, controller) {
+              return _buildModal(report, controller);
+            },
+          ),
         ),
         leading: Icon(
           (() {
@@ -234,138 +239,151 @@ class _ReportPageState extends State<ReportPage> {
     );
   }
 
-  Widget _buildModal(Report report) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
-      height: MediaQuery.of(context).size.height -
-          MediaQuery.of(context).padding.top,
-      child: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(4.0),
-            child: Align(
-              alignment: Alignment.centerLeft,
-              child: Text(
-                report.title,
-                style: Theme.of(context).textTheme.titleLarge,
-              ),
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(4.0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                Text(
-                  DateFormat('yyyy/MM/dd HH:mm', 'ja')
-                      .format(report.startDateTime.toLocal()),
-                  style: Theme.of(context).textTheme.bodyLarge,
-                ),
-                const Icon(Icons.arrow_right_alt_rounded),
-                Text(
-                  DateFormat('yyyy/MM/dd HH:mm', 'ja')
-                      .format(report.endDateTime.toLocal()),
-                  style: Theme.of(context).textTheme.bodyLarge,
-                ),
-              ],
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(4.0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                Container(
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(8.0),
-                    border: Border.all(
-                      color: Theme.of(context).colorScheme.primary,
-                      width: 2,
-                    ),
-                  ),
-                  padding: const EdgeInsets.symmetric(
-                    vertical: 2.0,
-                    horizontal: 4.0,
-                  ),
-                  child: Text(
-                    report.status,
-                    style: Theme.of(context).textTheme.bodyLarge,
-                  ),
-                ),
-                Container(
-                  margin: const EdgeInsets.only(left: 8.0),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(8.0),
-                    border: Border.all(
-                      color: Theme.of(context).colorScheme.primary,
-                      width: 2,
-                    ),
-                  ),
-                  padding: const EdgeInsets.symmetric(
-                    vertical: 2.0,
-                    horizontal: 4.0,
-                  ),
-                  child: Text(
-                    report.isSubmitted
-                        ? '提出済 ${DateFormat('yyyy/MM/dd HH:mm', 'ja').format(report.submittedDateTime.toLocal())}'
-                        : '未提出',
-                    style: Theme.of(context).textTheme.bodyLarge,
-                  ),
-                ),
-                Visibility(
-                  visible: report.isArchived,
-                  child: const Padding(
-                    padding: EdgeInsets.all(8.0),
-                    child: Icon(Icons.archive_outlined),
-                  ),
-                )
-              ],
-            ),
-          ),
-          const SizedBox(height: 8.0),
-          Padding(
-            padding: const EdgeInsets.all(4.0),
+  Widget _buildModal(Report report, ScrollController controller) {
+    return ListView(
+      controller: controller,
+      padding: const EdgeInsets.all(16.0),
+      children: [
+        Padding(
+          padding: const EdgeInsets.all(4.0),
+          child: Align(
+            alignment: Alignment.centerLeft,
             child: Text(
-              report.isAcquired ? report.description : '未取得',
+              report.title,
+              style: Theme.of(context).textTheme.titleLarge,
             ),
           ),
-          const Padding(
-            padding: EdgeInsets.all(4.0),
-            child: Divider(thickness: 2.0),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(4.0),
-            child: Text(
-              report.isAcquired ? report.message : '未取得',
-            ),
-          ),
-          const Expanded(child: SizedBox()),
-          Row(
+        ),
+        Padding(
+          padding: const EdgeInsets.all(4.0),
+          child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
-              ElevatedButton(
-                onPressed: () {
-                  context
-                      .read<ApiProvider>()
-                      .setArchiveReport(report.id, !report.isArchived);
-                  Navigator.of(context).pop();
-                },
-                child:
-                    Icon(report.isArchived ? Icons.unarchive : Icons.archive),
+              Text(
+                DateFormat('yyyy/MM/dd HH:mm', 'ja')
+                    .format(report.startDateTime.toLocal()),
+                style: Theme.of(context).textTheme.bodyLarge,
               ),
-              ElevatedButton(
-                onPressed: () => Navigator.of(context).pop(),
-                child: const Icon(Icons.close_rounded),
-              ),
-              ElevatedButton(
-                onPressed: () => Navigator.of(context).pop(),
-                child: const Icon(Icons.sync_rounded),
+              const Icon(Icons.arrow_right_alt_rounded),
+              Text(
+                DateFormat('yyyy/MM/dd HH:mm', 'ja')
+                    .format(report.endDateTime.toLocal()),
+                style: Theme.of(context).textTheme.bodyLarge,
               ),
             ],
           ),
-          const SizedBox(height: 8.0),
-        ],
-      ),
+        ),
+        Padding(
+          padding: const EdgeInsets.all(4.0),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              Container(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(8.0),
+                  border: Border.all(
+                    color: Theme.of(context).colorScheme.primary,
+                    width: 2,
+                  ),
+                ),
+                padding: const EdgeInsets.symmetric(
+                  vertical: 2.0,
+                  horizontal: 4.0,
+                ),
+                child: Text(
+                  report.status,
+                  style: Theme.of(context).textTheme.bodyLarge,
+                ),
+              ),
+              Container(
+                margin: const EdgeInsets.only(left: 8.0),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(8.0),
+                  border: Border.all(
+                    color: Theme.of(context).colorScheme.primary,
+                    width: 2,
+                  ),
+                ),
+                padding: const EdgeInsets.symmetric(
+                  vertical: 2.0,
+                  horizontal: 4.0,
+                ),
+                child: Text(
+                  report.isSubmitted
+                      ? '提出済 ${DateFormat('yyyy/MM/dd HH:mm', 'ja').format(report.submittedDateTime.toLocal())}'
+                      : '未提出',
+                  style: Theme.of(context).textTheme.bodyLarge,
+                ),
+              ),
+              Visibility(
+                visible: report.isArchived,
+                child: const Padding(
+                  padding: EdgeInsets.all(8.0),
+                  child: Icon(Icons.archive_outlined),
+                ),
+              )
+            ],
+          ),
+        ),
+        const SizedBox(height: 8.0),
+        Padding(
+          padding: const EdgeInsets.all(4.0),
+          child: Text(
+            report.isAcquired ? report.description : '未取得',
+          ),
+        ),
+        const Padding(
+          padding: EdgeInsets.all(4.0),
+          child: Divider(thickness: 2.0),
+        ),
+        Padding(
+          padding: const EdgeInsets.all(4.0),
+          child: Text(
+            report.isAcquired ? report.message : '未取得',
+          ),
+        ),
+        const SizedBox(height: 8.0),
+        Row(
+          children: [
+            Expanded(
+              child: Container(
+                padding: const EdgeInsets.all(4.0),
+                child: ElevatedButton(
+                  onPressed: () {
+                    context
+                        .read<ApiProvider>()
+                        .setArchiveReport(report.id, !report.isArchived);
+                    Navigator.of(context).pop();
+                  },
+                  child: Icon(report.isArchived
+                      ? Icons.unarchive_rounded
+                      : Icons.archive_rounded),
+                ),
+              ),
+            ),
+            Expanded(
+              child: Container(
+                padding: const EdgeInsets.all(4.0),
+                child: ElevatedButton(
+                  onPressed: () async =>
+                      context.read<ApiProvider>().fetchDetailReport(report),
+                  child: const Icon(Icons.sync_rounded),
+                ),
+              ),
+            ),
+            Expanded(
+              child: Container(
+                padding: const EdgeInsets.all(4.0),
+                child: ElevatedButton(
+                  onPressed: () => Navigator.of(context).pop(),
+                  child: const Icon(Icons.share_rounded),
+                ),
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 8.0),
+      ],
     );
   }
 }

@@ -4,7 +4,7 @@ import 'dart:typed_data';
 import 'package:gakujo_task/api/parse.dart';
 import 'package:html/dom.dart';
 
-class Contact {
+class Contact implements Comparable<Contact> {
   String subjects;
   String teacherName;
   String contactType;
@@ -124,5 +124,41 @@ class Contact {
           .text
           .trim();
     }
+  }
+
+  bool contains(String value) =>
+      subjects.toLowerCase().contains(value.toLowerCase()) ||
+      title.toLowerCase().contains(value.toLowerCase()) ||
+      (content ?? '').toLowerCase().contains(value.toLowerCase());
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) {
+      return true;
+    }
+    if (other is Contact) {
+      return subjects == other.subjects &&
+          title == other.title &&
+          contactDateTime == other.contactDateTime;
+    }
+    return false;
+  }
+
+  @override
+  int get hashCode =>
+      subjects.hashCode ^ title.hashCode ^ contactDateTime.hashCode;
+
+  @override
+  int compareTo(Contact other) {
+    final compare1 = contactDateTime.compareTo(other.contactDateTime);
+    if (compare1 != 0) {
+      return compare1;
+    }
+    final compare2 = subjects.compareTo(other.subjects);
+    if (compare2 != 0) {
+      return compare2;
+    }
+    final compare3 = title.compareTo(other.title);
+    return compare3;
   }
 }

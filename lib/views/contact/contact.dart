@@ -85,19 +85,15 @@ class _ContactPageState extends State<ContactPage> {
       title: _searchStatus
           ? TextField(
               onChanged: (value) {
-                setState(() {
-                  _suggestContacts = context
-                      .read<ApiProvider>()
-                      .api
-                      .contacts
-                      .where(
-                        (e) => e.subjects == widget.subject.subjectsName,
-                      )
-                      .where((e) =>
-                          e.title.contains(value) ||
-                          (e.content ?? '').contains(value))
-                      .toList();
-                });
+                setState(() => _suggestContacts = context
+                    .read<ApiProvider>()
+                    .api
+                    .contacts
+                    .where(
+                      (e) => e.subjects == widget.subject.subjectsName,
+                    )
+                    .where((e) => e.contains(value))
+                    .toList());
               },
               autofocus: true,
               textInputAction: TextInputAction.search,
@@ -136,7 +132,8 @@ class _ContactPageState extends State<ContactPage> {
         motion: const DrawerMotion(),
         children: [
           SlidableAction(
-            onPressed: ((context) {}),
+            onPressed: (context) async =>
+                context.read<ApiProvider>().fetchDetailContact(contact),
             backgroundColor: const Color(0xFF0392CF),
             foregroundColor: Colors.white,
             icon: Icons.sync,
@@ -150,7 +147,12 @@ class _ContactPageState extends State<ContactPage> {
           shape: const RoundedRectangleBorder(
               borderRadius: BorderRadius.vertical(top: Radius.circular(16.0))),
           context: context,
-          builder: (context) => _buildModal(contact),
+          builder: (context) => DraggableScrollableSheet(
+            expand: false,
+            builder: (context, controller) {
+              return _buildModal(contact, controller);
+            },
+          ),
         ),
         title: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -187,90 +189,98 @@ class _ContactPageState extends State<ContactPage> {
     );
   }
 
-  Widget _buildModal(Contact contact) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
-      height: MediaQuery.of(context).size.height -
-          MediaQuery.of(context).padding.top,
-      child: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(4.0),
-            child: Align(
-              alignment: Alignment.centerLeft,
-              child: Text(
-                contact.title,
-                style: Theme.of(context).textTheme.titleLarge,
-              ),
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(4.0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                Text(
-                  DateFormat('yyyy/MM/dd HH:mm', 'ja')
-                      .format(contact.targetDateTime.toLocal()),
-                  style: Theme.of(context).textTheme.bodyLarge,
-                ),
-                Text(
-                  DateFormat('yyyy/MM/dd HH:mm', 'ja')
-                      .format(contact.contactDateTime.toLocal()),
-                  style: Theme.of(context).textTheme.bodyLarge,
-                ),
-              ],
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(4.0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                Container(
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(8.0),
-                    border: Border.all(
-                      color: Theme.of(context).colorScheme.primary,
-                      width: 2,
-                    ),
-                  ),
-                  padding: const EdgeInsets.symmetric(
-                    vertical: 2.0,
-                    horizontal: 4.0,
-                  ),
-                  child: Text(
-                    contact.contactType,
-                    style: Theme.of(context).textTheme.bodyLarge,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 8.0),
-          Padding(
-            padding: const EdgeInsets.all(4.0),
+  Widget _buildModal(Contact contact, ScrollController controller) {
+    return ListView(
+      controller: controller,
+      padding: const EdgeInsets.all(16.0),
+      children: [
+        Padding(
+          padding: const EdgeInsets.all(4.0),
+          child: Align(
+            alignment: Alignment.centerLeft,
             child: Text(
-              contact.isAcquired ? contact.content ?? '' : '未取得',
+              contact.title,
+              style: Theme.of(context).textTheme.titleLarge,
             ),
           ),
-          const Expanded(child: SizedBox()),
-          Row(
+        ),
+        Padding(
+          padding: const EdgeInsets.all(4.0),
+          child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
-              ElevatedButton(
-                onPressed: () => Navigator.of(context).pop(),
-                child: const Icon(Icons.close_rounded),
+              Text(
+                DateFormat('yyyy/MM/dd HH:mm', 'ja')
+                    .format(contact.targetDateTime.toLocal()),
+                style: Theme.of(context).textTheme.bodyLarge,
               ),
-              ElevatedButton(
-                onPressed: () => Navigator.of(context).pop(),
-                child: const Icon(Icons.sync_rounded),
+              Text(
+                DateFormat('yyyy/MM/dd HH:mm', 'ja')
+                    .format(contact.contactDateTime.toLocal()),
+                style: Theme.of(context).textTheme.bodyLarge,
               ),
             ],
           ),
-          const SizedBox(height: 8.0),
-        ],
-      ),
+        ),
+        Padding(
+          padding: const EdgeInsets.all(4.0),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              Container(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(8.0),
+                  border: Border.all(
+                    color: Theme.of(context).colorScheme.primary,
+                    width: 2,
+                  ),
+                ),
+                padding: const EdgeInsets.symmetric(
+                  vertical: 2.0,
+                  horizontal: 4.0,
+                ),
+                child: Text(
+                  contact.contactType,
+                  style: Theme.of(context).textTheme.bodyLarge,
+                ),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 8.0),
+        Padding(
+          padding: const EdgeInsets.all(4.0),
+          child: Text(
+            contact.isAcquired ? contact.content ?? '' : '未取得',
+          ),
+        ),
+        const SizedBox(height: 8.0),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: [
+            Expanded(
+              child: Container(
+                padding: const EdgeInsets.all(4.0),
+                child: ElevatedButton(
+                  onPressed: () async =>
+                      context.read<ApiProvider>().fetchDetailContact(contact),
+                  child: const Icon(Icons.sync_rounded),
+                ),
+              ),
+            ),
+            Expanded(
+              child: Container(
+                padding: const EdgeInsets.all(4.0),
+                child: ElevatedButton(
+                  onPressed: () => Navigator.of(context).pop(),
+                  child: const Icon(Icons.share_rounded),
+                ),
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 8.0),
+      ],
     );
   }
 }

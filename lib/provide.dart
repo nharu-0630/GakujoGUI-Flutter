@@ -2,6 +2,9 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:gakujo_task/api/api.dart';
+import 'package:gakujo_task/models/contact.dart';
+import 'package:gakujo_task/models/quiz.dart';
+import 'package:gakujo_task/models/report.dart';
 
 class ApiProvider extends ChangeNotifier {
   final api = Api(2022, 3, dotenv.env['USERNAME']!, dotenv.env['PASSWORD']!);
@@ -35,11 +38,27 @@ class ApiProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  void fetchAll() async {
+    if (isLoading) return;
+    _toggleLoading();
+    try {
+      await api.fetchLogin();
+      await api.fetchSubjects();
+      await api.fetchContacts();
+      await api.fetchReports();
+      await api.fetchQuizzes();
+      _toggleLoading();
+    } catch (e) {
+      _onError(e);
+    }
+  }
+
   void fetchLogin() async {
     if (isLoading) return;
     _toggleLoading();
     try {
-      await api.fetchLogin().then((_) => _toggleLoading());
+      await api.fetchLogin();
+      _toggleLoading();
     } catch (e) {
       _onError(e);
     }
@@ -49,7 +68,8 @@ class ApiProvider extends ChangeNotifier {
     if (isLoading) return;
     _toggleLoading();
     try {
-      await api.fetchSubjects().then((_) => _toggleLoading());
+      await api.fetchSubjects();
+      _toggleLoading();
     } catch (e) {
       _onError(e);
     }
@@ -59,7 +79,19 @@ class ApiProvider extends ChangeNotifier {
     if (isLoading) return;
     _toggleLoading();
     try {
-      await api.fetchContacts().then((_) => _toggleLoading());
+      await api.fetchContacts();
+      _toggleLoading();
+    } catch (e) {
+      _onError(e);
+    }
+  }
+
+  void fetchDetailContact(Contact contact) async {
+    if (isLoading) return;
+    _toggleLoading();
+    try {
+      await api.fetchDetailContact(contact);
+      _toggleLoading();
     } catch (e) {
       _onError(e);
     }
@@ -69,17 +101,19 @@ class ApiProvider extends ChangeNotifier {
     if (isLoading) return;
     _toggleLoading();
     try {
-      await api.fetchReports().then((_) => _toggleLoading());
+      await api.fetchReports();
+      _toggleLoading();
     } catch (e) {
       _onError(e);
     }
   }
 
-  void fetchQuizzes() async {
+  void fetchDetailReport(Report report) async {
     if (isLoading) return;
     _toggleLoading();
     try {
-      await api.fetchQuizzes().then((_) => _toggleLoading());
+      await api.fetchDetailReport(report);
+      _toggleLoading();
     } catch (e) {
       _onError(e);
     }
@@ -89,6 +123,28 @@ class ApiProvider extends ChangeNotifier {
     api.reports.where((e) => e.id == id).first.isArchived = value;
     api.saveSettings();
     notifyListeners();
+  }
+
+  void fetchQuizzes() async {
+    if (isLoading) return;
+    _toggleLoading();
+    try {
+      await api.fetchQuizzes();
+      _toggleLoading();
+    } catch (e) {
+      _onError(e);
+    }
+  }
+
+  void fetchDetailQuiz(Quiz quiz) async {
+    if (isLoading) return;
+    _toggleLoading();
+    try {
+      await api.fetchDetailQuiz(quiz);
+      _toggleLoading();
+    } catch (e) {
+      _onError(e);
+    }
   }
 
   void setArchiveQuiz(String id, bool value) {
