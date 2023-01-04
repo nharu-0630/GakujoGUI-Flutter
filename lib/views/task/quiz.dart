@@ -1,39 +1,40 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:gakujo_task/app.dart';
-import 'package:gakujo_task/models/contact.dart';
-import 'package:gakujo_task/models/subject.dart';
+import 'package:gakujo_task/models/quiz.dart';
 import 'package:gakujo_task/provide.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
-class ContactPage extends StatefulWidget {
-  final Subject subject;
-  const ContactPage(this.subject, {Key? key}) : super(key: key);
+class QuizPage extends StatefulWidget {
+  const QuizPage({Key? key}) : super(key: key);
 
   @override
-  State<ContactPage> createState() => _ContactPageState();
+  State<QuizPage> createState() => _QuizPageState();
 }
 
-class _ContactPageState extends State<ContactPage> {
+class _QuizPageState extends State<QuizPage> {
   bool _searchStatus = false;
-  List<Contact> _suggestContacts = [];
+  bool _filterStatus = false;
+  List<Quiz> _suggestQuizzes = [];
 
   @override
   Widget build(BuildContext context) {
-    final List<Contact> contacts = context
+    final List<Quiz> quizzes = context
         .watch<ApiProvider>()
         .api
-        .contacts
-        .where(
-          (e) => e.subjects == widget.subject.subjectsName,
-        )
+        .quizzes
+        .where((e) => _filterStatus
+            ? !(e.isArchived ||
+                !(!e.isSubmitted && e.endDateTime.isAfter(DateTime.now())))
+            : true)
         .toList();
+    quizzes.sort(((a, b) => b.compareTo(a)));
     return Scaffold(
       body: CustomScrollView(
         slivers: [
           _buildAppBar(context),
-          contacts.isEmpty
+          quizzes.isEmpty
               ? SliverFillRemaining(
                   child: Center(
                     child: Column(
@@ -42,12 +43,12 @@ class _ContactPageState extends State<ContactPage> {
                         const Padding(
                           padding: EdgeInsets.all(8.0),
                           child: Icon(
-                            Icons.speaker_notes_off_rounded,
+                            Icons.beach_access_rounded,
                             size: 48.0,
                           ),
                         ),
                         Text(
-                          'メッセージはありません',
+                          'タスクはありません',
                           style: Theme.of(context).textTheme.titleMedium,
                         ),
                       ],
@@ -60,12 +61,12 @@ class _ContactPageState extends State<ContactPage> {
                     delegate: _searchStatus
                         ? SliverChildBuilderDelegate(
                             (_, index) =>
-                                _buildCard(context, _suggestContacts[index]),
-                            childCount: _suggestContacts.length,
+                                _buildCard(context, _suggestQuizzes[index]),
+                            childCount: _suggestQuizzes.length,
                           )
                         : SliverChildBuilderDelegate(
-                            (_, index) => _buildCard(context, contacts[index]),
-                            childCount: contacts.length,
+                            (_, index) => _buildCard(context, quizzes[index]),
+                            childCount: quizzes.length,
                           ),
                   ),
                 )
@@ -79,30 +80,27 @@ class _ContactPageState extends State<ContactPage> {
       leading: Padding(
         padding: const EdgeInsets.all(8.0),
         child: IconButton(
-            onPressed: () => Navigator.of(context).pop(),
-            icon: const Icon(Icons.arrow_back_ios_new)),
+          onPressed: () => Navigator.of(context).pop(),
+          icon: const Icon(Icons.arrow_back_ios_new),
+        ),
       ),
       title: _searchStatus
           ? TextField(
               onChanged: (value) {
                 setState(() {
-                  _suggestContacts = context
+                  _suggestQuizzes = context
                       .read<ApiProvider>()
                       .api
-                      .contacts
-                      .where(
-                        (e) => e.subjects == widget.subject.subjectsName,
-                      )
+                      .quizzes
                       .where((e) =>
-                          e.title.contains(value) ||
-                          (e.content ?? '').contains(value))
+                          e.title.contains(value) || e.subject.contains(value))
                       .toList();
                 });
               },
               autofocus: true,
               textInputAction: TextInputAction.search,
             )
-          : Text(widget.subject.subjectsName),
+          : const Text('小テスト'),
       actions: _searchStatus
           ? [
               IconButton(
@@ -118,20 +116,48 @@ class _ContactPageState extends State<ContactPage> {
               IconButton(
                 onPressed: (() {
                   setState(() {
-                    _searchStatus = true;
-                    _suggestContacts = [];
+                    _filterStatus = !_filterStatus;
                   });
                 }),
-                icon: const Icon(Icons.search),
+                icon: Icon(
+                    _filterStatus ? Icons.filter_alt : Icons.filter_alt_off),
+              ),
+              Padding(
+                padding: const EdgeInsets.only(right: 8.0),
+                child: IconButton(
+                  onPressed: (() {
+                    setState(() {
+                      _searchStatus = true;
+                      _suggestQuizzes = [];
+                    });
+                  }),
+                  icon: const Icon(Icons.search),
+                ),
               ),
             ],
       bottom: buildAppBarBottom(context),
     );
   }
 
-  Widget _buildCard(BuildContext context, Contact contact) {
+  Widget _buildCard(BuildContext context, Quiz quiz) {
     return Slidable(
-      key: Key(contact.hashCode.toString()),
+      key: Key(quiz.id),
+      startActionPane: ActionPane(
+        motion: const DrawerMotion(),
+        children: [
+          SlidableAction(
+            onPressed: ((context) {
+              context
+                  .read<ApiProvider>()
+                  .setArchiveQuiz(quiz.id, !quiz.isArchived);
+            }),
+            backgroundColor: const Color(0xFF7BC043),
+            foregroundColor: Colors.white,
+            icon: quiz.isArchived ? Icons.unarchive : Icons.archive,
+            label: quiz.isArchived ? 'アーカイブ解除' : 'アーカイブ',
+          ),
+        ],
+      ),
       endActionPane: ActionPane(
         motion: const DrawerMotion(),
         children: [
@@ -150,21 +176,38 @@ class _ContactPageState extends State<ContactPage> {
           shape: const RoundedRectangleBorder(
               borderRadius: BorderRadius.vertical(top: Radius.circular(16.0))),
           context: context,
-          builder: (context) => _buildModal(contact),
+          builder: (context) => _buildModal(quiz),
+        ),
+        leading: Icon(
+          (() {
+            if (quiz.isSubmitted) {
+              if (quiz.endDateTime.isAfter(DateTime.now())) {
+                return Icons.check_box_outlined;
+              } else {
+                return Icons.check_box_rounded;
+              }
+            } else {
+              if (quiz.endDateTime.isAfter(DateTime.now())) {
+                return Icons.crop_square_outlined;
+              } else {
+                return Icons.square_rounded;
+              }
+            }
+          })(),
         ),
         title: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Expanded(
               child: Text(
-                contact.subjects,
+                quiz.subject,
                 style: Theme.of(context).textTheme.bodyMedium,
                 overflow: TextOverflow.ellipsis,
               ),
             ),
             Text(
               DateFormat('yyyy/MM/dd HH:mm', 'ja')
-                  .format(contact.contactDateTime.toLocal()),
+                  .format(quiz.endDateTime.toLocal()),
               style: Theme.of(context).textTheme.bodyMedium,
             ),
           ],
@@ -174,20 +217,24 @@ class _ContactPageState extends State<ContactPage> {
           children: [
             Expanded(
               child: Text(
-                contact.title,
+                quiz.title,
                 style: Theme.of(context)
                     .textTheme
                     .titleMedium
                     ?.copyWith(fontWeight: FontWeight.bold),
               ),
             ),
+            Visibility(
+              visible: quiz.isArchived,
+              child: const Icon(Icons.archive_outlined),
+            )
           ],
         ),
       ),
     );
   }
 
-  Widget _buildModal(Contact contact) {
+  Widget _buildModal(Quiz quiz) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
       height: MediaQuery.of(context).size.height -
@@ -199,7 +246,7 @@ class _ContactPageState extends State<ContactPage> {
             child: Align(
               alignment: Alignment.centerLeft,
               child: Text(
-                contact.title,
+                quiz.title,
                 style: Theme.of(context).textTheme.titleLarge,
               ),
             ),
@@ -211,12 +258,13 @@ class _ContactPageState extends State<ContactPage> {
               children: [
                 Text(
                   DateFormat('yyyy/MM/dd HH:mm', 'ja')
-                      .format(contact.targetDateTime.toLocal()),
+                      .format(quiz.startDateTime.toLocal()),
                   style: Theme.of(context).textTheme.bodyLarge,
                 ),
+                const Icon(Icons.arrow_right_alt_rounded),
                 Text(
                   DateFormat('yyyy/MM/dd HH:mm', 'ja')
-                      .format(contact.contactDateTime.toLocal()),
+                      .format(quiz.endDateTime.toLocal()),
                   style: Theme.of(context).textTheme.bodyLarge,
                 ),
               ],
@@ -240,10 +288,35 @@ class _ContactPageState extends State<ContactPage> {
                     horizontal: 4.0,
                   ),
                   child: Text(
-                    contact.contactType,
+                    quiz.status,
                     style: Theme.of(context).textTheme.bodyLarge,
                   ),
                 ),
+                Container(
+                  margin: const EdgeInsets.only(left: 8.0),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(8.0),
+                    border: Border.all(
+                      color: Theme.of(context).colorScheme.primary,
+                      width: 2,
+                    ),
+                  ),
+                  padding: const EdgeInsets.symmetric(
+                    vertical: 2.0,
+                    horizontal: 4.0,
+                  ),
+                  child: Text(
+                    quiz.isSubmitted ? '提出済' : '未提出',
+                    style: Theme.of(context).textTheme.bodyLarge,
+                  ),
+                ),
+                Visibility(
+                  visible: quiz.isArchived,
+                  child: const Padding(
+                    padding: EdgeInsets.all(8.0),
+                    child: Icon(Icons.archive_outlined),
+                  ),
+                )
               ],
             ),
           ),
@@ -251,13 +324,32 @@ class _ContactPageState extends State<ContactPage> {
           Padding(
             padding: const EdgeInsets.all(4.0),
             child: Text(
-              contact.isAcquired ? contact.content ?? '' : '未取得',
+              quiz.isAcquired ? quiz.description : '未取得',
+            ),
+          ),
+          const Padding(
+            padding: EdgeInsets.all(4.0),
+            child: Divider(thickness: 2.0),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(4.0),
+            child: Text(
+              quiz.isAcquired ? quiz.message : '未取得',
             ),
           ),
           const Expanded(child: SizedBox()),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
+              ElevatedButton(
+                onPressed: () {
+                  context
+                      .read<ApiProvider>()
+                      .setArchiveQuiz(quiz.id, !quiz.isArchived);
+                  Navigator.of(context).pop();
+                },
+                child: Icon(quiz.isArchived ? Icons.unarchive : Icons.archive),
+              ),
               ElevatedButton(
                 onPressed: () => Navigator.of(context).pop(),
                 child: const Icon(Icons.close_rounded),

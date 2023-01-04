@@ -56,6 +56,7 @@ class _AppState extends State<App> {
               : 'Hi, ${context.watch<ApiProvider>().api.settings['FullName']}!',
         ),
       ),
+      bottom: buildAppBarBottom(context),
     );
   }
 
@@ -98,4 +99,21 @@ class _AppState extends State<App> {
       ],
     );
   }
+}
+
+PreferredSize buildAppBarBottom(BuildContext context) {
+  return PreferredSize(
+    preferredSize: const Size.fromHeight(6.0),
+    child: Visibility(
+      visible: context.watch<ApiProvider>().isLoading,
+      child: LinearProgressIndicator(
+        minHeight: 3.0,
+        valueColor: context.watch<ApiProvider>().isError
+            ? AlwaysStoppedAnimation<Color>(Theme.of(context).colorScheme.error)
+            : AlwaysStoppedAnimation<Color>(
+                Theme.of(context).colorScheme.primary,
+              ),
+      ),
+    ),
+  );
 }

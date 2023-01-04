@@ -28,7 +28,9 @@ class Api {
   Dio _client = Dio();
   CookieJar _cookieJar = CookieJar();
 
-  Api(this.year, this.semester, this.username, this.password);
+  Api(this.year, this.semester, this.username, this.password) {
+    loadSettings();
+  }
 
   String get schoolYear => year.toString();
   String get semesterCode => (semester < 2 ? 1 : 2).toString();

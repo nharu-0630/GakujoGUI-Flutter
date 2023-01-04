@@ -11,8 +11,8 @@ class ContactWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var subjects = context.read<ApiProvider>().api.subjects;
-    var contacts = context.read<ApiProvider>().api.contacts;
+    var subjects = context.watch<ApiProvider>().api.subjects;
+    var contacts = context.watch<ApiProvider>().api.contacts;
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16.0),
       child: subjects.isEmpty
@@ -50,51 +50,42 @@ class ContactWidget extends StatelessWidget {
 
   Widget _buildContactTile(
       BuildContext context, Subject subject, List<Contact> contacts) {
-    return GestureDetector(
+    return ListTile(
       onTap: () {
-        Navigator.of(context).push(MaterialPageRoute(
-            builder: (context) => ContactPage(subject, contacts)));
+        Navigator.of(context).push(
+            MaterialPageRoute(builder: (context) => ContactPage(subject)));
       },
-      child: Container(
-        margin: const EdgeInsets.symmetric(vertical: 16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Expanded(
-                  child: Text(
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    subject.subjectsName,
-                    style: Theme.of(context)
-                        .textTheme
-                        .titleMedium
-                        ?.copyWith(fontWeight: FontWeight.bold),
-                  ),
-                ),
-                Text(
-                  contacts.isNotEmpty
-                      ? DateFormat('yyyy/MM/dd HH:mm', 'ja')
-                          .format(contacts.last.contactDateTime.toLocal())
-                      : '',
-                  style: Theme.of(context).textTheme.bodyMedium,
-                )
-              ],
-            ),
-            const SizedBox(height: 6.0),
-            Text(
-              contacts.isNotEmpty
-                  ? contacts.last.content != null
-                      ? contacts.last.content!.replaceAll('\n', ' ')
-                      : '未取得'
-                  : 'メッセージなし',
+      title: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Expanded(
+            child: Text(
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
+              subject.subjectsName,
+              style: Theme.of(context)
+                  .textTheme
+                  .titleMedium
+                  ?.copyWith(fontWeight: FontWeight.bold),
             ),
-          ],
-        ),
+          ),
+          Text(
+            contacts.isNotEmpty
+                ? DateFormat('yyyy/MM/dd HH:mm', 'ja')
+                    .format(contacts.last.contactDateTime.toLocal())
+                : '',
+            style: Theme.of(context).textTheme.bodyMedium,
+          )
+        ],
+      ),
+      subtitle: Text(
+        contacts.isNotEmpty
+            ? contacts.last.isAcquired
+                ? contacts.last.content!.replaceAll('\n', ' ')
+                : '未取得'
+            : 'メッセージなし',
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
       ),
     );
   }

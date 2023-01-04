@@ -1,10 +1,6 @@
 import 'dart:convert';
 
-import 'package:collection/collection.dart';
-import 'package:flutter/material.dart' show Icons;
 import 'package:gakujo_task/api/parse.dart';
-import 'package:gakujo_task/constants/colors.dart';
-import 'package:gakujo_task/models/task.dart';
 import 'package:html/dom.dart';
 
 class Report implements Comparable<Report> {
@@ -274,25 +270,4 @@ class Report implements Comparable<Report> {
     final compare4 = id.compareTo(other.id);
     return compare4;
   }
-
-  static Task toTask(List<Report> reports) => Task(
-      iconData: Icons.text_snippet_rounded,
-      title: 'レポート',
-      bgColor: kYellowLight,
-      iconColor: kYellowDark,
-      btnColor: kYellow,
-      left: reports
-          .where((e) => !e.isSubmitted && e.endDateTime.isAfter(DateTime.now()))
-          .length,
-      done: reports.where((e) => e.isSubmitted).length,
-      desc: reports
-          .sorted()
-          .map((e) => {
-                'time': e.endDateTime,
-                'title': e.title,
-                'slot': e.subject,
-                'tlColor': kYellowDark,
-                'bgColor': kYellowLight,
-              })
-          .toList());
 }

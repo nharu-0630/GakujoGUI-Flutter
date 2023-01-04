@@ -6,9 +6,14 @@ import 'package:gakujo_task/views/home/widgets/task.dart';
 import 'package:provider/provider.dart';
 import 'package:sticky_headers/sticky_headers.dart';
 
-class HomeWidget extends StatelessWidget {
+class HomeWidget extends StatefulWidget {
   const HomeWidget({Key? key}) : super(key: key);
 
+  @override
+  State<HomeWidget> createState() => _HomeWidgetState();
+}
+
+class _HomeWidgetState extends State<HomeWidget> {
   @override
   Widget build(BuildContext context) {
     return RefreshIndicator(
@@ -34,6 +39,7 @@ class HomeWidget extends StatelessWidget {
             ),
             content: const TaskWidget(),
           ),
+          const SizedBox(height: 16.0),
           StickyHeader(
             header: Container(
               width: double.infinity,

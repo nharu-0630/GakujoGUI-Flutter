@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:gakujo_task/models/quiz.dart';
-import 'package:gakujo_task/models/report.dart';
-import 'package:gakujo_task/models/task.dart';
+import 'package:gakujo_task/constants/colors.dart';
 import 'package:gakujo_task/provide.dart';
-import 'package:gakujo_task/views/task/task.dart';
+import 'package:gakujo_task/views/task/quiz.dart';
+import 'package:gakujo_task/views/task/report.dart';
 import 'package:provider/provider.dart';
 
 class TaskWidget extends StatelessWidget {
@@ -11,31 +10,25 @@ class TaskWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var tasks = [
-      Report.toTask(context.read<ApiProvider>().api.reports),
-      Quiz.toTask(context.read<ApiProvider>().api.quizzes)
-    ];
-    return Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16.0),
-        child: GridView.builder(
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          itemCount: tasks.length,
-          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 2,
-            crossAxisSpacing: 16.0,
-            mainAxisSpacing: 16.0,
-          ),
-          itemBuilder: ((context, index) =>
-              _buildTaskTile(context, tasks[index])),
-        ));
+    return GridView.count(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      mainAxisSpacing: 16.0,
+      crossAxisSpacing: 16.0,
+      padding: const EdgeInsets.symmetric(horizontal: 16.0),
+      crossAxisCount: 2,
+      children: [
+        _buildReportTile(context),
+        _buildQuizTile(context),
+      ],
+    );
   }
 
-  Widget _buildTaskTile(BuildContext context, Task task) {
+  Widget _buildReportTile(BuildContext context) {
     return GestureDetector(
       onTap: () {
         Navigator.of(context)
-            .push(MaterialPageRoute(builder: (context) => TaskPage(task)));
+            .push(MaterialPageRoute(builder: (context) => const ReportPage()));
       },
       child: Card(
         child: Padding(
@@ -44,21 +37,58 @@ class TaskWidget extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
-              Icon(
-                task.iconData,
-                color: task.iconColor,
+              const Icon(
+                Icons.text_snippet_rounded,
+                color: kYellowDark,
                 size: 36.0,
               ),
               Text(
-                task.title!,
+                'レポート',
                 style: Theme.of(context).textTheme.titleLarge,
               ),
               Align(
                 alignment: Alignment.centerRight,
                 child: _buildTaskStatus(
                   context,
-                  task.iconColor!.withOpacity(0.4),
-                  '残り ${task.left}',
+                  kYellowDark.withOpacity(0.4),
+                  '残り ${context.watch<ApiProvider>().api.reports.where((e) => !(e.isArchived || !(!e.isSubmitted && e.endDateTime.isAfter(DateTime.now())))).length}',
+                ),
+              )
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildQuizTile(BuildContext context) {
+    return GestureDetector(
+      onTap: () {
+        Navigator.of(context)
+            .push(MaterialPageRoute(builder: (context) => const QuizPage()));
+      },
+      child: Card(
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              const Icon(
+                Icons.quiz_rounded,
+                color: kRedDark,
+                size: 36.0,
+              ),
+              Text(
+                '小テスト',
+                style: Theme.of(context).textTheme.titleLarge,
+              ),
+              Align(
+                alignment: Alignment.centerRight,
+                child: _buildTaskStatus(
+                  context,
+                  kRedDark.withOpacity(0.4),
+                  '残り ${context.watch<ApiProvider>().api.quizzes.where((e) => !(e.isArchived || !(!e.isSubmitted && e.endDateTime.isAfter(DateTime.now())))).length}',
                 ),
               )
             ],
