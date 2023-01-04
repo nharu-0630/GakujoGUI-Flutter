@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:gakujo_task/app.dart';
@@ -31,52 +32,56 @@ class _ReportPageState extends State<ReportPage> {
         .toList();
     reports.sort(((a, b) => b.compareTo(a)));
     return Scaffold(
-      body: CustomScrollView(
-        slivers: [
-          _buildAppBar(context),
-          reports.isEmpty
-              ? SliverFillRemaining(
-                  child: Center(
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        const Padding(
-                          padding: EdgeInsets.all(8.0),
-                          child: Icon(
-                            Icons.beach_access_rounded,
-                            size: 48.0,
-                          ),
+      body: NestedScrollView(
+        headerSliverBuilder: (context, innerBoxScrolled) =>
+            [_buildAppBar(context)],
+        body: RefreshIndicator(
+          onRefresh: () async =>
+              await context.read<ApiProvider>().api.fetchReports(),
+          child: reports.isEmpty
+              ? LayoutBuilder(
+                  builder: (context, constraints) => SingleChildScrollView(
+                    physics: const AlwaysScrollableScrollPhysics(),
+                    child: ConstrainedBox(
+                      constraints:
+                          BoxConstraints(minHeight: constraints.maxHeight),
+                      child: Center(
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const Padding(
+                              padding: EdgeInsets.all(8.0),
+                              child: Icon(
+                                Icons.beach_access_rounded,
+                                size: 48.0,
+                              ),
+                            ),
+                            Text(
+                              'タスクはありません',
+                              style: Theme.of(context).textTheme.titleMedium,
+                            ),
+                          ],
                         ),
-                        Text(
-                          'タスクはありません',
-                          style: Theme.of(context).textTheme.titleMedium,
-                        ),
-                      ],
+                      ),
                     ),
                   ),
                 )
-              : SliverPadding(
-                  padding: const EdgeInsets.all(8.0),
-                  sliver: SliverList(
-                    delegate: _searchStatus
-                        ? SliverChildBuilderDelegate(
-                            (_, index) =>
-                                _buildCard(context, _suggestReports[index]),
-                            childCount: _suggestReports.length,
-                          )
-                        : SliverChildBuilderDelegate(
-                            (_, index) => _buildCard(context, reports[index]),
-                            childCount: reports.length,
-                          ),
-                  ),
-                )
-        ],
+              : ListView.builder(
+                  padding: const EdgeInsets.only(top: 8),
+                  itemCount:
+                      _searchStatus ? _suggestReports.length : reports.length,
+                  itemBuilder: (context, index) => _searchStatus
+                      ? _buildCard(context, _suggestReports[index])
+                      : _buildCard(context, reports[index]),
+                ),
+        ),
       ),
     );
   }
 
   Widget _buildAppBar(BuildContext context) {
     return SliverAppBar(
+      centerTitle: true,
       leading: Padding(
         padding: const EdgeInsets.all(8.0),
         child: IconButton(
@@ -171,18 +176,44 @@ class _ReportPageState extends State<ReportPage> {
         ],
       ),
       child: ListTile(
-        onTap: () => showModalBottomSheet(
-          isScrollControlled: true,
-          shape: const RoundedRectangleBorder(
-              borderRadius: BorderRadius.vertical(top: Radius.circular(16.0))),
-          context: context,
-          builder: (context) => DraggableScrollableSheet(
-            expand: false,
-            builder: (context, controller) {
-              return _buildModal(report, controller);
-            },
-          ),
-        ),
+        onTap: () async {
+          if (!report.isAcquired) {
+            await showDialog(
+              context: context,
+              builder: (_) => CupertinoAlertDialog(
+                content: const Text('未取得のレポートです。取得しますか？'),
+                actions: [
+                  CupertinoDialogAction(
+                      isDestructiveAction: true,
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                      },
+                      child: const Text('キャンセル')),
+                  CupertinoDialogAction(
+                    child: const Text('取得'),
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                      context.read<ApiProvider>().fetchDetailReport(report);
+                    },
+                  )
+                ],
+              ),
+            );
+          }
+          showModalBottomSheet(
+            isScrollControlled: true,
+            shape: const RoundedRectangleBorder(
+                borderRadius:
+                    BorderRadius.vertical(top: Radius.circular(16.0))),
+            context: context,
+            builder: (context) => DraggableScrollableSheet(
+              expand: false,
+              builder: (context, controller) {
+                return _buildModal(report, controller);
+              },
+            ),
+          );
+        },
         leading: Icon(
           (() {
             if (report.isSubmitted) {
@@ -328,7 +359,7 @@ class _ReportPageState extends State<ReportPage> {
         const SizedBox(height: 8.0),
         Padding(
           padding: const EdgeInsets.all(4.0),
-          child: Text(
+          child: SelectableText(
             report.isAcquired ? report.description : '未取得',
           ),
         ),
@@ -338,7 +369,7 @@ class _ReportPageState extends State<ReportPage> {
         ),
         Padding(
           padding: const EdgeInsets.all(4.0),
-          child: Text(
+          child: SelectableText(
             report.isAcquired ? report.message : '未取得',
           ),
         ),

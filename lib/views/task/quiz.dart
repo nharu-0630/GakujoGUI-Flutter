@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:gakujo_task/app.dart';
@@ -31,52 +32,56 @@ class _QuizPageState extends State<QuizPage> {
         .toList();
     quizzes.sort(((a, b) => b.compareTo(a)));
     return Scaffold(
-      body: CustomScrollView(
-        slivers: [
-          _buildAppBar(context),
-          quizzes.isEmpty
-              ? SliverFillRemaining(
-                  child: Center(
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        const Padding(
-                          padding: EdgeInsets.all(8.0),
-                          child: Icon(
-                            Icons.beach_access_rounded,
-                            size: 48.0,
-                          ),
+      body: NestedScrollView(
+        headerSliverBuilder: (context, innerBoxScrolled) =>
+            [_buildAppBar(context)],
+        body: RefreshIndicator(
+          onRefresh: () async =>
+              await context.read<ApiProvider>().api.fetchQuizzes(),
+          child: quizzes.isEmpty
+              ? LayoutBuilder(
+                  builder: (context, constraints) => SingleChildScrollView(
+                    physics: const AlwaysScrollableScrollPhysics(),
+                    child: ConstrainedBox(
+                      constraints:
+                          BoxConstraints(minHeight: constraints.maxHeight),
+                      child: Center(
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const Padding(
+                              padding: EdgeInsets.all(8.0),
+                              child: Icon(
+                                Icons.beach_access_rounded,
+                                size: 48.0,
+                              ),
+                            ),
+                            Text(
+                              'タスクはありません',
+                              style: Theme.of(context).textTheme.titleMedium,
+                            ),
+                          ],
                         ),
-                        Text(
-                          'タスクはありません',
-                          style: Theme.of(context).textTheme.titleMedium,
-                        ),
-                      ],
+                      ),
                     ),
                   ),
                 )
-              : SliverPadding(
-                  padding: const EdgeInsets.all(8.0),
-                  sliver: SliverList(
-                    delegate: _searchStatus
-                        ? SliverChildBuilderDelegate(
-                            (_, index) =>
-                                _buildCard(context, _suggestQuizzes[index]),
-                            childCount: _suggestQuizzes.length,
-                          )
-                        : SliverChildBuilderDelegate(
-                            (_, index) => _buildCard(context, quizzes[index]),
-                            childCount: quizzes.length,
-                          ),
-                  ),
-                )
-        ],
+              : ListView.builder(
+                  padding: const EdgeInsets.only(top: 8),
+                  itemCount:
+                      _searchStatus ? _suggestQuizzes.length : quizzes.length,
+                  itemBuilder: (context, index) => _searchStatus
+                      ? _buildCard(context, _suggestQuizzes[index])
+                      : _buildCard(context, quizzes[index]),
+                ),
+        ),
       ),
     );
   }
 
   Widget _buildAppBar(BuildContext context) {
     return SliverAppBar(
+      centerTitle: true,
       leading: Padding(
         padding: const EdgeInsets.all(8.0),
         child: IconButton(
@@ -171,18 +176,44 @@ class _QuizPageState extends State<QuizPage> {
         ],
       ),
       child: ListTile(
-        onTap: () => showModalBottomSheet(
-          isScrollControlled: true,
-          shape: const RoundedRectangleBorder(
-              borderRadius: BorderRadius.vertical(top: Radius.circular(16.0))),
-          context: context,
-          builder: (context) => DraggableScrollableSheet(
-            expand: false,
-            builder: (context, controller) {
-              return _buildModal(quiz, controller);
-            },
-          ),
-        ),
+        onTap: () async {
+          if (!quiz.isAcquired) {
+            await showDialog(
+              context: context,
+              builder: (_) => CupertinoAlertDialog(
+                content: const Text('未取得の小テストです。取得しますか？'),
+                actions: [
+                  CupertinoDialogAction(
+                      isDestructiveAction: true,
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                      },
+                      child: const Text('キャンセル')),
+                  CupertinoDialogAction(
+                    child: const Text('取得'),
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                      context.read<ApiProvider>().fetchDetailQuiz(quiz);
+                    },
+                  )
+                ],
+              ),
+            );
+          }
+          showModalBottomSheet(
+            isScrollControlled: true,
+            shape: const RoundedRectangleBorder(
+                borderRadius:
+                    BorderRadius.vertical(top: Radius.circular(16.0))),
+            context: context,
+            builder: (context) => DraggableScrollableSheet(
+              expand: false,
+              builder: (context, controller) {
+                return _buildModal(quiz, controller);
+              },
+            ),
+          );
+        },
         leading: Icon(
           (() {
             if (quiz.isSubmitted) {
@@ -326,7 +357,7 @@ class _QuizPageState extends State<QuizPage> {
         const SizedBox(height: 8.0),
         Padding(
           padding: const EdgeInsets.all(4.0),
-          child: Text(
+          child: SelectableText(
             quiz.isAcquired ? quiz.description : '未取得',
           ),
         ),
@@ -336,7 +367,7 @@ class _QuizPageState extends State<QuizPage> {
         ),
         Padding(
           padding: const EdgeInsets.all(4.0),
-          child: Text(
+          child: SelectableText(
             quiz.isAcquired ? quiz.message : '未取得',
           ),
         ),

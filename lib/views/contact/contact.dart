@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:gakujo_task/app.dart';
@@ -6,6 +7,7 @@ import 'package:gakujo_task/models/subject.dart';
 import 'package:gakujo_task/provide.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+import 'package:share_plus/share_plus.dart';
 
 class ContactPage extends StatefulWidget {
   final Subject subject;
@@ -142,18 +144,44 @@ class _ContactPageState extends State<ContactPage> {
         ],
       ),
       child: ListTile(
-        onTap: () => showModalBottomSheet(
-          isScrollControlled: true,
-          shape: const RoundedRectangleBorder(
-              borderRadius: BorderRadius.vertical(top: Radius.circular(16.0))),
-          context: context,
-          builder: (context) => DraggableScrollableSheet(
-            expand: false,
-            builder: (context, controller) {
-              return _buildModal(contact, controller);
-            },
-          ),
-        ),
+        onTap: () async {
+          if (!contact.isAcquired) {
+            await showDialog(
+              context: context,
+              builder: (_) => CupertinoAlertDialog(
+                content: const Text('未取得の授業です。取得しますか？'),
+                actions: [
+                  CupertinoDialogAction(
+                      isDestructiveAction: true,
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                      },
+                      child: const Text('キャンセル')),
+                  CupertinoDialogAction(
+                    child: const Text('取得'),
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                      context.read<ApiProvider>().fetchDetailContact(contact);
+                    },
+                  )
+                ],
+              ),
+            );
+          }
+          showModalBottomSheet(
+            isScrollControlled: true,
+            shape: const RoundedRectangleBorder(
+                borderRadius:
+                    BorderRadius.vertical(top: Radius.circular(16.0))),
+            context: context,
+            builder: (context) => DraggableScrollableSheet(
+              expand: false,
+              builder: (context, controller) {
+                return _buildModal(contact, controller);
+              },
+            ),
+          );
+        },
         title: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
@@ -250,7 +278,7 @@ class _ContactPageState extends State<ContactPage> {
         const SizedBox(height: 8.0),
         Padding(
           padding: const EdgeInsets.all(4.0),
-          child: Text(
+          child: SelectableText(
             contact.isAcquired ? contact.content ?? '' : '未取得',
           ),
         ),
@@ -272,7 +300,8 @@ class _ContactPageState extends State<ContactPage> {
               child: Container(
                 padding: const EdgeInsets.all(4.0),
                 child: ElevatedButton(
-                  onPressed: () => Navigator.of(context).pop(),
+                  onPressed: () => Share.share(contact.content ?? '未取得',
+                      subject: contact.title),
                   child: const Icon(Icons.share_rounded),
                 ),
               ),

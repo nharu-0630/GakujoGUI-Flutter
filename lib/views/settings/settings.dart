@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:gakujo_task/provide.dart';
 import 'package:provider/provider.dart';
@@ -39,7 +40,29 @@ class SettingsWidget extends StatelessWidget {
                     backgroundColor: Theme.of(context).colorScheme.primary,
                     foregroundColor: Theme.of(context).colorScheme.onPrimary,
                   ),
-                  onPressed: () async => context.read<ApiProvider>().fetchAll(),
+                  onPressed: () async {
+                    showDialog(
+                      context: context,
+                      builder: (_) => CupertinoAlertDialog(
+                        content: const Text('一括更新には時間がかかります。更新しますか？'),
+                        actions: [
+                          CupertinoDialogAction(
+                              isDestructiveAction: true,
+                              onPressed: () {
+                                Navigator.of(context).pop();
+                              },
+                              child: const Text('キャンセル')),
+                          CupertinoDialogAction(
+                            child: const Text('取得'),
+                            onPressed: () {
+                              Navigator.of(context).pop();
+                              context.read<ApiProvider>().fetchAll();
+                            },
+                          )
+                        ],
+                      ),
+                    );
+                  },
                   child: Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: Row(
@@ -68,7 +91,29 @@ class SettingsWidget extends StatelessWidget {
                     backgroundColor: Theme.of(context).colorScheme.error,
                     foregroundColor: Theme.of(context).colorScheme.onError,
                   ),
-                  onPressed: () => context.read<ApiProvider>().clearSettings(),
+                  onPressed: () async {
+                    showDialog(
+                      context: context,
+                      builder: (_) => CupertinoAlertDialog(
+                        content: const Text('初期化するとすべてのデータが削除されます。初期化しますか？'),
+                        actions: [
+                          CupertinoDialogAction(
+                              onPressed: () {
+                                Navigator.of(context).pop();
+                              },
+                              child: const Text('キャンセル')),
+                          CupertinoDialogAction(
+                            isDestructiveAction: true,
+                            child: const Text('初期化'),
+                            onPressed: () {
+                              Navigator.of(context).pop();
+                              context.read<ApiProvider>().clearSettings();
+                            },
+                          )
+                        ],
+                      ),
+                    );
+                  },
                   child: Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: Row(

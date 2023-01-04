@@ -24,15 +24,24 @@ class _HomeWidgetState extends State<HomeWidget> {
           const StatusWidget(),
           StickyHeader(
             header: Container(
-              width: double.infinity,
               color: Theme.of(context).scaffoldBackgroundColor,
               padding:
                   const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-              child: Text(
-                'タスク',
-                style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                      fontWeight: FontWeight.bold,
-                    ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    'タスク',
+                    style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                          fontWeight: FontWeight.bold,
+                        ),
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.sync),
+                    onPressed: () async =>
+                        context.read<ApiProvider>().fetchTasks(),
+                  ),
+                ],
               ),
             ),
             content: const TaskWidget(),
@@ -40,15 +49,24 @@ class _HomeWidgetState extends State<HomeWidget> {
           const SizedBox(height: 16.0),
           StickyHeader(
             header: Container(
-              width: double.infinity,
               color: Theme.of(context).scaffoldBackgroundColor,
               padding:
                   const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-              child: Text(
-                'メッセージ',
-                style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                      fontWeight: FontWeight.bold,
-                    ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    'メッセージ',
+                    style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                          fontWeight: FontWeight.bold,
+                        ),
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.sync),
+                    onPressed: () async =>
+                        context.read<ApiProvider>().fetchContacts(),
+                  ),
+                ],
               ),
             ),
             content: const ContactWidget(),

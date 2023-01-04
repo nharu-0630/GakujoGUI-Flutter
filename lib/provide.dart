@@ -53,6 +53,18 @@ class ApiProvider extends ChangeNotifier {
     }
   }
 
+  void fetchTasks() async {
+    if (isLoading) return;
+    _toggleLoading();
+    try {
+      await api.fetchReports();
+      await api.fetchQuizzes();
+      _toggleLoading();
+    } catch (e) {
+      _onError(e);
+    }
+  }
+
   void fetchLogin() async {
     if (isLoading) return;
     _toggleLoading();

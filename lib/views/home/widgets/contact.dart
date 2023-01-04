@@ -72,7 +72,7 @@ class ContactWidget extends StatelessWidget {
           Text(
             contacts.isNotEmpty
                 ? DateFormat('yyyy/MM/dd HH:mm', 'ja')
-                    .format(contacts.last.contactDateTime.toLocal())
+                    .format(contacts.first.contactDateTime.toLocal())
                 : '',
             style: Theme.of(context).textTheme.bodyMedium,
           )
@@ -80,8 +80,8 @@ class ContactWidget extends StatelessWidget {
       ),
       subtitle: Text(
         contacts.isNotEmpty
-            ? contacts.last.isAcquired
-                ? contacts.last.content!.replaceAll('\n', ' ')
+            ? contacts.first.isAcquired
+                ? contacts.first.content!.replaceAll('\n', ' ')
                 : '未取得'
             : 'メッセージなし',
         maxLines: 1,
