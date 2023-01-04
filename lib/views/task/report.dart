@@ -259,6 +259,7 @@ class _ReportPageState extends State<ReportPage> {
                     .textTheme
                     .titleMedium
                     ?.copyWith(fontWeight: FontWeight.bold),
+                overflow: TextOverflow.ellipsis,
               ),
             ),
             Visibility(

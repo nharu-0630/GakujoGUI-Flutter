@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:better_open_file/better_open_file.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -213,8 +211,16 @@ class _ContactPageState extends State<ContactPage> {
                     .textTheme
                     .titleMedium
                     ?.copyWith(fontWeight: FontWeight.bold),
+                overflow: TextOverflow.ellipsis,
               ),
             ),
+            Visibility(
+              visible: contact.fileNames?.isNotEmpty ?? false,
+              child: const Padding(
+                padding: EdgeInsets.all(8.0),
+                child: Icon(Icons.file_present_outlined),
+              ),
+            )
           ],
         ),
       ),
@@ -296,17 +302,20 @@ class _ContactPageState extends State<ContactPage> {
           child: Padding(
             padding: const EdgeInsets.all(4.0),
             child: ListView.builder(
+              padding: const EdgeInsets.all(0.0),
               shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
               itemCount: contact.fileNames?.length ?? 0,
               itemBuilder: (context, index) {
                 return ListTile(
-                  title: Text(basename(contact.fileNames![index])),
-                  onTap: () async {
-                    var file = File(contact.fileNames![index]);
-                    print(file.path);
-                    print(await file.exists());
-                    OpenFile.open(contact.fileNames![index]);
-                  },
+                  title: Row(
+                    children: [
+                      const Icon(Icons.file_present_outlined),
+                      const SizedBox(width: 8.0),
+                      Text(basename(contact.fileNames![index])),
+                    ],
+                  ),
+                  onTap: () async => OpenFile.open(contact.fileNames![index]),
                 );
               },
             ),

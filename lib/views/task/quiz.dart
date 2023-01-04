@@ -259,6 +259,7 @@ class _QuizPageState extends State<QuizPage> {
                     .textTheme
                     .titleMedium
                     ?.copyWith(fontWeight: FontWeight.bold),
+                overflow: TextOverflow.ellipsis,
               ),
             ),
             Visibility(
