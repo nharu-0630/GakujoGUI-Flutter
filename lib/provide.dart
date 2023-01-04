@@ -101,12 +101,12 @@ class ApiProvider extends ChangeNotifier {
   void fetchDetailContact(Contact contact) async {
     if (isLoading) return;
     _toggleLoading();
-    try {
-      await api.fetchDetailContact(contact);
-      _toggleLoading();
-    } catch (e) {
-      _onError(e);
-    }
+    // try {
+    await api.fetchDetailContact(contact);
+    _toggleLoading();
+    // } catch (e) {
+    //   _onError(e);
+    // }
   }
 
   void fetchReports() async {

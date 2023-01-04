@@ -1,3 +1,6 @@
+import 'dart:io';
+
+import 'package:better_open_file/better_open_file.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
@@ -6,6 +9,7 @@ import 'package:gakujo_task/models/contact.dart';
 import 'package:gakujo_task/models/subject.dart';
 import 'package:gakujo_task/provide.dart';
 import 'package:intl/intl.dart';
+import 'package:path/path.dart';
 import 'package:provider/provider.dart';
 import 'package:share_plus/share_plus.dart';
 
@@ -177,7 +181,7 @@ class _ContactPageState extends State<ContactPage> {
             builder: (context) => DraggableScrollableSheet(
               expand: false,
               builder: (context, controller) {
-                return _buildModal(contact, controller);
+                return _buildModal(context, contact, controller);
               },
             ),
           );
@@ -217,7 +221,8 @@ class _ContactPageState extends State<ContactPage> {
     );
   }
 
-  Widget _buildModal(Contact contact, ScrollController controller) {
+  Widget _buildModal(
+      BuildContext context, Contact contact, ScrollController controller) {
     return ListView(
       controller: controller,
       padding: const EdgeInsets.all(16.0),
@@ -279,7 +284,32 @@ class _ContactPageState extends State<ContactPage> {
         Padding(
           padding: const EdgeInsets.all(4.0),
           child: SelectableText(
-            contact.isAcquired ? contact.content ?? '' : '未取得',
+            contact.isAcquired ? contact.content : '未取得',
+          ),
+        ),
+        const Padding(
+          padding: EdgeInsets.all(4.0),
+          child: Divider(thickness: 2.0),
+        ),
+        Visibility(
+          visible: contact.fileNames?.isNotEmpty ?? false,
+          child: Padding(
+            padding: const EdgeInsets.all(4.0),
+            child: ListView.builder(
+              shrinkWrap: true,
+              itemCount: contact.fileNames?.length ?? 0,
+              itemBuilder: (context, index) {
+                return ListTile(
+                  title: Text(basename(contact.fileNames![index])),
+                  onTap: () async {
+                    var file = File(contact.fileNames![index]);
+                    print(file.path);
+                    print(await file.exists());
+                    OpenFile.open(contact.fileNames![index]);
+                  },
+                );
+              },
+            ),
           ),
         ),
         const SizedBox(height: 8.0),
@@ -300,8 +330,8 @@ class _ContactPageState extends State<ContactPage> {
               child: Container(
                 padding: const EdgeInsets.all(4.0),
                 child: ElevatedButton(
-                  onPressed: () => Share.share(contact.content ?? '未取得',
-                      subject: contact.title),
+                  onPressed: () =>
+                      Share.share(contact.content, subject: contact.title),
                   child: const Icon(Icons.share_rounded),
                 ),
               ),

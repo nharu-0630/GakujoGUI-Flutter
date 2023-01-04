@@ -4,6 +4,25 @@ import 'package:gakujo_task/api/parse.dart';
 import 'package:html/dom.dart';
 
 class Quiz implements Comparable<Quiz> {
+  String subject;
+  String title;
+  String id;
+  String schoolYear;
+  String subjectCode;
+  String classCode;
+  String status;
+  DateTime startDateTime = DateTime.fromMicrosecondsSinceEpoch(0);
+  DateTime endDateTime = DateTime.fromMicrosecondsSinceEpoch(0);
+  String submissionStatus;
+  String implementationFormat;
+  String operation;
+  int questionsCount;
+  String evaluationMethod;
+  String description;
+  String message;
+  bool isAcquired = false;
+  bool isArchived = false;
+
   Quiz(
     this.subject,
     this.title,
@@ -24,30 +43,6 @@ class Quiz implements Comparable<Quiz> {
     required this.isAcquired,
     required this.isArchived,
   });
-
-  factory Quiz.fromJson(dynamic json) {
-    json = json as Map<String, dynamic>;
-    return Quiz(
-      json['subject'] as String,
-      json['title'] as String,
-      json['id'] as String,
-      json['schoolYear'] as String,
-      json['subjectCode'] as String,
-      json['classCode'] as String,
-      json['status'] as String,
-      (json['startDateTime'] as String).parseDateTime(),
-      (json['endDateTime'] as String).parseDateTime(),
-      json['submissionStatus'] as String,
-      json['implementationFormat'] as String,
-      json['operation'] as String,
-      json['questionsCount'] as int,
-      json['evaluationMethod'] as String,
-      json['description'] as String,
-      json['message'] as String,
-      isAcquired: json['isAcquired'] as bool,
-      isArchived: json['isArchived'] as bool,
-    );
-  }
 
   factory Quiz.fromDocument(String subject, Document document) {
     final title =
@@ -144,25 +139,6 @@ class Quiz implements Comparable<Quiz> {
     );
   }
 
-  String subject = '';
-  String title = '';
-  String id = '';
-  String schoolYear = '';
-  String subjectCode = '';
-  String classCode = '';
-  String status = '';
-  DateTime startDateTime = DateTime.fromMicrosecondsSinceEpoch(0);
-  DateTime endDateTime = DateTime.fromMicrosecondsSinceEpoch(0);
-  String submissionStatus = '';
-  String implementationFormat = '';
-  String operation = '';
-  int questionsCount = 0;
-  String evaluationMethod = '';
-  String description = '';
-  String message = '';
-  bool isAcquired = false;
-  bool isArchived = false;
-
   static Map<String, dynamic> toMap(Quiz quiz) => <String, dynamic>{
         'subject': quiz.subject,
         'title': quiz.title,
@@ -183,6 +159,30 @@ class Quiz implements Comparable<Quiz> {
         'isAcquired': quiz.isAcquired,
         'isArchived': quiz.isArchived
       };
+
+  factory Quiz.fromJson(dynamic json) {
+    json = json as Map<String, dynamic>;
+    return Quiz(
+      json['subject'] as String,
+      json['title'] as String,
+      json['id'] as String,
+      json['schoolYear'] as String,
+      json['subjectCode'] as String,
+      json['classCode'] as String,
+      json['status'] as String,
+      (json['startDateTime'] as String).parseDateTime(),
+      (json['endDateTime'] as String).parseDateTime(),
+      json['submissionStatus'] as String,
+      json['implementationFormat'] as String,
+      json['operation'] as String,
+      json['questionsCount'] as int,
+      json['evaluationMethod'] as String,
+      json['description'] as String,
+      json['message'] as String,
+      isAcquired: json['isAcquired'] as bool,
+      isArchived: json['isArchived'] as bool,
+    );
+  }
 
   static String encode(List<Quiz> quizzes) => json.encode(
         quizzes.map<Map<String, dynamic>>(Quiz.toMap).toList(),

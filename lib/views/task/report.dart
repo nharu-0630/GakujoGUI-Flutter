@@ -6,6 +6,7 @@ import 'package:gakujo_task/models/report.dart';
 import 'package:gakujo_task/provide.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+import 'package:share_plus/share_plus.dart';
 
 class ReportPage extends StatefulWidget {
   const ReportPage({Key? key}) : super(key: key);
@@ -406,7 +407,9 @@ class _ReportPageState extends State<ReportPage> {
               child: Container(
                 padding: const EdgeInsets.all(4.0),
                 child: ElevatedButton(
-                  onPressed: () => Navigator.of(context).pop(),
+                  onPressed: () => Share.share(
+                      '${report.description}\n\n${report.message}',
+                      subject: report.title),
                   child: const Icon(Icons.share_rounded),
                 ),
               ),

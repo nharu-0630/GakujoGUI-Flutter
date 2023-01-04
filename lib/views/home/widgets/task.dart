@@ -48,7 +48,7 @@ class TaskWidget extends StatelessWidget {
               ),
               Align(
                 alignment: Alignment.centerRight,
-                child: _buildTaskStatus(
+                child: _buildStatus(
                   context,
                   kYellowDark.withOpacity(0.4),
                   '残り ${context.watch<ApiProvider>().api.reports.where((e) => !(e.isArchived || !(!e.isSubmitted && e.endDateTime.isAfter(DateTime.now())))).length}',
@@ -85,7 +85,7 @@ class TaskWidget extends StatelessWidget {
               ),
               Align(
                 alignment: Alignment.centerRight,
-                child: _buildTaskStatus(
+                child: _buildStatus(
                   context,
                   kRedDark.withOpacity(0.4),
                   '残り ${context.watch<ApiProvider>().api.quizzes.where((e) => !(e.isArchived || !(!e.isSubmitted && e.endDateTime.isAfter(DateTime.now())))).length}',
@@ -98,7 +98,7 @@ class TaskWidget extends StatelessWidget {
     );
   }
 
-  Widget _buildTaskStatus(BuildContext context, Color color, String text) {
+  Widget _buildStatus(BuildContext context, Color color, String text) {
     return Container(
       padding: const EdgeInsets.symmetric(
         vertical: 8.0,

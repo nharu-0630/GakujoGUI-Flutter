@@ -17,28 +17,6 @@ class Subject {
     this.subjectColor,
   );
 
-  static String encode(List<Subject> subjects) => json.encode(
-        subjects.map<Map<String, dynamic>>(Subject.toJson).toList(),
-      );
-
-  static List<Subject> decode(String subjects) => json.decode(subjects) is List
-      ? (json.decode(subjects) as List).map<Subject>(Subject.fromJson).toList()
-      : [];
-
-  factory Subject.fromJson(dynamic json) => Subject(
-        json['subjectsName'] as String,
-        json['teacherName'] as String,
-        json['classRoom'] as String,
-        Color(json['subjectColor']),
-      );
-
-  static Map<String, dynamic> toJson(Subject subject) => <String, dynamic>{
-        'subjectsName': subject.subjectsName,
-        'teacherName': subject.teacherName,
-        'classRoom': subject.classRoom,
-        'subjectColor': subject.subjectColor.value,
-      };
-
   factory Subject.fromElement(Element element) {
     var bytes =
         md5.convert(utf8.encode(element.querySelectorAll('li')[0].text.trim()));
@@ -53,4 +31,26 @@ class Subject {
       Color(int.parse('0xFF${bytes.toString().substring(0, 6)}')),
     );
   }
+
+  static Map<String, dynamic> toMap(Subject subject) => <String, dynamic>{
+        'subjectsName': subject.subjectsName,
+        'teacherName': subject.teacherName,
+        'classRoom': subject.classRoom,
+        'subjectColor': subject.subjectColor.value,
+      };
+
+  factory Subject.fromJson(dynamic json) => Subject(
+        json['subjectsName'] as String,
+        json['teacherName'] as String,
+        json['classRoom'] as String,
+        Color(json['subjectColor']),
+      );
+
+  static String encode(List<Subject> subjects) => json.encode(
+        subjects.map<Map<String, dynamic>>(Subject.toMap).toList(),
+      );
+
+  static List<Subject> decode(String subjects) => json.decode(subjects) is List
+      ? (json.decode(subjects) as List).map<Subject>(Subject.fromJson).toList()
+      : [];
 }

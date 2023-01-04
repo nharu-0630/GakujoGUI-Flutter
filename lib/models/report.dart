@@ -4,6 +4,24 @@ import 'package:gakujo_task/api/parse.dart';
 import 'package:html/dom.dart';
 
 class Report implements Comparable<Report> {
+  String subject;
+  String title;
+  String id;
+  String schoolYear;
+  String subjectCode;
+  String classCode;
+  String status;
+  DateTime startDateTime;
+  DateTime endDateTime = DateTime.fromMicrosecondsSinceEpoch(0);
+  String implementationFormat;
+  String operation;
+  DateTime submittedDateTime = DateTime.fromMicrosecondsSinceEpoch(0);
+  String evaluationMethod;
+  String description;
+  String message;
+  bool isAcquired = false;
+  bool isArchived = false;
+
   Report(
     this.subject,
     this.title,
@@ -23,29 +41,6 @@ class Report implements Comparable<Report> {
     required this.isAcquired,
     required this.isArchived,
   });
-
-  factory Report.fromJson(dynamic json) {
-    json = json as Map<String, dynamic>;
-    return Report(
-      json['subject'] as String,
-      json['title'] as String,
-      json['id'] as String,
-      json['schoolYear'] as String,
-      json['subjectCode'] as String,
-      json['classCode'] as String,
-      json['status'] as String,
-      (json['startDateTime'] as String).parseDateTime(),
-      (json['endDateTime'] as String).parseDateTime(),
-      json['implementationFormat'] as String,
-      json['operation'] as String,
-      (json['submittedDateTime'] as String).parseDateTime(),
-      json['evaluationMethod'] as String,
-      json['description'] as String,
-      json['message'] as String,
-      isAcquired: json['isAcquired'] as bool,
-      isArchived: json['isArchived'] as bool,
-    );
-  }
 
   factory Report.fromDocument(String subject, Document document) {
     final title =
@@ -153,24 +148,6 @@ class Report implements Comparable<Report> {
     );
   }
 
-  String subject = '';
-  String title = '';
-  String id = '';
-  String schoolYear = '';
-  String subjectCode = '';
-  String classCode = '';
-  String status = '';
-  DateTime startDateTime = DateTime.fromMicrosecondsSinceEpoch(0);
-  DateTime endDateTime = DateTime.fromMicrosecondsSinceEpoch(0);
-  String implementationFormat = '';
-  String operation = '';
-  DateTime submittedDateTime = DateTime.fromMicrosecondsSinceEpoch(0);
-  String evaluationMethod = '';
-  String description = '';
-  String message = '';
-  bool isAcquired = false;
-  bool isArchived = false;
-
   static Map<String, dynamic> toMap(Report report) => <String, dynamic>{
         'subject': report.subject,
         'title': report.title,
@@ -190,6 +167,29 @@ class Report implements Comparable<Report> {
         'isAcquired': report.isAcquired,
         'isArchived': report.isArchived
       };
+
+  factory Report.fromJson(dynamic json) {
+    json = json as Map<String, dynamic>;
+    return Report(
+      json['subject'] as String,
+      json['title'] as String,
+      json['id'] as String,
+      json['schoolYear'] as String,
+      json['subjectCode'] as String,
+      json['classCode'] as String,
+      json['status'] as String,
+      (json['startDateTime'] as String).parseDateTime(),
+      (json['endDateTime'] as String).parseDateTime(),
+      json['implementationFormat'] as String,
+      json['operation'] as String,
+      (json['submittedDateTime'] as String).parseDateTime(),
+      json['evaluationMethod'] as String,
+      json['description'] as String,
+      json['message'] as String,
+      isAcquired: json['isAcquired'] as bool,
+      isArchived: json['isArchived'] as bool,
+    );
+  }
 
   static String encode(List<Report> reports) => json.encode(
         reports.map<Map<String, dynamic>>(Report.toMap).toList(),

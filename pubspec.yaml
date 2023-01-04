@@ -37,6 +37,9 @@ dependencies:
   crypto: ^3.0.2
   flutter_slidable: ^2.0.0
   share_plus: ^6.3.0
+  file_saver: ^0.1.1
+  path: ^1.8.2
+  better_open_file: ^3.6.4
 
 dev_dependencies:
   flutter_test:

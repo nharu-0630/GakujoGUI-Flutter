@@ -18,7 +18,7 @@ extension StringParsing on String {
 
   String trimJsArgs(int index) => split(',')[index]
       .replaceAll('\'', '')
-      .replaceAll('(', 'replace')
+      .replaceAll('(', '')
       .replaceAll(')', '')
       .replaceAll(';', '')
       .trim();

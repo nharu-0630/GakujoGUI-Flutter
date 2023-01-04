@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:typed_data';
 
 import 'package:gakujo_task/api/parse.dart';
 import 'package:html/dom.dart';
@@ -9,8 +8,7 @@ class Contact implements Comparable<Contact> {
   String teacherName;
   String contactType;
   String title;
-  String? content;
-  List<Uint8List>? fileBytes;
+  String content;
   List<String>? fileNames;
   String? fileLinkRelease;
   String? referenceUrl;
@@ -26,7 +24,6 @@ class Contact implements Comparable<Contact> {
       this.contactType,
       this.title,
       this.content,
-      this.fileBytes,
       this.fileNames,
       this.fileLinkRelease,
       this.referenceUrl,
@@ -35,49 +32,6 @@ class Contact implements Comparable<Contact> {
       this.contactDateTime,
       this.webReplyRequest,
       {required this.isAcquired});
-
-  static String encode(List<Contact> contacts) => json.encode(
-        contacts.map<Map<String, dynamic>>(Contact.toJson).toList(),
-      );
-
-  static List<Contact> decode(String contacts) => json.decode(contacts) is List
-      ? (json.decode(contacts) as List).map<Contact>(Contact.fromJson).toList()
-      : [];
-
-  factory Contact.fromJson(dynamic json) => Contact(
-      json['subjects'] as String,
-      json['teacherName'] as String,
-      json['contactType'] as String,
-      json['title'] as String,
-      json['content'] as String?,
-      (json['fileBytes'] as List<dynamic>?)
-          ?.map((e) => base64Decode(e as String))
-          .toList(),
-      (json['fileNames'] as List<dynamic>?)?.map((e) => e as String).toList(),
-      json['fileLinkRelease'] as String?,
-      json['referenceUrl'] as String?,
-      json['severity'] as String?,
-      DateTime.parse(json['targetDateTime'] as String),
-      DateTime.parse(json['contactDateTime'] as String),
-      json['webReplyRequest'] as String?,
-      isAcquired: json['isAcquired'] as bool);
-
-  static Map<String, dynamic> toJson(Contact contact) => <String, dynamic>{
-        'subjects': contact.subjects,
-        'teacherName': contact.teacherName,
-        'contactType': contact.contactType,
-        'title': contact.title,
-        'content': contact.content,
-        'fileBytes': contact.fileBytes?.map(base64Encode).toList(),
-        'fileNames': contact.fileNames,
-        'fileLinkRelease': contact.fileLinkRelease,
-        'referenceUrl': contact.referenceUrl,
-        'severity': contact.severity,
-        'targetDateTime': contact.targetDateTime.toIso8601String(),
-        'contactDateTime': contact.contactDateTime.toIso8601String(),
-        'webReplyRequest': contact.webReplyRequest,
-        'isAcquired': contact.isAcquired,
-      };
 
   factory Contact.fromElement(Element element) {
     return Contact(
@@ -90,7 +44,6 @@ class Contact implements Comparable<Contact> {
       element.querySelectorAll('td')[4].text.trim(),
       element.querySelectorAll('td')[3].querySelector('a')!.text.trim(),
       '',
-      null,
       null,
       '',
       '',
@@ -108,12 +61,65 @@ class Contact implements Comparable<Contact> {
     );
   }
 
+  static Map<String, dynamic> toMap(Contact contact) => <String, dynamic>{
+        'subjects': contact.subjects,
+        'teacherName': contact.teacherName,
+        'contactType': contact.contactType,
+        'title': contact.title,
+        'content': contact.content,
+        'fileNames': contact.fileNames,
+        'fileLinkRelease': contact.fileLinkRelease,
+        'referenceUrl': contact.referenceUrl,
+        'severity': contact.severity,
+        'targetDateTime': contact.targetDateTime.toIso8601String(),
+        'contactDateTime': contact.contactDateTime.toIso8601String(),
+        'webReplyRequest': contact.webReplyRequest,
+        'isAcquired': contact.isAcquired,
+      };
+
+  factory Contact.fromJson(dynamic json) => Contact(
+      json['subjects'] as String,
+      json['teacherName'] as String,
+      json['contactType'] as String,
+      json['title'] as String,
+      json['content'] as String,
+      (json['fileNames'] as List<dynamic>?)?.map((e) => e as String).toList(),
+      json['fileLinkRelease'] as String?,
+      json['referenceUrl'] as String?,
+      json['severity'] as String?,
+      DateTime.parse(json['targetDateTime'] as String),
+      DateTime.parse(json['contactDateTime'] as String),
+      json['webReplyRequest'] as String?,
+      isAcquired: json['isAcquired'] as bool);
+
+  static String encode(List<Contact> contacts) => json.encode(
+        contacts.map<Map<String, dynamic>>(Contact.toMap).toList(),
+      );
+
+  static List<Contact> decode(String contacts) => json.decode(contacts) is List
+      ? (json.decode(contacts) as List).map<Contact>(Contact.fromJson).toList()
+      : [];
+
   void toDetail(Document document) {
     isAcquired = true;
     if (document.querySelectorAll('table.ttb_entry > tbody > tr > td').length >
         2) {
       content = document
           .querySelectorAll('table.ttb_entry > tbody > tr > td')[2]
+          .text
+          .trim();
+    }
+    if (document.querySelectorAll('table.ttb_entry > tbody > tr > td').length >
+        4) {
+      fileLinkRelease = document
+          .querySelectorAll('table.ttb_entry > tbody > tr > td')[4]
+          .text
+          .trim();
+    }
+    if (document.querySelectorAll('table.ttb_entry > tbody > tr > td').length >
+        5) {
+      referenceUrl = document
+          .querySelectorAll('table.ttb_entry > tbody > tr > td')[5]
           .text
           .trim();
     }
@@ -129,7 +135,7 @@ class Contact implements Comparable<Contact> {
   bool contains(String value) =>
       subjects.toLowerCase().contains(value.toLowerCase()) ||
       title.toLowerCase().contains(value.toLowerCase()) ||
-      (content ?? '').toLowerCase().contains(value.toLowerCase());
+      (content).toLowerCase().contains(value.toLowerCase());
 
   @override
   bool operator ==(Object other) {

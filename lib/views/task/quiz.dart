@@ -6,6 +6,7 @@ import 'package:gakujo_task/models/quiz.dart';
 import 'package:gakujo_task/provide.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+import 'package:share_plus/share_plus.dart';
 
 class QuizPage extends StatefulWidget {
   const QuizPage({Key? key}) : super(key: key);
@@ -404,7 +405,9 @@ class _QuizPageState extends State<QuizPage> {
               child: Container(
                 padding: const EdgeInsets.all(4.0),
                 child: ElevatedButton(
-                  onPressed: () => Navigator.of(context).pop(),
+                  onPressed: () => Share.share(
+                      '${quiz.description}\n\n${quiz.message}',
+                      subject: quiz.title),
                   child: const Icon(Icons.share_rounded),
                 ),
               ),

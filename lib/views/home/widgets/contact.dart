@@ -38,7 +38,7 @@ class ContactWidget extends StatelessWidget {
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
               itemCount: subjects.length,
-              itemBuilder: ((context, index) => _buildContactTile(
+              itemBuilder: ((context, index) => _buildTile(
                   context,
                   subjects[index],
                   contacts
@@ -48,7 +48,7 @@ class ContactWidget extends StatelessWidget {
     );
   }
 
-  Widget _buildContactTile(
+  Widget _buildTile(
       BuildContext context, Subject subject, List<Contact> contacts) {
     return ListTile(
       onTap: () {
@@ -81,7 +81,7 @@ class ContactWidget extends StatelessWidget {
       subtitle: Text(
         contacts.isNotEmpty
             ? contacts.first.isAcquired
-                ? contacts.first.content!.replaceAll('\n', ' ')
+                ? contacts.first.content.replaceAll('\n', ' ')
                 : '未取得'
             : 'メッセージなし',
         maxLines: 1,

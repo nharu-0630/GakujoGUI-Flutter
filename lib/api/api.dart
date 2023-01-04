@@ -5,18 +5,21 @@ import 'package:cookie_jar/cookie_jar.dart';
 import 'package:dio/dio.dart';
 import 'package:dio_cookie_manager/dio_cookie_manager.dart';
 import 'package:dio_smart_retry/dio_smart_retry.dart';
+import 'package:file_saver/file_saver.dart';
 import 'package:flutter/foundation.dart';
+import 'package:gakujo_task/api/parse.dart';
 import 'package:gakujo_task/models/contact.dart';
 import 'package:gakujo_task/models/quiz.dart';
 import 'package:gakujo_task/models/report.dart';
 import 'package:gakujo_task/models/subject.dart';
 import 'package:html/parser.dart' show parse;
+import 'package:path/path.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uuid/uuid.dart';
 import 'package:version/version.dart';
 
 class Api {
-  static final Version version = Version(1, 1, 0);
+  static final Version version = Version(1, 2, 0);
 
   final Duration _interval = const Duration(milliseconds: 2000);
 
@@ -479,7 +482,55 @@ class Api {
           }),
     );
     _updateToken(response.data, required: true);
-    contact.toDetail(parse(response.data));
+    var document = parse(response.data);
+    if (document.querySelectorAll('table.ttb_entry > tbody > tr > td').length >
+        3) {
+      contact.fileNames = [];
+      for (var i = 0;
+          i <
+              document
+                  .querySelectorAll('table.ttb_entry > tbody > tr > td')[3]
+                  .querySelectorAll('a')
+                  .length;
+          i++) {
+        var htmlNode = document
+            .querySelectorAll('table.ttb_entry > tbody > tr > td')[3]
+            .querySelectorAll('a')[i];
+        if (htmlNode.attributes['onclick']!.contains('allFileDownload')) {
+          continue;
+        }
+        var prefix = htmlNode.attributes['onclick']!
+            .trimJsArgs(0)
+            .replaceAll('fileDownLoad', '');
+        var no = htmlNode.attributes['onclick']!.trimJsArgs(1);
+        var response = await _client.postUri<dynamic>(
+          Uri.https(
+            'gakujo.shizuoka.ac.jp',
+            '/portal/common/fileUploadDownload/fileDownLoad',
+          ),
+          data: {
+            'org.apache.struts.taglib.html.TOKEN': _token,
+            'prefix': prefix,
+            'no': no,
+            'EXCLUDE_SET': '',
+            'sequence': '',
+            'webspaceTabDisplayFlag': '',
+            'screenName': '',
+            'fileNameAutonumberFla': '',
+            'fileNameDisplayFlag': '',
+          },
+          options: Options(responseType: ResponseType.bytes),
+        );
+        String path = await FileSaver.instance.saveFile(
+          basenameWithoutExtension(htmlNode.text.trim()),
+          response.data,
+          extension(htmlNode.text.trim()).replaceFirst('.', ''),
+        );
+        contact.fileNames?.add(path);
+      }
+    }
+
+    contact.toDetail(document);
     saveSettings();
     return contact;
   }
