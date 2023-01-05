@@ -4,6 +4,7 @@ import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:gakujo_task/app.dart';
 import 'package:gakujo_task/models/report.dart';
 import 'package:gakujo_task/provide.dart';
+import 'package:gakujo_task/views/common/file.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:share_plus/share_plus.dart';
@@ -87,7 +88,7 @@ class _ReportPageState extends State<ReportPage> {
         padding: const EdgeInsets.all(8.0),
         child: IconButton(
           onPressed: () => Navigator.of(context).pop(),
-          icon: const Icon(Icons.arrow_back_ios_new),
+          icon: const Icon(Icons.arrow_back_ios_new_rounded),
         ),
       ),
       title: _searchStatus
@@ -114,7 +115,7 @@ class _ReportPageState extends State<ReportPage> {
                     _searchStatus = false;
                   });
                 }),
-                icon: const Icon(Icons.close),
+                icon: const Icon(Icons.close_rounded),
               ),
             ]
           : [
@@ -124,8 +125,9 @@ class _ReportPageState extends State<ReportPage> {
                     _filterStatus = !_filterStatus;
                   });
                 }),
-                icon: Icon(
-                    _filterStatus ? Icons.filter_alt : Icons.filter_alt_off),
+                icon: Icon(_filterStatus
+                    ? Icons.filter_alt_rounded
+                    : Icons.filter_alt_off_rounded),
               ),
               Padding(
                 padding: const EdgeInsets.only(right: 8.0),
@@ -136,7 +138,7 @@ class _ReportPageState extends State<ReportPage> {
                       _suggestReports = [];
                     });
                   }),
-                  icon: const Icon(Icons.search),
+                  icon: const Icon(Icons.search_rounded),
                 ),
               ),
             ],
@@ -158,7 +160,9 @@ class _ReportPageState extends State<ReportPage> {
             }),
             backgroundColor: const Color(0xFF7BC043),
             foregroundColor: Colors.white,
-            icon: report.isArchived ? Icons.unarchive : Icons.archive,
+            icon: report.isArchived
+                ? Icons.unarchive_rounded
+                : Icons.archive_rounded,
             label: report.isArchived ? 'アーカイブ解除' : 'アーカイブ',
           ),
         ],
@@ -171,7 +175,7 @@ class _ReportPageState extends State<ReportPage> {
                 context.read<ApiProvider>().fetchDetailReport(report),
             backgroundColor: const Color(0xFF0392CF),
             foregroundColor: Colors.white,
-            icon: Icons.sync,
+            icon: Icons.sync_rounded,
             label: '更新',
           ),
         ],
@@ -263,8 +267,15 @@ class _ReportPageState extends State<ReportPage> {
               ),
             ),
             Visibility(
+              visible: report.fileNames?.isNotEmpty ?? false,
+              child: const Padding(
+                padding: EdgeInsets.all(8.0),
+                child: Icon(Icons.file_present_rounded),
+              ),
+            ),
+            Visibility(
               visible: report.isArchived,
-              child: const Icon(Icons.archive_outlined),
+              child: const Icon(Icons.archive_rounded),
             )
           ],
         ),
@@ -352,7 +363,7 @@ class _ReportPageState extends State<ReportPage> {
                 visible: report.isArchived,
                 child: const Padding(
                   padding: EdgeInsets.all(8.0),
-                  child: Icon(Icons.archive_outlined),
+                  child: Icon(Icons.archive_rounded),
                 ),
               )
             ],
@@ -373,6 +384,17 @@ class _ReportPageState extends State<ReportPage> {
           padding: const EdgeInsets.all(4.0),
           child: SelectableText(
             report.isAcquired ? report.message : '未取得',
+          ),
+        ),
+        const Padding(
+          padding: EdgeInsets.all(4.0),
+          child: Divider(thickness: 2.0),
+        ),
+        Visibility(
+          visible: report.fileNames?.isNotEmpty ?? false,
+          child: Padding(
+            padding: const EdgeInsets.all(4.0),
+            child: buildFileList(report.fileNames),
           ),
         ),
         const SizedBox(height: 8.0),

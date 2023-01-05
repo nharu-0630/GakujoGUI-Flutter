@@ -37,7 +37,7 @@ class _HomeWidgetState extends State<HomeWidget> {
                         ),
                   ),
                   IconButton(
-                    icon: const Icon(Icons.sync),
+                    icon: const Icon(Icons.sync_rounded),
                     onPressed: () async =>
                         context.read<ApiProvider>().fetchTasks(),
                   ),
@@ -62,7 +62,7 @@ class _HomeWidgetState extends State<HomeWidget> {
                         ),
                   ),
                   IconButton(
-                    icon: const Icon(Icons.sync),
+                    icon: const Icon(Icons.sync_rounded),
                     onPressed: () async =>
                         context.read<ApiProvider>().fetchContacts(),
                   ),

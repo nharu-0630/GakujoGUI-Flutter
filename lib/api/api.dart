@@ -5,7 +5,6 @@ import 'package:cookie_jar/cookie_jar.dart';
 import 'package:dio/dio.dart';
 import 'package:dio_cookie_manager/dio_cookie_manager.dart';
 import 'package:dio_smart_retry/dio_smart_retry.dart';
-import 'package:file_saver/file_saver.dart';
 import 'package:flutter/foundation.dart';
 import 'package:gakujo_task/api/parse.dart';
 import 'package:gakujo_task/models/contact.dart';
@@ -14,12 +13,13 @@ import 'package:gakujo_task/models/report.dart';
 import 'package:gakujo_task/models/subject.dart';
 import 'package:html/parser.dart' show parse;
 import 'package:path/path.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uuid/uuid.dart';
 import 'package:version/version.dart';
 
 class Api {
-  static final Version version = Version(1, 2, 0);
+  static final Version version = Version(1, 2, 1);
 
   final Duration _interval = const Duration(milliseconds: 2000);
 
@@ -486,23 +486,17 @@ class Api {
     if (document.querySelectorAll('table.ttb_entry > tbody > tr > td').length >
         3) {
       contact.fileNames = [];
-      for (var i = 0;
-          i <
-              document
-                  .querySelectorAll('table.ttb_entry > tbody > tr > td')[3]
-                  .querySelectorAll('a')
-                  .length;
-          i++) {
-        var htmlNode = document
-            .querySelectorAll('table.ttb_entry > tbody > tr > td')[3]
-            .querySelectorAll('a')[i];
-        if (htmlNode.attributes['onclick']!.contains('allFileDownload')) {
+      final dir = await getApplicationDocumentsDirectory();
+      for (var node in document
+          .querySelectorAll('table.ttb_entry > tbody > tr > td')[3]
+          .querySelectorAll('a')) {
+        if (node.attributes['onclick']!.contains('allFileDownload')) {
           continue;
         }
-        var prefix = htmlNode.attributes['onclick']!
+        var prefix = node.attributes['onclick']!
             .trimJsArgs(0)
             .replaceAll('fileDownLoad', '');
-        var no = htmlNode.attributes['onclick']!.trimJsArgs(1);
+        var no = node.attributes['onclick']!.trimJsArgs(1);
         var response = await _client.postUri<dynamic>(
           Uri.https(
             'gakujo.shizuoka.ac.jp',
@@ -521,12 +515,9 @@ class Api {
           },
           options: Options(responseType: ResponseType.bytes),
         );
-        String path = await FileSaver.instance.saveFile(
-          basenameWithoutExtension(htmlNode.text.trim()),
-          response.data,
-          extension(htmlNode.text.trim()).replaceFirst('.', ''),
-        );
-        contact.fileNames?.add(path);
+        final file = File(join(dir.path, basename(node.text.trim())));
+        file.writeAsBytes(response.data);
+        contact.fileNames?.add(basename(node.text.trim()));
       }
     }
 
@@ -609,10 +600,6 @@ class Api {
         'subjectDispCode': '',
         'operationFormat': ['1', '2'],
         'searchList_length': '-1',
-        // '_searchConditionDisp.accordionSearchCondition': 'true',
-        // '_screenIdentifier': 'SC_A02_01_G',
-        // '_screenInfoDisp': '',
-        // '_scrollTop': '0'
       },
     );
     _updateToken(response.data, required: true);
@@ -667,10 +654,6 @@ class Api {
           'subjectDispCode': '',
           'operationFormat': ['1', '2'],
           'searchList_length': '-1',
-          // '_searchConditionDisp.accordionSearchCondition': 'true',
-          // '_screenIdentifier': 'SC_A02_01_G',
-          // '_screenInfoDisp': '',
-          // '_scrollTop': '0'
         },
       );
       _updateToken(response.data, required: true);
@@ -706,14 +689,40 @@ class Api {
         'subjectDispCode': '',
         'operationFormat': ['1', '2'],
         'searchList_length': '-1',
-        // '_searchConditionDisp.accordionSearchCondition': 'true',
-        // '_screenIdentifier': 'SC_A02_01_G',
-        // '_screenInfoDisp': '',
-        // '_scrollTop': '0'
       },
     );
     _updateToken(response.data, required: true);
-    report.toDetail(parse(response.data));
+    var document = parse(response.data);
+    report.fileNames = [];
+    final dir = await getApplicationDocumentsDirectory();
+    for (var node in document
+        .querySelector('#area > table > tbody > tr:nth-child(4) > td')!
+        .querySelectorAll('a')) {
+      if (node.attributes['onclick']!.contains('fileAllDownload')) {
+        continue;
+      }
+      var selectedKey = node.attributes['onclick']!
+          .trimJsArgs(0)
+          .replaceAll('fileDownload', '');
+      var prefix = node.attributes['onclick']!.trimJsArgs(1);
+      var response = await _client.postUri<dynamic>(
+        Uri.https(
+          'gakujo.shizuoka.ac.jp',
+          '/portal/classsupport/fileDownload/temporaryFileDownload',
+        ),
+        data: {
+          'org.apache.struts.taglib.html.TOKEN': _token,
+          'selectedKey': selectedKey,
+          'prefix': prefix,
+          'EXCLUDE_SET': '',
+        },
+        options: Options(responseType: ResponseType.bytes),
+      );
+      final file = File(join(dir.path, basename(node.text.trim())));
+      file.writeAsBytes(response.data);
+      report.fileNames?.add(basename(node.text.trim()));
+    }
+    report.toDetail(document);
     saveSettings();
     return report;
   }
@@ -756,10 +765,6 @@ class Api {
         'subjectDispCode': '',
         'operationFormat': ['1', '2'],
         'searchList_length': '-1',
-        // '_searchConditionDisp.accordionSearchCondition': 'true',
-        // '_screenIdentifier': 'SC_A03_01_G',
-        // '_screenInfoDisp': '',
-        // '_scrollTop': '0'
       },
     );
     _updateToken(response.data, required: true);
@@ -814,10 +819,6 @@ class Api {
           'subjectDispCode': '',
           'operationFormat': ['1', '2'],
           'searchList_length': '-1',
-          // '_searchConditionDisp.accordionSearchCondition': 'true',
-          // '_screenIdentifier': 'SC_A03_01_G',
-          // '_screenInfoDisp': '',
-          // '_scrollTop': '0'
         },
       );
       _updateToken(response.data, required: true);
@@ -850,14 +851,40 @@ class Api {
         'subjectDispCode': '',
         'operationFormat': ['1', '2'],
         'searchList_length': '-1',
-        // '_searchConditionDisp.accordionSearchCondition': 'true',
-        // '_screenIdentifier': 'SC_A03_01_G',
-        // '_screenInfoDisp': '',
-        // '_scrollTop': '0'
       }),
     );
     _updateToken(response.data, required: true);
-    quiz.toDetail(parse(response.data));
+    var document = parse(response.data);
+    quiz.fileNames = [];
+    final dir = await getApplicationDocumentsDirectory();
+    for (var node in document
+        .querySelector('#area > table > tbody > tr:nth-child(5) > td')!
+        .querySelectorAll('a')) {
+      if (node.attributes['onclick']!.contains('fileAllDownload')) {
+        continue;
+      }
+      var selectedKey = node.attributes['onclick']!
+          .trimJsArgs(0)
+          .replaceAll('fileDownload', '');
+      var prefix = node.attributes['onclick']!.trimJsArgs(1);
+      var response = await _client.postUri<dynamic>(
+        Uri.https(
+          'gakujo.shizuoka.ac.jp',
+          '/portal/classsupport/fileDownload/temporaryFileDownload',
+        ),
+        data: {
+          'org.apache.struts.taglib.html.TOKEN': _token,
+          'selectedKey': selectedKey,
+          'prefix': prefix,
+          'EXCLUDE_SET': '',
+        },
+        options: Options(responseType: ResponseType.bytes),
+      );
+      final file = File(join(dir.path, basename(node.text.trim())));
+      file.writeAsBytes(response.data);
+      quiz.fileNames?.add(basename(node.text.trim()));
+    }
+    quiz.toDetail(document);
     saveSettings();
     return quiz;
   }

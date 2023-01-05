@@ -18,6 +18,7 @@ class Report implements Comparable<Report> {
   DateTime submittedDateTime = DateTime.fromMicrosecondsSinceEpoch(0);
   String evaluationMethod;
   String description;
+  List<String>? fileNames;
   String message;
   bool isAcquired = false;
   bool isArchived = false;
@@ -37,6 +38,7 @@ class Report implements Comparable<Report> {
     this.submittedDateTime,
     this.evaluationMethod,
     this.description,
+    this.fileNames,
     this.message, {
     required this.isAcquired,
     required this.isArchived,
@@ -83,6 +85,7 @@ class Report implements Comparable<Report> {
       submittedDateTime,
       '',
       '',
+      null,
       '',
       isAcquired: false,
       isArchived: false,
@@ -142,6 +145,7 @@ class Report implements Comparable<Report> {
       submittedDateTime,
       '',
       '',
+      null,
       '',
       isAcquired: false,
       isArchived: false,
@@ -163,6 +167,7 @@ class Report implements Comparable<Report> {
         'submittedDateTime': report.submittedDateTime.toIso8601String(),
         'evaluationMethod': report.evaluationMethod,
         'description': report.description,
+        'fileNames': report.fileNames,
         'message': report.message,
         'isAcquired': report.isAcquired,
         'isArchived': report.isArchived
@@ -185,6 +190,7 @@ class Report implements Comparable<Report> {
       (json['submittedDateTime'] as String).parseDateTime(),
       json['evaluationMethod'] as String,
       json['description'] as String,
+      (json['fileNames'] as List<dynamic>?)?.map((e) => e as String).toList(),
       json['message'] as String,
       isAcquired: json['isAcquired'] as bool,
       isArchived: json['isArchived'] as bool,

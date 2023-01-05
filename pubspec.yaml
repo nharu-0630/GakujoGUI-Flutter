@@ -40,6 +40,7 @@ dependencies:
   file_saver: ^0.1.1
   path: ^1.8.2
   better_open_file: ^3.6.4
+  path_provider: ^2.0.11
 
 dev_dependencies:
   flutter_test:

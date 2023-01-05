@@ -1,4 +1,3 @@
-import 'package:better_open_file/better_open_file.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
@@ -6,8 +5,8 @@ import 'package:gakujo_task/app.dart';
 import 'package:gakujo_task/models/contact.dart';
 import 'package:gakujo_task/models/subject.dart';
 import 'package:gakujo_task/provide.dart';
+import 'package:gakujo_task/views/common/file.dart';
 import 'package:intl/intl.dart';
-import 'package:path/path.dart';
 import 'package:provider/provider.dart';
 import 'package:share_plus/share_plus.dart';
 
@@ -84,7 +83,7 @@ class _ContactPageState extends State<ContactPage> {
         padding: const EdgeInsets.all(8.0),
         child: IconButton(
             onPressed: () => Navigator.of(context).pop(),
-            icon: const Icon(Icons.arrow_back_ios_new)),
+            icon: const Icon(Icons.arrow_back_ios_new_rounded)),
       ),
       title: _searchStatus
           ? TextField(
@@ -111,7 +110,7 @@ class _ContactPageState extends State<ContactPage> {
                     _searchStatus = false;
                   });
                 }),
-                icon: const Icon(Icons.close),
+                icon: const Icon(Icons.close_rounded),
               ),
             ]
           : [
@@ -122,7 +121,7 @@ class _ContactPageState extends State<ContactPage> {
                     _suggestContacts = [];
                   });
                 }),
-                icon: const Icon(Icons.search),
+                icon: const Icon(Icons.search_rounded),
               ),
             ],
       bottom: buildAppBarBottom(context),
@@ -140,7 +139,7 @@ class _ContactPageState extends State<ContactPage> {
                 context.read<ApiProvider>().fetchDetailContact(contact),
             backgroundColor: const Color(0xFF0392CF),
             foregroundColor: Colors.white,
-            icon: Icons.sync,
+            icon: Icons.sync_rounded,
             label: '更新',
           ),
         ],
@@ -218,7 +217,7 @@ class _ContactPageState extends State<ContactPage> {
               visible: contact.fileNames?.isNotEmpty ?? false,
               child: const Padding(
                 padding: EdgeInsets.all(8.0),
-                child: Icon(Icons.file_present_outlined),
+                child: Icon(Icons.file_present_rounded),
               ),
             )
           ],
@@ -301,24 +300,7 @@ class _ContactPageState extends State<ContactPage> {
           visible: contact.fileNames?.isNotEmpty ?? false,
           child: Padding(
             padding: const EdgeInsets.all(4.0),
-            child: ListView.builder(
-              padding: const EdgeInsets.all(0.0),
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              itemCount: contact.fileNames?.length ?? 0,
-              itemBuilder: (context, index) {
-                return ListTile(
-                  title: Row(
-                    children: [
-                      const Icon(Icons.file_present_outlined),
-                      const SizedBox(width: 8.0),
-                      Text(basename(contact.fileNames![index])),
-                    ],
-                  ),
-                  onTap: () async => OpenFile.open(contact.fileNames![index]),
-                );
-              },
-            ),
+            child: buildFileList(contact.fileNames),
           ),
         ),
         const SizedBox(height: 8.0),

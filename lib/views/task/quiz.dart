@@ -4,6 +4,7 @@ import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:gakujo_task/app.dart';
 import 'package:gakujo_task/models/quiz.dart';
 import 'package:gakujo_task/provide.dart';
+import 'package:gakujo_task/views/common/file.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:share_plus/share_plus.dart';
@@ -87,7 +88,7 @@ class _QuizPageState extends State<QuizPage> {
         padding: const EdgeInsets.all(8.0),
         child: IconButton(
           onPressed: () => Navigator.of(context).pop(),
-          icon: const Icon(Icons.arrow_back_ios_new),
+          icon: const Icon(Icons.arrow_back_ios_new_rounded),
         ),
       ),
       title: _searchStatus
@@ -114,7 +115,7 @@ class _QuizPageState extends State<QuizPage> {
                     _searchStatus = false;
                   });
                 }),
-                icon: const Icon(Icons.close),
+                icon: const Icon(Icons.close_rounded),
               ),
             ]
           : [
@@ -124,8 +125,9 @@ class _QuizPageState extends State<QuizPage> {
                     _filterStatus = !_filterStatus;
                   });
                 }),
-                icon: Icon(
-                    _filterStatus ? Icons.filter_alt : Icons.filter_alt_off),
+                icon: Icon(_filterStatus
+                    ? Icons.filter_alt_rounded
+                    : Icons.filter_alt_off_rounded),
               ),
               Padding(
                 padding: const EdgeInsets.only(right: 8.0),
@@ -136,7 +138,7 @@ class _QuizPageState extends State<QuizPage> {
                       _suggestQuizzes = [];
                     });
                   }),
-                  icon: const Icon(Icons.search),
+                  icon: const Icon(Icons.search_rounded),
                 ),
               ),
             ],
@@ -158,7 +160,9 @@ class _QuizPageState extends State<QuizPage> {
             }),
             backgroundColor: const Color(0xFF7BC043),
             foregroundColor: Colors.white,
-            icon: quiz.isArchived ? Icons.unarchive : Icons.archive,
+            icon: quiz.isArchived
+                ? Icons.unarchive_rounded
+                : Icons.archive_rounded,
             label: quiz.isArchived ? 'アーカイブ解除' : 'アーカイブ',
           ),
         ],
@@ -171,7 +175,7 @@ class _QuizPageState extends State<QuizPage> {
                 context.read<ApiProvider>().fetchDetailQuiz(quiz),
             backgroundColor: const Color(0xFF0392CF),
             foregroundColor: Colors.white,
-            icon: Icons.sync,
+            icon: Icons.sync_rounded,
             label: '更新',
           ),
         ],
@@ -263,8 +267,15 @@ class _QuizPageState extends State<QuizPage> {
               ),
             ),
             Visibility(
+              visible: quiz.fileNames?.isNotEmpty ?? false,
+              child: const Padding(
+                padding: EdgeInsets.all(8.0),
+                child: Icon(Icons.file_present_rounded),
+              ),
+            ),
+            Visibility(
               visible: quiz.isArchived,
-              child: const Icon(Icons.archive_outlined),
+              child: const Icon(Icons.archive_rounded),
             )
           ],
         ),
@@ -350,7 +361,7 @@ class _QuizPageState extends State<QuizPage> {
                 visible: quiz.isArchived,
                 child: const Padding(
                   padding: EdgeInsets.all(8.0),
-                  child: Icon(Icons.archive_outlined),
+                  child: Icon(Icons.archive_rounded),
                 ),
               )
             ],
@@ -371,6 +382,17 @@ class _QuizPageState extends State<QuizPage> {
           padding: const EdgeInsets.all(4.0),
           child: SelectableText(
             quiz.isAcquired ? quiz.message : '未取得',
+          ),
+        ),
+        const Padding(
+          padding: EdgeInsets.all(4.0),
+          child: Divider(thickness: 2.0),
+        ),
+        Visibility(
+          visible: quiz.fileNames?.isNotEmpty ?? false,
+          child: Padding(
+            padding: const EdgeInsets.all(4.0),
+            child: buildFileList(quiz.fileNames),
           ),
         ),
         const SizedBox(height: 8.0),

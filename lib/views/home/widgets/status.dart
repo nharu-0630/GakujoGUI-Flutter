@@ -22,7 +22,7 @@ class StatusWidget extends StatelessWidget {
                 const Padding(
                   padding: EdgeInsets.only(top: 4.0),
                   child: Icon(
-                    Icons.school,
+                    Icons.school_rounded,
                     size: 24.0,
                   ),
                 ),

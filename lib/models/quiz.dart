@@ -19,6 +19,7 @@ class Quiz implements Comparable<Quiz> {
   int questionsCount;
   String evaluationMethod;
   String description;
+  List<String>? fileNames;
   String message;
   bool isAcquired = false;
   bool isArchived = false;
@@ -39,6 +40,7 @@ class Quiz implements Comparable<Quiz> {
     this.questionsCount,
     this.evaluationMethod,
     this.description,
+    this.fileNames,
     this.message, {
     required this.isAcquired,
     required this.isArchived,
@@ -77,6 +79,7 @@ class Quiz implements Comparable<Quiz> {
       -1,
       '',
       '',
+      null,
       '',
       isAcquired: false,
       isArchived: false,
@@ -133,6 +136,7 @@ class Quiz implements Comparable<Quiz> {
       -1,
       '',
       '',
+      null,
       '',
       isAcquired: false,
       isArchived: false,
@@ -155,6 +159,7 @@ class Quiz implements Comparable<Quiz> {
         'questionsCount': quiz.questionsCount,
         'evaluationMethod': quiz.evaluationMethod,
         'description': quiz.description,
+        'fileNames': quiz.fileNames,
         'message': quiz.message,
         'isAcquired': quiz.isAcquired,
         'isArchived': quiz.isArchived
@@ -178,6 +183,7 @@ class Quiz implements Comparable<Quiz> {
       json['questionsCount'] as int,
       json['evaluationMethod'] as String,
       json['description'] as String,
+      (json['fileNames'] as List<dynamic>?)?.map((e) => e as String).toList(),
       json['message'] as String,
       isAcquired: json['isAcquired'] as bool,
       isArchived: json['isArchived'] as bool,

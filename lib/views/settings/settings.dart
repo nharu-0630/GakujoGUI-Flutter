@@ -1,6 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:gakujo_task/api/api.dart';
 import 'package:gakujo_task/provide.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:provider/provider.dart';
 import 'package:sticky_headers/sticky_headers.dart';
 
@@ -29,7 +31,26 @@ class SettingsWidget extends StatelessWidget {
                 child: Align(
                   alignment: Alignment.topLeft,
                   child: Text(
-                    'Token: ${context.watch<ApiProvider>().api.token} \nSubjects Items: ${context.watch<ApiProvider>().api.subjects.length}\n Contacts Items: ${context.watch<ApiProvider>().api.contacts.length}\n Reports Items: ${context.watch<ApiProvider>().api.reports.length}\n Quizzes Items: ${context.watch<ApiProvider>().api.quizzes.length}',
+                    'Token: ${context.watch<ApiProvider>().api.token} \nAccessEnvironmentKey: ${context.watch<ApiProvider>().api.settings['AccessEnvironmentKey']} \nAccessEnvironmentValue: ${context.watch<ApiProvider>().api.settings['AccessEnvironmentValue']}',
+                  ),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Align(
+                  alignment: Alignment.topLeft,
+                  child: FutureBuilder(
+                    future: PackageInfo.fromPlatform(),
+                    builder: (context, AsyncSnapshot<PackageInfo> snapshot) {
+                      if (!snapshot.hasData) {
+                        return const Text(
+                          'Client Version: \nAPI Version: ',
+                        );
+                      }
+                      return Text(
+                        'Client Version: ${snapshot.data!.version}\nAPI Version: ${Api.version}',
+                      );
+                    },
                   ),
                 ),
               ),
@@ -68,7 +89,7 @@ class SettingsWidget extends StatelessWidget {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        const Icon(Icons.sync),
+                        const Icon(Icons.sync_rounded),
                         const SizedBox(width: 8.0),
                         Text(
                           '一括更新',
@@ -119,7 +140,7 @@ class SettingsWidget extends StatelessWidget {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        const Icon(Icons.delete),
+                        const Icon(Icons.delete_rounded),
                         const SizedBox(width: 8.0),
                         Text(
                           '初期化',
