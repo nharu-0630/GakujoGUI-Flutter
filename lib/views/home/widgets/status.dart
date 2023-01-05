@@ -44,10 +44,10 @@ class StatusWidget extends StatelessWidget {
                               style: Theme.of(context).textTheme.titleMedium,
                             ),
                             Text(
-                              (settings['LastLoginTime'] == null
+                              (settings.lastLoginTime == null
                                   ? ''
                                   : DateFormat('yyyy/MM/dd HH:mm', 'ja')
-                                      .format(settings['LastLoginTime'])),
+                                      .format(settings.lastLoginTime)),
                               style: Theme.of(context).textTheme.titleMedium,
                             ),
                           ],

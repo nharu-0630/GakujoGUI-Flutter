@@ -46,17 +46,17 @@ class _AppState extends State<App> {
     return AppBar(
       leading: Padding(
         padding: const EdgeInsets.only(left: 16.0),
-        child: settings['ProfileImage'] == null
+        child: settings.profileImage == null
             ? const Icon(Icons.person_rounded, size: 36.0)
-            : Image.memory(base64.decode(settings['ProfileImage'])),
+            : Image.memory(base64.decode(settings.profileImage!)),
       ),
       centerTitle: false,
       title: Padding(
         padding: const EdgeInsets.all(8.0),
         child: Text(
-          settings['FullName'] == null
+          settings.fullName == null
               ? 'Hi!'
-              : 'Hi, ${context.watch<ApiProvider>().api.settings['FullName']}!',
+              : 'Hi, ${context.watch<ApiProvider>().api.settings.fullName}!',
         ),
       ),
       bottom: buildAppBarBottom(context),

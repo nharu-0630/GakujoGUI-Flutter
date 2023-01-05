@@ -11,6 +11,7 @@ import 'package:gakujo_task/api/parse.dart';
 import 'package:gakujo_task/models/contact.dart';
 import 'package:gakujo_task/models/quiz.dart';
 import 'package:gakujo_task/models/report.dart';
+import 'package:gakujo_task/models/settings.dart';
 import 'package:gakujo_task/models/subject.dart';
 import 'package:html/parser.dart' show parse;
 import 'package:path/path.dart';
@@ -23,28 +24,30 @@ class Api {
 
   final Duration _interval = const Duration(milliseconds: 2000);
 
-  final int year;
-  final int semester;
-  final String username;
-  final String password;
+  String get _username => settings.username ?? '';
+  String get _password => settings.password ?? '';
+  int get _year => settings.year ?? 2022;
+  int get _semester => settings.semester ?? 3;
 
   Dio _client = Dio();
   CookieJar _cookieJar = CookieJar();
 
-  Api(this.year, this.semester, this.username, this.password) {
+  Api() {
     loadSettings();
   }
 
-  String get schoolYear => year.toString();
-  String get semesterCode => (semester < 2 ? 1 : 2).toString();
-  String get reportDateStart => '$schoolYear/${semester < 2 ? '04' : '10'}/01';
-  String get reportDateEnd => '$schoolYear/${semester < 2 ? '09' : '03'}/01';
-  String get suffix => '_${year}_$semesterCode';
+  String get _schoolYear => _year.toString();
+  String get _semesterCode => (_semester < 2 ? 1 : 2).toString();
+  String get _reportDateStart =>
+      '$_schoolYear/${_semester < 2 ? '04' : '10'}/01';
+  // String get _reportDateEnd => '$_schoolYear/${_semester < 2 ? '09' : '03'}/01';
+  String get _suffix => '_${_year}_$_semesterCode';
 
   String _token = '';
   String get token => _token;
 
-  dynamic settings = {};
+  Settings settings = Settings(null, null, null, null, null, null,
+      DateTime.fromMicrosecondsSinceEpoch(0), null, null, null);
   List<Contact> contacts = [];
   List<Subject> subjects = [];
   List<Report> reports = [];
@@ -75,32 +78,45 @@ class Api {
     if (!(await storage.containsKey(key: 'Settings'))) {
       return;
     }
-    settings = json.decode((await storage.read(key: 'Settings'))!);
-    if (settings['AccessEnvironmentKey'] != null &&
-        settings['AccessEnvironmentValue'] != null) {
+    settings =
+        Settings.fromJson(json.decode((await storage.read(key: 'Settings'))!));
+    if (settings.accessEnvironmentKey != null &&
+        settings.accessEnvironmentValue != null) {
       _cookieJar.saveFromResponse(
         Uri.https('gakujo.shizuoka.ac.jp', '/portal'),
         [
           Cookie(
-            settings['AccessEnvironmentKey'],
-            settings['AccessEnvironmentValue'],
+            settings.accessEnvironmentKey!,
+            settings.accessEnvironmentValue!,
           )
         ],
       );
     }
-    if (!(await storage.containsKey(key: 'Subjects$suffix'))) {
+    if (!(await storage.containsKey(key: 'Subjects$_suffix'))) {
       subjects = Subject.decode((await storage.read(key: 'Settings'))!);
     }
-    if (!(await storage.containsKey(key: 'Contacts$suffix'))) {
-      contacts = Contact.decode((await storage.read(key: 'Contacts$suffix'))!);
+    if (!(await storage.containsKey(key: 'Contacts$_suffix'))) {
+      contacts = Contact.decode((await storage.read(key: 'Contacts$_suffix'))!);
     }
-    if (!(await storage.containsKey(key: 'Reports$suffix'))) {
-      reports = Report.decode((await storage.read(key: 'Reports$suffix'))!);
+    if (!(await storage.containsKey(key: 'Reports$_suffix'))) {
+      reports = Report.decode((await storage.read(key: 'Reports$_suffix'))!);
     }
-    if (!(await storage.containsKey(key: 'Quizzes$suffix'))) {
-      quizzes = Quiz.decode((await storage.read(key: 'Quizzes$suffix'))!);
+    if (!(await storage.containsKey(key: 'Quizzes$_suffix'))) {
+      quizzes = Quiz.decode((await storage.read(key: 'Quizzes$_suffix'))!);
     }
     await saveSettings();
+  }
+
+  Future<void> refreshSemester() async {
+    var storage = FlutterSecureStorage(
+        aOptions: Platform.isAndroid
+            ? const AndroidOptions(
+                encryptedSharedPreferences: true,
+              )
+            : AndroidOptions.defaultOptions);
+    await storage.write(
+        key: 'Settings', value: json.encode(Settings.toMap(settings)));
+    loadSettings();
   }
 
   Future<void> clearSettings() async {
@@ -110,42 +126,31 @@ class Api {
                 encryptedSharedPreferences: true,
               )
             : AndroidOptions.defaultOptions);
-    await storage.write(key: 'Settings', value: json.encode({}));
-    await storage.write(key: 'Subjects$suffix', value: Subject.encode([]));
-    await storage.write(key: 'Contacts$suffix', value: Contact.encode([]));
-    await storage.write(key: 'Reports$suffix', value: Report.encode([]));
-    await storage.write(key: 'Quizzes$suffix', value: Quiz.encode([]));
+    await storage.write(
+        key: 'Settings',
+        value: json.encode(Settings.toMap(Settings(null, null, null, null, null,
+            null, DateTime.fromMicrosecondsSinceEpoch(0), null, null, null))));
+    await storage.write(key: 'Subjects$_suffix', value: Subject.encode([]));
+    await storage.write(key: 'Contacts$_suffix', value: Contact.encode([]));
+    await storage.write(key: 'Reports$_suffix', value: Report.encode([]));
+    await storage.write(key: 'Quizzes$_suffix', value: Quiz.encode([]));
   }
 
   Future<void> saveSettings() async {
-    List<Cookie> cookies = (await _cookieJar
-        .loadForRequest(Uri.https('gakujo.shizuoka.ac.jp', '/portal')));
-    if (cookies
-        .where(
-          (element) => element.name.contains('Access-Environment-Cookie'),
-        )
-        .isNotEmpty) {
-      Cookie cookie = cookies
-          .where(
-            (element) => element.name.contains('Access-Environment-Cookie'),
-          )
-          .first;
-      settings['AccessEnvironmentKey'] = cookie.name;
-      settings['AccessEnvironmentValue'] = cookie.value;
-    }
     var storage = FlutterSecureStorage(
         aOptions: Platform.isAndroid
             ? const AndroidOptions(
                 encryptedSharedPreferences: true,
               )
             : AndroidOptions.defaultOptions);
-    await storage.write(key: 'Settings', value: json.encode(settings));
     await storage.write(
-        key: 'Subjects$suffix', value: Subject.encode(subjects));
+        key: 'Settings', value: json.encode(Settings.toMap(settings)));
     await storage.write(
-        key: 'Contacts$suffix', value: Contact.encode(contacts));
-    await storage.write(key: 'Reports$suffix', value: Report.encode(reports));
-    await storage.write(key: 'Quizzes$suffix', value: Quiz.encode(quizzes));
+        key: 'Subjects$_suffix', value: Subject.encode(subjects));
+    await storage.write(
+        key: 'Contacts$_suffix', value: Contact.encode(contacts));
+    await storage.write(key: 'Reports$_suffix', value: Report.encode(reports));
+    await storage.write(key: 'Quizzes$_suffix', value: Quiz.encode(quizzes));
   }
 
   void _initialize() {
@@ -255,7 +260,7 @@ class Api {
             'execution': 'e1s1',
           },
         ),
-        data: 'j_username=$username&j_password=$password&_eventId_proceed=',
+        data: 'j_username=$_username&j_password=$_password&_eventId_proceed=',
         options: Options(
           followRedirects: false,
           headers: {
@@ -341,6 +346,8 @@ class Api {
         .querySelectorAll(
             '#container > div > form > div:nth-child(2) > div.access_env > table > tbody > tr > td > input[type=text]')
         .isNotEmpty) {
+      var accessEnvName = 'GakujoTask ${(const Uuid()).v4().substring(0, 8)}';
+      settings.accessEnvironmentName = accessEnvName;
       await Future.delayed(_interval);
       response = await _client.postUri<dynamic>(
         Uri.https(
@@ -348,7 +355,7 @@ class Api {
           '/portal/common/accessEnvironmentRegist/goHome/',
         ),
         data:
-            'org.apache.struts.taglib.html.TOKEN=$_token&accessEnvName=GakujoTask ${(const Uuid()).v4().substring(0, 8)}&newAccessKey=',
+            'org.apache.struts.taglib.html.TOKEN=$_token&accessEnvName=$accessEnvName&newAccessKey=',
         options: Options(),
       );
     }
@@ -367,10 +374,10 @@ class Api {
     var name = parse(response.data)
         .querySelector('#header-cog > li > a > span > span')
         ?.text;
-    settings['FullName'] =
+    settings.fullName =
         name?.substring(0, name.indexOf('さん')).replaceAll('　', '');
 
-    if (settings['ProfileImage'] == null) {
+    if (settings.profileImage == null) {
       await Future.delayed(_interval);
       response = await _client.getUri<dynamic>(
         Uri.https(
@@ -382,9 +389,24 @@ class Api {
         ),
         options: Options(responseType: ResponseType.bytes),
       );
-      settings['ProfileImage'] = base64.encode(response.data);
+      settings.profileImage = base64.encode(response.data);
     }
-    settings['LastLoginTime'] = DateTime.now();
+    settings.lastLoginTime = DateTime.now();
+    List<Cookie> cookies = (await _cookieJar
+        .loadForRequest(Uri.https('gakujo.shizuoka.ac.jp', '/portal')));
+    if (cookies
+        .where(
+          (element) => element.name.contains('Access-Environment-Cookie'),
+        )
+        .isNotEmpty) {
+      Cookie cookie = cookies
+          .where(
+            (element) => element.name.contains('Access-Environment-Cookie'),
+          )
+          .first;
+      settings.accessEnvironmentKey = cookie.name;
+      settings.accessEnvironmentValue = cookie.value;
+    }
     await saveSettings();
   }
 
@@ -412,8 +434,8 @@ class Api {
       data: {
         'org.apache.struts.taglib.html.TOKEN': _token,
         'teacherCode': '',
-        'schoolYear': schoolYear,
-        'semesterCode': semesterCode,
+        'schoolYear': _schoolYear,
+        'semesterCode': _semesterCode,
         'subjectDispCode': '',
         'searchKeyWord': '',
         'checkSearchKeywordTeacherUserName': 'on',
@@ -422,7 +444,7 @@ class Api {
         'contactKindCode': '',
         'targetDateStart': '',
         'targetDateEnd': '',
-        'reportDateStart': reportDateStart
+        'reportDateStart': _reportDateStart
       },
     );
     _updateToken(response.data, required: true);
@@ -463,8 +485,8 @@ class Api {
           <String, dynamic>{
             'org.apache.struts.taglib.html.TOKEN': _token,
             'teacherCode': '',
-            'schoolYear': schoolYear,
-            'semesterCode': semesterCode,
+            'schoolYear': _schoolYear,
+            'semesterCode': _semesterCode,
             'subjectDispCode': '',
             'searchKeyWord': '',
             'checkSearchKeywordTeacherUserName': 'on',
@@ -473,7 +495,7 @@ class Api {
             'contactKindCode': '',
             'targetDateStart': '',
             'targetDateEnd': '',
-            'reportDateStart': reportDateStart
+            'reportDateStart': _reportDateStart
           },
         ),
       );
@@ -497,8 +519,8 @@ class Api {
           <String, dynamic>{
             'org.apache.struts.taglib.html.TOKEN': _token,
             'teacherCode': '',
-            'schoolYear': schoolYear,
-            'semesterCode': semesterCode,
+            'schoolYear': _schoolYear,
+            'semesterCode': _semesterCode,
             'subjectDispCode': '',
             'searchKeyWord': '',
             'checkSearchKeywordTeacherUserName': 'on',
@@ -507,7 +529,7 @@ class Api {
             'contactKindCode': '',
             'targetDateStart': '',
             'targetDateEnd': '',
-            'reportDateStart': reportDateStart,
+            'reportDateStart': _reportDateStart,
             'reportDateEnd': '',
             'requireResponse': '',
             'studentCode': '',
@@ -583,8 +605,8 @@ class Api {
           '/portal/portaltopcommon/timeTableForTop/searchTimeTable',
           <String, dynamic>{
             'org.apache.struts.taglib.html.TOKEN': _token,
-            'schoolYear': schoolYear,
-            'semesterCode': semesterCode,
+            'schoolYear': _schoolYear,
+            'semesterCode': _semesterCode,
           }),
     );
     _updateToken(response.data, required: true);
@@ -630,8 +652,8 @@ class Api {
         'listSchoolYear': '',
         'listSubjectCode': '',
         'listClassCode': '',
-        'schoolYear': schoolYear,
-        'semesterCode': semesterCode,
+        'schoolYear': _schoolYear,
+        'semesterCode': _semesterCode,
         'subjectDispCode': '',
         'operationFormat': ['1', '2'],
         'searchList_length': '-1',
@@ -684,8 +706,8 @@ class Api {
           'listSchoolYear': '',
           'listSubjectCode': '',
           'listClassCode': '',
-          'schoolYear': schoolYear,
-          'semesterCode': semesterCode,
+          'schoolYear': _schoolYear,
+          'semesterCode': _semesterCode,
           'subjectDispCode': '',
           'operationFormat': ['1', '2'],
           'searchList_length': '-1',
@@ -716,11 +738,11 @@ class Api {
         'hidClassCode': '',
         'entranceDiv': '',
         'backPath': '',
-        'listSchoolYear': schoolYear,
+        'listSchoolYear': _schoolYear,
         'listSubjectCode': report.subjectCode,
         'listClassCode': report.classCode,
-        'schoolYear': schoolYear,
-        'semesterCode': semesterCode,
+        'schoolYear': _schoolYear,
+        'semesterCode': _semesterCode,
         'subjectDispCode': '',
         'operationFormat': ['1', '2'],
         'searchList_length': '-1',
@@ -796,8 +818,8 @@ class Api {
         'listSchoolYear': '',
         'listSubjectCode': '',
         'listClassCode': '',
-        'schoolYear': schoolYear,
-        'semesterCode': semesterCode,
+        'schoolYear': _schoolYear,
+        'semesterCode': _semesterCode,
         'subjectDispCode': '',
         'operationFormat': ['1', '2'],
         'searchList_length': '-1',
@@ -850,8 +872,8 @@ class Api {
           'listSchoolYear': '',
           'listSubjectCode': '',
           'listClassCode': '',
-          'schoolYear': schoolYear,
-          'semesterCode': semesterCode,
+          'schoolYear': _schoolYear,
+          'semesterCode': _semesterCode,
           'subjectDispCode': '',
           'operationFormat': ['1', '2'],
           'searchList_length': '-1',
@@ -879,11 +901,11 @@ class Api {
         'hidClassCode': '',
         'entranceDiv': '',
         'backPath': '',
-        'listSchoolYear': schoolYear,
+        'listSchoolYear': _schoolYear,
         'listSubjectCode': quiz.subjectCode,
         'listClassCode': quiz.classCode,
-        'schoolYear': schoolYear,
-        'semesterCode': semesterCode,
+        'schoolYear': _schoolYear,
+        'semesterCode': _semesterCode,
         'subjectDispCode': '',
         'operationFormat': ['1', '2'],
         'searchList_length': '-1',

@@ -1,5 +1,4 @@
 import 'package:flutter/foundation.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:gakujo_task/api/api.dart';
 import 'package:gakujo_task/models/contact.dart';
@@ -7,7 +6,7 @@ import 'package:gakujo_task/models/quiz.dart';
 import 'package:gakujo_task/models/report.dart';
 
 class ApiProvider extends ChangeNotifier {
-  final api = Api(2022, 3, dotenv.env['USERNAME']!, dotenv.env['PASSWORD']!);
+  var api = Api();
   var isLoading = false;
   var isError = false;
 
@@ -101,12 +100,12 @@ class ApiProvider extends ChangeNotifier {
   void fetchDetailContact(Contact contact) async {
     if (isLoading) return;
     _toggleLoading();
-    // try {
-    await api.fetchDetailContact(contact);
-    _toggleLoading();
-    // } catch (e) {
-    //   _onError(e);
-    // }
+    try {
+      await api.fetchDetailContact(contact);
+      _toggleLoading();
+    } catch (e) {
+      _onError(e);
+    }
   }
 
   void fetchReports() async {
@@ -163,5 +162,17 @@ class ApiProvider extends ChangeNotifier {
     api.quizzes.where((e) => e.id == id).first.isArchived = value;
     api.saveSettings();
     notifyListeners();
+  }
+
+  void setUserInfo(String username, String password) {
+    api.settings.username = username;
+    api.settings.password = password;
+    api.saveSettings();
+  }
+
+  void setSemester(int? year, int? semester) {
+    if (year != null) api.settings.year = year;
+    if (semester != null) api.settings.semester = semester;
+    api.refreshSemester();
   }
 }
