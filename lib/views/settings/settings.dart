@@ -11,6 +11,7 @@ class SettingsWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    var settings = context.watch<ApiProvider>().api.settings;
     return ListView(
       physics: const AlwaysScrollableScrollPhysics(),
       children: [
@@ -31,7 +32,7 @@ class SettingsWidget extends StatelessWidget {
                 child: Align(
                   alignment: Alignment.topLeft,
                   child: Text(
-                    'Token: ${context.watch<ApiProvider>().api.token} \nAccessEnvironmentKey: ${context.watch<ApiProvider>().api.settings['AccessEnvironmentKey']} \nAccessEnvironmentValue: ${context.watch<ApiProvider>().api.settings['AccessEnvironmentValue']}',
+                    'Token: ${context.watch<ApiProvider>().api.token} \nAccessEnvironmentKey: ${settings['AccessEnvironmentKey']} \nAccessEnvironmentValue: ${settings['AccessEnvironmentValue']}',
                   ),
                 ),
               ),

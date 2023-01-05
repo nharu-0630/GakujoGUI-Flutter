@@ -6,6 +6,7 @@ import 'package:dio/dio.dart';
 import 'package:dio_cookie_manager/dio_cookie_manager.dart';
 import 'package:dio_smart_retry/dio_smart_retry.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:gakujo_task/api/parse.dart';
 import 'package:gakujo_task/models/contact.dart';
 import 'package:gakujo_task/models/quiz.dart';
@@ -14,7 +15,6 @@ import 'package:gakujo_task/models/subject.dart';
 import 'package:html/parser.dart' show parse;
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uuid/uuid.dart';
 import 'package:version/version.dart';
 
@@ -66,42 +66,55 @@ class Api {
   }
 
   Future<void> loadSettings() async {
-    var prefs = await SharedPreferences.getInstance();
-    if (prefs.getString('Settings') == null) {
+    var storage = FlutterSecureStorage(
+        aOptions: Platform.isAndroid
+            ? const AndroidOptions(
+                encryptedSharedPreferences: true,
+              )
+            : AndroidOptions.defaultOptions);
+    if (!(await storage.containsKey(key: 'Settings'))) {
       return;
     }
-    settings = json.decode(prefs.getString('Settings')!);
-
+    settings = json.decode((await storage.read(key: 'Settings'))!);
     if (settings['AccessEnvironmentKey'] != null &&
         settings['AccessEnvironmentValue'] != null) {
       _cookieJar.saveFromResponse(
-          Uri.https('gakujo.shizuoka.ac.jp', '/portal'), [
-        Cookie(settings['AccessEnvironmentKey'],
-            settings['AccessEnvironmentValue'])
-      ]);
+        Uri.https('gakujo.shizuoka.ac.jp', '/portal'),
+        [
+          Cookie(
+            settings['AccessEnvironmentKey'],
+            settings['AccessEnvironmentValue'],
+          )
+        ],
+      );
     }
-    if (prefs.getString('Subjects$suffix') != null) {
-      subjects = Subject.decode(prefs.getString('Subjects$suffix')!);
+    if (!(await storage.containsKey(key: 'Subjects$suffix'))) {
+      subjects = Subject.decode((await storage.read(key: 'Settings'))!);
     }
-    if (prefs.getString('Contacts$suffix') != null) {
-      contacts = Contact.decode(prefs.getString('Contacts$suffix')!);
+    if (!(await storage.containsKey(key: 'Contacts$suffix'))) {
+      contacts = Contact.decode((await storage.read(key: 'Contacts$suffix'))!);
     }
-    if (prefs.getString('Reports$suffix') != null) {
-      reports = Report.decode(prefs.getString('Reports$suffix')!);
+    if (!(await storage.containsKey(key: 'Reports$suffix'))) {
+      reports = Report.decode((await storage.read(key: 'Reports$suffix'))!);
     }
-    if (prefs.getString('Quizzes$suffix') != null) {
-      quizzes = Quiz.decode(prefs.getString('Quizzes$suffix')!);
+    if (!(await storage.containsKey(key: 'Quizzes$suffix'))) {
+      quizzes = Quiz.decode((await storage.read(key: 'Quizzes$suffix'))!);
     }
     await saveSettings();
   }
 
   Future<void> clearSettings() async {
-    var prefs = await SharedPreferences.getInstance();
-    await prefs.setString('Settings', json.encode({}));
-    await prefs.setString('Subjects$suffix', Subject.encode([]));
-    await prefs.setString('Contacts$suffix', Contact.encode([]));
-    await prefs.setString('Reports$suffix', Report.encode([]));
-    await prefs.setString('Quizzes$suffix', Quiz.encode([]));
+    final storage = FlutterSecureStorage(
+        aOptions: Platform.isAndroid
+            ? const AndroidOptions(
+                encryptedSharedPreferences: true,
+              )
+            : AndroidOptions.defaultOptions);
+    await storage.write(key: 'Settings', value: json.encode({}));
+    await storage.write(key: 'Subjects$suffix', value: Subject.encode([]));
+    await storage.write(key: 'Contacts$suffix', value: Contact.encode([]));
+    await storage.write(key: 'Reports$suffix', value: Report.encode([]));
+    await storage.write(key: 'Quizzes$suffix', value: Quiz.encode([]));
   }
 
   Future<void> saveSettings() async {
@@ -120,13 +133,19 @@ class Api {
       settings['AccessEnvironmentKey'] = cookie.name;
       settings['AccessEnvironmentValue'] = cookie.value;
     }
-
-    var prefs = await SharedPreferences.getInstance();
-    await prefs.setString('Settings', json.encode(settings));
-    await prefs.setString('Subjects$suffix', Subject.encode(subjects));
-    await prefs.setString('Contacts$suffix', Contact.encode(contacts));
-    await prefs.setString('Reports$suffix', Report.encode(reports));
-    await prefs.setString('Quizzes$suffix', Quiz.encode(quizzes));
+    var storage = FlutterSecureStorage(
+        aOptions: Platform.isAndroid
+            ? const AndroidOptions(
+                encryptedSharedPreferences: true,
+              )
+            : AndroidOptions.defaultOptions);
+    await storage.write(key: 'Settings', value: json.encode(settings));
+    await storage.write(
+        key: 'Subjects$suffix', value: Subject.encode(subjects));
+    await storage.write(
+        key: 'Contacts$suffix', value: Contact.encode(contacts));
+    await storage.write(key: 'Reports$suffix', value: Report.encode(reports));
+    await storage.write(key: 'Quizzes$suffix', value: Quiz.encode(quizzes));
   }
 
   void _initialize() {
@@ -351,6 +370,21 @@ class Api {
     settings['FullName'] =
         name?.substring(0, name.indexOf('さん')).replaceAll('　', '');
 
+    if (settings['ProfileImage'] == null) {
+      await Future.delayed(_interval);
+      response = await _client.getUri<dynamic>(
+        Uri.https(
+          'gakujo.shizuoka.ac.jp',
+          '/portal/common/fileDownload/downloadFavoriteImage',
+          {
+            'org.apache.struts.taglib.html.TOKEN=': _token,
+          },
+        ),
+        options: Options(responseType: ResponseType.bytes),
+      );
+      settings['ProfileImage'] = base64.encode(response.data);
+    }
+    settings['LastLoginTime'] = DateTime.now();
     await saveSettings();
   }
 
@@ -486,7 +520,7 @@ class Api {
     if (document.querySelectorAll('table.ttb_entry > tbody > tr > td').length >
         3) {
       contact.fileNames = [];
-      final dir = await getApplicationDocumentsDirectory();
+      var dir = await getApplicationDocumentsDirectory();
       for (var node in document
           .querySelectorAll('table.ttb_entry > tbody > tr > td')[3]
           .querySelectorAll('a')) {
@@ -497,6 +531,7 @@ class Api {
             .trimJsArgs(0)
             .replaceAll('fileDownLoad', '');
         var no = node.attributes['onclick']!.trimJsArgs(1);
+        await Future.delayed(_interval);
         var response = await _client.postUri<dynamic>(
           Uri.https(
             'gakujo.shizuoka.ac.jp',
@@ -515,7 +550,7 @@ class Api {
           },
           options: Options(responseType: ResponseType.bytes),
         );
-        final file = File(join(dir.path, basename(node.text.trim())));
+        var file = File(join(dir.path, basename(node.text.trim())));
         file.writeAsBytes(response.data);
         contact.fileNames?.add(basename(node.text.trim()));
       }
@@ -694,7 +729,7 @@ class Api {
     _updateToken(response.data, required: true);
     var document = parse(response.data);
     report.fileNames = [];
-    final dir = await getApplicationDocumentsDirectory();
+    var dir = await getApplicationDocumentsDirectory();
     for (var node in document
         .querySelector('#area > table > tbody > tr:nth-child(4) > td')!
         .querySelectorAll('a')) {
@@ -705,6 +740,7 @@ class Api {
           .trimJsArgs(0)
           .replaceAll('fileDownload', '');
       var prefix = node.attributes['onclick']!.trimJsArgs(1);
+      await Future.delayed(_interval);
       var response = await _client.postUri<dynamic>(
         Uri.https(
           'gakujo.shizuoka.ac.jp',
@@ -718,7 +754,7 @@ class Api {
         },
         options: Options(responseType: ResponseType.bytes),
       );
-      final file = File(join(dir.path, basename(node.text.trim())));
+      var file = File(join(dir.path, basename(node.text.trim())));
       file.writeAsBytes(response.data);
       report.fileNames?.add(basename(node.text.trim()));
     }
@@ -856,7 +892,7 @@ class Api {
     _updateToken(response.data, required: true);
     var document = parse(response.data);
     quiz.fileNames = [];
-    final dir = await getApplicationDocumentsDirectory();
+    var dir = await getApplicationDocumentsDirectory();
     for (var node in document
         .querySelector('#area > table > tbody > tr:nth-child(5) > td')!
         .querySelectorAll('a')) {
@@ -867,6 +903,7 @@ class Api {
           .trimJsArgs(0)
           .replaceAll('fileDownload', '');
       var prefix = node.attributes['onclick']!.trimJsArgs(1);
+      await Future.delayed(_interval);
       var response = await _client.postUri<dynamic>(
         Uri.https(
           'gakujo.shizuoka.ac.jp',
@@ -880,7 +917,7 @@ class Api {
         },
         options: Options(responseType: ResponseType.bytes),
       );
-      final file = File(join(dir.path, basename(node.text.trim())));
+      var file = File(join(dir.path, basename(node.text.trim())));
       file.writeAsBytes(response.data);
       quiz.fileNames?.add(basename(node.text.trim()));
     }

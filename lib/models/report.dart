@@ -45,23 +45,23 @@ class Report implements Comparable<Report> {
   });
 
   factory Report.fromDocument(String subject, Document document) {
-    final title =
+    var title =
         document.querySelector('#area > table > tbody > tr > td')?.text ?? '';
-    final id = document
+    var id = document
             .querySelector(
               '#right-box > form > input[type=hidden]:nth-child(2)',
             )
             ?.attributes['value'] ??
         '';
-    final startDateTime = document
+    var startDateTime = document
         .querySelector('#area > table > tbody > tr:nth-child(1) > td')!
         .text
         .trimSpanDateTime(0);
-    final endDateTime = document
+    var endDateTime = document
         .querySelector('#area > table > tbody > tr:nth-child(1) > td')!
         .text
         .trimSpanDateTime(1);
-    final submittedDateTime = document
+    var submittedDateTime = document
             .querySelector(
               '''
 #area > div > table > tbody > tr > td > table > tbody > tr > td > label''',
@@ -70,7 +70,7 @@ class Report implements Comparable<Report> {
             .replaceAll(RegExp(r'.*comment by .*? '), '')
             .parseDateTime() ??
         DateTime.fromMicrosecondsSinceEpoch(0);
-    final report = Report(
+    var report = Report(
       subject.trimSubject(),
       title,
       id,
@@ -94,37 +94,37 @@ class Report implements Comparable<Report> {
   }
 
   factory Report.fromElement(Element element) {
-    final subject =
+    var subject =
         element.querySelectorAll('td')[0].text.trimWhiteSpace().trimSubject();
-    final title =
+    var title =
         element.querySelectorAll('td')[1].querySelector('a')!.text.trim();
-    final id = element
+    var id = element
         .querySelectorAll('td')[1]
         .querySelector('a')!
         .attributes['onclick']!
         .trimJsArgs(1);
-    final schoolYear = element
+    var schoolYear = element
         .querySelectorAll('td')[1]
         .querySelector('a')!
         .attributes['onclick']!
         .trimJsArgs(3);
-    final subjectCode = element
+    var subjectCode = element
         .querySelectorAll('td')[1]
         .querySelector('a')!
         .attributes['onclick']!
         .trimJsArgs(4);
-    final classCode = element
+    var classCode = element
         .querySelectorAll('td')[1]
         .querySelector('a')!
         .attributes['onclick']!
         .trimJsArgs(5);
-    final status = element.querySelectorAll('td')[2].text.trim();
-    final startDateTime =
+    var status = element.querySelectorAll('td')[2].text.trim();
+    var startDateTime =
         element.querySelectorAll('td')[3].text.trimSpanDateTime(0);
-    final endDateTime =
+    var endDateTime =
         element.querySelectorAll('td')[3].text.trimSpanDateTime(1);
-    final implementationFormat = element.querySelectorAll('td')[5].text.trim();
-    final operation = element.querySelectorAll('td')[6].text.trim();
+    var implementationFormat = element.querySelectorAll('td')[5].text.trim();
+    var operation = element.querySelectorAll('td')[6].text.trim();
     var submittedDateTime = DateTime.fromMicrosecondsSinceEpoch(0);
     if (element.querySelectorAll('td')[4].text != '') {
       submittedDateTime =
@@ -261,19 +261,19 @@ class Report implements Comparable<Report> {
 
   @override
   int compareTo(Report other) {
-    final compare1 = endDateTime.compareTo(other.endDateTime);
+    var compare1 = endDateTime.compareTo(other.endDateTime);
     if (compare1 != 0) {
       return compare1;
     }
-    final compare2 = startDateTime.compareTo(other.startDateTime);
+    var compare2 = startDateTime.compareTo(other.startDateTime);
     if (compare2 != 0) {
       return compare2;
     }
-    final compare3 = subjectCode.compareTo(other.subjectCode);
+    var compare3 = subjectCode.compareTo(other.subjectCode);
     if (compare3 != 0) {
       return compare3;
     }
-    final compare4 = id.compareTo(other.id);
+    var compare4 = id.compareTo(other.id);
     return compare4;
   }
 }

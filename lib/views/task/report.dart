@@ -4,7 +4,7 @@ import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:gakujo_task/app.dart';
 import 'package:gakujo_task/models/report.dart';
 import 'package:gakujo_task/provide.dart';
-import 'package:gakujo_task/views/common/file.dart';
+import 'package:gakujo_task/views/common/widget.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:share_plus/share_plus.dart';
@@ -23,7 +23,7 @@ class _ReportPageState extends State<ReportPage> {
 
   @override
   Widget build(BuildContext context) {
-    final List<Report> reports = context
+    var reports = context
         .watch<ApiProvider>()
         .api
         .reports
@@ -268,10 +268,7 @@ class _ReportPageState extends State<ReportPage> {
             ),
             Visibility(
               visible: report.fileNames?.isNotEmpty ?? false,
-              child: const Padding(
-                padding: EdgeInsets.all(8.0),
-                child: Icon(Icons.file_present_rounded),
-              ),
+              child: const Icon(Icons.file_present_rounded),
             ),
             Visibility(
               visible: report.isArchived,
@@ -361,10 +358,7 @@ class _ReportPageState extends State<ReportPage> {
               ),
               Visibility(
                 visible: report.isArchived,
-                child: const Padding(
-                  padding: EdgeInsets.all(8.0),
-                  child: Icon(Icons.archive_rounded),
-                ),
+                child: const Icon(Icons.archive_rounded),
               )
             ],
           ),
@@ -386,9 +380,12 @@ class _ReportPageState extends State<ReportPage> {
             report.isAcquired ? report.message : '未取得',
           ),
         ),
-        const Padding(
-          padding: EdgeInsets.all(4.0),
-          child: Divider(thickness: 2.0),
+        Visibility(
+          visible: report.fileNames?.isNotEmpty ?? false,
+          child: const Padding(
+            padding: EdgeInsets.all(4.0),
+            child: Divider(thickness: 2.0),
+          ),
         ),
         Visibility(
           visible: report.fileNames?.isNotEmpty ?? false,

@@ -5,7 +5,7 @@ import 'package:gakujo_task/app.dart';
 import 'package:gakujo_task/models/contact.dart';
 import 'package:gakujo_task/models/subject.dart';
 import 'package:gakujo_task/provide.dart';
-import 'package:gakujo_task/views/common/file.dart';
+import 'package:gakujo_task/views/common/widget.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:share_plus/share_plus.dart';
@@ -24,7 +24,7 @@ class _ContactPageState extends State<ContactPage> {
 
   @override
   Widget build(BuildContext context) {
-    final List<Contact> contacts = context
+    var contacts = context
         .watch<ApiProvider>()
         .api
         .contacts
@@ -188,8 +188,11 @@ class _ContactPageState extends State<ContactPage> {
           children: [
             Expanded(
               child: Text(
-                contact.subjects,
-                style: Theme.of(context).textTheme.bodyMedium,
+                contact.title,
+                style: Theme.of(context)
+                    .textTheme
+                    .titleMedium
+                    ?.copyWith(fontWeight: FontWeight.bold),
                 overflow: TextOverflow.ellipsis,
               ),
             ),
@@ -205,20 +208,16 @@ class _ContactPageState extends State<ContactPage> {
           children: [
             Expanded(
               child: Text(
-                contact.title,
-                style: Theme.of(context)
-                    .textTheme
-                    .titleMedium
-                    ?.copyWith(fontWeight: FontWeight.bold),
+                contact.isAcquired
+                    ? contact.content.replaceAll('\n', ' ')
+                    : '未取得',
+                maxLines: 2,
                 overflow: TextOverflow.ellipsis,
               ),
             ),
             Visibility(
               visible: contact.fileNames?.isNotEmpty ?? false,
-              child: const Padding(
-                padding: EdgeInsets.all(8.0),
-                child: Icon(Icons.file_present_rounded),
-              ),
+              child: const Icon(Icons.file_present_rounded),
             )
           ],
         ),
@@ -244,20 +243,13 @@ class _ContactPageState extends State<ContactPage> {
         ),
         Padding(
           padding: const EdgeInsets.all(4.0),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              Text(
-                DateFormat('yyyy/MM/dd HH:mm', 'ja')
-                    .format(contact.targetDateTime.toLocal()),
-                style: Theme.of(context).textTheme.bodyLarge,
-              ),
-              Text(
-                DateFormat('yyyy/MM/dd HH:mm', 'ja')
-                    .format(contact.contactDateTime.toLocal()),
-                style: Theme.of(context).textTheme.bodyLarge,
-              ),
-            ],
+          child: Align(
+            alignment: Alignment.centerRight,
+            child: Text(
+              DateFormat('yyyy/MM/dd HH:mm', 'ja')
+                  .format(contact.contactDateTime.toLocal()),
+              style: Theme.of(context).textTheme.bodyLarge,
+            ),
           ),
         ),
         Padding(
@@ -288,20 +280,19 @@ class _ContactPageState extends State<ContactPage> {
         const SizedBox(height: 8.0),
         Padding(
           padding: const EdgeInsets.all(4.0),
-          child: SelectableText(
-            contact.isAcquired ? contact.content : '未取得',
-          ),
-        ),
-        const Padding(
-          padding: EdgeInsets.all(4.0),
-          child: Divider(thickness: 2.0),
+          child: buildAutoLinkText(
+              context, contact.isAcquired ? contact.content : '未取得'),
         ),
         Visibility(
           visible: contact.fileNames?.isNotEmpty ?? false,
-          child: Padding(
-            padding: const EdgeInsets.all(4.0),
-            child: buildFileList(contact.fileNames),
+          child: const Padding(
+            padding: EdgeInsets.all(4.0),
+            child: Divider(thickness: 2.0),
           ),
+        ),
+        Visibility(
+          visible: contact.fileNames?.isNotEmpty ?? false,
+          child: buildFileList(contact.fileNames),
         ),
         const SizedBox(height: 8.0),
         Row(

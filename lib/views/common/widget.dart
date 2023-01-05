@@ -5,6 +5,9 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
+import 'package:selectable_autolink_text/selectable_autolink_text.dart';
+import 'package:share_plus/share_plus.dart';
+import 'package:url_launcher/url_launcher_string.dart';
 
 ListView buildFileList(List<String>? fileNames) {
   return ListView.builder(
@@ -69,4 +72,16 @@ Icon buildExtIcon(String ext) {
     default:
       return const Icon(Icons.file_present_rounded);
   }
+}
+
+SelectableAutoLinkText buildAutoLinkText(BuildContext context, String text) {
+  return SelectableAutoLinkText(
+    text,
+    style: Theme.of(context).textTheme.bodyMedium,
+    linkStyle: const TextStyle(color: Colors.blueAccent),
+    onTap: (url) => launchUrlString(url, mode: LaunchMode.inAppWebView),
+    onLongPress: (url) => Share.share(url),
+    linkRegExpPattern:
+        r'https?:\/\/(?:www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b(?:[-a-zA-Z0-9()@:%_\+.~#?&\/=]*)',
+  );
 }

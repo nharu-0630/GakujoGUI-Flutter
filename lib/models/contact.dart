@@ -156,15 +156,15 @@ class Contact implements Comparable<Contact> {
 
   @override
   int compareTo(Contact other) {
-    final compare1 = contactDateTime.compareTo(other.contactDateTime);
+    var compare1 = contactDateTime.compareTo(other.contactDateTime);
     if (compare1 != 0) {
       return compare1;
     }
-    final compare2 = subjects.compareTo(other.subjects);
+    var compare2 = subjects.compareTo(other.subjects);
     if (compare2 != 0) {
       return compare2;
     }
-    final compare3 = title.compareTo(other.title);
+    var compare3 = title.compareTo(other.title);
     return compare3;
   }
 }

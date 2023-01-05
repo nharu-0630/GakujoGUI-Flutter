@@ -41,6 +41,8 @@ dependencies:
   path: ^1.8.2
   better_open_file: ^3.6.4
   path_provider: ^2.0.11
+  selectable_autolink_text: ^2.3.0
+  flutter_secure_storage: ^7.0.1
 
 dev_dependencies:
   flutter_test:

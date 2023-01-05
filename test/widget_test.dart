@@ -8,7 +8,7 @@
 void main() async {
   // group('Api test', () {
   //   dotenv.load(fileName: '.env');
-  //   final api = Api(2022, 2, dotenv.env['USERNAME']!, dotenv.env['PASSWORD']!);
+  //   var api = Api(2022, 2, dotenv.env['USERNAME']!, dotenv.env['PASSWORD']!);
 
   //   setUp(() {});
 

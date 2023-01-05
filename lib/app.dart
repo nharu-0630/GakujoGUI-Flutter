@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:gakujo_task/provide.dart';
 import 'package:gakujo_task/views/home/home.dart';
@@ -40,16 +42,19 @@ class _AppState extends State<App> {
   }
 
   AppBar _buildAppBar() {
+    var settings = context.watch<ApiProvider>().api.settings;
     return AppBar(
       leading: Padding(
         padding: const EdgeInsets.only(left: 16.0),
-        child: Image.asset('assets/images/avatar.png'),
+        child: settings['ProfileImage'] == null
+            ? const Icon(Icons.person_rounded, size: 36.0)
+            : Image.memory(base64.decode(settings['ProfileImage'])),
       ),
       centerTitle: false,
       title: Padding(
         padding: const EdgeInsets.all(8.0),
         child: Text(
-          context.watch<ApiProvider>().api.settings['FullName'] == null
+          settings['FullName'] == null
               ? 'Hi!'
               : 'Hi, ${context.watch<ApiProvider>().api.settings['FullName']}!',
         ),

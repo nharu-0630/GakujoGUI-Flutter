@@ -106,7 +106,7 @@ class TaskWidget extends StatelessWidget {
       ),
       decoration: BoxDecoration(
         color: color,
-        borderRadius: BorderRadius.circular(16.0),
+        borderRadius: BorderRadius.circular(32.0),
       ),
       child: Text(
         text,
