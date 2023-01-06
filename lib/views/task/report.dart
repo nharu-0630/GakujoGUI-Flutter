@@ -82,6 +82,7 @@ class _ReportPageState extends State<ReportPage> {
   Widget _buildAppBar(BuildContext context) {
     return SliverAppBar(
       centerTitle: true,
+      floating: true,
       leading: Padding(
         padding: const EdgeInsets.all(8.0),
         child: IconButton(

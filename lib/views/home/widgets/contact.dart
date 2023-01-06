@@ -44,11 +44,13 @@ class ContactWidget extends StatelessWidget {
               physics: const NeverScrollableScrollPhysics(),
               itemCount: subjects.length,
               itemBuilder: ((context, index) => _buildTile(
-                  context,
-                  subjects[index],
-                  contacts
-                      .where((e) => e.subjects == subjects[index].subjectsName)
-                      .toList())),
+                    context,
+                    subjects[index],
+                    contacts
+                        .where(
+                            (e) => e.subjects == subjects[index].subjectsName)
+                        .toList(),
+                  )),
             ),
     );
   }

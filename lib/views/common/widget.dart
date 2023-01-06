@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:better_open_file/better_open_file.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 import 'package:selectable_autolink_text/selectable_autolink_text.dart';
@@ -19,18 +20,18 @@ ListView buildFileList(List<String>? fileNames) {
       return ListTile(
         title: Row(
           children: [
-            buildExtIcon(p.extension(fileNames![index]).replaceFirst('.', '')),
+            _buildExtIcon(p.extension(fileNames![index]).replaceFirst('.', '')),
             const SizedBox(width: 8.0),
             Text(p.basename(fileNames[index])),
           ],
         ),
-        onTap: () async => openFile(fileNames[index]),
+        onTap: () async => _openFile(fileNames[index]),
       );
     },
   );
 }
 
-void openFile(String filename) async {
+void _openFile(String filename) async {
   var path = p.join((await getApplicationDocumentsDirectory()).path, filename);
   if (File(path).existsSync()) {
     OpenFile.open(path);
@@ -43,34 +44,39 @@ void openFile(String filename) async {
   }
 }
 
-Icon buildExtIcon(String ext) {
+Icon _buildExtIcon(String ext) {
   switch (ext) {
     case 'pdf':
-      return const Icon(Icons.picture_as_pdf_rounded);
+      return const Icon(FontAwesomeIcons.filePdf);
     case 'doc':
     case 'docx':
-      return const Icon(Icons.description_rounded);
+      return const Icon(FontAwesomeIcons.fileWord);
     case 'xls':
     case 'xlsx':
-      return const Icon(Icons.table_rows_rounded);
+      return const Icon(FontAwesomeIcons.fileExcel);
     case 'ppt':
     case 'pptx':
-      return const Icon(Icons.slideshow_rounded);
+      return const Icon(FontAwesomeIcons.filePowerpoint);
+    case 'zip':
+    case 'rar':
+      return const Icon(FontAwesomeIcons.fileZipper);
+    case 'csv':
+      return const Icon(FontAwesomeIcons.fileCsv);
     case 'txt':
-      return const Icon(Icons.text_fields_rounded);
+      return const Icon(FontAwesomeIcons.fileLines);
     case 'jpg':
     case 'jpeg':
     case 'png':
     case 'gif':
-      return const Icon(Icons.image_rounded);
+      return const Icon(FontAwesomeIcons.fileImage);
     case 'mp4':
     case 'mov':
-      return const Icon(Icons.video_collection_rounded);
+      return const Icon(FontAwesomeIcons.fileVideo);
     case 'mp3':
     case 'wav':
-      return const Icon(Icons.music_note_rounded);
+      return const Icon(FontAwesomeIcons.fileAudio);
     default:
-      return const Icon(Icons.file_present_rounded);
+      return const Icon(FontAwesomeIcons.file);
   }
 }
 

@@ -45,7 +45,7 @@ class _ContactPageState extends State<ContactPage> {
                         const Padding(
                           padding: EdgeInsets.all(8.0),
                           child: Icon(
-                            Icons.speaker_notes_off_rounded,
+                            Icons.message_rounded,
                             size: 48.0,
                           ),
                         ),
@@ -79,23 +79,28 @@ class _ContactPageState extends State<ContactPage> {
 
   Widget _buildAppBar(BuildContext context) {
     return SliverAppBar(
+      centerTitle: true,
+      floating: true,
       leading: Padding(
         padding: const EdgeInsets.all(8.0),
         child: IconButton(
-            onPressed: () => Navigator.of(context).pop(),
-            icon: const Icon(Icons.arrow_back_ios_new_rounded)),
+          onPressed: () => Navigator.of(context).pop(),
+          icon: const Icon(Icons.arrow_back_ios_new_rounded),
+        ),
       ),
       title: _searchStatus
           ? TextField(
               onChanged: (value) {
-                setState(() => _suggestContacts = context
-                    .read<ApiProvider>()
-                    .contacts
-                    .where(
-                      (e) => e.subjects == widget.subject.subjectsName,
-                    )
-                    .where((e) => e.contains(value))
-                    .toList());
+                setState(() {
+                  _suggestContacts = context
+                      .read<ApiProvider>()
+                      .contacts
+                      .where(
+                        (e) => e.subjects == widget.subject.subjectsName,
+                      )
+                      .where((e) => e.contains(value))
+                      .toList();
+                });
               },
               autofocus: true,
               textInputAction: TextInputAction.search,
@@ -177,7 +182,7 @@ class _ContactPageState extends State<ContactPage> {
             builder: (context) => DraggableScrollableSheet(
               expand: false,
               builder: (context, controller) {
-                return _buildModal(context, contact, controller);
+                return _buildModal(contact, controller);
               },
             ),
           );
@@ -224,8 +229,7 @@ class _ContactPageState extends State<ContactPage> {
     );
   }
 
-  Widget _buildModal(
-      BuildContext context, Contact contact, ScrollController controller) {
+  Widget _buildModal(Contact contact, ScrollController controller) {
     return ListView(
       controller: controller,
       padding: const EdgeInsets.all(16.0),
@@ -291,11 +295,13 @@ class _ContactPageState extends State<ContactPage> {
         ),
         Visibility(
           visible: contact.fileNames?.isNotEmpty ?? false,
-          child: buildFileList(contact.fileNames),
+          child: Padding(
+            padding: const EdgeInsets.all(4.0),
+            child: buildFileList(contact.fileNames),
+          ),
         ),
         const SizedBox(height: 8.0),
         Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
             Expanded(
               child: Container(

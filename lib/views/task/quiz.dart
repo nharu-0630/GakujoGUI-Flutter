@@ -82,6 +82,7 @@ class _QuizPageState extends State<QuizPage> {
   Widget _buildAppBar(BuildContext context) {
     return SliverAppBar(
       centerTitle: true,
+      floating: true,
       leading: Padding(
         padding: const EdgeInsets.all(8.0),
         child: IconButton(
@@ -384,7 +385,10 @@ class _QuizPageState extends State<QuizPage> {
         ),
         Visibility(
           visible: quiz.fileNames?.isNotEmpty ?? false,
-          child: buildFileList(quiz.fileNames),
+          child: Padding(
+            padding: const EdgeInsets.all(4.0),
+            child: buildFileList(quiz.fileNames),
+          ),
         ),
         const SizedBox(height: 8.0),
         Row(
