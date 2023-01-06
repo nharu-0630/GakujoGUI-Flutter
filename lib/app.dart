@@ -1,5 +1,4 @@
-import 'dart:convert';
-
+import 'package:cached_memory_image/provider/cached_memory_image_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:gakujo_task/provide.dart';
 import 'package:gakujo_task/views/home/home.dart';
@@ -48,7 +47,10 @@ class _AppState extends State<App> {
         padding: const EdgeInsets.only(left: 16.0),
         child: settings.profileImage == null
             ? const Icon(Icons.person_rounded, size: 36.0)
-            : Image.memory(base64.decode(settings.profileImage!)),
+            : CircleAvatar(
+                backgroundImage: CachedMemoryImageProvider('ProfileImage',
+                    base64: settings.profileImage),
+              ),
       ),
       centerTitle: false,
       title: Padding(
