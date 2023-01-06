@@ -25,7 +25,6 @@ class _QuizPageState extends State<QuizPage> {
   Widget build(BuildContext context) {
     var quizzes = context
         .watch<ApiProvider>()
-        .api
         .quizzes
         .where((e) => _filterStatus
             ? !(e.isArchived ||
@@ -38,8 +37,7 @@ class _QuizPageState extends State<QuizPage> {
         headerSliverBuilder: (context, innerBoxScrolled) =>
             [_buildAppBar(context)],
         body: RefreshIndicator(
-          onRefresh: () async =>
-              await context.read<ApiProvider>().api.fetchQuizzes(),
+          onRefresh: () async => context.read<ApiProvider>().fetchQuizzes(),
           child: quizzes.isEmpty
               ? LayoutBuilder(
                   builder: (context, constraints) => SingleChildScrollView(
@@ -54,7 +52,7 @@ class _QuizPageState extends State<QuizPage> {
                             const Padding(
                               padding: EdgeInsets.all(8.0),
                               child: Icon(
-                                Icons.beach_access_rounded,
+                                Icons.task_rounded,
                                 size: 48.0,
                               ),
                             ),
@@ -97,7 +95,6 @@ class _QuizPageState extends State<QuizPage> {
                 setState(() {
                   _suggestQuizzes = context
                       .read<ApiProvider>()
-                      .api
                       .quizzes
                       .where((e) => e.contains(value))
                       .toList();

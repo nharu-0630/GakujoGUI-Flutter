@@ -4,25 +4,40 @@ import 'package:gakujo_task/api/api.dart';
 import 'package:gakujo_task/models/contact.dart';
 import 'package:gakujo_task/models/quiz.dart';
 import 'package:gakujo_task/models/report.dart';
+import 'package:gakujo_task/models/settings.dart';
+import 'package:gakujo_task/models/subject.dart';
 
 class ApiProvider extends ChangeNotifier {
-  var api = Api();
-  var isLoading = false;
-  var isError = false;
+  final Api _api = Api();
+  String get token => _api.token;
+  Settings get settings => _api.settings;
+  List<Subject> get subjects => _api.subjects;
+  List<Contact> get contacts => _api.contacts;
+  List<Report> get reports => _api.reports;
+  List<Quiz> get quizzes => _api.quizzes;
+
+  bool get isLoading => _isLoading;
+  bool _isLoading = false;
+  bool get isError => _isError;
+  bool _isError = false;
+
+  ApiProvider() {
+    loadSettings();
+  }
 
   void loadSettings() {
-    api.loadSettings().then((value) => notifyListeners());
+    _api.loadSettings().then((value) => notifyListeners());
   }
 
   void clearSettings() {
-    api.clearSettings().then((value) => notifyListeners());
+    _api.clearSettings().then((value) => notifyListeners());
   }
 
   void _onError(Object e) {
-    isError = true;
+    _isError = true;
     notifyListeners();
     Future<void>.delayed(const Duration(seconds: 2), () {
-      isError = false;
+      _isError = false;
       _toggleLoading();
     });
     Fluttertoast.showToast(
@@ -33,7 +48,7 @@ class ApiProvider extends ChangeNotifier {
   }
 
   void _toggleLoading() {
-    isLoading = !isLoading;
+    _isLoading = !isLoading;
     notifyListeners();
   }
 
@@ -41,11 +56,11 @@ class ApiProvider extends ChangeNotifier {
     if (isLoading) return;
     _toggleLoading();
     try {
-      await api.fetchLogin();
-      await api.fetchSubjects();
-      await api.fetchContacts();
-      await api.fetchReports();
-      await api.fetchQuizzes();
+      await _api.fetchLogin();
+      await _api.fetchSubjects();
+      await _api.fetchContacts();
+      await _api.fetchReports();
+      await _api.fetchQuizzes();
       _toggleLoading();
     } catch (e) {
       _onError(e);
@@ -56,8 +71,8 @@ class ApiProvider extends ChangeNotifier {
     if (isLoading) return;
     _toggleLoading();
     try {
-      await api.fetchReports();
-      await api.fetchQuizzes();
+      await _api.fetchReports();
+      await _api.fetchQuizzes();
       _toggleLoading();
     } catch (e) {
       _onError(e);
@@ -68,7 +83,7 @@ class ApiProvider extends ChangeNotifier {
     if (isLoading) return;
     _toggleLoading();
     try {
-      await api.fetchLogin();
+      await _api.fetchLogin();
       _toggleLoading();
     } catch (e) {
       _onError(e);
@@ -79,7 +94,7 @@ class ApiProvider extends ChangeNotifier {
     if (isLoading) return;
     _toggleLoading();
     try {
-      await api.fetchSubjects();
+      await _api.fetchSubjects();
       _toggleLoading();
     } catch (e) {
       _onError(e);
@@ -90,7 +105,7 @@ class ApiProvider extends ChangeNotifier {
     if (isLoading) return;
     _toggleLoading();
     try {
-      await api.fetchContacts();
+      await _api.fetchContacts();
       _toggleLoading();
     } catch (e) {
       _onError(e);
@@ -101,7 +116,7 @@ class ApiProvider extends ChangeNotifier {
     if (isLoading) return;
     _toggleLoading();
     try {
-      await api.fetchDetailContact(contact);
+      await _api.fetchDetailContact(contact);
       _toggleLoading();
     } catch (e) {
       _onError(e);
@@ -112,7 +127,7 @@ class ApiProvider extends ChangeNotifier {
     if (isLoading) return;
     _toggleLoading();
     try {
-      await api.fetchReports();
+      await _api.fetchReports();
       _toggleLoading();
     } catch (e) {
       _onError(e);
@@ -123,7 +138,7 @@ class ApiProvider extends ChangeNotifier {
     if (isLoading) return;
     _toggleLoading();
     try {
-      await api.fetchDetailReport(report);
+      await _api.fetchDetailReport(report);
       _toggleLoading();
     } catch (e) {
       _onError(e);
@@ -131,8 +146,8 @@ class ApiProvider extends ChangeNotifier {
   }
 
   void setArchiveReport(String id, bool value) {
-    api.reports.where((e) => e.id == id).first.isArchived = value;
-    api.saveSettings();
+    _api.reports.where((e) => e.id == id).first.isArchived = value;
+    _api.saveSettings();
     notifyListeners();
   }
 
@@ -140,7 +155,7 @@ class ApiProvider extends ChangeNotifier {
     if (isLoading) return;
     _toggleLoading();
     try {
-      await api.fetchQuizzes();
+      await _api.fetchQuizzes();
       _toggleLoading();
     } catch (e) {
       _onError(e);
@@ -151,7 +166,7 @@ class ApiProvider extends ChangeNotifier {
     if (isLoading) return;
     _toggleLoading();
     try {
-      await api.fetchDetailQuiz(quiz);
+      await _api.fetchDetailQuiz(quiz);
       _toggleLoading();
     } catch (e) {
       _onError(e);
@@ -159,20 +174,20 @@ class ApiProvider extends ChangeNotifier {
   }
 
   void setArchiveQuiz(String id, bool value) {
-    api.quizzes.where((e) => e.id == id).first.isArchived = value;
-    api.saveSettings();
+    _api.quizzes.where((e) => e.id == id).first.isArchived = value;
+    _api.saveSettings();
     notifyListeners();
   }
 
   void setUserInfo(String username, String password) {
-    api.settings.username = username;
-    api.settings.password = password;
-    api.saveSettings();
+    _api.settings.username = username;
+    _api.settings.password = password;
+    _api.saveSettings();
   }
 
   void setSemester(int? year, int? semester) {
-    if (year != null) api.settings.year = year;
-    if (semester != null) api.settings.semester = semester;
-    api.refreshSemester();
+    if (year != null) _api.settings.year = year;
+    if (semester != null) _api.settings.semester = semester;
+    _api.refreshSemester();
   }
 }

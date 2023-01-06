@@ -26,12 +26,12 @@ class _ContactPageState extends State<ContactPage> {
   Widget build(BuildContext context) {
     var contacts = context
         .watch<ApiProvider>()
-        .api
         .contacts
         .where(
           (e) => e.subjects == widget.subject.subjectsName,
         )
         .toList();
+    contacts.sort(((a, b) => b.compareTo(a)));
     return Scaffold(
       body: CustomScrollView(
         slivers: [
@@ -90,7 +90,6 @@ class _ContactPageState extends State<ContactPage> {
               onChanged: (value) {
                 setState(() => _suggestContacts = context
                     .read<ApiProvider>()
-                    .api
                     .contacts
                     .where(
                       (e) => e.subjects == widget.subject.subjectsName,

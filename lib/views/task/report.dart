@@ -25,7 +25,6 @@ class _ReportPageState extends State<ReportPage> {
   Widget build(BuildContext context) {
     var reports = context
         .watch<ApiProvider>()
-        .api
         .reports
         .where((e) => _filterStatus
             ? !(e.isArchived ||
@@ -38,8 +37,7 @@ class _ReportPageState extends State<ReportPage> {
         headerSliverBuilder: (context, innerBoxScrolled) =>
             [_buildAppBar(context)],
         body: RefreshIndicator(
-          onRefresh: () async =>
-              await context.read<ApiProvider>().api.fetchReports(),
+          onRefresh: () async => context.read<ApiProvider>().fetchReports(),
           child: reports.isEmpty
               ? LayoutBuilder(
                   builder: (context, constraints) => SingleChildScrollView(
@@ -54,7 +52,7 @@ class _ReportPageState extends State<ReportPage> {
                             const Padding(
                               padding: EdgeInsets.all(8.0),
                               child: Icon(
-                                Icons.beach_access_rounded,
+                                Icons.task_rounded,
                                 size: 48.0,
                               ),
                             ),
@@ -97,7 +95,6 @@ class _ReportPageState extends State<ReportPage> {
                 setState(() {
                   _suggestReports = context
                       .read<ApiProvider>()
-                      .api
                       .reports
                       .where((e) => e.contains(value))
                       .toList();

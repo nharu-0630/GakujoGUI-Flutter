@@ -9,7 +9,7 @@ class StatusWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var settings = context.watch<ApiProvider>().api.settings;
+    var settings = context.watch<ApiProvider>().settings;
     return Padding(
       padding: const EdgeInsets.all(16.0),
       child: Card(
@@ -44,7 +44,8 @@ class StatusWidget extends StatelessWidget {
                               style: Theme.of(context).textTheme.titleMedium,
                             ),
                             Text(
-                              (settings.lastLoginTime == null
+                              (settings.lastLoginTime ==
+                                      DateTime.fromMicrosecondsSinceEpoch(0)
                                   ? ''
                                   : DateFormat('yyyy/MM/dd HH:mm', 'ja')
                                       .format(settings.lastLoginTime)),

@@ -11,8 +11,13 @@ class ContactWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var subjects = context.watch<ApiProvider>().api.subjects;
-    var contacts = context.watch<ApiProvider>().api.contacts;
+    var subjects = context.watch<ApiProvider>().subjects;
+    var contacts = context.watch<ApiProvider>().contacts;
+    subjects.sort((a, b) {
+      var aContact = contacts.firstWhere((e) => e.subjects == a.subjectsName);
+      var bContact = contacts.firstWhere((e) => e.subjects == b.subjectsName);
+      return bContact.contactDateTime.compareTo(aContact.contactDateTime);
+    });
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16.0),
       child: subjects.isEmpty
@@ -23,8 +28,8 @@ class ContactWidget extends StatelessWidget {
                   const Padding(
                     padding: EdgeInsets.all(8.0),
                     child: Icon(
-                      Icons.speaker_notes_off_rounded,
-                      size: 24.0,
+                      Icons.message_rounded,
+                      size: 32.0,
                     ),
                   ),
                   Text(

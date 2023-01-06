@@ -615,7 +615,9 @@ class Api {
     subjects.addAll(parse(response.data)
         .querySelector('#st1')!
         .querySelectorAll('ul')
-        .map(Subject.fromElement));
+        .map(Subject.fromElement)
+        .toSet()
+        .toList());
     saveSettings();
   }
 

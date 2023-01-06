@@ -41,7 +41,7 @@ class _AppState extends State<App> {
   }
 
   AppBar _buildAppBar() {
-    var settings = context.watch<ApiProvider>().api.settings;
+    var settings = context.watch<ApiProvider>().settings;
     return AppBar(
       leading: Padding(
         padding: const EdgeInsets.only(left: 16.0),
@@ -56,9 +56,7 @@ class _AppState extends State<App> {
       title: Padding(
         padding: const EdgeInsets.all(8.0),
         child: Text(
-          settings.fullName == null
-              ? 'Hi!'
-              : 'Hi, ${context.watch<ApiProvider>().api.settings.fullName}!',
+          settings.fullName == null ? 'Hi!' : 'Hi, ${settings.fullName}!',
         ),
       ),
       bottom: buildAppBarBottom(context),

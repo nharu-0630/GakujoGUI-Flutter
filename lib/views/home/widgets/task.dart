@@ -51,7 +51,7 @@ class TaskWidget extends StatelessWidget {
                 child: _buildStatus(
                   context,
                   kYellowDark.withOpacity(0.4),
-                  '残り ${context.watch<ApiProvider>().api.reports.where((e) => !(e.isArchived || !(!e.isSubmitted && e.endDateTime.isAfter(DateTime.now())))).length}',
+                  '残り ${context.watch<ApiProvider>().reports.where((e) => !(e.isArchived || !(!e.isSubmitted && e.endDateTime.isAfter(DateTime.now())))).length}',
                 ),
               )
             ],
@@ -88,7 +88,7 @@ class TaskWidget extends StatelessWidget {
                 child: _buildStatus(
                   context,
                   kRedDark.withOpacity(0.4),
-                  '残り ${context.watch<ApiProvider>().api.quizzes.where((e) => !(e.isArchived || !(!e.isSubmitted && e.endDateTime.isAfter(DateTime.now())))).length}',
+                  '残り ${context.watch<ApiProvider>().quizzes.where((e) => !(e.isArchived || !(!e.isSubmitted && e.endDateTime.isAfter(DateTime.now())))).length}',
                 ),
               )
             ],

@@ -17,7 +17,7 @@ class _HomeWidgetState extends State<HomeWidget> {
   @override
   Widget build(BuildContext context) {
     return RefreshIndicator(
-      onRefresh: () async => context.read<ApiProvider>().fetchLogin(),
+      onRefresh: () async => context.read<ApiProvider>().fetchAll(),
       child: ListView(
         physics: const AlwaysScrollableScrollPhysics(),
         children: [

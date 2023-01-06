@@ -4,7 +4,7 @@ import 'dart:ui';
 import 'package:crypto/crypto.dart' show md5;
 import 'package:html/dom.dart';
 
-class Subject {
+class Subject implements Comparable<Subject> {
   String subjectsName;
   String teacherName;
   String classRoom;
@@ -53,4 +53,35 @@ class Subject {
   static List<Subject> decode(String subjects) => json.decode(subjects) is List
       ? (json.decode(subjects) as List).map<Subject>(Subject.fromJson).toList()
       : [];
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) {
+      return true;
+    }
+    if (other is Subject) {
+      return subjectsName == other.subjectsName &&
+          teacherName == other.teacherName &&
+          classRoom == other.classRoom;
+    }
+    return false;
+  }
+
+  @override
+  int get hashCode =>
+      subjectsName.hashCode ^ teacherName.hashCode ^ classRoom.hashCode;
+
+  @override
+  int compareTo(Subject other) {
+    var compare1 = subjectsName.compareTo(other.subjectsName);
+    if (compare1 != 0) {
+      return compare1;
+    }
+    var compare2 = teacherName.compareTo(other.teacherName);
+    if (compare2 != 0) {
+      return compare2;
+    }
+    var compare3 = classRoom.compareTo(other.classRoom);
+    return compare3;
+  }
 }
