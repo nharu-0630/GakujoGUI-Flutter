@@ -28,14 +28,16 @@ class _HomeWidgetState extends State<HomeWidget> {
               padding:
                   const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
               child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
+                  const Icon(Icons.task_rounded),
+                  const SizedBox(width: 8.0),
                   Text(
                     'タスク',
                     style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                           fontWeight: FontWeight.bold,
                         ),
                   ),
+                  const Spacer(),
                   IconButton(
                     icon: const Icon(Icons.sync_rounded),
                     onPressed: () async =>
@@ -53,14 +55,16 @@ class _HomeWidgetState extends State<HomeWidget> {
               padding:
                   const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
               child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
+                  const Icon(Icons.message_rounded),
+                  const SizedBox(width: 8.0),
                   Text(
                     'メッセージ',
                     style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                           fontWeight: FontWeight.bold,
                         ),
                   ),
+                  const Spacer(),
                   IconButton(
                     icon: const Icon(Icons.sync_rounded),
                     onPressed: () async =>

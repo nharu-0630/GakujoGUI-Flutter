@@ -37,14 +37,20 @@ class _SettingsWidgetState extends State<SettingsWidget> {
         children: [
           StickyHeader(
             header: Container(
-              width: double.infinity,
               color: Theme.of(context).scaffoldBackgroundColor,
-              padding: const EdgeInsets.all(16),
-              child: Text(
-                'アカウント',
-                style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                      fontWeight: FontWeight.bold,
-                    ),
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+              child: Row(
+                children: [
+                  const Icon(Icons.account_circle_rounded),
+                  const SizedBox(width: 8.0),
+                  Text(
+                    'アカウント',
+                    style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                          fontWeight: FontWeight.bold,
+                        ),
+                  ),
+                ],
               ),
             ),
             content: Container(
@@ -328,14 +334,20 @@ class _SettingsWidgetState extends State<SettingsWidget> {
           ),
           StickyHeader(
             header: Container(
-              width: double.infinity,
               color: Theme.of(context).scaffoldBackgroundColor,
-              padding: const EdgeInsets.all(16),
-              child: Text(
-                '開発者向け',
-                style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                      fontWeight: FontWeight.bold,
-                    ),
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+              child: Row(
+                children: [
+                  const Icon(Icons.developer_mode_rounded),
+                  const SizedBox(width: 8.0),
+                  Text(
+                    '開発者向け',
+                    style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                          fontWeight: FontWeight.bold,
+                        ),
+                  ),
+                ],
               ),
             ),
             content: Container(
