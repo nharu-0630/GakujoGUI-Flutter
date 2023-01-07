@@ -64,22 +64,17 @@ class _AppState extends State<App> {
   }
 
   Widget _buildBottomNavigationBar() {
-    return Stack(
-      children: [
-        BottomNavigationBar(
-          iconSize: 36.0,
-          currentIndex: _index,
-          onTap: (value) => setState(() => _index = value),
-          showSelectedLabels: false,
-          showUnselectedLabels: false,
-          items: const [
-            BottomNavigationBarItem(
-                label: 'Home', icon: Icon(Icons.home_rounded)),
-            BottomNavigationBarItem(
-              label: 'Settings',
-              icon: Icon(Icons.settings_rounded),
-            ),
-          ],
+    return BottomNavigationBar(
+      iconSize: 36.0,
+      currentIndex: _index,
+      onTap: (value) => setState(() => _index = value),
+      showSelectedLabels: false,
+      showUnselectedLabels: false,
+      items: const [
+        BottomNavigationBarItem(label: 'Home', icon: Icon(Icons.home_rounded)),
+        BottomNavigationBarItem(
+          label: 'Settings',
+          icon: Icon(Icons.settings_rounded),
         ),
       ],
     );
