@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:gakujo_task/app.dart';
 import 'package:gakujo_task/provide.dart';
 import 'package:intl/date_symbol_data_local.dart';
@@ -11,7 +10,6 @@ void main() async {
   SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,
   ]);
-  await dotenv.load(fileName: '.env');
   initializeDateFormatting('ja');
   runApp(const MyApp());
 }

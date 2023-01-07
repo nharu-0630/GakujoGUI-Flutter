@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:gakujo_task/api/api.dart';
 import 'package:gakujo_task/provide.dart';
 import 'package:package_info_plus/package_info_plus.dart';
@@ -14,14 +15,21 @@ class SettingsWidget extends StatefulWidget {
 }
 
 class _SettingsWidgetState extends State<SettingsWidget> {
-  var _username = '';
-  var _password = '';
-  var _year = '';
-  var _semester = '';
+  late TextEditingController _usernameController;
+  late TextEditingController _passwordController;
+  late TextEditingController _yearController;
+  late TextEditingController _semesterController;
+
+  var _isObscure = true;
 
   @override
   Widget build(BuildContext context) {
     var settings = context.watch<ApiProvider>().settings;
+    _usernameController = TextEditingController(text: settings.username);
+    _passwordController = TextEditingController(text: settings.password);
+    _yearController = TextEditingController(text: settings.year.toString());
+    _semesterController =
+        TextEditingController(text: settings.semester.toString());
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: ListView(
@@ -54,12 +62,9 @@ class _SettingsWidgetState extends State<SettingsWidget> {
                         ),
                       ),
                       Expanded(
-                          flex: 3,
-                          child: TextField(
-                            controller:
-                                TextEditingController(text: settings.username),
-                            onChanged: (value) => _username = value,
-                          )),
+                        flex: 3,
+                        child: TextField(controller: _usernameController),
+                      ),
                     ],
                   ),
                   Row(
@@ -73,13 +78,21 @@ class _SettingsWidgetState extends State<SettingsWidget> {
                         ),
                       ),
                       Expanded(
-                          flex: 3,
-                          child: TextField(
-                            controller:
-                                TextEditingController(text: settings.password),
-                            obscureText: true,
-                            onChanged: (value) => _password = value,
-                          )),
+                        flex: 3,
+                        child: TextField(
+                          controller: _passwordController,
+                          obscureText: _isObscure,
+                          decoration: InputDecoration(
+                            suffixIcon: IconButton(
+                              icon: Icon(_isObscure
+                                  ? Icons.visibility_off_rounded
+                                  : Icons.visibility_rounded),
+                              onPressed: () =>
+                                  setState(() => _isObscure = !_isObscure),
+                            ),
+                          ),
+                        ),
+                      ),
                     ],
                   ),
                   Padding(
@@ -90,13 +103,10 @@ class _SettingsWidgetState extends State<SettingsWidget> {
                         foregroundColor:
                             Theme.of(context).colorScheme.onPrimary,
                       ),
-                      onPressed: () async {
-                        setState(() {
-                          context
-                              .read<ApiProvider>()
-                              .setUserInfo(_username, _password);
-                        });
-                      },
+                      onPressed: () async => setState(() => context
+                          .read<ApiProvider>()
+                          .setUserInfo(_usernameController.text,
+                              _passwordController.text)),
                       child: Padding(
                         padding: const EdgeInsets.all(8.0),
                         child: Row(
@@ -134,12 +144,15 @@ class _SettingsWidgetState extends State<SettingsWidget> {
                         ),
                       ),
                       Expanded(
-                          flex: 3,
-                          child: TextField(
-                            controller: TextEditingController(
-                                text: settings.year.toString()),
-                            onChanged: (value) => _year = value,
-                          )),
+                        flex: 3,
+                        child: TextField(
+                          keyboardType: TextInputType.number,
+                          inputFormatters: [
+                            FilteringTextInputFormatter.digitsOnly
+                          ],
+                          controller: _yearController,
+                        ),
+                      ),
                     ],
                   ),
                   Row(
@@ -153,12 +166,16 @@ class _SettingsWidgetState extends State<SettingsWidget> {
                         ),
                       ),
                       Expanded(
-                          flex: 3,
-                          child: TextField(
-                            controller: TextEditingController(
-                                text: settings.semester.toString()),
-                            onChanged: (value) => _semester = value,
-                          )),
+                        flex: 3,
+                        child: TextField(
+                          keyboardType: TextInputType.number,
+                          inputFormatters: [
+                            FilteringTextInputFormatter.digitsOnly
+                          ],
+                          controller: TextEditingController(
+                              text: settings.semester.toString()),
+                        ),
+                      ),
                     ],
                   ),
                   Padding(
@@ -169,12 +186,10 @@ class _SettingsWidgetState extends State<SettingsWidget> {
                         foregroundColor:
                             Theme.of(context).colorScheme.onPrimary,
                       ),
-                      onPressed: () async {
-                        setState(() {
-                          context.read<ApiProvider>().setSemester(
-                              int.tryParse(_year), int.tryParse(_semester));
-                        });
-                      },
+                      onPressed: () async => setState(() => context
+                          .read<ApiProvider>()
+                          .setSemester(int.tryParse(_yearController.text),
+                              int.tryParse(_semesterController.text))),
                       child: Padding(
                         padding: const EdgeInsets.all(8.0),
                         child: Row(
