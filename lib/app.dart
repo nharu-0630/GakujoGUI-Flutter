@@ -64,18 +64,17 @@ class _AppState extends State<App> {
   }
 
   Widget _buildBottomNavigationBar() {
-    return BottomNavigationBar(
-      iconSize: 36.0,
-      currentIndex: _index,
-      onTap: (value) => setState(() => _index = value),
-      showSelectedLabels: false,
-      showUnselectedLabels: false,
-      items: const [
-        BottomNavigationBarItem(label: 'Home', icon: Icon(Icons.home_rounded)),
-        BottomNavigationBarItem(
-          label: 'Settings',
-          icon: Icon(Icons.settings_rounded),
-        ),
+    return NavigationBar(
+      onDestinationSelected: (int value) => setState(() => _index = value),
+      selectedIndex: _index,
+      labelBehavior: NavigationDestinationLabelBehavior.onlyShowSelected,
+      destinations: const [
+        NavigationDestination(
+            icon: Icon(Icons.home_rounded), label: 'Home', tooltip: 'Home'),
+        NavigationDestination(
+            icon: Icon(Icons.settings_rounded),
+            label: 'Settings',
+            tooltip: 'Settings'),
       ],
     );
   }
