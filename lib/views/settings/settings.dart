@@ -23,13 +23,19 @@ class _SettingsWidgetState extends State<SettingsWidget> {
   var _isObscure = true;
 
   @override
-  Widget build(BuildContext context) {
+  void didChangeDependencies() {
+    super.didChangeDependencies();
     var settings = context.watch<ApiProvider>().settings;
     _usernameController = TextEditingController(text: settings.username);
     _passwordController = TextEditingController(text: settings.password);
     _yearController = TextEditingController(text: settings.year.toString());
     _semesterController =
         TextEditingController(text: settings.semester.toString());
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    var settings = context.watch<ApiProvider>().settings;
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: ListView(
@@ -178,8 +184,7 @@ class _SettingsWidgetState extends State<SettingsWidget> {
                           inputFormatters: [
                             FilteringTextInputFormatter.digitsOnly
                           ],
-                          controller: TextEditingController(
-                              text: settings.semester.toString()),
+                          controller: _semesterController,
                         ),
                       ),
                     ],
