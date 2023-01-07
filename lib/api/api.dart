@@ -41,7 +41,7 @@ class Api {
   String get _reportDateStart =>
       '$_schoolYear/${_semester < 2 ? '04' : '10'}/01';
   // String get _reportDateEnd => '$_schoolYear/${_semester < 2 ? '09' : '03'}/01';
-  String get _suffix => '_${_year}_$_semesterCode';
+  String get _suffix => '_$_schoolYear$_semesterCode';
 
   String _token = '';
   String get token => _token;
@@ -93,7 +93,7 @@ class Api {
       );
     }
     if (!(await storage.containsKey(key: 'Subjects$_suffix'))) {
-      subjects = Subject.decode((await storage.read(key: 'Settings'))!);
+      subjects = Subject.decode((await storage.read(key: 'Subjects$_suffix'))!);
     }
     if (!(await storage.containsKey(key: 'Contacts$_suffix'))) {
       contacts = Contact.decode((await storage.read(key: 'Contacts$_suffix'))!);
@@ -120,7 +120,7 @@ class Api {
   }
 
   Future<void> clearSettings() async {
-    final storage = FlutterSecureStorage(
+    var storage = FlutterSecureStorage(
         aOptions: Platform.isAndroid
             ? const AndroidOptions(
                 encryptedSharedPreferences: true,
@@ -156,7 +156,7 @@ class Api {
   void _initialize() {
     _client = Dio(BaseOptions(
       headers: {
-        'User-Agent': 'Chrome/105.0.5195.127 GakujoTask/$version',
+        'User-Agent': 'Chrome/108.0.5359.124 GakujoTask/$version',
       },
       contentType: Headers.formUrlEncodedContentType,
     ));
