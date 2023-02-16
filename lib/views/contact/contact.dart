@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:gakujo_task/app.dart';
 import 'package:gakujo_task/models/contact.dart';
+import 'package:gakujo_task/models/contact_repository.dart';
 import 'package:gakujo_task/models/subject.dart';
 import 'package:gakujo_task/provide.dart';
 import 'package:gakujo_task/views/common/widget.dart';
@@ -24,56 +25,65 @@ class _ContactPageState extends State<ContactPage> {
 
   @override
   Widget build(BuildContext context) {
-    var contacts = context
-        .watch<ApiProvider>()
-        .contacts
-        .where(
-          (e) => e.subjects == widget.subject.subjectsName,
-        )
-        .toList();
-    contacts.sort(((a, b) => b.compareTo(a)));
-    return Scaffold(
-      body: CustomScrollView(
-        slivers: [
-          _buildAppBar(context),
-          contacts.isEmpty
-              ? SliverFillRemaining(
-                  child: Center(
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        const Padding(
-                          padding: EdgeInsets.all(8.0),
-                          child: Icon(
-                            Icons.message_rounded,
-                            size: 48.0,
+    return FutureBuilder(
+      future: context
+          .read<ContactRepository>()
+          .getSubjects(widget.subject.subjectsName),
+      builder: (context, AsyncSnapshot<List<Contact>> snapshot) {
+        if (snapshot.hasData) {
+          snapshot.data!.sort(((a, b) => b.compareTo(a)));
+          return Scaffold(
+            body: CustomScrollView(
+              slivers: [
+                _buildAppBar(context),
+                snapshot.data!.isEmpty
+                    ? SliverFillRemaining(
+                        child: Center(
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              const Padding(
+                                padding: EdgeInsets.all(8.0),
+                                child: Icon(
+                                  Icons.message_rounded,
+                                  size: 48.0,
+                                ),
+                              ),
+                              Text(
+                                'メッセージはありません',
+                                style: Theme.of(context).textTheme.titleMedium,
+                              ),
+                            ],
                           ),
                         ),
-                        Text(
-                          'メッセージはありません',
-                          style: Theme.of(context).textTheme.titleMedium,
+                      )
+                    : SliverPadding(
+                        padding: const EdgeInsets.all(8.0),
+                        sliver: SliverList(
+                          delegate: _searchStatus
+                              ? SliverChildBuilderDelegate(
+                                  (_, index) => _buildCard(
+                                      context, _suggestContacts[index]),
+                                  childCount: _suggestContacts.length,
+                                )
+                              : SliverChildBuilderDelegate(
+                                  (_, index) => _buildCard(
+                                      context, snapshot.data![index]),
+                                  childCount: snapshot.data!.length,
+                                ),
                         ),
-                      ],
-                    ),
-                  ),
-                )
-              : SliverPadding(
-                  padding: const EdgeInsets.all(8.0),
-                  sliver: SliverList(
-                    delegate: _searchStatus
-                        ? SliverChildBuilderDelegate(
-                            (_, index) =>
-                                _buildCard(context, _suggestContacts[index]),
-                            childCount: _suggestContacts.length,
-                          )
-                        : SliverChildBuilderDelegate(
-                            (_, index) => _buildCard(context, contacts[index]),
-                            childCount: contacts.length,
-                          ),
-                  ),
-                )
-        ],
-      ),
+                      )
+              ],
+            ),
+          );
+        } else {
+          return const Scaffold(
+            body: Center(
+              child: CircularProgressIndicator(),
+            ),
+          );
+        }
+      },
     );
   }
 
@@ -91,13 +101,10 @@ class _ContactPageState extends State<ContactPage> {
       title: _searchStatus
           ? TextField(
               onChanged: (value) {
-                setState(() {
-                  _suggestContacts = context
-                      .read<ApiProvider>()
-                      .contacts
-                      .where(
-                        (e) => e.subjects == widget.subject.subjectsName,
-                      )
+                setState(() async {
+                  _suggestContacts = (await context
+                          .read<ContactRepository>()
+                          .getSubjects(widget.subject.subjectsName))
                       .where((e) => e.contains(value))
                       .toList();
                 });

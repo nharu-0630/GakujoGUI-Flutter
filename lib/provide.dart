@@ -1,6 +1,7 @@
-import 'package:flutter/foundation.dart';
-import 'package:fluttertoast/fluttertoast.dart';
+import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
+import 'package:flutter/material.dart';
 import 'package:gakujo_task/api/api.dart';
+import 'package:gakujo_task/app.dart';
 import 'package:gakujo_task/models/contact.dart';
 import 'package:gakujo_task/models/quiz.dart';
 import 'package:gakujo_task/models/report.dart';
@@ -12,7 +13,6 @@ class ApiProvider extends ChangeNotifier {
   String get token => _api.token;
   Settings get settings => _api.settings;
   List<Subject> get subjects => _api.subjects;
-  List<Contact> get contacts => _api.contacts;
   List<Report> get reports => _api.reports;
   List<Quiz> get quizzes => _api.quizzes;
 
@@ -40,11 +40,20 @@ class ApiProvider extends ChangeNotifier {
       _isError = false;
       _toggleLoading();
     });
-    Fluttertoast.showToast(
-      msg: e.toString(),
-      toastLength: Toast.LENGTH_LONG,
-      timeInSecForIosWeb: 5,
+    final snackBar = SnackBar(
+      elevation: 0,
+      behavior: SnackBarBehavior.floating,
+      backgroundColor: Colors.transparent,
+      content: AwesomeSnackbarContent(
+        title: 'Error',
+        message: e.toString(),
+        contentType: ContentType.failure,
+        inMaterialBanner: true,
+      ),
     );
+    scaffoldKey.currentState!
+      ..hideCurrentSnackBar()
+      ..showSnackBar(snackBar);
   }
 
   void _toggleLoading() {

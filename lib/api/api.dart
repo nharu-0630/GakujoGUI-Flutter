@@ -8,7 +8,9 @@ import 'package:dio_smart_retry/dio_smart_retry.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:gakujo_task/api/parse.dart';
+import 'package:gakujo_task/app.dart';
 import 'package:gakujo_task/models/contact.dart';
+import 'package:gakujo_task/models/contact_repository.dart';
 import 'package:gakujo_task/models/quiz.dart';
 import 'package:gakujo_task/models/report.dart';
 import 'package:gakujo_task/models/settings.dart';
@@ -16,6 +18,7 @@ import 'package:gakujo_task/models/subject.dart';
 import 'package:html/parser.dart' show parse;
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:provider/provider.dart';
 import 'package:uuid/uuid.dart';
 import 'package:version/version.dart';
 
@@ -48,7 +51,6 @@ class Api {
 
   Settings settings = Settings(null, null, null, null, null, null,
       DateTime.fromMicrosecondsSinceEpoch(0), null, null, null);
-  List<Contact> contacts = [];
   List<Subject> subjects = [];
   List<Report> reports = [];
   List<Quiz> quizzes = [];
@@ -95,9 +97,6 @@ class Api {
     if (!(await storage.containsKey(key: 'Subjects$_suffix'))) {
       subjects = Subject.decode((await storage.read(key: 'Subjects$_suffix'))!);
     }
-    if (!(await storage.containsKey(key: 'Contacts$_suffix'))) {
-      contacts = Contact.decode((await storage.read(key: 'Contacts$_suffix'))!);
-    }
     if (!(await storage.containsKey(key: 'Reports$_suffix'))) {
       reports = Report.decode((await storage.read(key: 'Reports$_suffix'))!);
     }
@@ -131,26 +130,22 @@ class Api {
         value: json.encode(Settings.toMap(Settings(null, null, null, null, null,
             null, DateTime.fromMicrosecondsSinceEpoch(0), null, null, null))));
     await storage.write(key: 'Subjects$_suffix', value: Subject.encode([]));
-    await storage.write(key: 'Contacts$_suffix', value: Contact.encode([]));
     await storage.write(key: 'Reports$_suffix', value: Report.encode([]));
     await storage.write(key: 'Quizzes$_suffix', value: Quiz.encode([]));
   }
 
   Future<void> saveSettings() async {
-    var storage = FlutterSecureStorage(
-        aOptions: Platform.isAndroid
-            ? const AndroidOptions(
-                encryptedSharedPreferences: true,
-              )
-            : AndroidOptions.defaultOptions);
-    await storage.write(
-        key: 'Settings', value: json.encode(Settings.toMap(settings)));
-    await storage.write(
-        key: 'Subjects$_suffix', value: Subject.encode(subjects));
-    await storage.write(
-        key: 'Contacts$_suffix', value: Contact.encode(contacts));
-    await storage.write(key: 'Reports$_suffix', value: Report.encode(reports));
-    await storage.write(key: 'Quizzes$_suffix', value: Quiz.encode(quizzes));
+    // const storage = FlutterSecureStorage(
+    //   aOptions: AndroidOptions(
+    //     encryptedSharedPreferences: true,
+    //   ),
+    // );
+    // await storage.write(
+    //     key: 'Settings', value: json.encode(Settings.toMap(settings)));
+    // await storage.write(
+    //     key: 'Subjects$_suffix', value: Subject.encode(subjects));
+    // await storage.write(key: 'Reports$_suffix', value: Report.encode(reports));
+    // await storage.write(key: 'Quizzes$_suffix', value: Quiz.encode(quizzes));
   }
 
   void _initialize() {
@@ -449,11 +444,13 @@ class Api {
     );
     _updateToken(response.data, required: true);
 
+    final contactRepository =
+        navigatorKey.currentContext?.read<ContactRepository>();
     for (var element in parse(response.data)
         .querySelectorAll('#tbl_A01_01 > tbody > tr')
         .map(Contact.fromElement)
         .toList()) {
-      if (!contacts.contains(element)) contacts.add(element);
+      contactRepository?.add(element);
     }
 
     await saveSettings();
@@ -499,7 +496,7 @@ class Api {
           },
         ),
       );
-      _updateToken(response.data);
+      _updateToken(response.data, required: true);
 
       index = parse(response.data)
           .querySelectorAll('#tbl_A01_01 > tbody > tr')
@@ -580,6 +577,9 @@ class Api {
 
     contact.toDetail(document);
     saveSettings();
+    final contactRepository =
+        navigatorKey.currentContext?.read<ContactRepository>();
+    contactRepository?.add(contact, overwrite: true);
     return contact;
   }
 

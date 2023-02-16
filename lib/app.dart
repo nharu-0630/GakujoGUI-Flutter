@@ -12,12 +12,17 @@ class App extends StatefulWidget {
   State<App> createState() => _AppState();
 }
 
+final scaffoldKey = GlobalKey<ScaffoldMessengerState>();
+final navigatorKey = GlobalKey<NavigatorState>();
+
 class _AppState extends State<App> {
   var _index = 0;
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      scaffoldMessengerKey: scaffoldKey,
+      navigatorKey: navigatorKey,
       themeMode: ThemeMode.system,
       theme: ThemeData(
         useMaterial3: true,
@@ -55,8 +60,17 @@ class _AppState extends State<App> {
       centerTitle: false,
       title: Padding(
         padding: const EdgeInsets.all(8.0),
-        child: Text(
-          settings.fullName == null ? 'Hi!' : 'Hi, ${settings.fullName}!',
+        child: Row(
+          children: [
+            Text(
+              settings.fullName == null ? 'Hi!' : 'Hi, ${settings.fullName}!',
+            ),
+            const Spacer(),
+            IconButton(
+              icon: const Icon(Icons.sync_rounded),
+              onPressed: () async => context.read<ApiProvider>().fetchLogin(),
+            ),
+          ],
         ),
       ),
       bottom: buildAppBarBottom(context),

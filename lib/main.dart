@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:gakujo_task/app.dart';
+import 'package:gakujo_task/models/contact.dart';
+import 'package:gakujo_task/models/contact_repository.dart';
 import 'package:gakujo_task/provide.dart';
+import 'package:hive_flutter/adapters.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:provider/provider.dart';
 
@@ -11,6 +14,8 @@ void main() async {
     DeviceOrientation.portraitUp,
   ]);
   initializeDateFormatting('ja');
+  await Hive.initFlutter();
+  Hive.registerAdapter(ContactAdapter());
   runApp(const MyApp());
 }
 
@@ -31,8 +36,11 @@ class _MyAppState extends State<MyApp> {
   Widget build(BuildContext context) {
     SystemChrome.setSystemUIOverlayStyle(
         const SystemUiOverlayStyle(statusBarColor: Colors.transparent));
-    return ChangeNotifierProvider(
-      create: (_) => ApiProvider(),
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => ApiProvider()),
+        Provider(create: (_) => ContactRepository(ContactBox())),
+      ],
       child: const App(),
     );
   }

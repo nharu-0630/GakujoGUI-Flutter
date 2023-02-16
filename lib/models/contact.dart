@@ -1,21 +1,36 @@
-import 'dart:convert';
-
 import 'package:gakujo_task/api/parse.dart';
+import 'package:hive/hive.dart';
 import 'package:html/dom.dart';
 
+part 'contact.g.dart';
+
+@HiveType(typeId: 1)
 class Contact implements Comparable<Contact> {
+  @HiveField(0)
   String subjects;
+  @HiveField(1)
   String teacherName;
+  @HiveField(2)
   String contactType;
+  @HiveField(3)
   String title;
+  @HiveField(4)
   String content;
+  @HiveField(5)
   List<String>? fileNames;
+  @HiveField(6)
   String? fileLinkRelease;
+  @HiveField(7)
   String? referenceUrl;
+  @HiveField(8)
   String? severity;
+  @HiveField(9)
   DateTime targetDateTime;
+  @HiveField(10)
   DateTime contactDateTime;
+  @HiveField(11)
   String? webReplyRequest;
+  @HiveField(12)
   bool isAcquired;
 
   Contact(
@@ -60,45 +75,6 @@ class Contact implements Comparable<Contact> {
       isAcquired: false,
     );
   }
-
-  static Map<String, dynamic> toMap(Contact contact) => <String, dynamic>{
-        'subjects': contact.subjects,
-        'teacherName': contact.teacherName,
-        'contactType': contact.contactType,
-        'title': contact.title,
-        'content': contact.content,
-        'fileNames': contact.fileNames,
-        'fileLinkRelease': contact.fileLinkRelease,
-        'referenceUrl': contact.referenceUrl,
-        'severity': contact.severity,
-        'targetDateTime': contact.targetDateTime.toIso8601String(),
-        'contactDateTime': contact.contactDateTime.toIso8601String(),
-        'webReplyRequest': contact.webReplyRequest,
-        'isAcquired': contact.isAcquired,
-      };
-
-  factory Contact.fromJson(dynamic json) => Contact(
-      json['subjects'] as String,
-      json['teacherName'] as String,
-      json['contactType'] as String,
-      json['title'] as String,
-      json['content'] as String,
-      (json['fileNames'] as List<dynamic>?)?.map((e) => e as String).toList(),
-      json['fileLinkRelease'] as String?,
-      json['referenceUrl'] as String?,
-      json['severity'] as String?,
-      DateTime.parse(json['targetDateTime'] as String),
-      DateTime.parse(json['contactDateTime'] as String),
-      json['webReplyRequest'] as String?,
-      isAcquired: json['isAcquired'] as bool);
-
-  static String encode(List<Contact> contacts) => json.encode(
-        contacts.map<Map<String, dynamic>>(Contact.toMap).toList(),
-      );
-
-  static List<Contact> decode(String contacts) => json.decode(contacts) is List
-      ? (json.decode(contacts) as List).map<Contact>(Contact.fromJson).toList()
-      : [];
 
   void toDetail(Document document) {
     isAcquired = true;
@@ -166,5 +142,16 @@ class Contact implements Comparable<Contact> {
     }
     var compare3 = title.compareTo(other.title);
     return compare3;
+  }
+}
+
+class ContactBox {
+  Future<Box> box = Hive.openBox<Contact>('contact');
+
+  Future<void> open() async {
+    Box b = await box;
+    if (!b.isOpen) {
+      box = Hive.openBox<Contact>('contact');
+    }
   }
 }
