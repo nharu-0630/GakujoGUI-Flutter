@@ -1,26 +1,46 @@
-import 'dart:convert';
-
 import 'package:gakujo_task/api/parse.dart';
+import 'package:hive/hive.dart';
 import 'package:html/dom.dart';
 
+part 'report.g.dart';
+
+@HiveType(typeId: 4)
 class Report implements Comparable<Report> {
+  @HiveField(0)
   String subject;
+  @HiveField(1)
   String title;
+  @HiveField(2)
   String id;
+  @HiveField(3)
   String schoolYear;
+  @HiveField(4)
   String subjectCode;
+  @HiveField(5)
   String classCode;
+  @HiveField(6)
   String status;
+  @HiveField(7)
   DateTime startDateTime;
+  @HiveField(8)
   DateTime endDateTime = DateTime.fromMicrosecondsSinceEpoch(0);
+  @HiveField(9)
   String implementationFormat;
+  @HiveField(10)
   String operation;
+  @HiveField(11)
   DateTime submittedDateTime = DateTime.fromMicrosecondsSinceEpoch(0);
+  @HiveField(12)
   String evaluationMethod;
+  @HiveField(13)
   String description;
+  @HiveField(14)
   List<String>? fileNames;
+  @HiveField(15)
   String message;
+  @HiveField(16)
   bool isAcquired = false;
+  @HiveField(17)
   bool isArchived = false;
 
   Report(
@@ -152,59 +172,6 @@ class Report implements Comparable<Report> {
     );
   }
 
-  static Map<String, dynamic> toMap(Report report) => <String, dynamic>{
-        'subject': report.subject,
-        'title': report.title,
-        'id': report.id,
-        'schoolYear': report.schoolYear,
-        'subjectCode': report.subjectCode,
-        'classCode': report.classCode,
-        'status': report.status,
-        'startDateTime': report.startDateTime.toIso8601String(),
-        'endDateTime': report.endDateTime.toIso8601String(),
-        'implementationFormat': report.implementationFormat,
-        'operation': report.operation,
-        'submittedDateTime': report.submittedDateTime.toIso8601String(),
-        'evaluationMethod': report.evaluationMethod,
-        'description': report.description,
-        'fileNames': report.fileNames,
-        'message': report.message,
-        'isAcquired': report.isAcquired,
-        'isArchived': report.isArchived
-      };
-
-  factory Report.fromJson(dynamic json) {
-    json = json as Map<String, dynamic>;
-    return Report(
-      json['subject'] as String,
-      json['title'] as String,
-      json['id'] as String,
-      json['schoolYear'] as String,
-      json['subjectCode'] as String,
-      json['classCode'] as String,
-      json['status'] as String,
-      (json['startDateTime'] as String).parseDateTime(),
-      (json['endDateTime'] as String).parseDateTime(),
-      json['implementationFormat'] as String,
-      json['operation'] as String,
-      (json['submittedDateTime'] as String).parseDateTime(),
-      json['evaluationMethod'] as String,
-      json['description'] as String,
-      (json['fileNames'] as List<dynamic>?)?.map((e) => e as String).toList(),
-      json['message'] as String,
-      isAcquired: json['isAcquired'] as bool,
-      isArchived: json['isArchived'] as bool,
-    );
-  }
-
-  static String encode(List<Report> reports) => json.encode(
-        reports.map<Map<String, dynamic>>(Report.toMap).toList(),
-      );
-
-  static List<Report> decode(String reports) => json.decode(reports) is List
-      ? (json.decode(reports) as List).map<Report>(Report.fromJson).toList()
-      : [];
-
   bool get isSubmitted =>
       submittedDateTime != DateTime.fromMicrosecondsSinceEpoch(0);
 
@@ -275,5 +242,58 @@ class Report implements Comparable<Report> {
     }
     var compare4 = id.compareTo(other.id);
     return compare4;
+  }
+}
+
+class ReportBox {
+  Future<Box> box = Hive.openBox<Report>('report');
+
+  Future<void> open() async {
+    Box b = await box;
+    if (!b.isOpen) {
+      box = Hive.openBox<Report>('report');
+    }
+  }
+}
+
+class ReportRepository {
+  late ReportBox _reportBox;
+
+  ReportRepository(ReportBox reportBox) {
+    _reportBox = reportBox;
+  }
+
+  Future<void> add(Report report, {bool overwrite = false}) async {
+    final box = await _reportBox.box;
+    if (!overwrite && box.containsKey(report.id)) return;
+    await box.put(report.id, report);
+  }
+
+  Future<void> addAll(List<Report> reports) async {
+    final box = await _reportBox.box;
+    for (final report in reports) {
+      await box.put(report.id, report);
+    }
+  }
+
+  Future<void> delete(Report report) async {
+    final box = await _reportBox.box;
+    await box.delete(report.id);
+  }
+
+  Future<void> deleteAll() async {
+    final box = await _reportBox.box;
+    await box.deleteFromDisk();
+    await _reportBox.open();
+  }
+
+  Future<List<Report>> getAll() async {
+    final box = await _reportBox.box;
+    return box.values.toList().cast<Report>();
+  }
+
+  Future<void> setArchive(String id, bool value) async {
+    final box = await _reportBox.box;
+    box.get(id).isArchived = value;
   }
 }

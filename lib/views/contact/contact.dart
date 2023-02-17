@@ -20,6 +20,7 @@ class ContactPage extends StatefulWidget {
 
 class _ContactPageState extends State<ContactPage> {
   bool _searchStatus = false;
+  List<Contact> _contacts = [];
   List<Contact> _suggestContacts = [];
 
   @override
@@ -30,12 +31,13 @@ class _ContactPageState extends State<ContactPage> {
           .getSubjects(widget.subject.subjectsName),
       builder: (context, AsyncSnapshot<List<Contact>> snapshot) {
         if (snapshot.hasData) {
-          snapshot.data!.sort(((a, b) => b.compareTo(a)));
+          _contacts = snapshot.data!;
+          _contacts.sort(((a, b) => b.compareTo(a)));
           return Scaffold(
             body: CustomScrollView(
               slivers: [
                 _buildAppBar(context),
-                snapshot.data!.isEmpty
+                _contacts.isEmpty
                     ? SliverFillRemaining(
                         child: Center(
                           child: Column(
@@ -66,9 +68,9 @@ class _ContactPageState extends State<ContactPage> {
                                   childCount: _suggestContacts.length,
                                 )
                               : SliverChildBuilderDelegate(
-                                  (_, index) => _buildCard(
-                                      context, snapshot.data![index]),
-                                  childCount: snapshot.data!.length,
+                                  (_, index) =>
+                                      _buildCard(context, _contacts[index]),
+                                  childCount: _contacts.length,
                                 ),
                         ),
                       )
@@ -99,15 +101,10 @@ class _ContactPageState extends State<ContactPage> {
       ),
       title: _searchStatus
           ? TextField(
-              onChanged: (value) {
-                setState(() async {
-                  _suggestContacts = (await context
-                          .read<ContactRepository>()
-                          .getSubjects(widget.subject.subjectsName))
-                      .where((e) => e.contains(value))
-                      .toList();
-                });
-              },
+              onChanged: (value) => setState(() {
+                _suggestContacts =
+                    _contacts.where((e) => e.contains(value)).toList();
+              }),
               autofocus: true,
               textInputAction: TextInputAction.search,
             )

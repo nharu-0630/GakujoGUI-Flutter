@@ -26,7 +26,7 @@ class Api {
   final Duration _interval = const Duration(milliseconds: 2000);
 
   Future<Settings>? get _settings =>
-      navigatorKey.currentContext?.watch<SettingsRepository>().load();
+      navigatorKey.currentContext?.read<SettingsRepository>().load();
 
   Future<String?> get _username async => (await _settings)?.username;
   Future<String?> get _password async => (await _settings)?.password;
@@ -78,13 +78,10 @@ class Api {
         ],
       );
     }
-    await saveSettings();
   }
 
   Future<void> clearSettings() async =>
       await navigatorKey.currentContext?.watch<SettingsRepository>().delete();
-
-  Future<void> saveSettings() async {}
 
   void _initialize() {
     _client = Dio(BaseOptions(
@@ -597,16 +594,12 @@ class Api {
       },
     );
     _updateToken(response.data, required: true);
-    for (var element in parse(response.data)
-        .querySelectorAll('#searchList > tbody > tr')
-        .map(Report.fromElement)) {
-      // if (!reports.contains(element)) {
-      //   reports.add(element);
-      // } else {
-      //   reports.where((e) => e == element).forEach((e) => e.toRefresh(element));
-      // }
-    }
-    saveSettings();
+
+    navigatorKey.currentContext?.read<ReportRepository>().addAll(
+        parse(response.data)
+            .querySelectorAll('#searchList > tbody > tr')
+            .map(Report.fromElement)
+            .toList());
   }
 
   Future<Report> fetchDetailReport(Report report, {bool bypass = false}) async {
@@ -717,8 +710,11 @@ class Api {
       file.writeAsBytes(response.data);
       report.fileNames?.add(basename(node.text.trim()));
     }
+
     report.toDetail(document);
-    saveSettings();
+    navigatorKey.currentContext
+        ?.read<ReportRepository>()
+        .add(report, overwrite: true);
     return report;
   }
 
@@ -763,16 +759,12 @@ class Api {
       },
     );
     _updateToken(response.data, required: true);
-    for (var element in parse(response.data)
-        .querySelectorAll('#searchList > tbody > tr')
-        .map(Quiz.fromElement)) {
-      // if (!quizzes.contains(element)) {
-      //   quizzes.add(element);
-      // } else {
-      //   quizzes.where((e) => e == element).forEach((e) => e.toRefresh(element));
-      // }
-    }
-    saveSettings();
+
+    navigatorKey.currentContext?.read<QuizRepository>().addAll(
+        parse(response.data)
+            .querySelectorAll('#searchList > tbody > tr')
+            .map(Quiz.fromElement)
+            .toList());
   }
 
   Future<Quiz> fetchDetailQuiz(Quiz quiz, {bool bypass = false}) async {
@@ -880,8 +872,11 @@ class Api {
       file.writeAsBytes(response.data);
       quiz.fileNames?.add(basename(node.text.trim()));
     }
+
     quiz.toDetail(document);
-    saveSettings();
+    navigatorKey.currentContext
+        ?.read<QuizRepository>()
+        .add(quiz, overwrite: true);
     return quiz;
   }
 }

@@ -5,6 +5,7 @@ import 'package:gakujo_task/app.dart';
 import 'package:gakujo_task/models/contact.dart';
 import 'package:gakujo_task/models/quiz.dart';
 import 'package:gakujo_task/models/report.dart';
+import 'package:provider/provider.dart';
 
 class ApiProvider extends ChangeNotifier {
   final Api _api = Api();
@@ -148,11 +149,6 @@ class ApiProvider extends ChangeNotifier {
     }
   }
 
-  void setArchiveReport(String id, bool value) {
-    // _api.reports.where((e) => e.id == id).first.isArchived = value;
-    _api.saveSettings();
-    notifyListeners();
-  }
 
   void fetchQuizzes() async {
     if (isLoading) return;
@@ -174,11 +170,5 @@ class ApiProvider extends ChangeNotifier {
     } catch (e) {
       _onError(e);
     }
-  }
-
-  void setArchiveQuiz(String id, bool value) {
-    // _api.quizzes.where((e) => e.id == id).first.isArchived = value;
-    _api.saveSettings();
-    notifyListeners();
   }
 }

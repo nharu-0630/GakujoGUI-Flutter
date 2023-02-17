@@ -19,64 +19,81 @@ class QuizPage extends StatefulWidget {
 class _QuizPageState extends State<QuizPage> {
   bool _searchStatus = false;
   bool _filterStatus = false;
+  List<Quiz> _quizzes = [];
   List<Quiz> _suggestQuizzes = [];
 
   @override
   Widget build(BuildContext context) {
-    // var quizzes = context
-    //     .watch<ApiProvider>()
-    //     .quizzes
-    //     .where((e) => _filterStatus
-    //         ? !(e.isArchived ||
-    //             !(!e.isSubmitted && e.endDateTime.isAfter(DateTime.now())))
-    //         : true)
-    //     .toList();
-    var quizzes = [];
-    quizzes.sort(((a, b) => b.compareTo(a)));
-    return Scaffold(
-      body: NestedScrollView(
-        headerSliverBuilder: (context, innerBoxScrolled) =>
-            [_buildAppBar(context)],
-        body: RefreshIndicator(
-          onRefresh: () async => context.read<ApiProvider>().fetchQuizzes(),
-          child: quizzes.isEmpty
-              ? LayoutBuilder(
-                  builder: (context, constraints) => SingleChildScrollView(
-                    physics: const AlwaysScrollableScrollPhysics(),
-                    child: ConstrainedBox(
-                      constraints:
-                          BoxConstraints(minHeight: constraints.maxHeight),
-                      child: Center(
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            const Padding(
-                              padding: EdgeInsets.all(8.0),
-                              child: Icon(
-                                Icons.task_rounded,
-                                size: 48.0,
+    return FutureBuilder(
+      future: context.watch<QuizRepository>().getAll(),
+      builder: (context, AsyncSnapshot<List<Quiz>> snapshot) {
+        if (snapshot.hasData) {
+          _quizzes = snapshot.data!;
+          _quizzes.sort(((a, b) => b.compareTo(a)));
+          final filteredQuizzes = _quizzes
+              .where((e) => _filterStatus
+                  ? !(e.isArchived ||
+                      !(!e.isSubmitted &&
+                          e.endDateTime.isAfter(DateTime.now())))
+                  : true)
+              .toList();
+          return Scaffold(
+            body: NestedScrollView(
+              headerSliverBuilder: (context, innerBoxScrolled) =>
+                  [_buildAppBar(context)],
+              body: RefreshIndicator(
+                onRefresh: () async =>
+                    context.read<ApiProvider>().fetchQuizzes(),
+                child: filteredQuizzes.isEmpty
+                    ? LayoutBuilder(
+                        builder: (context, constraints) =>
+                            SingleChildScrollView(
+                          physics: const AlwaysScrollableScrollPhysics(),
+                          child: ConstrainedBox(
+                            constraints: BoxConstraints(
+                                minHeight: constraints.maxHeight),
+                            child: Center(
+                              child: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  const Padding(
+                                    padding: EdgeInsets.all(8.0),
+                                    child: Icon(
+                                      Icons.task_rounded,
+                                      size: 48.0,
+                                    ),
+                                  ),
+                                  Text(
+                                    'タスクはありません',
+                                    style:
+                                        Theme.of(context).textTheme.titleMedium,
+                                  ),
+                                ],
                               ),
                             ),
-                            Text(
-                              'タスクはありません',
-                              style: Theme.of(context).textTheme.titleMedium,
-                            ),
-                          ],
+                          ),
                         ),
+                      )
+                    : ListView.builder(
+                        padding: const EdgeInsets.only(top: 8),
+                        itemCount: _searchStatus
+                            ? _suggestQuizzes.length
+                            : filteredQuizzes.length,
+                        itemBuilder: (context, index) => _searchStatus
+                            ? _buildCard(context, _suggestQuizzes[index])
+                            : _buildCard(context, filteredQuizzes[index]),
                       ),
-                    ),
-                  ),
-                )
-              : ListView.builder(
-                  padding: const EdgeInsets.only(top: 8),
-                  itemCount:
-                      _searchStatus ? _suggestQuizzes.length : quizzes.length,
-                  itemBuilder: (context, index) => _searchStatus
-                      ? _buildCard(context, _suggestQuizzes[index])
-                      : _buildCard(context, quizzes[index]),
-                ),
-        ),
-      ),
+              ),
+            ),
+          );
+        } else {
+          return const Scaffold(
+            body: Center(
+              child: CircularProgressIndicator(),
+            ),
+          );
+        }
+      },
     );
   }
 
@@ -94,12 +111,9 @@ class _QuizPageState extends State<QuizPage> {
       title: _searchStatus
           ? TextField(
               onChanged: (value) {
-                setState(() {
-                  // _suggestQuizzes = context
-                  //     .read<ApiProvider>()
-                  //     .quizzes
-                  //     .where((e) => e.contains(value))
-                  //     .toList();
+                setState(() async {
+                  _suggestQuizzes =
+                      _quizzes.where((e) => e.contains(value)).toList();
                 });
               },
               autofocus: true,
@@ -152,11 +166,10 @@ class _QuizPageState extends State<QuizPage> {
         motion: const DrawerMotion(),
         children: [
           SlidableAction(
-            onPressed: ((context) {
-              context
-                  .read<ApiProvider>()
-                  .setArchiveQuiz(quiz.id, !quiz.isArchived);
-            }),
+            onPressed: (context) => context
+                .read<QuizRepository>()
+                .setArchive(quiz.id, !quiz.isArchived)
+                .then((value) => setState(() {})),
             backgroundColor: const Color(0xFF7BC043),
             foregroundColor: Colors.white,
             icon: quiz.isArchived
@@ -400,8 +413,9 @@ class _QuizPageState extends State<QuizPage> {
                 child: ElevatedButton(
                   onPressed: () {
                     context
-                        .read<ApiProvider>()
-                        .setArchiveQuiz(quiz.id, !quiz.isArchived);
+                        .read<QuizRepository>()
+                        .setArchive(quiz.id, !quiz.isArchived)
+                        .then((value) => setState(() {}));
                     Navigator.of(context).pop();
                   },
                   child: Icon(quiz.isArchived

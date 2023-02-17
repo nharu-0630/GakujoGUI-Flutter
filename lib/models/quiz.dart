@@ -1,27 +1,48 @@
-import 'dart:convert';
-
 import 'package:gakujo_task/api/parse.dart';
+import 'package:hive/hive.dart';
 import 'package:html/dom.dart';
 
+part 'quiz.g.dart';
+
+@HiveType(typeId: 5)
 class Quiz implements Comparable<Quiz> {
+  @HiveField(0)
   String subject;
+  @HiveField(1)
   String title;
+  @HiveField(2)
   String id;
+  @HiveField(3)
   String schoolYear;
+  @HiveField(4)
   String subjectCode;
+  @HiveField(5)
   String classCode;
+  @HiveField(6)
   String status;
+  @HiveField(7)
   DateTime startDateTime = DateTime.fromMicrosecondsSinceEpoch(0);
+  @HiveField(8)
   DateTime endDateTime = DateTime.fromMicrosecondsSinceEpoch(0);
+  @HiveField(9)
   String submissionStatus;
+  @HiveField(10)
   String implementationFormat;
+  @HiveField(11)
   String operation;
+  @HiveField(12)
   int questionsCount;
+  @HiveField(13)
   String evaluationMethod;
+  @HiveField(14)
   String description;
+  @HiveField(15)
   List<String>? fileNames;
+  @HiveField(16)
   String message;
+  @HiveField(17)
   bool isAcquired = false;
+  @HiveField(18)
   bool isArchived = false;
 
   Quiz(
@@ -143,61 +164,6 @@ class Quiz implements Comparable<Quiz> {
     );
   }
 
-  static Map<String, dynamic> toMap(Quiz quiz) => <String, dynamic>{
-        'subject': quiz.subject,
-        'title': quiz.title,
-        'id': quiz.id,
-        'schoolYear': quiz.schoolYear,
-        'subjectCode': quiz.subjectCode,
-        'classCode': quiz.classCode,
-        'status': quiz.status,
-        'startDateTime': quiz.startDateTime.toIso8601String(),
-        'endDateTime': quiz.endDateTime.toIso8601String(),
-        'submissionStatus': quiz.submissionStatus,
-        'implementationFormat': quiz.implementationFormat,
-        'operation': quiz.operation,
-        'questionsCount': quiz.questionsCount,
-        'evaluationMethod': quiz.evaluationMethod,
-        'description': quiz.description,
-        'fileNames': quiz.fileNames,
-        'message': quiz.message,
-        'isAcquired': quiz.isAcquired,
-        'isArchived': quiz.isArchived
-      };
-
-  factory Quiz.fromJson(dynamic json) {
-    json = json as Map<String, dynamic>;
-    return Quiz(
-      json['subject'] as String,
-      json['title'] as String,
-      json['id'] as String,
-      json['schoolYear'] as String,
-      json['subjectCode'] as String,
-      json['classCode'] as String,
-      json['status'] as String,
-      (json['startDateTime'] as String).parseDateTime(),
-      (json['endDateTime'] as String).parseDateTime(),
-      json['submissionStatus'] as String,
-      json['implementationFormat'] as String,
-      json['operation'] as String,
-      json['questionsCount'] as int,
-      json['evaluationMethod'] as String,
-      json['description'] as String,
-      (json['fileNames'] as List<dynamic>?)?.map((e) => e as String).toList(),
-      json['message'] as String,
-      isAcquired: json['isAcquired'] as bool,
-      isArchived: json['isArchived'] as bool,
-    );
-  }
-
-  static String encode(List<Quiz> quizzes) => json.encode(
-        quizzes.map<Map<String, dynamic>>(Quiz.toMap).toList(),
-      );
-
-  static List<Quiz> decode(String quizzes) => json.decode(quizzes) is List
-      ? (json.decode(quizzes) as List).map<Quiz>(Quiz.fromJson).toList()
-      : [];
-
   bool get isSubmitted => submissionStatus != '未提出';
 
   void toRefresh(Quiz quiz) {
@@ -273,5 +239,62 @@ class Quiz implements Comparable<Quiz> {
     }
     var compare4 = id.compareTo(other.id);
     return compare4;
+  }
+}
+
+class QuizBox {
+  Future<Box> box = Hive.openBox<Quiz>('quiz');
+
+  Future<void> open() async {
+    Box b = await box;
+    if (!b.isOpen) {
+      box = Hive.openBox<Quiz>('quiz');
+    }
+  }
+}
+
+class QuizRepository {
+  late QuizBox _quizBox;
+
+  QuizRepository(QuizBox quizBox) {
+    _quizBox = quizBox;
+  }
+
+  Future<void> add(Quiz quiz, {bool overwrite = false}) async {
+    final box = await _quizBox.box;
+    if (!overwrite && box.containsKey(quiz.id)) {
+      Quiz oldQuiz = box.get(quiz.id)!;
+      oldQuiz.toRefresh(quiz);
+      await box.put(quiz.id, oldQuiz);
+    }
+    await box.put(quiz.id, quiz);
+  }
+
+  Future<void> addAll(List<Quiz> quizzes) async {
+    final box = await _quizBox.box;
+    for (final quiz in quizzes) {
+      await box.put(quiz.id, quiz);
+    }
+  }
+
+  Future<void> delete(Quiz quiz) async {
+    final box = await _quizBox.box;
+    await box.delete(quiz.id);
+  }
+
+  Future<void> deleteAll() async {
+    final box = await _quizBox.box;
+    await box.deleteFromDisk();
+    await _quizBox.open();
+  }
+
+  Future<List<Quiz>> getAll() async {
+    final box = await _quizBox.box;
+    return box.values.toList().cast<Quiz>();
+  }
+
+  Future<void> setArchive(String id, bool value) async {
+    final box = await _quizBox.box;
+    box.get(id).isArchived = value;
   }
 }

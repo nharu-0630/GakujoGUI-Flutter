@@ -134,8 +134,8 @@ class _SettingsWidgetState extends State<SettingsWidget> {
                         final settingsRepository = navigatorKey.currentContext
                             ?.read<SettingsRepository>();
                         final settings = await settingsRepository?.load();
-                        settings?.username = _usernameController?.text;
-                        settings?.password = _passwordController?.text;
+                        settings?.username = _usernameController.text;
+                        settings?.password = _passwordController.text;
                         await settingsRepository?.save(settings!);
                       },
                       child: Padding(
@@ -220,10 +220,9 @@ class _SettingsWidgetState extends State<SettingsWidget> {
                         final settingsRepository = navigatorKey.currentContext
                             ?.read<SettingsRepository>();
                         final settings = await settingsRepository?.load();
-                        settings?.year =
-                            int.parse(_yearController?.text ?? '2022');
+                        settings?.year = int.parse(_yearController.text);
                         settings?.semester =
-                            int.parse(_semesterController?.text ?? '3');
+                            int.parse(_semesterController.text);
                         await settingsRepository?.save(settings!);
                       },
                       child: Padding(

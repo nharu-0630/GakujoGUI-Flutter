@@ -19,64 +19,81 @@ class ReportPage extends StatefulWidget {
 class _ReportPageState extends State<ReportPage> {
   bool _searchStatus = false;
   bool _filterStatus = false;
+  List<Report> _reports = [];
   List<Report> _suggestReports = [];
 
   @override
   Widget build(BuildContext context) {
-    // var reports = context
-    //     .watch<ApiProvider>()
-    //     .reports
-    //     .where((e) => _filterStatus
-    //         ? !(e.isArchived ||
-    //             !(!e.isSubmitted && e.endDateTime.isAfter(DateTime.now())))
-    //         : true)
-    //     .toList();
-    var reports = [];
-    reports.sort(((a, b) => b.compareTo(a)));
-    return Scaffold(
-      body: NestedScrollView(
-        headerSliverBuilder: (context, innerBoxScrolled) =>
-            [_buildAppBar(context)],
-        body: RefreshIndicator(
-          onRefresh: () async => context.read<ApiProvider>().fetchReports(),
-          child: reports.isEmpty
-              ? LayoutBuilder(
-                  builder: (context, constraints) => SingleChildScrollView(
-                    physics: const AlwaysScrollableScrollPhysics(),
-                    child: ConstrainedBox(
-                      constraints:
-                          BoxConstraints(minHeight: constraints.maxHeight),
-                      child: Center(
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            const Padding(
-                              padding: EdgeInsets.all(8.0),
-                              child: Icon(
-                                Icons.task_rounded,
-                                size: 48.0,
+    return FutureBuilder(
+      future: context.watch<ReportRepository>().getAll(),
+      builder: (context, AsyncSnapshot<List<Report>> snapshot) {
+        if (snapshot.hasData) {
+          _reports = snapshot.data!;
+          _reports.sort(((a, b) => b.compareTo(a)));
+          final filteredReports = _reports
+              .where((e) => _filterStatus
+                  ? !(e.isArchived ||
+                      !(!e.isSubmitted &&
+                          e.endDateTime.isAfter(DateTime.now())))
+                  : true)
+              .toList();
+          return Scaffold(
+            body: NestedScrollView(
+              headerSliverBuilder: (context, innerBoxScrolled) =>
+                  [_buildAppBar(context)],
+              body: RefreshIndicator(
+                onRefresh: () async =>
+                    context.read<ApiProvider>().fetchReports(),
+                child: filteredReports.isEmpty
+                    ? LayoutBuilder(
+                        builder: (context, constraints) =>
+                            SingleChildScrollView(
+                          physics: const AlwaysScrollableScrollPhysics(),
+                          child: ConstrainedBox(
+                            constraints: BoxConstraints(
+                                minHeight: constraints.maxHeight),
+                            child: Center(
+                              child: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  const Padding(
+                                    padding: EdgeInsets.all(8.0),
+                                    child: Icon(
+                                      Icons.task_rounded,
+                                      size: 48.0,
+                                    ),
+                                  ),
+                                  Text(
+                                    'タスクはありません',
+                                    style:
+                                        Theme.of(context).textTheme.titleMedium,
+                                  ),
+                                ],
                               ),
                             ),
-                            Text(
-                              'タスクはありません',
-                              style: Theme.of(context).textTheme.titleMedium,
-                            ),
-                          ],
+                          ),
                         ),
+                      )
+                    : ListView.builder(
+                        padding: const EdgeInsets.only(top: 8),
+                        itemCount: _searchStatus
+                            ? _suggestReports.length
+                            : filteredReports.length,
+                        itemBuilder: (context, index) => _searchStatus
+                            ? _buildCard(context, _suggestReports[index])
+                            : _buildCard(context, filteredReports[index]),
                       ),
-                    ),
-                  ),
-                )
-              : ListView.builder(
-                  padding: const EdgeInsets.only(top: 8),
-                  itemCount:
-                      _searchStatus ? _suggestReports.length : reports.length,
-                  itemBuilder: (context, index) => _searchStatus
-                      ? _buildCard(context, _suggestReports[index])
-                      : _buildCard(context, reports[index]),
-                ),
-        ),
-      ),
+              ),
+            ),
+          );
+        } else {
+          return const Scaffold(
+            body: Center(
+              child: CircularProgressIndicator(),
+            ),
+          );
+        }
+      },
     );
   }
 
@@ -95,11 +112,8 @@ class _ReportPageState extends State<ReportPage> {
           ? TextField(
               onChanged: (value) {
                 setState(() {
-                  // _suggestReports = context
-                  //     .read<ApiProvider>()
-                  //     .reports
-                  //     .where((e) => e.contains(value))
-                  //     .toList();
+                  _suggestReports =
+                      _reports.where((e) => e.contains(value)).toList();
                 });
               },
               autofocus: true,
@@ -152,11 +166,10 @@ class _ReportPageState extends State<ReportPage> {
         motion: const DrawerMotion(),
         children: [
           SlidableAction(
-            onPressed: ((context) {
-              context
-                  .read<ApiProvider>()
-                  .setArchiveReport(report.id, !report.isArchived);
-            }),
+            onPressed: (context) => context
+                .read<ReportRepository>()
+                .setArchive(report.id, !report.isArchived)
+                .then((value) => setState(() {})),
             backgroundColor: const Color(0xFF7BC043),
             foregroundColor: Colors.white,
             icon: report.isArchived
@@ -402,8 +415,9 @@ class _ReportPageState extends State<ReportPage> {
                 child: ElevatedButton(
                   onPressed: () {
                     context
-                        .read<ApiProvider>()
-                        .setArchiveReport(report.id, !report.isArchived);
+                        .read<ReportRepository>()
+                        .setArchive(report.id, !report.isArchived)
+                        .then((value) => setState(() {}));
                     Navigator.of(context).pop();
                   },
                   child: Icon(report.isArchived
