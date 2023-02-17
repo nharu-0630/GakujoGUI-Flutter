@@ -288,6 +288,11 @@ class QuizRepository {
     await _quizBox.open();
   }
 
+  Future<Quiz?> get(String id) async {
+    final box = await _quizBox.box;
+    return box.get(id);
+  }
+
   Future<List<Quiz>> getAll() async {
     final box = await _quizBox.box;
     return box.values.toList().cast<Quiz>();

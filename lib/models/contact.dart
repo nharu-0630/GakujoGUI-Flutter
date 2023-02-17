@@ -187,6 +187,11 @@ class ContactRepository {
     await _contactBox.open();
   }
 
+  Future<Contact?> get(int key) async {
+    final box = await _contactBox.box;
+    return box.get(key);
+  }
+
   Future<List<Contact>> getAll() async {
     final box = await _contactBox.box;
     return box.values.toList().cast<Contact>();

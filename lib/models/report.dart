@@ -287,6 +287,11 @@ class ReportRepository {
     await _reportBox.open();
   }
 
+  Future<Report?> get(String id) async {
+    final box = await _reportBox.box;
+    return box.get(id);
+  }
+
   Future<List<Report>> getAll() async {
     final box = await _reportBox.box;
     return box.values.toList().cast<Report>();

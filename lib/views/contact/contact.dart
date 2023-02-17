@@ -101,10 +101,8 @@ class _ContactPageState extends State<ContactPage> {
       ),
       title: _searchStatus
           ? TextField(
-              onChanged: (value) => setState(() {
-                _suggestContacts =
-                    _contacts.where((e) => e.contains(value)).toList();
-              }),
+              onChanged: (value) => setState(() => _suggestContacts =
+                  _contacts.where((e) => e.contains(value)).toList()),
               autofocus: true,
               textInputAction: TextInputAction.search,
             )
@@ -112,22 +110,16 @@ class _ContactPageState extends State<ContactPage> {
       actions: _searchStatus
           ? [
               IconButton(
-                onPressed: (() {
-                  setState(() {
-                    _searchStatus = false;
-                  });
-                }),
+                onPressed: (() => setState(() => _searchStatus = false)),
                 icon: const Icon(Icons.close_rounded),
               ),
             ]
           : [
               IconButton(
-                onPressed: (() {
-                  setState(() {
-                    _searchStatus = true;
-                    _suggestContacts = [];
-                  });
-                }),
+                onPressed: (() => setState(() {
+                      _searchStatus = true;
+                      _suggestContacts = [];
+                    })),
                 icon: const Icon(Icons.search_rounded),
               ),
             ],
@@ -152,9 +144,9 @@ class _ContactPageState extends State<ContactPage> {
         ],
       ),
       child: ListTile(
-        onTap: () async {
+        onTap: () {
           if (!contact.isAcquired) {
-            await showDialog(
+            showDialog(
               context: context,
               builder: (_) => CupertinoAlertDialog(
                 content: const Text('未取得の授業です。取得しますか？'),
@@ -175,24 +167,32 @@ class _ContactPageState extends State<ContactPage> {
                 ],
               ),
             );
+          } else {
+            showModalBottomSheet(
+              isScrollControlled: true,
+              shape: const RoundedRectangleBorder(
+                  borderRadius:
+                      BorderRadius.vertical(top: Radius.circular(16.0))),
+              context: context,
+              builder: (context) => DraggableScrollableSheet(
+                expand: false,
+                builder: (context, controller) {
+                  return _buildModal(contact, controller);
+                },
+              ),
+            );
           }
-          showModalBottomSheet(
-            isScrollControlled: true,
-            shape: const RoundedRectangleBorder(
-                borderRadius:
-                    BorderRadius.vertical(top: Radius.circular(16.0))),
-            context: context,
-            builder: (context) => DraggableScrollableSheet(
-              expand: false,
-              builder: (context, controller) {
-                return _buildModal(contact, controller);
-              },
-            ),
-          );
         },
         title: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
+            Visibility(
+              visible: contact.severity == '重要',
+              child: const Padding(
+                padding: EdgeInsets.only(right: 4.0),
+                child: Icon(Icons.label_important_rounded),
+              ),
+            ),
             Expanded(
               child: Text(
                 contact.title,

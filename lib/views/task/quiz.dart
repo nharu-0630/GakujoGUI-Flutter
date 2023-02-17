@@ -110,47 +110,40 @@ class _QuizPageState extends State<QuizPage> {
       ),
       title: _searchStatus
           ? TextField(
-              onChanged: (value) {
-                setState(() async {
-                  _suggestQuizzes =
-                      _quizzes.where((e) => e.contains(value)).toList();
-                });
-              },
+              onChanged: (value) => setState(() => _suggestQuizzes =
+                  _quizzes.where((e) => e.contains(value)).toList()),
               autofocus: true,
               textInputAction: TextInputAction.search,
             )
           : const Text('小テスト'),
       actions: _searchStatus
           ? [
-              IconButton(
-                onPressed: (() {
-                  setState(() {
-                    _searchStatus = false;
-                  });
-                }),
-                icon: const Icon(Icons.close_rounded),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: IconButton(
+                  onPressed: (() => setState(() => _searchStatus = false)),
+                  icon: const Icon(Icons.close_rounded),
+                ),
               ),
             ]
           : [
-              IconButton(
-                onPressed: (() {
-                  setState(() {
-                    _filterStatus = !_filterStatus;
-                  });
-                }),
-                icon: Icon(_filterStatus
-                    ? Icons.filter_alt_rounded
-                    : Icons.filter_alt_off_rounded),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: IconButton(
+                  onPressed: (() =>
+                      setState(() => _filterStatus = !_filterStatus)),
+                  icon: Icon(_filterStatus
+                      ? Icons.filter_alt_rounded
+                      : Icons.filter_alt_off_rounded),
+                ),
               ),
               Padding(
-                padding: const EdgeInsets.only(right: 8.0),
+                padding: const EdgeInsets.all(8.0),
                 child: IconButton(
-                  onPressed: (() {
-                    setState(() {
-                      _searchStatus = true;
-                      _suggestQuizzes = [];
-                    });
-                  }),
+                  onPressed: (() => setState(() {
+                        _searchStatus = true;
+                        _suggestQuizzes = [];
+                      })),
                   icon: const Icon(Icons.search_rounded),
                 ),
               ),
@@ -193,9 +186,9 @@ class _QuizPageState extends State<QuizPage> {
         ],
       ),
       child: ListTile(
-        onTap: () async {
+        onTap: () {
           if (!quiz.isAcquired) {
-            await showDialog(
+            showDialog(
               context: context,
               builder: (_) => CupertinoAlertDialog(
                 content: const Text('未取得の小テストです。取得しますか？'),
@@ -216,20 +209,21 @@ class _QuizPageState extends State<QuizPage> {
                 ],
               ),
             );
+          } else {
+            showModalBottomSheet(
+              isScrollControlled: true,
+              shape: const RoundedRectangleBorder(
+                  borderRadius:
+                      BorderRadius.vertical(top: Radius.circular(16.0))),
+              context: context,
+              builder: (context) => DraggableScrollableSheet(
+                expand: false,
+                builder: (context, controller) {
+                  return _buildModal(quiz, controller);
+                },
+              ),
+            );
           }
-          showModalBottomSheet(
-            isScrollControlled: true,
-            shape: const RoundedRectangleBorder(
-                borderRadius:
-                    BorderRadius.vertical(top: Radius.circular(16.0))),
-            context: context,
-            builder: (context) => DraggableScrollableSheet(
-              expand: false,
-              builder: (context, controller) {
-                return _buildModal(quiz, controller);
-              },
-            ),
-          );
         },
         leading: Icon(
           (() {

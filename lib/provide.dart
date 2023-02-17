@@ -5,7 +5,6 @@ import 'package:gakujo_task/app.dart';
 import 'package:gakujo_task/models/contact.dart';
 import 'package:gakujo_task/models/quiz.dart';
 import 'package:gakujo_task/models/report.dart';
-import 'package:provider/provider.dart';
 
 class ApiProvider extends ChangeNotifier {
   final Api _api = Api();
@@ -46,7 +45,7 @@ class ApiProvider extends ChangeNotifier {
         inMaterialBanner: true,
       ),
     );
-    scaffoldKey.currentState!
+    scaffoldMessengerKey.currentState!
       ..hideCurrentSnackBar()
       ..showSnackBar(snackBar);
   }
@@ -148,7 +147,6 @@ class ApiProvider extends ChangeNotifier {
       _onError(e);
     }
   }
-
 
   void fetchQuizzes() async {
     if (isLoading) return;

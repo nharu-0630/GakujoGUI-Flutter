@@ -122,35 +122,35 @@ class _ReportPageState extends State<ReportPage> {
           : const Text('レポート'),
       actions: _searchStatus
           ? [
-              IconButton(
-                onPressed: (() {
-                  setState(() {
-                    _searchStatus = false;
-                  });
-                }),
-                icon: const Icon(Icons.close_rounded),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: IconButton(
+                  onPressed: (() => setState(() {
+                        _searchStatus = false;
+                      })),
+                  icon: const Icon(Icons.close_rounded),
+                ),
               ),
             ]
           : [
-              IconButton(
-                onPressed: (() {
-                  setState(() {
-                    _filterStatus = !_filterStatus;
-                  });
-                }),
-                icon: Icon(_filterStatus
-                    ? Icons.filter_alt_rounded
-                    : Icons.filter_alt_off_rounded),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: IconButton(
+                  onPressed: (() => setState(() {
+                        _filterStatus = !_filterStatus;
+                      })),
+                  icon: Icon(_filterStatus
+                      ? Icons.filter_alt_rounded
+                      : Icons.filter_alt_off_rounded),
+                ),
               ),
               Padding(
-                padding: const EdgeInsets.only(right: 8.0),
+                padding: const EdgeInsets.all(8.0),
                 child: IconButton(
-                  onPressed: (() {
-                    setState(() {
-                      _searchStatus = true;
-                      _suggestReports = [];
-                    });
-                  }),
+                  onPressed: (() => setState(() {
+                        _searchStatus = true;
+                        _suggestReports = [];
+                      })),
                   icon: const Icon(Icons.search_rounded),
                 ),
               ),
@@ -193,9 +193,9 @@ class _ReportPageState extends State<ReportPage> {
         ],
       ),
       child: ListTile(
-        onTap: () async {
+        onTap: () {
           if (!report.isAcquired) {
-            await showDialog(
+            showDialog(
               context: context,
               builder: (_) => CupertinoAlertDialog(
                 content: const Text('未取得のレポートです。取得しますか？'),
@@ -216,20 +216,21 @@ class _ReportPageState extends State<ReportPage> {
                 ],
               ),
             );
+          } else {
+            showModalBottomSheet(
+              isScrollControlled: true,
+              shape: const RoundedRectangleBorder(
+                  borderRadius:
+                      BorderRadius.vertical(top: Radius.circular(16.0))),
+              context: context,
+              builder: (context) => DraggableScrollableSheet(
+                expand: false,
+                builder: (context, controller) {
+                  return _buildModal(report, controller);
+                },
+              ),
+            );
           }
-          showModalBottomSheet(
-            isScrollControlled: true,
-            shape: const RoundedRectangleBorder(
-                borderRadius:
-                    BorderRadius.vertical(top: Radius.circular(16.0))),
-            context: context,
-            builder: (context) => DraggableScrollableSheet(
-              expand: false,
-              builder: (context, controller) {
-                return _buildModal(report, controller);
-              },
-            ),
-          );
         },
         leading: Icon(
           (() {
