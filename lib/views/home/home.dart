@@ -102,6 +102,8 @@ class _HomeWidgetState extends State<HomeWidget> {
             child: DrawerHeader(
               child: Column(
                 children: [
+                  Text('GakujoTask',
+                      style: Theme.of(context).textTheme.titleLarge),
                   FutureBuilder(
                     future: context.watch<SettingsRepository>().load(),
                     builder: ((context, AsyncSnapshot<Settings> snapshot) =>
