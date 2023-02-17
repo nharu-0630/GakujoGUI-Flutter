@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:gakujo_task/constants/colors.dart';
-import 'package:gakujo_task/provide.dart';
 import 'package:gakujo_task/views/task/quiz.dart';
 import 'package:gakujo_task/views/task/report.dart';
-import 'package:provider/provider.dart';
 
 class TaskWidget extends StatelessWidget {
   const TaskWidget({Key? key}) : super(key: key);
@@ -46,14 +44,14 @@ class TaskWidget extends StatelessWidget {
                 'レポート',
                 style: Theme.of(context).textTheme.titleLarge,
               ),
-              Align(
-                alignment: Alignment.centerRight,
-                child: _buildStatus(
-                  context,
-                  kYellowDark.withOpacity(0.4),
-                  '残り ${context.watch<ApiProvider>().reports.where((e) => !(e.isArchived || !(!e.isSubmitted && e.endDateTime.isAfter(DateTime.now())))).length}',
-                ),
-              )
+              // Align(
+              //   alignment: Alignment.centerRight,
+              //   child: _buildStatus(
+              //     context,
+              //     kYellowDark.withOpacity(0.4),
+              //     '残り ${context.watch<ApiProvider>().reports.where((e) => !(e.isArchived || !(!e.isSubmitted && e.endDateTime.isAfter(DateTime.now())))).length}',
+              //   ),
+              // )
             ],
           ),
         ),
@@ -83,14 +81,14 @@ class TaskWidget extends StatelessWidget {
                 '小テスト',
                 style: Theme.of(context).textTheme.titleLarge,
               ),
-              Align(
-                alignment: Alignment.centerRight,
-                child: _buildStatus(
-                  context,
-                  kRedDark.withOpacity(0.4),
-                  '残り ${context.watch<ApiProvider>().quizzes.where((e) => !(e.isArchived || !(!e.isSubmitted && e.endDateTime.isAfter(DateTime.now())))).length}',
-                ),
-              )
+              // Align(
+              //   alignment: Alignment.centerRight,
+              //   child: _buildStatus(
+              //     context,
+              //     kRedDark.withOpacity(0.4),
+              //     '残り ${context.watch<ApiProvider>().quizzes.where((e) => !(e.isArchived || !(!e.isSubmitted && e.endDateTime.isAfter(DateTime.now())))).length}',
+              //   ),
+              // )
             ],
           ),
         ),

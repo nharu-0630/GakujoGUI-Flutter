@@ -5,16 +5,10 @@ import 'package:gakujo_task/app.dart';
 import 'package:gakujo_task/models/contact.dart';
 import 'package:gakujo_task/models/quiz.dart';
 import 'package:gakujo_task/models/report.dart';
-import 'package:gakujo_task/models/settings.dart';
-import 'package:gakujo_task/models/subject.dart';
 
 class ApiProvider extends ChangeNotifier {
   final Api _api = Api();
   String get token => _api.token;
-  Settings get settings => _api.settings;
-  List<Subject> get subjects => _api.subjects;
-  List<Report> get reports => _api.reports;
-  List<Quiz> get quizzes => _api.quizzes;
 
   bool get isLoading => _isLoading;
   bool _isLoading = false;
@@ -155,7 +149,7 @@ class ApiProvider extends ChangeNotifier {
   }
 
   void setArchiveReport(String id, bool value) {
-    _api.reports.where((e) => e.id == id).first.isArchived = value;
+    // _api.reports.where((e) => e.id == id).first.isArchived = value;
     _api.saveSettings();
     notifyListeners();
   }
@@ -183,20 +177,8 @@ class ApiProvider extends ChangeNotifier {
   }
 
   void setArchiveQuiz(String id, bool value) {
-    _api.quizzes.where((e) => e.id == id).first.isArchived = value;
+    // _api.quizzes.where((e) => e.id == id).first.isArchived = value;
     _api.saveSettings();
     notifyListeners();
-  }
-
-  void setUserInfo(String username, String password) {
-    _api.settings.username = username;
-    _api.settings.password = password;
-    _api.saveSettings();
-  }
-
-  void setSemester(int? year, int? semester) {
-    if (year != null) _api.settings.year = year;
-    if (semester != null) _api.settings.semester = semester;
-    _api.refreshSemester();
   }
 }

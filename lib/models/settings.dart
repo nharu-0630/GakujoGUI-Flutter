@@ -1,15 +1,28 @@
-import 'package:gakujo_task/api/parse.dart';
+import 'package:hive/hive.dart';
 
+part 'settings.g.dart';
+
+@HiveType(typeId: 3)
 class Settings {
+  @HiveField(0)
   String? username;
+  @HiveField(1)
   String? password;
+  @HiveField(2)
   int? year;
+  @HiveField(3)
   int? semester;
+  @HiveField(4)
   String? fullName;
+  @HiveField(5)
   String? profileImage;
+  @HiveField(6)
   DateTime lastLoginTime = DateTime.fromMicrosecondsSinceEpoch(0);
+  @HiveField(7)
   String? accessEnvironmentName;
+  @HiveField(8)
   String? accessEnvironmentKey;
+  @HiveField(9)
   String? accessEnvironmentValue;
 
   Settings(
@@ -24,33 +37,43 @@ class Settings {
     this.accessEnvironmentKey,
     this.accessEnvironmentValue,
   );
+}
 
-  static Map<String, dynamic> toMap(Settings settings) => <String, dynamic>{
-        'username': settings.username,
-        'password': settings.password,
-        'year': settings.year,
-        'semester': settings.semester,
-        'fullName': settings.fullName,
-        'profileImage': settings.profileImage,
-        'lastLoginTime': settings.lastLoginTime.toIso8601String(),
-        'accessEnvironmentName': settings.accessEnvironmentName,
-        'accessEnvironmentKey': settings.accessEnvironmentKey,
-        'accessEnvironmentValue': settings.accessEnvironmentValue,
-      };
+class SettingsBox {
+  Future<Box> box = Hive.openBox<Settings>('settings');
 
-  factory Settings.fromJson(dynamic json) {
-    json = json as Map<String, dynamic>;
-    return Settings(
-      json['username'] as String?,
-      json['password'] as String?,
-      json['year'] as int?,
-      json['semester'] as int?,
-      json['fullName'] as String?,
-      json['profileImage'] as String?,
-      (json['lastLoginTime'] as String).parseDateTime(),
-      json['accessEnvironmentName'] as String?,
-      json['accessEnvironmentKey'] as String?,
-      json['accessEnvironmentValue'] as String?,
-    );
+  Future<void> open() async {
+    Box b = await box;
+    if (!b.isOpen) {
+      box = Hive.openBox<Settings>('settings');
+    }
+  }
+}
+
+class SettingsRepository {
+  late SettingsBox _settingsBox;
+
+  SettingsRepository(SettingsBox settingsBox) {
+    _settingsBox = settingsBox;
+  }
+
+  Future<void> save(Settings settings) async {
+    await _settingsBox.open();
+    Box b = await _settingsBox.box;
+    await b.put('settings', settings);
+  }
+
+  Future<Settings> load() async {
+    await _settingsBox.open();
+    Box b = await _settingsBox.box;
+    return b.get('settings') ??
+        Settings(null, null, null, null, null, null,
+            DateTime.fromMicrosecondsSinceEpoch(0), null, null, null);
+  }
+
+  Future<void> delete() async {
+    await _settingsBox.open();
+    Box b = await _settingsBox.box;
+    await b.delete('settings');
   }
 }

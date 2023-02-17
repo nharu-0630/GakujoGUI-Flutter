@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:gakujo_task/app.dart';
 import 'package:gakujo_task/models/contact.dart';
-import 'package:gakujo_task/models/contact_repository.dart';
 import 'package:gakujo_task/models/subject.dart';
 import 'package:gakujo_task/provide.dart';
 import 'package:gakujo_task/views/common/widget.dart';
@@ -27,7 +26,7 @@ class _ContactPageState extends State<ContactPage> {
   Widget build(BuildContext context) {
     return FutureBuilder(
       future: context
-          .read<ContactRepository>()
+          .watch<ContactRepository>()
           .getSubjects(widget.subject.subjectsName),
       builder: (context, AsyncSnapshot<List<Contact>> snapshot) {
         if (snapshot.hasData) {

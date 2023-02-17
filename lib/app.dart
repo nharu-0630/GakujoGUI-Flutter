@@ -1,5 +1,6 @@
 import 'package:cached_memory_image/provider/cached_memory_image_provider.dart';
 import 'package:flutter/material.dart';
+import 'package:gakujo_task/models/settings.dart';
 import 'package:gakujo_task/provide.dart';
 import 'package:gakujo_task/views/home/home.dart';
 import 'package:gakujo_task/views/settings/settings.dart';
@@ -46,32 +47,52 @@ class _AppState extends State<App> {
   }
 
   AppBar _buildAppBar() {
-    var settings = context.watch<ApiProvider>().settings;
     return AppBar(
-      leading: Padding(
-        padding: const EdgeInsets.only(left: 16.0),
-        child: settings.profileImage == null
-            ? const Icon(Icons.person_rounded, size: 36.0)
-            : CircleAvatar(
-                backgroundImage: CachedMemoryImageProvider('ProfileImage',
-                    base64: settings.profileImage),
-              ),
+      leading: FutureBuilder(
+        future: context.watch<SettingsRepository>().load(),
+        builder: (context, AsyncSnapshot<Settings> snapshot) {
+          if (snapshot.hasData) {
+            return Padding(
+              padding: const EdgeInsets.only(left: 16.0),
+              child: snapshot.data?.profileImage == null
+                  ? const Icon(Icons.person_rounded, size: 36.0)
+                  : CircleAvatar(
+                      backgroundImage: CachedMemoryImageProvider('ProfileImage',
+                          base64: snapshot.data?.profileImage),
+                    ),
+            );
+          } else {
+            return const SizedBox.shrink();
+          }
+        },
       ),
       centerTitle: false,
-      title: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Row(
-          children: [
-            Text(
-              settings.fullName == null ? 'Hi!' : 'Hi, ${settings.fullName}!',
-            ),
-            const Spacer(),
-            IconButton(
-              icon: const Icon(Icons.sync_rounded),
-              onPressed: () async => context.read<ApiProvider>().fetchLogin(),
-            ),
-          ],
-        ),
+      title: FutureBuilder(
+        future: context.watch<SettingsRepository>().load(),
+        builder: (context, AsyncSnapshot<Settings> snapshot) {
+          if (snapshot.hasData) {
+            return Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Row(
+                children: [
+                  Text(
+                    snapshot.data?.fullName == null
+                        ? 'Hi!'
+                        : 'Hi, ${snapshot.data?.fullName}!',
+                  ),
+                  const Spacer(),
+                  IconButton(
+                    icon: const Icon(Icons.sync_rounded),
+                    onPressed: () async =>
+                        context.read<ApiProvider>().fetchLogin(),
+                  ),
+                ],
+              ),
+            );
+          } else {
+            return const SizedBox.shrink();
+          }
+        },
       ),
       bottom: buildAppBarBottom(context),
     );

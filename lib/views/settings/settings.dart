@@ -2,6 +2,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:gakujo_task/api/api.dart';
+import 'package:gakujo_task/app.dart';
+import 'package:gakujo_task/models/settings.dart';
 import 'package:gakujo_task/provide.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:provider/provider.dart';
@@ -15,27 +17,40 @@ class SettingsWidget extends StatefulWidget {
 }
 
 class _SettingsWidgetState extends State<SettingsWidget> {
-  late TextEditingController _usernameController;
-  late TextEditingController _passwordController;
-  late TextEditingController _yearController;
-  late TextEditingController _semesterController;
+  TextEditingController _usernameController = TextEditingController();
+  TextEditingController _passwordController = TextEditingController();
+  TextEditingController _yearController = TextEditingController();
+  TextEditingController _semesterController = TextEditingController();
 
   var _isObscure = true;
 
   @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    var settings = context.watch<ApiProvider>().settings;
-    _usernameController = TextEditingController(text: settings.username);
-    _passwordController = TextEditingController(text: settings.password);
-    _yearController = TextEditingController(text: settings.year.toString());
-    _semesterController =
-        TextEditingController(text: settings.semester.toString());
+  void initState() {
+    super.initState();
+    initValue();
+  }
+
+  void initValue() {
+    navigatorKey.currentContext?.watch<SettingsRepository>().load().then(
+      (value) {
+        setState(
+          () {
+            _usernameController =
+                TextEditingController(text: value.username ?? '');
+            _passwordController =
+                TextEditingController(text: value.password ?? '');
+            _yearController =
+                TextEditingController(text: value.year.toString());
+            _semesterController =
+                TextEditingController(text: value.semester.toString());
+          },
+        );
+      },
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    var settings = context.watch<ApiProvider>().settings;
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: ListView(
@@ -115,10 +130,14 @@ class _SettingsWidgetState extends State<SettingsWidget> {
                         foregroundColor:
                             Theme.of(context).colorScheme.onPrimary,
                       ),
-                      onPressed: () async => setState(() => context
-                          .read<ApiProvider>()
-                          .setUserInfo(_usernameController.text,
-                              _passwordController.text)),
+                      onPressed: () async {
+                        final settingsRepository = navigatorKey.currentContext
+                            ?.read<SettingsRepository>();
+                        final settings = await settingsRepository?.load();
+                        settings?.username = _usernameController?.text;
+                        settings?.password = _passwordController?.text;
+                        await settingsRepository?.save(settings!);
+                      },
                       child: Padding(
                         padding: const EdgeInsets.all(8.0),
                         child: Row(
@@ -197,10 +216,16 @@ class _SettingsWidgetState extends State<SettingsWidget> {
                         foregroundColor:
                             Theme.of(context).colorScheme.onPrimary,
                       ),
-                      onPressed: () async => setState(() => context
-                          .read<ApiProvider>()
-                          .setSemester(int.tryParse(_yearController.text),
-                              int.tryParse(_semesterController.text))),
+                      onPressed: () async {
+                        final settingsRepository = navigatorKey.currentContext
+                            ?.read<SettingsRepository>();
+                        final settings = await settingsRepository?.load();
+                        settings?.year =
+                            int.parse(_yearController?.text ?? '2022');
+                        settings?.semester =
+                            int.parse(_semesterController?.text ?? '3');
+                        await settingsRepository?.save(settings!);
+                      },
                       child: Padding(
                         padding: const EdgeInsets.all(8.0),
                         child: Row(
@@ -359,15 +384,15 @@ class _SettingsWidgetState extends State<SettingsWidget> {
               padding: const EdgeInsets.symmetric(horizontal: 16.0),
               child: Column(
                 children: [
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Align(
-                      alignment: Alignment.topLeft,
-                      child: Text(
-                        'Token: ${context.watch<ApiProvider>().token} \nAccessEnvironmentName: ${settings.accessEnvironmentName} \nAccessEnvironmentKey: ${settings.accessEnvironmentKey} \nAccessEnvironmentValue: ${settings.accessEnvironmentValue} \nUsername: ${settings.username} \nYear: ${settings.year} \nSemester: ${settings.semester} ',
-                      ),
-                    ),
-                  ),
+                  // Padding(
+                  //   padding: const EdgeInsets.all(8.0),
+                  //   child: Align(
+                  //     alignment: Alignment.topLeft,
+                  //     child: Text(
+                  //       'Token: ${context.watch<ApiProvider>().token} \nAccessEnvironmentName: ${settings.accessEnvironmentName} \nAccessEnvironmentKey: ${settings.accessEnvironmentKey} \nAccessEnvironmentValue: ${settings.accessEnvironmentValue} \nUsername: ${settings.username} \nYear: ${settings.year} \nSemester: ${settings.semester} \n',
+                  //     ),
+                  //   ),
+                  // ),
                   const Padding(
                     padding: EdgeInsets.all(4.0),
                     child: Divider(thickness: 2.0),

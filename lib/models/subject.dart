@@ -2,13 +2,21 @@ import 'dart:convert';
 import 'dart:ui';
 
 import 'package:crypto/crypto.dart' show md5;
+import 'package:hive/hive.dart';
 import 'package:html/dom.dart';
 
+part 'subject.g.dart';
+
+@HiveType(typeId: 2)
 class Subject implements Comparable<Subject> {
+  @HiveField(0)
   String subjectsName;
+  @HiveField(1)
   String teacherName;
+  @HiveField(2)
   String classRoom;
-  Color subjectColor;
+  @HiveField(3)
+  int? subjectColor;
 
   Subject(
     this.subjectsName,
@@ -28,31 +36,9 @@ class Subject implements Comparable<Subject> {
           .replaceAll(RegExp(r'（.*）(.*)'), ''),
       element.querySelectorAll('li')[1].text.trim(),
       element.querySelectorAll('li')[2].text.trim(),
-      Color(int.parse('0xFF${bytes.toString().substring(0, 6)}')),
+      int.parse('0xFF${bytes.toString().substring(0, 6)}'),
     );
   }
-
-  static Map<String, dynamic> toMap(Subject subject) => <String, dynamic>{
-        'subjectsName': subject.subjectsName,
-        'teacherName': subject.teacherName,
-        'classRoom': subject.classRoom,
-        'subjectColor': subject.subjectColor.value,
-      };
-
-  factory Subject.fromJson(dynamic json) => Subject(
-        json['subjectsName'] as String,
-        json['teacherName'] as String,
-        json['classRoom'] as String,
-        Color(json['subjectColor']),
-      );
-
-  static String encode(List<Subject> subjects) => json.encode(
-        subjects.map<Map<String, dynamic>>(Subject.toMap).toList(),
-      );
-
-  static List<Subject> decode(String subjects) => json.decode(subjects) is List
-      ? (json.decode(subjects) as List).map<Subject>(Subject.fromJson).toList()
-      : [];
 
   @override
   bool operator ==(Object other) {
@@ -83,5 +69,52 @@ class Subject implements Comparable<Subject> {
     }
     var compare3 = classRoom.compareTo(other.classRoom);
     return compare3;
+  }
+}
+
+class SubjectBox {
+  Future<Box> box = Hive.openBox<Subject>('subject');
+
+  Future<void> open() async {
+    Box b = await box;
+    if (!b.isOpen) {
+      box = Hive.openBox<Subject>('subject');
+    }
+  }
+}
+
+class SubjectRepository {
+  late SubjectBox _subjectBox;
+
+  SubjectRepository(SubjectBox subjectBox) {
+    _subjectBox = subjectBox;
+  }
+
+  Future<void> add(Subject subject, {bool overwrite = false}) async {
+    final box = await _subjectBox.box;
+    if (!overwrite && box.containsKey(subject.hashCode)) return;
+    await box.put(subject.hashCode, subject);
+  }
+
+  Future<void> addAll(List<Subject> subjects) async {
+    final box = await _subjectBox.box;
+    for (final subject in subjects) {
+      await box.put(subject.hashCode, subject);
+    }
+  }
+
+  Future<void> delete(Subject subjects) async {
+    final box = await _subjectBox.box;
+    await box.delete(subjects.hashCode);
+  }
+
+  Future<void> deleteAll() async {
+    final box = await _subjectBox.box;
+    await box.deleteAll(box.keys);
+  }
+
+  Future<List<Subject>> getAll() async {
+    final box = await _subjectBox.box;
+    return box.values.toList().cast<Subject>();
   }
 }

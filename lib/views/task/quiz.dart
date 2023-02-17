@@ -23,14 +23,15 @@ class _QuizPageState extends State<QuizPage> {
 
   @override
   Widget build(BuildContext context) {
-    var quizzes = context
-        .watch<ApiProvider>()
-        .quizzes
-        .where((e) => _filterStatus
-            ? !(e.isArchived ||
-                !(!e.isSubmitted && e.endDateTime.isAfter(DateTime.now())))
-            : true)
-        .toList();
+    // var quizzes = context
+    //     .watch<ApiProvider>()
+    //     .quizzes
+    //     .where((e) => _filterStatus
+    //         ? !(e.isArchived ||
+    //             !(!e.isSubmitted && e.endDateTime.isAfter(DateTime.now())))
+    //         : true)
+    //     .toList();
+    var quizzes = [];
     quizzes.sort(((a, b) => b.compareTo(a)));
     return Scaffold(
       body: NestedScrollView(
@@ -94,11 +95,11 @@ class _QuizPageState extends State<QuizPage> {
           ? TextField(
               onChanged: (value) {
                 setState(() {
-                  _suggestQuizzes = context
-                      .read<ApiProvider>()
-                      .quizzes
-                      .where((e) => e.contains(value))
-                      .toList();
+                  // _suggestQuizzes = context
+                  //     .read<ApiProvider>()
+                  //     .quizzes
+                  //     .where((e) => e.contains(value))
+                  //     .toList();
                 });
               },
               autofocus: true,

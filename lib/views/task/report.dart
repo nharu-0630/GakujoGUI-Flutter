@@ -23,14 +23,15 @@ class _ReportPageState extends State<ReportPage> {
 
   @override
   Widget build(BuildContext context) {
-    var reports = context
-        .watch<ApiProvider>()
-        .reports
-        .where((e) => _filterStatus
-            ? !(e.isArchived ||
-                !(!e.isSubmitted && e.endDateTime.isAfter(DateTime.now())))
-            : true)
-        .toList();
+    // var reports = context
+    //     .watch<ApiProvider>()
+    //     .reports
+    //     .where((e) => _filterStatus
+    //         ? !(e.isArchived ||
+    //             !(!e.isSubmitted && e.endDateTime.isAfter(DateTime.now())))
+    //         : true)
+    //     .toList();
+    var reports = [];
     reports.sort(((a, b) => b.compareTo(a)));
     return Scaffold(
       body: NestedScrollView(
@@ -94,11 +95,11 @@ class _ReportPageState extends State<ReportPage> {
           ? TextField(
               onChanged: (value) {
                 setState(() {
-                  _suggestReports = context
-                      .read<ApiProvider>()
-                      .reports
-                      .where((e) => e.contains(value))
-                      .toList();
+                  // _suggestReports = context
+                  //     .read<ApiProvider>()
+                  //     .reports
+                  //     .where((e) => e.contains(value))
+                  //     .toList();
                 });
               },
               autofocus: true,

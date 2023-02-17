@@ -6,11 +6,9 @@ import 'package:dio/dio.dart';
 import 'package:dio_cookie_manager/dio_cookie_manager.dart';
 import 'package:dio_smart_retry/dio_smart_retry.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:gakujo_task/api/parse.dart';
 import 'package:gakujo_task/app.dart';
 import 'package:gakujo_task/models/contact.dart';
-import 'package:gakujo_task/models/contact_repository.dart';
 import 'package:gakujo_task/models/quiz.dart';
 import 'package:gakujo_task/models/report.dart';
 import 'package:gakujo_task/models/settings.dart';
@@ -27,10 +25,13 @@ class Api {
 
   final Duration _interval = const Duration(milliseconds: 2000);
 
-  String get _username => settings.username ?? '';
-  String get _password => settings.password ?? '';
-  int get _year => settings.year ?? 2022;
-  int get _semester => settings.semester ?? 3;
+  Future<Settings>? get _settings =>
+      navigatorKey.currentContext?.watch<SettingsRepository>().load();
+
+  Future<String?> get _username async => (await _settings)?.username;
+  Future<String?> get _password async => (await _settings)?.password;
+  Future<int> get _year async => (await _settings)?.year ?? 2022;
+  Future<int> get _semester async => (await _settings)?.semester ?? 3;
 
   Dio _client = Dio();
   CookieJar _cookieJar = CookieJar();
@@ -39,21 +40,14 @@ class Api {
     loadSettings();
   }
 
-  String get _schoolYear => _year.toString();
-  String get _semesterCode => (_semester < 2 ? 1 : 2).toString();
-  String get _reportDateStart =>
-      '$_schoolYear/${_semester < 2 ? '04' : '10'}/01';
-  // String get _reportDateEnd => '$_schoolYear/${_semester < 2 ? '09' : '03'}/01';
-  String get _suffix => '_$_schoolYear$_semesterCode';
+  Future<String> get _schoolYear async => (await _year).toString();
+  Future<String> get _semesterCode async =>
+      ((await _semester) < 2 ? 1 : 2).toString();
+  Future<String> get _reportDateStart async =>
+      '${await _schoolYear}/${(await _semester) < 2 ? '04' : '10'}/01';
 
   String _token = '';
   String get token => _token;
-
-  Settings settings = Settings(null, null, null, null, null, null,
-      DateTime.fromMicrosecondsSinceEpoch(0), null, null, null);
-  List<Subject> subjects = [];
-  List<Report> reports = [];
-  List<Quiz> quizzes = [];
 
   bool _updateToken(dynamic data, {bool required = false}) {
     _token =
@@ -71,82 +65,26 @@ class Api {
   }
 
   Future<void> loadSettings() async {
-    var storage = FlutterSecureStorage(
-        aOptions: Platform.isAndroid
-            ? const AndroidOptions(
-                encryptedSharedPreferences: true,
-              )
-            : AndroidOptions.defaultOptions);
-    if (!(await storage.containsKey(key: 'Settings'))) {
-      return;
-    }
-    settings =
-        Settings.fromJson(json.decode((await storage.read(key: 'Settings'))!));
-    if (settings.accessEnvironmentKey != null &&
-        settings.accessEnvironmentValue != null) {
+    final settings = await _settings;
+    if (settings?.accessEnvironmentKey != null &&
+        settings?.accessEnvironmentValue != null) {
       _cookieJar.saveFromResponse(
         Uri.https('gakujo.shizuoka.ac.jp', '/portal'),
         [
           Cookie(
-            settings.accessEnvironmentKey!,
+            settings!.accessEnvironmentKey!,
             settings.accessEnvironmentValue!,
           )
         ],
       );
     }
-    if (!(await storage.containsKey(key: 'Subjects$_suffix'))) {
-      subjects = Subject.decode((await storage.read(key: 'Subjects$_suffix'))!);
-    }
-    if (!(await storage.containsKey(key: 'Reports$_suffix'))) {
-      reports = Report.decode((await storage.read(key: 'Reports$_suffix'))!);
-    }
-    if (!(await storage.containsKey(key: 'Quizzes$_suffix'))) {
-      quizzes = Quiz.decode((await storage.read(key: 'Quizzes$_suffix'))!);
-    }
     await saveSettings();
   }
 
-  Future<void> refreshSemester() async {
-    var storage = FlutterSecureStorage(
-        aOptions: Platform.isAndroid
-            ? const AndroidOptions(
-                encryptedSharedPreferences: true,
-              )
-            : AndroidOptions.defaultOptions);
-    await storage.write(
-        key: 'Settings', value: json.encode(Settings.toMap(settings)));
-    loadSettings();
-  }
+  Future<void> clearSettings() async =>
+      await navigatorKey.currentContext?.watch<SettingsRepository>().delete();
 
-  Future<void> clearSettings() async {
-    var storage = FlutterSecureStorage(
-        aOptions: Platform.isAndroid
-            ? const AndroidOptions(
-                encryptedSharedPreferences: true,
-              )
-            : AndroidOptions.defaultOptions);
-    await storage.write(
-        key: 'Settings',
-        value: json.encode(Settings.toMap(Settings(null, null, null, null, null,
-            null, DateTime.fromMicrosecondsSinceEpoch(0), null, null, null))));
-    await storage.write(key: 'Subjects$_suffix', value: Subject.encode([]));
-    await storage.write(key: 'Reports$_suffix', value: Report.encode([]));
-    await storage.write(key: 'Quizzes$_suffix', value: Quiz.encode([]));
-  }
-
-  Future<void> saveSettings() async {
-    // const storage = FlutterSecureStorage(
-    //   aOptions: AndroidOptions(
-    //     encryptedSharedPreferences: true,
-    //   ),
-    // );
-    // await storage.write(
-    //     key: 'Settings', value: json.encode(Settings.toMap(settings)));
-    // await storage.write(
-    //     key: 'Subjects$_suffix', value: Subject.encode(subjects));
-    // await storage.write(key: 'Reports$_suffix', value: Report.encode(reports));
-    // await storage.write(key: 'Quizzes$_suffix', value: Quiz.encode(quizzes));
-  }
+  Future<void> saveSettings() async {}
 
   void _initialize() {
     _client = Dio(BaseOptions(
@@ -255,7 +193,8 @@ class Api {
             'execution': 'e1s1',
           },
         ),
-        data: 'j_username=$_username&j_password=$_password&_eventId_proceed=',
+        data:
+            'j_username=${await _username}&j_password=${await _password}&_eventId_proceed=',
         options: Options(
           followRedirects: false,
           headers: {
@@ -337,12 +276,14 @@ class Api {
 
     _updateToken(response.data);
 
+    final settings = await _settings;
     if (parse(response.data)
         .querySelectorAll(
             '#container > div > form > div:nth-child(2) > div.access_env > table > tbody > tr > td > input[type=text]')
         .isNotEmpty) {
       var accessEnvName = 'GakujoTask ${(const Uuid()).v4().substring(0, 8)}';
-      settings.accessEnvironmentName = accessEnvName;
+
+      settings?.accessEnvironmentName = accessEnvName;
       await Future.delayed(_interval);
       response = await _client.postUri<dynamic>(
         Uri.https(
@@ -369,10 +310,10 @@ class Api {
     var name = parse(response.data)
         .querySelector('#header-cog > li > a > span > span')
         ?.text;
-    settings.fullName =
+    settings?.fullName =
         name?.substring(0, name.indexOf('さん')).replaceAll('　', '');
 
-    if (settings.profileImage == null) {
+    if (settings?.profileImage == null) {
       await Future.delayed(_interval);
       response = await _client.getUri<dynamic>(
         Uri.https(
@@ -384,9 +325,9 @@ class Api {
         ),
         options: Options(responseType: ResponseType.bytes),
       );
-      settings.profileImage = base64.encode(response.data);
+      settings?.profileImage = base64.encode(response.data);
     }
-    settings.lastLoginTime = DateTime.now();
+    settings?.lastLoginTime = DateTime.now();
     List<Cookie> cookies = (await _cookieJar
         .loadForRequest(Uri.https('gakujo.shizuoka.ac.jp', '/portal')));
     if (cookies
@@ -399,10 +340,10 @@ class Api {
             (element) => element.name.contains('Access-Environment-Cookie'),
           )
           .first;
-      settings.accessEnvironmentKey = cookie.name;
-      settings.accessEnvironmentValue = cookie.value;
+      settings?.accessEnvironmentKey = cookie.name;
+      settings?.accessEnvironmentValue = cookie.value;
     }
-    await saveSettings();
+    navigatorKey.currentContext?.read<SettingsRepository>().save(settings!);
   }
 
   Future<void> fetchContacts() async {
@@ -429,8 +370,8 @@ class Api {
       data: {
         'org.apache.struts.taglib.html.TOKEN': _token,
         'teacherCode': '',
-        'schoolYear': _schoolYear,
-        'semesterCode': _semesterCode,
+        'schoolYear': await _schoolYear,
+        'semesterCode': await _semesterCode,
         'subjectDispCode': '',
         'searchKeyWord': '',
         'checkSearchKeywordTeacherUserName': 'on',
@@ -444,16 +385,11 @@ class Api {
     );
     _updateToken(response.data, required: true);
 
-    final contactRepository =
-        navigatorKey.currentContext?.read<ContactRepository>();
-    for (var element in parse(response.data)
-        .querySelectorAll('#tbl_A01_01 > tbody > tr')
-        .map(Contact.fromElement)
-        .toList()) {
-      contactRepository?.add(element);
-    }
-
-    await saveSettings();
+    navigatorKey.currentContext?.watch<ContactRepository>().addAll(
+        parse(response.data)
+            .querySelectorAll('#tbl_A01_01 > tbody > tr')
+            .map(Contact.fromElement)
+            .toList());
   }
 
   Future<Contact> fetchDetailContact(Contact contact,
@@ -482,8 +418,8 @@ class Api {
           <String, dynamic>{
             'org.apache.struts.taglib.html.TOKEN': _token,
             'teacherCode': '',
-            'schoolYear': _schoolYear,
-            'semesterCode': _semesterCode,
+            'schoolYear': await _schoolYear,
+            'semesterCode': await _semesterCode,
             'subjectDispCode': '',
             'searchKeyWord': '',
             'checkSearchKeywordTeacherUserName': 'on',
@@ -516,8 +452,8 @@ class Api {
           <String, dynamic>{
             'org.apache.struts.taglib.html.TOKEN': _token,
             'teacherCode': '',
-            'schoolYear': _schoolYear,
-            'semesterCode': _semesterCode,
+            'schoolYear': await _schoolYear,
+            'semesterCode': await _semesterCode,
             'subjectDispCode': '',
             'searchKeyWord': '',
             'checkSearchKeywordTeacherUserName': 'on',
@@ -576,10 +512,9 @@ class Api {
     }
 
     contact.toDetail(document);
-    saveSettings();
-    final contactRepository =
-        navigatorKey.currentContext?.read<ContactRepository>();
-    contactRepository?.add(contact, overwrite: true);
+    navigatorKey.currentContext
+        ?.watch<ContactRepository>()
+        .add(contact, overwrite: true);
     return contact;
   }
 
@@ -605,20 +540,20 @@ class Api {
           '/portal/portaltopcommon/timeTableForTop/searchTimeTable',
           <String, dynamic>{
             'org.apache.struts.taglib.html.TOKEN': _token,
-            'schoolYear': _schoolYear,
-            'semesterCode': _semesterCode,
+            'schoolYear': await _schoolYear,
+            'semesterCode': await _semesterCode,
           }),
     );
     _updateToken(response.data, required: true);
 
-    subjects.clear();
-    subjects.addAll(parse(response.data)
-        .querySelector('#st1')!
-        .querySelectorAll('ul')
-        .map(Subject.fromElement)
-        .toSet()
-        .toList());
-    saveSettings();
+    navigatorKey.currentContext?.watch<SubjectRepository>().deleteAll();
+    navigatorKey.currentContext?.watch<SubjectRepository>().addAll(
+        parse(response.data)
+            .querySelector('#st1')!
+            .querySelectorAll('ul')
+            .map(Subject.fromElement)
+            .toSet()
+            .toList());
   }
 
   Future<void> fetchReports() async {
@@ -654,8 +589,8 @@ class Api {
         'listSchoolYear': '',
         'listSubjectCode': '',
         'listClassCode': '',
-        'schoolYear': _schoolYear,
-        'semesterCode': _semesterCode,
+        'schoolYear': await _schoolYear,
+        'semesterCode': await _semesterCode,
         'subjectDispCode': '',
         'operationFormat': ['1', '2'],
         'searchList_length': '-1',
@@ -665,11 +600,11 @@ class Api {
     for (var element in parse(response.data)
         .querySelectorAll('#searchList > tbody > tr')
         .map(Report.fromElement)) {
-      if (!reports.contains(element)) {
-        reports.add(element);
-      } else {
-        reports.where((e) => e == element).forEach((e) => e.toRefresh(element));
-      }
+      // if (!reports.contains(element)) {
+      //   reports.add(element);
+      // } else {
+      //   reports.where((e) => e == element).forEach((e) => e.toRefresh(element));
+      // }
     }
     saveSettings();
   }
@@ -708,8 +643,8 @@ class Api {
           'listSchoolYear': '',
           'listSubjectCode': '',
           'listClassCode': '',
-          'schoolYear': _schoolYear,
-          'semesterCode': _semesterCode,
+          'schoolYear': await _schoolYear,
+          'semesterCode': await _semesterCode,
           'subjectDispCode': '',
           'operationFormat': ['1', '2'],
           'searchList_length': '-1',
@@ -740,11 +675,11 @@ class Api {
         'hidClassCode': '',
         'entranceDiv': '',
         'backPath': '',
-        'listSchoolYear': _schoolYear,
+        'listSchoolYear': await _schoolYear,
         'listSubjectCode': report.subjectCode,
         'listClassCode': report.classCode,
-        'schoolYear': _schoolYear,
-        'semesterCode': _semesterCode,
+        'schoolYear': await _schoolYear,
+        'semesterCode': await _semesterCode,
         'subjectDispCode': '',
         'operationFormat': ['1', '2'],
         'searchList_length': '-1',
@@ -820,8 +755,8 @@ class Api {
         'listSchoolYear': '',
         'listSubjectCode': '',
         'listClassCode': '',
-        'schoolYear': _schoolYear,
-        'semesterCode': _semesterCode,
+        'schoolYear': await _schoolYear,
+        'semesterCode': await _semesterCode,
         'subjectDispCode': '',
         'operationFormat': ['1', '2'],
         'searchList_length': '-1',
@@ -831,11 +766,11 @@ class Api {
     for (var element in parse(response.data)
         .querySelectorAll('#searchList > tbody > tr')
         .map(Quiz.fromElement)) {
-      if (!quizzes.contains(element)) {
-        quizzes.add(element);
-      } else {
-        quizzes.where((e) => e == element).forEach((e) => e.toRefresh(element));
-      }
+      // if (!quizzes.contains(element)) {
+      //   quizzes.add(element);
+      // } else {
+      //   quizzes.where((e) => e == element).forEach((e) => e.toRefresh(element));
+      // }
     }
     saveSettings();
   }
@@ -874,8 +809,8 @@ class Api {
           'listSchoolYear': '',
           'listSubjectCode': '',
           'listClassCode': '',
-          'schoolYear': _schoolYear,
-          'semesterCode': _semesterCode,
+          'schoolYear': await _schoolYear,
+          'semesterCode': await _semesterCode,
           'subjectDispCode': '',
           'operationFormat': ['1', '2'],
           'searchList_length': '-1',
@@ -903,11 +838,11 @@ class Api {
         'hidClassCode': '',
         'entranceDiv': '',
         'backPath': '',
-        'listSchoolYear': _schoolYear,
+        'listSchoolYear': await _schoolYear,
         'listSubjectCode': quiz.subjectCode,
         'listClassCode': quiz.classCode,
-        'schoolYear': _schoolYear,
-        'semesterCode': _semesterCode,
+        'schoolYear': await _schoolYear,
+        'semesterCode': await _semesterCode,
         'subjectDispCode': '',
         'operationFormat': ['1', '2'],
         'searchList_length': '-1',

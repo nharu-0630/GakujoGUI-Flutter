@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:gakujo_task/provide.dart';
 import 'package:gakujo_task/views/home/widgets/contact.dart';
-import 'package:gakujo_task/views/home/widgets/status.dart';
 import 'package:gakujo_task/views/home/widgets/task.dart';
 import 'package:provider/provider.dart';
 import 'package:sticky_headers/sticky_headers.dart';
@@ -21,7 +20,7 @@ class _HomeWidgetState extends State<HomeWidget> {
       child: ListView(
         physics: const AlwaysScrollableScrollPhysics(),
         children: [
-          const StatusWidget(),
+          // const StatusWidget(),
           StickyHeader(
             header: Container(
               color: Theme.of(context).scaffoldBackgroundColor,

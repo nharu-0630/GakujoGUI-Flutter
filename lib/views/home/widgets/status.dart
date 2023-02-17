@@ -1,7 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:gakujo_task/provide.dart';
-import 'package:intl/intl.dart';
-import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
 class StatusWidget extends StatelessWidget {
@@ -9,7 +6,7 @@ class StatusWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var settings = context.watch<ApiProvider>().settings;
+    // var settings = context.watch<ApiProvider>().settings;
     return Padding(
       padding: const EdgeInsets.all(16.0),
       child: Card(
@@ -43,14 +40,14 @@ class StatusWidget extends StatelessWidget {
                               '最終ログイン',
                               style: Theme.of(context).textTheme.titleMedium,
                             ),
-                            Text(
-                              (settings.lastLoginTime ==
-                                      DateTime.fromMicrosecondsSinceEpoch(0)
-                                  ? ''
-                                  : DateFormat('yyyy/MM/dd HH:mm', 'ja')
-                                      .format(settings.lastLoginTime)),
-                              style: Theme.of(context).textTheme.titleMedium,
-                            ),
+                            // Text(
+                            //   (settings.lastLoginTime ==
+                            //           DateTime.fromMicrosecondsSinceEpoch(0)
+                            //       ? ''
+                            //       : DateFormat('yyyy/MM/dd HH:mm', 'ja')
+                            //           .format(settings.lastLoginTime)),
+                            //   style: Theme.of(context).textTheme.titleMedium,
+                            // ),
                           ],
                         )
                       ],

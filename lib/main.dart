@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:gakujo_task/app.dart';
 import 'package:gakujo_task/models/contact.dart';
-import 'package:gakujo_task/models/contact_repository.dart';
+import 'package:gakujo_task/models/settings.dart';
+import 'package:gakujo_task/models/subject.dart';
 import 'package:gakujo_task/provide.dart';
 import 'package:hive_flutter/adapters.dart';
 import 'package:intl/date_symbol_data_local.dart';
@@ -16,6 +17,8 @@ void main() async {
   initializeDateFormatting('ja');
   await Hive.initFlutter();
   Hive.registerAdapter(ContactAdapter());
+  Hive.registerAdapter(SubjectAdapter());
+  Hive.registerAdapter(SettingsAdapter());
   runApp(const MyApp());
 }
 
@@ -40,6 +43,8 @@ class _MyAppState extends State<MyApp> {
       providers: [
         ChangeNotifierProvider(create: (_) => ApiProvider()),
         Provider(create: (_) => ContactRepository(ContactBox())),
+        Provider(create: (_) => SubjectRepository(SubjectBox())),
+        Provider(create: (_) => SettingsRepository(SettingsBox())),
       ],
       child: const App(),
     );
