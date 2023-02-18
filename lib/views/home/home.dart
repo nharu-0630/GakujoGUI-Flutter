@@ -238,7 +238,7 @@ class _HomeWidgetState extends State<HomeWidget> {
           ListTile(
             title: Row(
               children: [
-                const Icon(Icons.settings_accessibility_rounded),
+                const Icon(Icons.school_rounded),
                 const SizedBox(width: 8.0),
                 Text(
                   '成績情報',

@@ -13,24 +13,27 @@ class Grade implements Comparable<Grade> {
   @HiveField(2)
   String subjectsSection;
   @HiveField(3)
-  int credit;
+  String selectionSection;
   @HiveField(4)
-  String evaluation;
+  int credit;
   @HiveField(5)
-  double? score;
+  String evaluation;
   @HiveField(6)
-  double? gp;
+  double? score;
   @HiveField(7)
-  String acquisitionYear;
+  double? gp;
   @HiveField(8)
-  DateTime reportDateTime = DateTime.fromMicrosecondsSinceEpoch(0);
+  String acquisitionYear;
   @HiveField(9)
+  DateTime reportDateTime = DateTime.fromMicrosecondsSinceEpoch(0);
+  @HiveField(10)
   String testType;
 
   Grade(
     this.subjectsName,
     this.teacherName,
     this.subjectsSection,
+    this.selectionSection,
     this.credit,
     this.evaluation,
     this.score,
@@ -45,13 +48,14 @@ class Grade implements Comparable<Grade> {
       element.querySelectorAll('td')[0].text.trim(),
       element.querySelectorAll('td')[1].text.trim(),
       element.querySelectorAll('td')[2].text.trim(),
-      int.parse(element.querySelectorAll('td')[3].text.trim()),
-      element.querySelectorAll('td')[4].text.trim(),
-      double.tryParse(element.querySelectorAll('td')[5].text.trim()),
+      element.querySelectorAll('td')[3].text.trim(),
+      int.parse(element.querySelectorAll('td')[4].text.trim()),
+      element.querySelectorAll('td')[5].text.trim(),
       double.tryParse(element.querySelectorAll('td')[6].text.trim()),
-      element.querySelectorAll('td')[7].text.trim(),
-      DateTime.parse(element.querySelectorAll('td')[8].text.trim()),
-      element.querySelectorAll('td')[9].text.trim(),
+      double.tryParse(element.querySelectorAll('td')[7].text.trim()),
+      element.querySelectorAll('td')[8].text.trim(),
+      DateTime.parse(element.querySelectorAll('td')[9].text.trim()),
+      element.querySelectorAll('td')[10].text.trim(),
     );
   }
 
@@ -86,7 +90,7 @@ class Grade implements Comparable<Grade> {
 }
 
 class GradeBox {
-  Future<Box> box = Hive.openBox<GradeBox>('grade');
+  Future<Box> box = Hive.openBox<Grade>('grade');
 
   Future<void> open() async {
     Box b = await box;
@@ -112,8 +116,8 @@ class GradeRepository extends ChangeNotifier {
 
   Future<void> addAll(List<Grade> grades) async {
     var box = await _gradeBox.box;
-    for (var subject in grades) {
-      await box.put(subject.hashCode, subject);
+    for (var grade in grades) {
+      await box.put(grade.hashCode, grade);
     }
     notifyListeners();
   }

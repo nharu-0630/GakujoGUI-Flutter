@@ -9,6 +9,7 @@ import 'package:flutter/foundation.dart';
 import 'package:gakujo_task/api/parse.dart';
 import 'package:gakujo_task/app.dart';
 import 'package:gakujo_task/models/contact.dart';
+import 'package:gakujo_task/models/grade.dart';
 import 'package:gakujo_task/models/quiz.dart';
 import 'package:gakujo_task/models/report.dart';
 import 'package:gakujo_task/models/settings.dart';
@@ -147,7 +148,7 @@ class Api {
           'Referer': 'https://gakujo.shizuoka.ac.jp/portal/',
         },
         followRedirects: false,
-        validateStatus: (status) => status! == 302,
+        validateStatus: (status) => status == 302,
       ),
     );
 
@@ -159,7 +160,7 @@ class Api {
           'Referer': 'https://gakujo.shizuoka.ac.jp/portal/',
         },
         followRedirects: false,
-        validateStatus: (status) => status! == 302 || status == 200,
+        validateStatus: (status) => status == 302 || status == 200,
       ),
     );
 
@@ -243,7 +244,7 @@ class Api {
           'Referer': 'https://idp.shizuoka.ac.jp/',
         },
         followRedirects: false,
-        validateStatus: (status) => status! == 302,
+        validateStatus: (status) => status == 302,
       ),
     );
 
@@ -260,7 +261,7 @@ class Api {
           'Referer': 'https://idp.shizuoka.ac.jp/',
         },
         followRedirects: false,
-        validateStatus: (status) => status! == 302 || status == 200,
+        validateStatus: (status) => status == 302 || status == 200,
       ),
     );
 
@@ -886,6 +887,13 @@ class Api {
         'gakujo.shizuoka.ac.jp',
         '/kyoumu/preLogin.do',
       ),
+      options: Options(
+        headers: {
+          'Origin': 'https://gakujo.shizuoka.ac.jp',
+          'Referer':
+              'https://gakujo.shizuoka.ac.jp/portal/home/home/initialize?EXCLUDE_SET=',
+        },
+      ),
     );
 
     await Future.delayed(_interval);
@@ -894,13 +902,15 @@ class Api {
         'gakujo.shizuoka.ac.jp',
         '/portal/home/systemCooperationLink/initializeShibboleth',
       ),
-      data: 'renkeiType=kyoumu',
+      data: {
+        'renkeiType': 'kyoumu',
+        'org.apache.struts.taglib.html.TOKEN': _token,
+      },
       options: Options(
-        followRedirects: false,
         headers: {
           'Origin': 'https://gakujo.shizuoka.ac.jp',
           'Referer':
-              'https://gakujo.shizuoka.ac.jp/portal/home/home/initialize',
+              'https://gakujo.shizuoka.ac.jp/portal/home/home/initialize?EXCLUDE_SET=',
         },
       ),
     );
@@ -913,8 +923,13 @@ class Api {
       ),
       data: 'loginID=',
       options: Options(
-        contentType: 'application/x-www-form-urlencoded',
-        validateStatus: (status) => status! == 302 || status == 200,
+        headers: {
+          'Origin': 'https://gakujo.shizuoka.ac.jp',
+          'Referer':
+              'https://gakujo.shizuoka.ac.jp/portal/home/systemCooperationLink/initializeShibboleth?renkeiType=kyoumu'
+        },
+        followRedirects: false,
+        validateStatus: (status) => status == 302 || status == 200,
       ),
     );
 
@@ -922,9 +937,49 @@ class Api {
       await Future.delayed(_interval);
       response = await _client.get<dynamic>(
         response.headers.value('location')!,
+      );
+
+      var samlResponse = Uri.decodeFull(
+        RegExp(r'(?<=SAMLResponse" value=").*(?=")')
+                .firstMatch(response.data.toString())
+                ?.group(0) ??
+            '',
+      );
+      var relayState = Uri.decodeFull(
+        RegExp(r'(?<=RelayState" value=").*(?=")')
+                .firstMatch(response.data.toString())
+                ?.group(0) ??
+            '',
+      ).replaceAll('&#x3a;', ':');
+
+      if (kDebugMode) {
+        print('SAMLResponse: ${samlResponse.substring(0, 10)} ...');
+        print('RelayState: ${relayState.substring(0, 10)} ...');
+      }
+
+      if (samlResponse.isEmpty || relayState.isEmpty) {
+        throw Exception('SAMLResponse or RelayState is empty.');
+      }
+
+      await Future.delayed(_interval);
+      await _client.postUri<dynamic>(
+        Uri.https(
+          'gakujo.shizuoka.ac.jp',
+          '/Shibboleth.sso/SAML2/POST',
+        ),
+        data: {
+          'RelayState': relayState,
+          'SAMLResponse': samlResponse,
+        },
         options: Options(
+          headers: {
+            'Accept':
+                'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
+            'Origin': 'https://idp.shizuoka.ac.jp',
+            'Referer': 'https://idp.shizuoka.ac.jp/',
+          },
           followRedirects: false,
-          validateStatus: (status) => status! == 302 || status == 200,
+          validateStatus: (status) => status == 302,
         ),
       );
     }
@@ -933,5 +988,40 @@ class Api {
       print(response.data);
     }
     return true;
+  }
+
+  Future<void> fetchGrades() async {
+    await fetchAcademicSystem();
+
+    await Future.delayed(_interval);
+    var response = await _client.getUri<dynamic>(
+      Uri.https(
+        'gakujo.shizuoka.ac.jp',
+        '/kyoumu/seisekiSearchStudentInit.do',
+        {
+          'mainMenuCode': '008',
+          'parentMenuCode': '007',
+        },
+      ),
+    );
+    var document = parse(response.data);
+
+    if (document.querySelector('table.txt12') != null) {
+      navigatorKey.currentContext?.read<GradeRepository>().deleteAll();
+      if (kDebugMode) {
+        print(document
+            .querySelector('table.txt12')!
+            .querySelectorAll('tr')
+            .skip(1)
+            .map(Grade.fromElement)
+            .toList());
+      }
+      navigatorKey.currentContext?.read<GradeRepository>().addAll(document
+          .querySelector('table.txt12')!
+          .querySelectorAll('tr')
+          .skip(1)
+          .map(Grade.fromElement)
+          .toList());
+    }
   }
 }

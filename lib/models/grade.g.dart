@@ -20,20 +20,21 @@ class GradeAdapter extends TypeAdapter<Grade> {
       fields[0] as String,
       fields[1] as String,
       fields[2] as String,
-      fields[3] as int,
-      fields[4] as String,
-      fields[5] as double?,
+      fields[3] as String,
+      fields[4] as int,
+      fields[5] as String,
       fields[6] as double?,
-      fields[7] as String,
-      fields[8] as DateTime,
-      fields[9] as String,
+      fields[7] as double?,
+      fields[8] as String,
+      fields[9] as DateTime,
+      fields[10] as String,
     );
   }
 
   @override
   void write(BinaryWriter writer, Grade obj) {
     writer
-      ..writeByte(10)
+      ..writeByte(11)
       ..writeByte(0)
       ..write(obj.subjectsName)
       ..writeByte(1)
@@ -41,18 +42,20 @@ class GradeAdapter extends TypeAdapter<Grade> {
       ..writeByte(2)
       ..write(obj.subjectsSection)
       ..writeByte(3)
-      ..write(obj.credit)
+      ..write(obj.selectionSection)
       ..writeByte(4)
-      ..write(obj.evaluation)
+      ..write(obj.credit)
       ..writeByte(5)
-      ..write(obj.score)
+      ..write(obj.evaluation)
       ..writeByte(6)
-      ..write(obj.gp)
+      ..write(obj.score)
       ..writeByte(7)
-      ..write(obj.acquisitionYear)
+      ..write(obj.gp)
       ..writeByte(8)
-      ..write(obj.reportDateTime)
+      ..write(obj.acquisitionYear)
       ..writeByte(9)
+      ..write(obj.reportDateTime)
+      ..writeByte(10)
       ..write(obj.testType);
   }
 

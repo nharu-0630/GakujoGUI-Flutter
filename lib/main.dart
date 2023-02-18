@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:gakujo_task/api/provide.dart';
 import 'package:gakujo_task/app.dart';
 import 'package:gakujo_task/models/contact.dart';
+import 'package:gakujo_task/models/grade.dart';
 import 'package:gakujo_task/models/quiz.dart';
 import 'package:gakujo_task/models/report.dart';
 import 'package:gakujo_task/models/settings.dart';
@@ -23,6 +24,7 @@ void main() async {
   Hive.registerAdapter(SettingsAdapter());
   Hive.registerAdapter(ReportAdapter());
   Hive.registerAdapter(QuizAdapter());
+  Hive.registerAdapter(GradeAdapter());
   runApp(const MyApp());
 }
 
@@ -48,9 +50,11 @@ class _MyAppState extends State<MyApp> {
         ChangeNotifierProvider(create: (_) => ApiRepository()),
         ChangeNotifierProvider(create: (_) => ContactRepository(ContactBox())),
         ChangeNotifierProvider(create: (_) => SubjectRepository(SubjectBox())),
-        ChangeNotifierProvider(create: (_) => SettingsRepository(SettingsBox())),
+        ChangeNotifierProvider(
+            create: (_) => SettingsRepository(SettingsBox())),
         ChangeNotifierProvider(create: (_) => ReportRepository(ReportBox())),
         ChangeNotifierProvider(create: (_) => QuizRepository(QuizBox())),
+        ChangeNotifierProvider(create: (_) => GradeRepository(GradeBox())),
       ],
       child: const App(),
     );

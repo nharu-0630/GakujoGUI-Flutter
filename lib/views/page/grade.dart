@@ -1,10 +1,7 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:gakujo_task/api/provide.dart';
 import 'package:gakujo_task/app.dart';
-import 'package:gakujo_task/models/report.dart';
-import 'package:gakujo_task/views/common/widget.dart';
+import 'package:gakujo_task/models/grade.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
@@ -17,33 +14,25 @@ class GradePage extends StatefulWidget {
 
 class _GradePageState extends State<GradePage> {
   bool _searchStatus = false;
-  bool _filterStatus = false;
-  List<Report> _reports = [];
-  List<Report> _suggestReports = [];
+  List<Grade> _grades = [];
+  List<Grade> _suggestGrades = [];
 
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
-      future: context.watch<ReportRepository>().getAll(),
-      builder: (context, AsyncSnapshot<List<Report>> snapshot) {
+      future: context.watch<GradeRepository>().getAll(),
+      builder: (context, AsyncSnapshot<List<Grade>> snapshot) {
         if (snapshot.hasData) {
-          _reports = snapshot.data!;
-          _reports.sort(((a, b) => b.compareTo(a)));
-          var filteredReports = _reports
-              .where((e) => _filterStatus
-                  ? !(e.isArchived ||
-                      !(!e.isSubmitted &&
-                          e.endDateTime.isAfter(DateTime.now())))
-                  : true)
-              .toList();
+          _grades = snapshot.data!;
+          _grades.sort(((a, b) => b.compareTo(a)));
           return Scaffold(
             body: NestedScrollView(
               headerSliverBuilder: (context, innerBoxScrolled) =>
                   [_buildAppBar(context)],
               body: RefreshIndicator(
                 onRefresh: () async =>
-                    context.read<ApiRepository>().fetchReports(),
-                child: filteredReports.isEmpty
+                    context.read<ApiRepository>().fetchGrades(),
+                child: _grades.isEmpty
                     ? LayoutBuilder(
                         builder: (context, constraints) =>
                             SingleChildScrollView(
@@ -58,12 +47,12 @@ class _GradePageState extends State<GradePage> {
                                   const Padding(
                                     padding: EdgeInsets.all(8.0),
                                     child: Icon(
-                                      Icons.task_rounded,
+                                      Icons.school_rounded,
                                       size: 48.0,
                                     ),
                                   ),
                                   Text(
-                                    'タスクはありません',
+                                    '成績情報はありません',
                                     style:
                                         Theme.of(context).textTheme.titleMedium,
                                   ),
@@ -76,11 +65,11 @@ class _GradePageState extends State<GradePage> {
                     : ListView.builder(
                         padding: const EdgeInsets.only(top: 8),
                         itemCount: _searchStatus
-                            ? _suggestReports.length
-                            : filteredReports.length,
+                            ? _suggestGrades.length
+                            : _grades.length,
                         itemBuilder: (context, index) => _searchStatus
-                            ? _buildCard(context, _suggestReports[index])
-                            : _buildCard(context, filteredReports[index]),
+                            ? _buildCard(context, _suggestGrades[index])
+                            : _buildCard(context, _grades[index]),
                       ),
               ),
             ),
@@ -109,12 +98,13 @@ class _GradePageState extends State<GradePage> {
       ),
       title: _searchStatus
           ? TextField(
-              onChanged: (value) => setState(() => _suggestReports =
-                  _reports.where((e) => e.contains(value)).toList()),
+              onChanged: (value) => setState(() => _suggestGrades = _grades
+                  .where((e) => e.subjectsName.contains(value))
+                  .toList()),
               autofocus: true,
               textInputAction: TextInputAction.search,
             )
-          : const Text('レポート'),
+          : const Text('成績情報'),
       actions: _searchStatus
           ? [
               Padding(
@@ -129,19 +119,9 @@ class _GradePageState extends State<GradePage> {
               Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: IconButton(
-                  onPressed: (() =>
-                      setState(() => _filterStatus = !_filterStatus)),
-                  icon: Icon(_filterStatus
-                      ? Icons.filter_alt_rounded
-                      : Icons.filter_alt_off_rounded),
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: IconButton(
                   onPressed: (() => setState(() {
                         _searchStatus = true;
-                        _suggestReports = [];
+                        _suggestGrades = [];
                       })),
                   icon: const Icon(Icons.search_rounded),
                 ),
@@ -151,136 +131,39 @@ class _GradePageState extends State<GradePage> {
     );
   }
 
-  Widget _buildCard(BuildContext context, Report report) {
-    return Slidable(
-      key: Key(report.id),
-      startActionPane: ActionPane(
-        motion: const DrawerMotion(),
+  Widget _buildCard(BuildContext context, Grade grade) {
+    return ListTile(
+      title: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          SlidableAction(
-            onPressed: (context) => context
-                .read<ReportRepository>()
-                .setArchive(report.id, !report.isArchived)
-                .then((value) => setState(() {})),
-            backgroundColor: const Color(0xFF7BC043),
-            foregroundColor: Colors.white,
-            icon: report.isArchived
-                ? Icons.unarchive_rounded
-                : Icons.archive_rounded,
-            label: report.isArchived ? 'アーカイブ解除' : 'アーカイブ',
-          ),
-        ],
-      ),
-      endActionPane: ActionPane(
-        motion: const DrawerMotion(),
-        children: [
-          SlidableAction(
-            onPressed: (context) async =>
-                context.read<ApiRepository>().fetchDetailReport(report),
-            backgroundColor: const Color(0xFF0392CF),
-            foregroundColor: Colors.white,
-            icon: Icons.sync_rounded,
-            label: '更新',
-          ),
-        ],
-      ),
-      child: ListTile(
-        onTap: () {
-          if (!report.isAcquired) {
-            showDialog(
-              context: context,
-              builder: (_) => CupertinoAlertDialog(
-                content: const Text('未取得のレポートです。取得しますか？'),
-                actions: [
-                  CupertinoDialogAction(
-                      isDestructiveAction: true,
-                      onPressed: () {
-                        Navigator.of(context).pop();
-                      },
-                      child: const Text('キャンセル')),
-                  CupertinoDialogAction(
-                    child: const Text('取得'),
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                      context.read<ApiRepository>().fetchDetailReport(report);
-                    },
-                  )
-                ],
-              ),
-            );
-          } else {
-            showModalBottomSheet(
-              isScrollControlled: true,
-              shape: const RoundedRectangleBorder(
-                  borderRadius:
-                      BorderRadius.vertical(top: Radius.circular(16.0))),
-              context: context,
-              builder: (context) => DraggableScrollableSheet(
-                expand: false,
-                builder: (context, controller) {
-                  return buildReportModal(context, report, controller);
-                },
-              ),
-            );
-          }
-        },
-        leading: Icon(
-          (() {
-            if (report.isSubmitted) {
-              if (report.endDateTime.isAfter(DateTime.now())) {
-                return Icons.check_box_outlined;
-              } else {
-                return Icons.check_box_rounded;
-              }
-            } else {
-              if (report.endDateTime.isAfter(DateTime.now())) {
-                return Icons.crop_square_outlined;
-              } else {
-                return Icons.square_rounded;
-              }
-            }
-          })(),
-        ),
-        title: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Expanded(
-              child: Text(
-                report.subject,
-                style: Theme.of(context).textTheme.bodyMedium,
-                overflow: TextOverflow.ellipsis,
-              ),
-            ),
-            Text(
-              DateFormat('yyyy/MM/dd HH:mm', 'ja')
-                  .format(report.endDateTime.toLocal()),
+          Expanded(
+            child: Text(
+              grade.subjectsName,
               style: Theme.of(context).textTheme.bodyMedium,
+              overflow: TextOverflow.ellipsis,
             ),
-          ],
-        ),
-        subtitle: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Expanded(
-              child: Text(
-                report.title,
-                style: Theme.of(context)
-                    .textTheme
-                    .titleMedium
-                    ?.copyWith(fontWeight: FontWeight.bold),
-                overflow: TextOverflow.ellipsis,
-              ),
+          ),
+          Text(
+            DateFormat('yyyy/MM/dd', 'ja')
+                .format(grade.reportDateTime.toLocal()),
+            style: Theme.of(context).textTheme.bodyMedium,
+          ),
+        ],
+      ),
+      subtitle: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Expanded(
+            child: Text(
+              grade.gp.toString(),
+              style: Theme.of(context)
+                  .textTheme
+                  .titleMedium
+                  ?.copyWith(fontWeight: FontWeight.bold),
+              overflow: TextOverflow.ellipsis,
             ),
-            Visibility(
-              visible: report.fileNames?.isNotEmpty ?? false,
-              child: const Icon(Icons.file_present_rounded),
-            ),
-            Visibility(
-              visible: report.isArchived,
-              child: const Icon(Icons.archive_rounded),
-            )
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
