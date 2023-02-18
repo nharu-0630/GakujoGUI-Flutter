@@ -166,4 +166,15 @@ class ApiRepository extends ChangeNotifier {
       _onError(e);
     }
   }
+
+  void fetchAcademicSystem() async {
+    if (isLoading) return;
+    _toggleLoading();
+    try {
+      await _api.fetchAcademicSystem();
+      _toggleLoading();
+    } catch (e) {
+      _onError(e);
+    }
+  }
 }

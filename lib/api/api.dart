@@ -13,7 +13,6 @@ import 'package:gakujo_task/models/quiz.dart';
 import 'package:gakujo_task/models/report.dart';
 import 'package:gakujo_task/models/settings.dart';
 import 'package:gakujo_task/models/subject.dart';
-import 'package:html/dom.dart';
 import 'package:html/parser.dart' show parse;
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
@@ -22,7 +21,7 @@ import 'package:uuid/uuid.dart';
 import 'package:version/version.dart';
 
 class Api {
-  static final version = Version(1, 2, 1);
+  static final version = Version(1, 3, 0);
 
   final _interval = const Duration(milliseconds: 2000);
 
@@ -87,7 +86,7 @@ class Api {
   void _initialize() {
     _client = Dio(BaseOptions(
       headers: {
-        'User-Agent': 'Chrome/108.0.5359.124 GakujoTask/$version',
+        'User-Agent': 'Chrome/110.0.5481.104 GakujoTask/$version',
       },
       contentType: Headers.formUrlEncodedContentType,
     ));
@@ -255,12 +254,12 @@ class Api {
         '/portal/shibbolethlogin/shibbolethLogin/initLogin/sso',
       ),
       options: Options(
-        followRedirects: false,
         headers: {
           'Accept':
               'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
           'Referer': 'https://idp.shizuoka.ac.jp/',
         },
+        followRedirects: false,
         validateStatus: (status) => status! == 302 || status == 200,
       ),
     );
@@ -879,5 +878,60 @@ class Api {
         ?.read<QuizRepository>()
         .add(quiz, overwrite: true);
     return quiz;
+  }
+
+  Future<bool> fetchAcademicSystem() async {
+    await _client.getUri<dynamic>(
+      Uri.https(
+        'gakujo.shizuoka.ac.jp',
+        '/kyoumu/preLogin.do',
+      ),
+    );
+
+    await Future.delayed(_interval);
+    var response = await _client.postUri<dynamic>(
+      Uri.https(
+        'gakujo.shizuoka.ac.jp',
+        '/portal/home/systemCooperationLink/initializeShibboleth',
+      ),
+      data: 'renkeiType=kyoumu',
+      options: Options(
+        followRedirects: false,
+        headers: {
+          'Origin': 'https://gakujo.shizuoka.ac.jp',
+          'Referer':
+              'https://gakujo.shizuoka.ac.jp/portal/home/home/initialize',
+        },
+      ),
+    );
+
+    await Future.delayed(_interval);
+    response = await _client.postUri<dynamic>(
+      Uri.https(
+        'gakujo.shizuoka.ac.jp',
+        '/kyoumu/sso/loginStudent.do',
+      ),
+      data: 'loginID=',
+      options: Options(
+        contentType: 'application/x-www-form-urlencoded',
+        validateStatus: (status) => status! == 302 || status == 200,
+      ),
+    );
+
+    if (response.statusCode == 302) {
+      await Future.delayed(_interval);
+      response = await _client.get<dynamic>(
+        response.headers.value('location')!,
+        options: Options(
+          followRedirects: false,
+          validateStatus: (status) => status! == 302 || status == 200,
+        ),
+      );
+    }
+
+    if (kDebugMode) {
+      print(response.data);
+    }
+    return true;
   }
 }

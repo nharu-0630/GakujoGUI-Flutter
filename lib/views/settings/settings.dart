@@ -387,6 +387,60 @@ class _SettingsWidgetState extends State<SettingsWidget> {
                 children: [
                   Padding(
                     padding: const EdgeInsets.all(8.0),
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Theme.of(context).colorScheme.error,
+                        foregroundColor: Theme.of(context).colorScheme.onError,
+                      ),
+                      onPressed: () async {
+                        showDialog(
+                          context: context,
+                          builder: (_) => CupertinoAlertDialog(
+                            content: const Text('実行しますか？'),
+                            actions: [
+                              CupertinoDialogAction(
+                                  onPressed: () {
+                                    Navigator.of(context).pop();
+                                  },
+                                  child: const Text('キャンセル')),
+                              CupertinoDialogAction(
+                                isDestructiveAction: true,
+                                child: const Text('実行'),
+                                onPressed: () async {
+                                  Navigator.of(context).pop();
+                                  context
+                                      .read<ApiRepository>()
+                                      .fetchAcademicSystem();
+                                },
+                              )
+                            ],
+                          ),
+                        );
+                      },
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            const Icon(Icons.developer_board_rounded),
+                            const SizedBox(width: 8.0),
+                            Text(
+                              'テスト',
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .bodyLarge!
+                                  .copyWith(
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .onError),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
                     child: Align(
                       alignment: Alignment.topLeft,
                       child: FutureBuilder(
