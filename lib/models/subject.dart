@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:crypto/crypto.dart' show md5;
+import 'package:flutter/material.dart' show ChangeNotifier;
 import 'package:hive/hive.dart';
 import 'package:html/dom.dart';
 
@@ -82,7 +83,7 @@ class SubjectBox {
   }
 }
 
-class SubjectRepository {
+class SubjectRepository extends ChangeNotifier {
   late SubjectBox _subjectBox;
 
   SubjectRepository(SubjectBox subjectBox) {
@@ -90,30 +91,35 @@ class SubjectRepository {
   }
 
   Future<void> add(Subject subject, {bool overwrite = false}) async {
-    final box = await _subjectBox.box;
+    var box = await _subjectBox.box;
     if (!overwrite && box.containsKey(subject.hashCode)) return;
     await box.put(subject.hashCode, subject);
+    notifyListeners();
   }
 
   Future<void> addAll(List<Subject> subjects) async {
-    final box = await _subjectBox.box;
-    for (final subject in subjects) {
+    var box = await _subjectBox.box;
+    for (var subject in subjects) {
       await box.put(subject.hashCode, subject);
     }
+    notifyListeners();
   }
 
   Future<void> delete(Subject subjects) async {
-    final box = await _subjectBox.box;
+    var box = await _subjectBox.box;
     await box.delete(subjects.hashCode);
+    notifyListeners();
   }
 
   Future<void> deleteAll() async {
-    final box = await _subjectBox.box;
-    await box.deleteAll(box.keys);
+    var box = await _subjectBox.box;
+    await box.deleteFromDisk();
+    await _subjectBox.open();
+    notifyListeners();
   }
 
   Future<List<Subject>> getAll() async {
-    final box = await _subjectBox.box;
+    var box = await _subjectBox.box;
     return box.values.toList().cast<Subject>();
   }
 }

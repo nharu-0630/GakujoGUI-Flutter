@@ -6,8 +6,8 @@ import 'package:gakujo_task/models/contact.dart';
 import 'package:gakujo_task/models/quiz.dart';
 import 'package:gakujo_task/models/report.dart';
 
-class ApiProvider extends ChangeNotifier {
-  final Api _api = Api();
+class ApiRepository extends ChangeNotifier {
+  final _api = Api();
   String get token => _api.token;
 
   bool get isLoading => _isLoading;
@@ -15,16 +15,12 @@ class ApiProvider extends ChangeNotifier {
   bool get isError => _isError;
   bool _isError = false;
 
-  ApiProvider() {
+  ApiRepository() {
     loadSettings();
   }
 
   void loadSettings() {
     _api.loadSettings().then((value) => notifyListeners());
-  }
-
-  void clearSettings() {
-    _api.clearSettings().then((value) => notifyListeners());
   }
 
   void _onError(Object e) {
@@ -34,20 +30,21 @@ class ApiProvider extends ChangeNotifier {
       _isError = false;
       _toggleLoading();
     });
-    final snackBar = SnackBar(
-      elevation: 0,
-      behavior: SnackBarBehavior.floating,
-      backgroundColor: Colors.transparent,
-      content: AwesomeSnackbarContent(
-        title: 'Error',
-        message: e.toString(),
-        contentType: ContentType.failure,
-        inMaterialBanner: true,
-      ),
-    );
     scaffoldMessengerKey.currentState!
       ..hideCurrentSnackBar()
-      ..showSnackBar(snackBar);
+      ..showSnackBar(
+        SnackBar(
+          elevation: 0,
+          behavior: SnackBarBehavior.floating,
+          backgroundColor: Colors.transparent,
+          content: AwesomeSnackbarContent(
+            title: 'Error',
+            message: e.toString(),
+            contentType: ContentType.failure,
+            inMaterialBanner: true,
+          ),
+        ),
+      );
   }
 
   void _toggleLoading() {

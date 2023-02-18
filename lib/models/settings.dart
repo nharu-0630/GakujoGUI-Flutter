@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 
 part 'settings.g.dart';
@@ -50,7 +51,7 @@ class SettingsBox {
   }
 }
 
-class SettingsRepository {
+class SettingsRepository extends ChangeNotifier {
   late SettingsBox _settingsBox;
 
   SettingsRepository(SettingsBox settingsBox) {
@@ -61,6 +62,7 @@ class SettingsRepository {
     await _settingsBox.open();
     Box b = await _settingsBox.box;
     await b.put('settings', settings);
+    notifyListeners();
   }
 
   Future<Settings> load() async {
@@ -74,6 +76,10 @@ class SettingsRepository {
   Future<void> delete() async {
     await _settingsBox.open();
     Box b = await _settingsBox.box;
-    await b.delete('settings');
+    await b.put(
+        'settings',
+        Settings(null, null, null, null, null, null,
+            DateTime.fromMicrosecondsSinceEpoch(0), null, null, null));
+    notifyListeners();
   }
 }

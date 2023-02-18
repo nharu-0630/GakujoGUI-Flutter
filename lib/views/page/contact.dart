@@ -1,10 +1,10 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
+import 'package:gakujo_task/api/provide.dart';
 import 'package:gakujo_task/app.dart';
 import 'package:gakujo_task/models/contact.dart';
 import 'package:gakujo_task/models/subject.dart';
-import 'package:gakujo_task/provide.dart';
 import 'package:gakujo_task/views/common/widget.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
@@ -135,7 +135,7 @@ class _ContactPageState extends State<ContactPage> {
         children: [
           SlidableAction(
             onPressed: (context) async =>
-                context.read<ApiProvider>().fetchDetailContact(contact),
+                context.read<ApiRepository>().fetchDetailContact(contact),
             backgroundColor: const Color(0xFF0392CF),
             foregroundColor: Colors.white,
             icon: Icons.sync_rounded,
@@ -161,7 +161,7 @@ class _ContactPageState extends State<ContactPage> {
                     child: const Text('取得'),
                     onPressed: () {
                       Navigator.of(context).pop();
-                      context.read<ApiProvider>().fetchDetailContact(contact);
+                      context.read<ApiRepository>().fetchDetailContact(contact);
                     },
                   )
                 ],
@@ -311,7 +311,7 @@ class _ContactPageState extends State<ContactPage> {
                 padding: const EdgeInsets.all(4.0),
                 child: ElevatedButton(
                   onPressed: () async =>
-                      context.read<ApiProvider>().fetchDetailContact(contact),
+                      context.read<ApiRepository>().fetchDetailContact(contact),
                   child: const Icon(Icons.sync_rounded),
                 ),
               ),

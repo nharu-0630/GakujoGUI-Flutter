@@ -2,9 +2,9 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:gakujo_task/api/api.dart';
+import 'package:gakujo_task/api/provide.dart';
 import 'package:gakujo_task/app.dart';
 import 'package:gakujo_task/models/settings.dart';
-import 'package:gakujo_task/provide.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:provider/provider.dart';
 import 'package:sticky_headers/sticky_headers.dart';
@@ -131,9 +131,9 @@ class _SettingsWidgetState extends State<SettingsWidget> {
                             Theme.of(context).colorScheme.onPrimary,
                       ),
                       onPressed: () async {
-                        final settingsRepository = navigatorKey.currentContext
+                        var settingsRepository = navigatorKey.currentContext
                             ?.read<SettingsRepository>();
-                        final settings = await settingsRepository?.load();
+                        var settings = await settingsRepository?.load();
                         settings?.username = _usernameController.text;
                         settings?.password = _passwordController.text;
                         await settingsRepository?.save(settings!);
@@ -217,9 +217,9 @@ class _SettingsWidgetState extends State<SettingsWidget> {
                             Theme.of(context).colorScheme.onPrimary,
                       ),
                       onPressed: () async {
-                        final settingsRepository = navigatorKey.currentContext
+                        var settingsRepository = navigatorKey.currentContext
                             ?.read<SettingsRepository>();
-                        final settings = await settingsRepository?.load();
+                        var settings = await settingsRepository?.load();
                         settings?.year = int.parse(_yearController.text);
                         settings?.semester =
                             int.parse(_semesterController.text);
@@ -275,7 +275,7 @@ class _SettingsWidgetState extends State<SettingsWidget> {
                                 child: const Text('取得'),
                                 onPressed: () {
                                   Navigator.of(context).pop();
-                                  context.read<ApiProvider>().fetchSubjects();
+                                  context.read<ApiRepository>().fetchSubjects();
                                 },
                               )
                             ],
@@ -326,9 +326,11 @@ class _SettingsWidgetState extends State<SettingsWidget> {
                               CupertinoDialogAction(
                                 isDestructiveAction: true,
                                 child: const Text('初期化'),
-                                onPressed: () {
+                                onPressed: () async {
                                   Navigator.of(context).pop();
-                                  context.read<ApiProvider>().clearSettings();
+                                  await context
+                                      .read<SettingsRepository>()
+                                      .delete();
                                 },
                               )
                             ],
@@ -383,19 +385,6 @@ class _SettingsWidgetState extends State<SettingsWidget> {
               padding: const EdgeInsets.symmetric(horizontal: 16.0),
               child: Column(
                 children: [
-                  // Padding(
-                  //   padding: const EdgeInsets.all(8.0),
-                  //   child: Align(
-                  //     alignment: Alignment.topLeft,
-                  //     child: Text(
-                  //       'Token: ${context.watch<ApiProvider>().token} \nAccessEnvironmentName: ${settings.accessEnvironmentName} \nAccessEnvironmentKey: ${settings.accessEnvironmentKey} \nAccessEnvironmentValue: ${settings.accessEnvironmentValue} \nUsername: ${settings.username} \nYear: ${settings.year} \nSemester: ${settings.semester} \n',
-                  //     ),
-                  //   ),
-                  // ),
-                  const Padding(
-                    padding: EdgeInsets.all(4.0),
-                    child: Divider(thickness: 2.0),
-                  ),
                   Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: Align(

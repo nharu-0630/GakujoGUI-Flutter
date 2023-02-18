@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart' show ChangeNotifier;
 import 'package:gakujo_task/api/parse.dart';
 import 'package:hive/hive.dart';
 import 'package:html/dom.dart';
@@ -156,7 +157,7 @@ class ContactBox {
   }
 }
 
-class ContactRepository {
+class ContactRepository extends ChangeNotifier {
   late ContactBox _contactBox;
 
   ContactRepository(ContactBox contactBox) {
@@ -164,41 +165,45 @@ class ContactRepository {
   }
 
   Future<void> add(Contact contact, {bool overwrite = false}) async {
-    final box = await _contactBox.box;
+    var box = await _contactBox.box;
     if (!overwrite && box.containsKey(contact.hashCode)) return;
     await box.put(contact.hashCode, contact);
+    notifyListeners();
   }
 
   Future<void> addAll(List<Contact> contacts) async {
-    final box = await _contactBox.box;
-    for (final contact in contacts) {
+    var box = await _contactBox.box;
+    for (var contact in contacts) {
       await box.put(contact.hashCode, contact);
     }
+    notifyListeners();
   }
 
   Future<void> delete(Contact contact) async {
-    final box = await _contactBox.box;
+    var box = await _contactBox.box;
     await box.delete(contact.hashCode);
+    notifyListeners();
   }
 
   Future<void> deleteAll() async {
-    final box = await _contactBox.box;
+    var box = await _contactBox.box;
     await box.deleteFromDisk();
     await _contactBox.open();
+    notifyListeners();
   }
 
   Future<Contact?> get(int key) async {
-    final box = await _contactBox.box;
+    var box = await _contactBox.box;
     return box.get(key);
   }
 
   Future<List<Contact>> getAll() async {
-    final box = await _contactBox.box;
+    var box = await _contactBox.box;
     return box.values.toList().cast<Contact>();
   }
 
   Future<List<Contact>> getSubjects(String subject) async {
-    final box = await _contactBox.box;
+    var box = await _contactBox.box;
     return box.values
         .where((contact) => contact.subjects == subject)
         .toList()

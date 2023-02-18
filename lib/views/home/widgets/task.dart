@@ -1,8 +1,9 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:gakujo_task/api/provide.dart';
 import 'package:gakujo_task/models/quiz.dart';
 import 'package:gakujo_task/models/report.dart';
-import 'package:gakujo_task/provide.dart';
+import 'package:gakujo_task/views/common/widget.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
@@ -74,10 +75,24 @@ class TaskWidget extends StatelessWidget {
                   child: const Text('取得'),
                   onPressed: () {
                     Navigator.of(context).pop();
-                    context.read<ApiProvider>().fetchDetailQuiz(quiz);
+                    context.read<ApiRepository>().fetchDetailQuiz(quiz);
                   },
                 )
               ],
+            ),
+          );
+        } else {
+          showModalBottomSheet(
+            isScrollControlled: true,
+            shape: const RoundedRectangleBorder(
+                borderRadius:
+                    BorderRadius.vertical(top: Radius.circular(16.0))),
+            context: context,
+            builder: (context) => DraggableScrollableSheet(
+              expand: false,
+              builder: (context, controller) {
+                return buildQuizModal(context, quiz, controller);
+              },
             ),
           );
         }
@@ -145,10 +160,24 @@ class TaskWidget extends StatelessWidget {
                   child: const Text('取得'),
                   onPressed: () {
                     Navigator.of(context).pop();
-                    context.read<ApiProvider>().fetchDetailReport(report);
+                    context.read<ApiRepository>().fetchDetailReport(report);
                   },
                 )
               ],
+            ),
+          );
+        } else {
+          showModalBottomSheet(
+            isScrollControlled: true,
+            shape: const RoundedRectangleBorder(
+                borderRadius:
+                    BorderRadius.vertical(top: Radius.circular(16.0))),
+            context: context,
+            builder: (context) => DraggableScrollableSheet(
+              expand: false,
+              builder: (context, controller) {
+                return buildReportModal(context, report, controller);
+              },
             ),
           );
         }

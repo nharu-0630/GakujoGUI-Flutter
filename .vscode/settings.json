@@ -8,6 +8,11 @@
     "onclick",
     "prefs",
     "Referer",
+    "tbody",
     "xyzyx"
-  ]
+  ],
+  "files.associations": {
+    "*.rmd": "markdown",
+    "xstring": "cpp"
+  }
 }

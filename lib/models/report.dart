@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart' show ChangeNotifier;
 import 'package:gakujo_task/api/parse.dart';
 import 'package:hive/hive.dart';
 import 'package:html/dom.dart';
@@ -256,7 +257,7 @@ class ReportBox {
   }
 }
 
-class ReportRepository {
+class ReportRepository extends ChangeNotifier {
   late ReportBox _reportBox;
 
   ReportRepository(ReportBox reportBox) {
@@ -264,41 +265,50 @@ class ReportRepository {
   }
 
   Future<void> add(Report report, {bool overwrite = false}) async {
-    final box = await _reportBox.box;
-    if (!overwrite && box.containsKey(report.id)) return;
+    var box = await _reportBox.box;
+    if (!overwrite && box.containsKey(report.id)) {
+      Report oldReport = box.get(report.id)!;
+      oldReport.toRefresh(report);
+      await box.put(report.id, oldReport);
+    }
     await box.put(report.id, report);
+    notifyListeners();
   }
 
   Future<void> addAll(List<Report> reports) async {
-    final box = await _reportBox.box;
-    for (final report in reports) {
+    var box = await _reportBox.box;
+    for (var report in reports) {
       await box.put(report.id, report);
     }
+    notifyListeners();
   }
 
   Future<void> delete(Report report) async {
-    final box = await _reportBox.box;
+    var box = await _reportBox.box;
     await box.delete(report.id);
+    notifyListeners();
   }
 
   Future<void> deleteAll() async {
-    final box = await _reportBox.box;
+    var box = await _reportBox.box;
     await box.deleteFromDisk();
     await _reportBox.open();
+    notifyListeners();
   }
 
   Future<Report?> get(String id) async {
-    final box = await _reportBox.box;
+    var box = await _reportBox.box;
     return box.get(id);
   }
 
   Future<List<Report>> getAll() async {
-    final box = await _reportBox.box;
+    var box = await _reportBox.box;
     return box.values.toList().cast<Report>();
   }
 
   Future<void> setArchive(String id, bool value) async {
-    final box = await _reportBox.box;
+    var box = await _reportBox.box;
     box.get(id).isArchived = value;
+    notifyListeners();
   }
 }

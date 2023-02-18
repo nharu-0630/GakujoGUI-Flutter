@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart' show ChangeNotifier;
 import 'package:gakujo_task/api/parse.dart';
 import 'package:hive/hive.dart';
 import 'package:html/dom.dart';
@@ -253,7 +254,7 @@ class QuizBox {
   }
 }
 
-class QuizRepository {
+class QuizRepository extends ChangeNotifier {
   late QuizBox _quizBox;
 
   QuizRepository(QuizBox quizBox) {
@@ -261,45 +262,50 @@ class QuizRepository {
   }
 
   Future<void> add(Quiz quiz, {bool overwrite = false}) async {
-    final box = await _quizBox.box;
+    var box = await _quizBox.box;
     if (!overwrite && box.containsKey(quiz.id)) {
       Quiz oldQuiz = box.get(quiz.id)!;
       oldQuiz.toRefresh(quiz);
       await box.put(quiz.id, oldQuiz);
     }
     await box.put(quiz.id, quiz);
+    notifyListeners();
   }
 
   Future<void> addAll(List<Quiz> quizzes) async {
-    final box = await _quizBox.box;
-    for (final quiz in quizzes) {
+    var box = await _quizBox.box;
+    for (var quiz in quizzes) {
       await box.put(quiz.id, quiz);
     }
+    notifyListeners();
   }
 
   Future<void> delete(Quiz quiz) async {
-    final box = await _quizBox.box;
+    var box = await _quizBox.box;
     await box.delete(quiz.id);
+    notifyListeners();
   }
 
   Future<void> deleteAll() async {
-    final box = await _quizBox.box;
+    var box = await _quizBox.box;
     await box.deleteFromDisk();
     await _quizBox.open();
+    notifyListeners();
   }
 
   Future<Quiz?> get(String id) async {
-    final box = await _quizBox.box;
+    var box = await _quizBox.box;
     return box.get(id);
   }
 
   Future<List<Quiz>> getAll() async {
-    final box = await _quizBox.box;
+    var box = await _quizBox.box;
     return box.values.toList().cast<Quiz>();
   }
 
   Future<void> setArchive(String id, bool value) async {
-    final box = await _quizBox.box;
+    var box = await _quizBox.box;
     box.get(id).isArchived = value;
+    notifyListeners();
   }
 }

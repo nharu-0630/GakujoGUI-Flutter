@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:gakujo_task/provide.dart';
+import 'package:gakujo_task/api/provide.dart';
 import 'package:gakujo_task/views/home/home.dart';
 import 'package:gakujo_task/views/settings/settings.dart';
 import 'package:provider/provider.dart';
@@ -11,8 +11,8 @@ class App extends StatefulWidget {
   State<App> createState() => _AppState();
 }
 
-final scaffoldMessengerKey = GlobalKey<ScaffoldMessengerState>();
-final navigatorKey = GlobalKey<NavigatorState>();
+var scaffoldMessengerKey = GlobalKey<ScaffoldMessengerState>();
+var navigatorKey = GlobalKey<NavigatorState>();
 
 class _AppState extends State<App> {
   var _index = 0;
@@ -50,11 +50,15 @@ class _AppState extends State<App> {
       labelBehavior: NavigationDestinationLabelBehavior.onlyShowSelected,
       destinations: const [
         NavigationDestination(
-            icon: Icon(Icons.home_rounded), label: 'Home', tooltip: 'Home'),
+          icon: Icon(Icons.home_rounded),
+          label: 'Home',
+          tooltip: 'Home',
+        ),
         NavigationDestination(
-            icon: Icon(Icons.settings_rounded),
-            label: 'Settings',
-            tooltip: 'Settings'),
+          icon: Icon(Icons.settings_rounded),
+          label: 'Settings',
+          tooltip: 'Settings',
+        ),
       ],
     );
   }
@@ -64,10 +68,10 @@ PreferredSize buildAppBarBottom(BuildContext context) {
   return PreferredSize(
     preferredSize: const Size.fromHeight(6.0),
     child: Visibility(
-      visible: context.watch<ApiProvider>().isLoading,
+      visible: context.watch<ApiRepository>().isLoading,
       child: LinearProgressIndicator(
         minHeight: 3.0,
-        valueColor: context.watch<ApiProvider>().isError
+        valueColor: context.watch<ApiRepository>().isError
             ? AlwaysStoppedAnimation<Color>(Theme.of(context).colorScheme.error)
             : AlwaysStoppedAnimation<Color>(
                 Theme.of(context).colorScheme.primary,

@@ -1,13 +1,12 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
+import 'package:gakujo_task/api/provide.dart';
 import 'package:gakujo_task/app.dart';
 import 'package:gakujo_task/models/quiz.dart';
-import 'package:gakujo_task/provide.dart';
 import 'package:gakujo_task/views/common/widget.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
-import 'package:share_plus/share_plus.dart';
 
 class QuizPage extends StatefulWidget {
   const QuizPage({Key? key}) : super(key: key);
@@ -30,7 +29,7 @@ class _QuizPageState extends State<QuizPage> {
         if (snapshot.hasData) {
           _quizzes = snapshot.data!;
           _quizzes.sort(((a, b) => b.compareTo(a)));
-          final filteredQuizzes = _quizzes
+          var filteredQuizzes = _quizzes
               .where((e) => _filterStatus
                   ? !(e.isArchived ||
                       !(!e.isSubmitted &&
@@ -43,7 +42,7 @@ class _QuizPageState extends State<QuizPage> {
                   [_buildAppBar(context)],
               body: RefreshIndicator(
                 onRefresh: () async =>
-                    context.read<ApiProvider>().fetchQuizzes(),
+                    context.read<ApiRepository>().fetchQuizzes(),
                 child: filteredQuizzes.isEmpty
                     ? LayoutBuilder(
                         builder: (context, constraints) =>
@@ -177,7 +176,7 @@ class _QuizPageState extends State<QuizPage> {
         children: [
           SlidableAction(
             onPressed: (context) async =>
-                context.read<ApiProvider>().fetchDetailQuiz(quiz),
+                context.read<ApiRepository>().fetchDetailQuiz(quiz),
             backgroundColor: const Color(0xFF0392CF),
             foregroundColor: Colors.white,
             icon: Icons.sync_rounded,
@@ -203,7 +202,7 @@ class _QuizPageState extends State<QuizPage> {
                     child: const Text('取得'),
                     onPressed: () {
                       Navigator.of(context).pop();
-                      context.read<ApiProvider>().fetchDetailQuiz(quiz);
+                      context.read<ApiRepository>().fetchDetailQuiz(quiz);
                     },
                   )
                 ],
@@ -219,7 +218,7 @@ class _QuizPageState extends State<QuizPage> {
               builder: (context) => DraggableScrollableSheet(
                 expand: false,
                 builder: (context, controller) {
-                  return _buildModal(quiz, controller);
+                  return buildQuizModal(context, quiz, controller);
                 },
               ),
             );
@@ -283,166 +282,6 @@ class _QuizPageState extends State<QuizPage> {
           ],
         ),
       ),
-    );
-  }
-
-  Widget _buildModal(Quiz quiz, ScrollController controller) {
-    return ListView(
-      controller: controller,
-      padding: const EdgeInsets.all(16.0),
-      children: [
-        Padding(
-          padding: const EdgeInsets.all(4.0),
-          child: Align(
-            alignment: Alignment.centerLeft,
-            child: Text(
-              quiz.title,
-              style: Theme.of(context).textTheme.titleLarge,
-            ),
-          ),
-        ),
-        Padding(
-          padding: const EdgeInsets.all(4.0),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              Text(
-                DateFormat('yyyy/MM/dd HH:mm', 'ja')
-                    .format(quiz.startDateTime.toLocal()),
-                style: Theme.of(context).textTheme.bodyLarge,
-              ),
-              const Icon(Icons.arrow_right_alt_rounded),
-              Text(
-                DateFormat('yyyy/MM/dd HH:mm', 'ja')
-                    .format(quiz.endDateTime.toLocal()),
-                style: Theme.of(context).textTheme.bodyLarge,
-              ),
-            ],
-          ),
-        ),
-        Padding(
-          padding: const EdgeInsets.all(4.0),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.end,
-            children: [
-              Container(
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(8.0),
-                  border: Border.all(
-                    color: Theme.of(context).colorScheme.primary,
-                    width: 2,
-                  ),
-                ),
-                padding: const EdgeInsets.symmetric(
-                  vertical: 2.0,
-                  horizontal: 4.0,
-                ),
-                child: Text(
-                  quiz.status,
-                  style: Theme.of(context).textTheme.bodyLarge,
-                ),
-              ),
-              Container(
-                margin: const EdgeInsets.only(left: 8.0),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(8.0),
-                  border: Border.all(
-                    color: Theme.of(context).colorScheme.primary,
-                    width: 2,
-                  ),
-                ),
-                padding: const EdgeInsets.symmetric(
-                  vertical: 2.0,
-                  horizontal: 4.0,
-                ),
-                child: Text(
-                  quiz.isSubmitted ? '提出済' : '未提出',
-                  style: Theme.of(context).textTheme.bodyLarge,
-                ),
-              ),
-              Visibility(
-                visible: quiz.isArchived,
-                child: const Icon(Icons.archive_rounded),
-              )
-            ],
-          ),
-        ),
-        const SizedBox(height: 8.0),
-        Padding(
-          padding: const EdgeInsets.all(4.0),
-          child: SelectableText(
-            quiz.isAcquired ? quiz.description : '未取得',
-          ),
-        ),
-        const Padding(
-          padding: EdgeInsets.all(4.0),
-          child: Divider(thickness: 2.0),
-        ),
-        Padding(
-          padding: const EdgeInsets.all(4.0),
-          child: SelectableText(
-            quiz.isAcquired ? quiz.message : '未取得',
-          ),
-        ),
-        Visibility(
-          visible: quiz.fileNames?.isNotEmpty ?? false,
-          child: const Padding(
-            padding: EdgeInsets.all(4.0),
-            child: Divider(thickness: 2.0),
-          ),
-        ),
-        Visibility(
-          visible: quiz.fileNames?.isNotEmpty ?? false,
-          child: Padding(
-            padding: const EdgeInsets.all(4.0),
-            child: buildFileList(quiz.fileNames),
-          ),
-        ),
-        const SizedBox(height: 8.0),
-        Row(
-          children: [
-            Expanded(
-              child: Container(
-                padding: const EdgeInsets.all(4.0),
-                child: ElevatedButton(
-                  onPressed: () {
-                    context
-                        .read<QuizRepository>()
-                        .setArchive(quiz.id, !quiz.isArchived)
-                        .then((value) => setState(() {}));
-                    Navigator.of(context).pop();
-                  },
-                  child: Icon(quiz.isArchived
-                      ? Icons.unarchive_rounded
-                      : Icons.archive_rounded),
-                ),
-              ),
-            ),
-            Expanded(
-              child: Container(
-                padding: const EdgeInsets.all(4.0),
-                child: ElevatedButton(
-                  onPressed: () async =>
-                      context.read<ApiProvider>().fetchDetailQuiz(quiz),
-                  child: const Icon(Icons.sync_rounded),
-                ),
-              ),
-            ),
-            Expanded(
-              child: Container(
-                padding: const EdgeInsets.all(4.0),
-                child: ElevatedButton(
-                  onPressed: () => Share.share(
-                      '${quiz.description}\n\n${quiz.message}',
-                      subject: quiz.title),
-                  child: const Icon(Icons.share_rounded),
-                ),
-              ),
-            ),
-          ],
-        ),
-        const SizedBox(height: 8.0),
-      ],
     );
   }
 }

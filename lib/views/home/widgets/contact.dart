@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:gakujo_task/models/contact.dart';
 import 'package:gakujo_task/models/subject.dart';
-import 'package:gakujo_task/views/contact/contact.dart';
+import 'package:gakujo_task/views/page/contact.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
@@ -17,8 +17,8 @@ class ContactWidget extends StatelessWidget {
       ]),
       builder: (context, AsyncSnapshot<List<dynamic>> snapshot) {
         if (snapshot.hasData) {
-          final subjects = snapshot.data![0] as List<Subject>;
-          final contacts = snapshot.data![1] as List<Contact>;
+          var subjects = snapshot.data![0] as List<Subject>;
+          var contacts = snapshot.data![1] as List<Contact>;
           subjects.sort((a, b) {
             var aContact =
                 contacts.firstWhere((e) => e.subjects == a.subjectsName);

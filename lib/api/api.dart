@@ -13,6 +13,7 @@ import 'package:gakujo_task/models/quiz.dart';
 import 'package:gakujo_task/models/report.dart';
 import 'package:gakujo_task/models/settings.dart';
 import 'package:gakujo_task/models/subject.dart';
+import 'package:html/dom.dart';
 import 'package:html/parser.dart' show parse;
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
@@ -21,9 +22,9 @@ import 'package:uuid/uuid.dart';
 import 'package:version/version.dart';
 
 class Api {
-  static final Version version = Version(1, 2, 1);
+  static final version = Version(1, 2, 1);
 
-  final Duration _interval = const Duration(milliseconds: 2000);
+  final _interval = const Duration(milliseconds: 2000);
 
   Future<Settings>? get _settings =>
       navigatorKey.currentContext?.read<SettingsRepository>().load();
@@ -65,7 +66,7 @@ class Api {
   }
 
   Future<void> loadSettings() async {
-    final settings = await _settings;
+    var settings = await _settings;
     if (settings?.accessEnvironmentKey != null &&
         settings?.accessEnvironmentValue != null) {
       _cookieJar.saveFromResponse(
@@ -273,7 +274,7 @@ class Api {
 
     _updateToken(response.data);
 
-    final settings = await _settings;
+    final Settings? settings = await _settings;
     if (parse(response.data)
         .querySelectorAll(
             '#container > div > form > div:nth-child(2) > div.access_env > table > tbody > tr > td > input[type=text]')

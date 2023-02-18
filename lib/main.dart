@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:gakujo_task/api/provide.dart';
 import 'package:gakujo_task/app.dart';
 import 'package:gakujo_task/models/contact.dart';
 import 'package:gakujo_task/models/quiz.dart';
 import 'package:gakujo_task/models/report.dart';
 import 'package:gakujo_task/models/settings.dart';
 import 'package:gakujo_task/models/subject.dart';
-import 'package:gakujo_task/provide.dart';
 import 'package:hive_flutter/adapters.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:provider/provider.dart';
@@ -45,12 +45,12 @@ class _MyAppState extends State<MyApp> {
         const SystemUiOverlayStyle(statusBarColor: Colors.transparent));
     return MultiProvider(
       providers: [
-        ChangeNotifierProvider(create: (_) => ApiProvider()),
-        Provider(create: (_) => ContactRepository(ContactBox())),
-        Provider(create: (_) => SubjectRepository(SubjectBox())),
-        Provider(create: (_) => SettingsRepository(SettingsBox())),
-        Provider(create: (_) => ReportRepository(ReportBox())),
-        Provider(create: (_) => QuizRepository(QuizBox())),
+        ChangeNotifierProvider(create: (_) => ApiRepository()),
+        ChangeNotifierProvider(create: (_) => ContactRepository(ContactBox())),
+        ChangeNotifierProvider(create: (_) => SubjectRepository(SubjectBox())),
+        ChangeNotifierProvider(create: (_) => SettingsRepository(SettingsBox())),
+        ChangeNotifierProvider(create: (_) => ReportRepository(ReportBox())),
+        ChangeNotifierProvider(create: (_) => QuizRepository(QuizBox())),
       ],
       child: const App(),
     );

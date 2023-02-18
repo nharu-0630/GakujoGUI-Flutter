@@ -1,13 +1,12 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
+import 'package:gakujo_task/api/provide.dart';
 import 'package:gakujo_task/app.dart';
 import 'package:gakujo_task/models/report.dart';
-import 'package:gakujo_task/provide.dart';
 import 'package:gakujo_task/views/common/widget.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
-import 'package:share_plus/share_plus.dart';
 
 class ReportPage extends StatefulWidget {
   const ReportPage({Key? key}) : super(key: key);
@@ -30,7 +29,7 @@ class _ReportPageState extends State<ReportPage> {
         if (snapshot.hasData) {
           _reports = snapshot.data!;
           _reports.sort(((a, b) => b.compareTo(a)));
-          final filteredReports = _reports
+          var filteredReports = _reports
               .where((e) => _filterStatus
                   ? !(e.isArchived ||
                       !(!e.isSubmitted &&
@@ -43,7 +42,7 @@ class _ReportPageState extends State<ReportPage> {
                   [_buildAppBar(context)],
               body: RefreshIndicator(
                 onRefresh: () async =>
-                    context.read<ApiProvider>().fetchReports(),
+                    context.read<ApiRepository>().fetchReports(),
                 child: filteredReports.isEmpty
                     ? LayoutBuilder(
                         builder: (context, constraints) =>
@@ -110,12 +109,8 @@ class _ReportPageState extends State<ReportPage> {
       ),
       title: _searchStatus
           ? TextField(
-              onChanged: (value) {
-                setState(() {
-                  _suggestReports =
-                      _reports.where((e) => e.contains(value)).toList();
-                });
-              },
+              onChanged: (value) => setState(() => _suggestReports =
+                  _reports.where((e) => e.contains(value)).toList()),
               autofocus: true,
               textInputAction: TextInputAction.search,
             )
@@ -125,9 +120,7 @@ class _ReportPageState extends State<ReportPage> {
               Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: IconButton(
-                  onPressed: (() => setState(() {
-                        _searchStatus = false;
-                      })),
+                  onPressed: (() => setState(() => _searchStatus = false)),
                   icon: const Icon(Icons.close_rounded),
                 ),
               ),
@@ -136,9 +129,8 @@ class _ReportPageState extends State<ReportPage> {
               Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: IconButton(
-                  onPressed: (() => setState(() {
-                        _filterStatus = !_filterStatus;
-                      })),
+                  onPressed: (() =>
+                      setState(() => _filterStatus = !_filterStatus)),
                   icon: Icon(_filterStatus
                       ? Icons.filter_alt_rounded
                       : Icons.filter_alt_off_rounded),
@@ -184,7 +176,7 @@ class _ReportPageState extends State<ReportPage> {
         children: [
           SlidableAction(
             onPressed: (context) async =>
-                context.read<ApiProvider>().fetchDetailReport(report),
+                context.read<ApiRepository>().fetchDetailReport(report),
             backgroundColor: const Color(0xFF0392CF),
             foregroundColor: Colors.white,
             icon: Icons.sync_rounded,
@@ -210,7 +202,7 @@ class _ReportPageState extends State<ReportPage> {
                     child: const Text('取得'),
                     onPressed: () {
                       Navigator.of(context).pop();
-                      context.read<ApiProvider>().fetchDetailReport(report);
+                      context.read<ApiRepository>().fetchDetailReport(report);
                     },
                   )
                 ],
@@ -226,7 +218,7 @@ class _ReportPageState extends State<ReportPage> {
               builder: (context) => DraggableScrollableSheet(
                 expand: false,
                 builder: (context, controller) {
-                  return _buildModal(report, controller);
+                  return buildReportModal(context, report, controller);
                 },
               ),
             );
@@ -290,168 +282,6 @@ class _ReportPageState extends State<ReportPage> {
           ],
         ),
       ),
-    );
-  }
-
-  Widget _buildModal(Report report, ScrollController controller) {
-    return ListView(
-      controller: controller,
-      padding: const EdgeInsets.all(16.0),
-      children: [
-        Padding(
-          padding: const EdgeInsets.all(4.0),
-          child: Align(
-            alignment: Alignment.centerLeft,
-            child: Text(
-              report.title,
-              style: Theme.of(context).textTheme.titleLarge,
-            ),
-          ),
-        ),
-        Padding(
-          padding: const EdgeInsets.all(4.0),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              Text(
-                DateFormat('yyyy/MM/dd HH:mm', 'ja')
-                    .format(report.startDateTime.toLocal()),
-                style: Theme.of(context).textTheme.bodyLarge,
-              ),
-              const Icon(Icons.arrow_right_alt_rounded),
-              Text(
-                DateFormat('yyyy/MM/dd HH:mm', 'ja')
-                    .format(report.endDateTime.toLocal()),
-                style: Theme.of(context).textTheme.bodyLarge,
-              ),
-            ],
-          ),
-        ),
-        Padding(
-          padding: const EdgeInsets.all(4.0),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.end,
-            children: [
-              Container(
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(8.0),
-                  border: Border.all(
-                    color: Theme.of(context).colorScheme.primary,
-                    width: 2,
-                  ),
-                ),
-                padding: const EdgeInsets.symmetric(
-                  vertical: 2.0,
-                  horizontal: 4.0,
-                ),
-                child: Text(
-                  report.status,
-                  style: Theme.of(context).textTheme.bodyLarge,
-                ),
-              ),
-              Container(
-                margin: const EdgeInsets.only(left: 8.0),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(8.0),
-                  border: Border.all(
-                    color: Theme.of(context).colorScheme.primary,
-                    width: 2,
-                  ),
-                ),
-                padding: const EdgeInsets.symmetric(
-                  vertical: 2.0,
-                  horizontal: 4.0,
-                ),
-                child: Text(
-                  report.isSubmitted
-                      ? '提出済 ${DateFormat('yyyy/MM/dd HH:mm', 'ja').format(report.submittedDateTime.toLocal())}'
-                      : '未提出',
-                  style: Theme.of(context).textTheme.bodyLarge,
-                ),
-              ),
-              Visibility(
-                visible: report.isArchived,
-                child: const Icon(Icons.archive_rounded),
-              )
-            ],
-          ),
-        ),
-        const SizedBox(height: 8.0),
-        Padding(
-          padding: const EdgeInsets.all(4.0),
-          child: SelectableText(
-            report.isAcquired ? report.description : '未取得',
-          ),
-        ),
-        const Padding(
-          padding: EdgeInsets.all(4.0),
-          child: Divider(thickness: 2.0),
-        ),
-        Padding(
-          padding: const EdgeInsets.all(4.0),
-          child: SelectableText(
-            report.isAcquired ? report.message : '未取得',
-          ),
-        ),
-        Visibility(
-          visible: report.fileNames?.isNotEmpty ?? false,
-          child: const Padding(
-            padding: EdgeInsets.all(4.0),
-            child: Divider(thickness: 2.0),
-          ),
-        ),
-        Visibility(
-          visible: report.fileNames?.isNotEmpty ?? false,
-          child: Padding(
-            padding: const EdgeInsets.all(4.0),
-            child: buildFileList(report.fileNames),
-          ),
-        ),
-        const SizedBox(height: 8.0),
-        Row(
-          children: [
-            Expanded(
-              child: Container(
-                padding: const EdgeInsets.all(4.0),
-                child: ElevatedButton(
-                  onPressed: () {
-                    context
-                        .read<ReportRepository>()
-                        .setArchive(report.id, !report.isArchived)
-                        .then((value) => setState(() {}));
-                    Navigator.of(context).pop();
-                  },
-                  child: Icon(report.isArchived
-                      ? Icons.unarchive_rounded
-                      : Icons.archive_rounded),
-                ),
-              ),
-            ),
-            Expanded(
-              child: Container(
-                padding: const EdgeInsets.all(4.0),
-                child: ElevatedButton(
-                  onPressed: () async =>
-                      context.read<ApiProvider>().fetchDetailReport(report),
-                  child: const Icon(Icons.sync_rounded),
-                ),
-              ),
-            ),
-            Expanded(
-              child: Container(
-                padding: const EdgeInsets.all(4.0),
-                child: ElevatedButton(
-                  onPressed: () => Share.share(
-                      '${report.description}\n\n${report.message}',
-                      subject: report.title),
-                  child: const Icon(Icons.share_rounded),
-                ),
-              ),
-            ),
-          ],
-        ),
-        const SizedBox(height: 8.0),
-      ],
     );
   }
 }

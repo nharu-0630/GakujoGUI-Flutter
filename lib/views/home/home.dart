@@ -1,12 +1,14 @@
 import 'package:cached_memory_image/provider/cached_memory_image_provider.dart';
 import 'package:flutter/material.dart';
+import 'package:gakujo_task/api/provide.dart';
 import 'package:gakujo_task/app.dart';
+import 'package:gakujo_task/models/quiz.dart';
+import 'package:gakujo_task/models/report.dart';
 import 'package:gakujo_task/models/settings.dart';
-import 'package:gakujo_task/provide.dart';
 import 'package:gakujo_task/views/home/widgets/contact.dart';
 import 'package:gakujo_task/views/home/widgets/task.dart';
-import 'package:gakujo_task/views/task/quiz.dart';
-import 'package:gakujo_task/views/task/report.dart';
+import 'package:gakujo_task/views/page/quiz.dart';
+import 'package:gakujo_task/views/page/report.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:sticky_headers/sticky_headers.dart';
@@ -18,17 +20,17 @@ class HomeWidget extends StatefulWidget {
   State<HomeWidget> createState() => _HomeWidgetState();
 }
 
-final scaffoldKey = GlobalKey<ScaffoldState>();
+var scaffoldKey = GlobalKey<ScaffoldState>();
 
 class _HomeWidgetState extends State<HomeWidget> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       key: scaffoldKey,
-      drawer: _buildDrawer(context),
+      drawer: _buildDrawer(),
       appBar: _buildAppBar(),
       body: RefreshIndicator(
-        onRefresh: () async => context.read<ApiProvider>().fetchAll(),
+        onRefresh: () async => context.read<ApiRepository>().fetchAll(),
         child: ListView(
           physics: const AlwaysScrollableScrollPhysics(),
           children: [
@@ -52,7 +54,7 @@ class _HomeWidgetState extends State<HomeWidget> {
                     IconButton(
                       icon: const Icon(Icons.sync_rounded),
                       onPressed: () async =>
-                          context.read<ApiProvider>().fetchTasks(),
+                          context.read<ApiRepository>().fetchTasks(),
                     ),
                   ],
                 ),
@@ -80,7 +82,7 @@ class _HomeWidgetState extends State<HomeWidget> {
                     IconButton(
                       icon: const Icon(Icons.sync_rounded),
                       onPressed: () async =>
-                          context.read<ApiProvider>().fetchContacts(),
+                          context.read<ApiRepository>().fetchContacts(),
                     ),
                   ],
                 ),
@@ -94,7 +96,7 @@ class _HomeWidgetState extends State<HomeWidget> {
     );
   }
 
-  Widget _buildDrawer(BuildContext context) {
+  Widget _buildDrawer() {
     return Drawer(
       child: ListView(
         children: [
@@ -102,19 +104,57 @@ class _HomeWidgetState extends State<HomeWidget> {
             child: DrawerHeader(
               child: Column(
                 children: [
-                  Text('GakujoTask',
-                      style: Theme.of(context).textTheme.titleLarge),
+                  Text(
+                    'GakujoTask',
+                    style: Theme.of(context).textTheme.titleLarge,
+                  ),
+                  const SizedBox(height: 16.0),
                   FutureBuilder(
                     future: context.watch<SettingsRepository>().load(),
                     builder: ((context, AsyncSnapshot<Settings> snapshot) =>
                         snapshot.hasData
-                            ? Text(
-                                (snapshot.data?.lastLoginTime ==
-                                        DateTime.fromMicrosecondsSinceEpoch(0)
-                                    ? ''
-                                    : DateFormat('yyyy/MM/dd HH:mm', 'ja')
-                                        .format(snapshot.data!.lastLoginTime)),
-                                style: Theme.of(context).textTheme.titleMedium,
+                            ? Column(
+                                children: [
+                                  Row(
+                                    children: [
+                                      const Icon(Icons.lock_clock_rounded),
+                                      const SizedBox(width: 8.0),
+                                      Text(
+                                        DateFormat('yyyy/MM/dd HH:mm', 'ja')
+                                            .format(
+                                                snapshot.data!.lastLoginTime),
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .titleMedium,
+                                      ),
+                                    ],
+                                  ),
+                                  Row(
+                                    children: [
+                                      const Icon(Icons.person_rounded),
+                                      const SizedBox(width: 8.0),
+                                      Text(
+                                        snapshot.data!.username ?? '',
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .titleMedium,
+                                      ),
+                                    ],
+                                  ),
+                                  Row(
+                                    children: [
+                                      const Icon(Icons.security_rounded),
+                                      const SizedBox(width: 8.0),
+                                      Text(
+                                        snapshot.data!.accessEnvironmentName ??
+                                            '',
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .titleMedium,
+                                      ),
+                                    ],
+                                  ),
+                                ],
                               )
                             : const SizedBox.shrink()),
                   ),
@@ -124,10 +164,32 @@ class _HomeWidgetState extends State<HomeWidget> {
           ),
           ListTile(
             title: Row(
-              children: const [
-                Icon(Icons.text_snippet_rounded),
-                SizedBox(width: 8.0),
-                Text('レポート'),
+              children: [
+                const Icon(Icons.text_snippet_rounded),
+                const SizedBox(width: 8.0),
+                Text(
+                  'レポート',
+                  style: Theme.of(context).textTheme.titleMedium,
+                ),
+                const Expanded(child: SizedBox()),
+                FutureBuilder(
+                  future: context.watch<ReportRepository>().getAll(),
+                  builder: (context, AsyncSnapshot<List<Report>> snapshot) {
+                    if (snapshot.hasData) {
+                      return Text(
+                        snapshot.data!
+                            .where((e) => !(e.isArchived ||
+                                !(!e.isSubmitted &&
+                                    e.endDateTime.isAfter(DateTime.now()))))
+                            .length
+                            .toString(),
+                        style: Theme.of(context).textTheme.titleMedium,
+                      );
+                    } else {
+                      return const SizedBox.shrink();
+                    }
+                  },
+                ),
               ],
             ),
             onTap: () {
@@ -138,10 +200,32 @@ class _HomeWidgetState extends State<HomeWidget> {
           ),
           ListTile(
             title: Row(
-              children: const [
-                Icon(Icons.quiz_rounded),
-                SizedBox(width: 8.0),
-                Text('小テスト'),
+              children: [
+                const Icon(Icons.quiz_rounded),
+                const SizedBox(width: 8.0),
+                Text(
+                  '小テスト',
+                  style: Theme.of(context).textTheme.titleMedium,
+                ),
+                const Expanded(child: SizedBox()),
+                FutureBuilder(
+                  future: context.watch<QuizRepository>().getAll(),
+                  builder: (context, AsyncSnapshot<List<Quiz>> snapshot) {
+                    if (snapshot.hasData) {
+                      return Text(
+                        snapshot.data!
+                            .where((e) => !(e.isArchived ||
+                                !(!e.isSubmitted &&
+                                    e.endDateTime.isAfter(DateTime.now()))))
+                            .length
+                            .toString(),
+                        style: Theme.of(context).textTheme.titleMedium,
+                      );
+                    } else {
+                      return const SizedBox.shrink();
+                    }
+                  },
+                ),
               ],
             ),
             onTap: () {
@@ -184,23 +268,20 @@ class _HomeWidgetState extends State<HomeWidget> {
         future: context.watch<SettingsRepository>().load(),
         builder: (context, AsyncSnapshot<Settings> snapshot) {
           if (snapshot.hasData) {
-            return Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Row(
-                children: [
-                  Text(
-                    snapshot.data?.fullName == null
-                        ? 'Hi!'
-                        : 'Hi, ${snapshot.data?.fullName}!',
-                  ),
-                  const Spacer(),
-                  IconButton(
-                    icon: const Icon(Icons.sync_rounded),
-                    onPressed: () async =>
-                        context.read<ApiProvider>().fetchLogin(),
-                  ),
-                ],
-              ),
+            return Row(
+              children: [
+                Text(
+                  snapshot.data?.fullName == null
+                      ? 'Hi!'
+                      : 'Hi, ${snapshot.data?.fullName}!',
+                ),
+                const Spacer(),
+                IconButton(
+                  icon: const Icon(Icons.sync_rounded),
+                  onPressed: () async =>
+                      context.read<ApiRepository>().fetchLogin(),
+                ),
+              ],
             );
           } else {
             return const SizedBox.shrink();
