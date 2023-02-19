@@ -181,11 +181,11 @@ class ApiRepository extends ChangeNotifier {
   void fetchGrades() async {
     if (isLoading) return;
     _toggleLoading();
-    // try {
-    await _api.fetchGrades();
-    _toggleLoading();
-    // } catch (e) {
-    //   _onError(e);
-    // }
+    try {
+      await _api.fetchGrades();
+      _toggleLoading();
+    } catch (e) {
+      _onError(e);
+    }
   }
 }

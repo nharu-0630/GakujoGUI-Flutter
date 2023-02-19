@@ -139,7 +139,7 @@ class _GradePageState extends State<GradePage> {
           Expanded(
             child: Text(
               grade.subjectsName,
-              style: Theme.of(context).textTheme.bodyMedium,
+              style: Theme.of(context).textTheme.titleMedium,
               overflow: TextOverflow.ellipsis,
             ),
           ),
@@ -151,16 +151,41 @@ class _GradePageState extends State<GradePage> {
         ],
       ),
       subtitle: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Expanded(
+          Text(
+            grade.teacherName.toString(),
+            style: Theme.of(context).textTheme.bodyMedium,
+          ),
+          Padding(
+            padding: const EdgeInsets.only(left: 8.0),
             child: Text(
-              grade.gp.toString(),
-              style: Theme.of(context)
-                  .textTheme
-                  .titleMedium
-                  ?.copyWith(fontWeight: FontWeight.bold),
-              overflow: TextOverflow.ellipsis,
+              grade.selectionSection.toString(),
+              style: Theme.of(context).textTheme.bodyMedium,
+            ),
+          ),
+          const Expanded(child: SizedBox()),
+          Text(
+            grade.evaluation,
+            style: Theme.of(context).textTheme.titleMedium,
+          ),
+          Visibility(
+            visible: grade.score != null,
+            child: Padding(
+              padding: const EdgeInsets.only(left: 8.0),
+              child: Text(
+                grade.score.toString(),
+                style: Theme.of(context).textTheme.titleMedium,
+              ),
+            ),
+          ),
+          Visibility(
+            visible: grade.gp != null,
+            child: Padding(
+              padding: const EdgeInsets.only(left: 8.0),
+              child: Text(
+                grade.gp.toString(),
+                style: Theme.of(context).textTheme.titleMedium,
+              ),
             ),
           ),
         ],

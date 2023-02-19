@@ -544,7 +544,7 @@ class Api {
     );
     _updateToken(response.data, required: true);
 
-    navigatorKey.currentContext?.watch<SubjectRepository>().deleteAll();
+    await navigatorKey.currentContext?.watch<SubjectRepository>().deleteAll();
     navigatorKey.currentContext?.watch<SubjectRepository>().addAll(
         parse(response.data)
             .querySelector('#st1')!
@@ -882,7 +882,7 @@ class Api {
   }
 
   Future<bool> fetchAcademicSystem() async {
-    await _client.getUri<dynamic>(
+    await _client.postUri<dynamic>(
       Uri.https(
         'gakujo.shizuoka.ac.jp',
         '/kyoumu/preLogin.do',
@@ -901,9 +901,11 @@ class Api {
       Uri.https(
         'gakujo.shizuoka.ac.jp',
         '/portal/home/systemCooperationLink/initializeShibboleth',
+        {
+          'renkeiType': 'kyoumu',
+        },
       ),
       data: {
-        'renkeiType': 'kyoumu',
         'org.apache.struts.taglib.html.TOKEN': _token,
       },
       options: Options(
@@ -1007,7 +1009,7 @@ class Api {
     var document = parse(response.data);
 
     if (document.querySelector('table.txt12') != null) {
-      navigatorKey.currentContext?.read<GradeRepository>().deleteAll();
+      await navigatorKey.currentContext?.read<GradeRepository>().deleteAll();
       if (kDebugMode) {
         print(document
             .querySelector('table.txt12')!
