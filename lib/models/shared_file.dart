@@ -40,12 +40,12 @@ class SharedFile implements Comparable<SharedFile> {
 
   factory SharedFile.fromElement(Element element) {
     var subject =
-        element.querySelectorAll('td')[0].text.trimWhiteSpace().trimSubject();
+        element.querySelectorAll('td')[1].text.trimWhiteSpace().trimSubject();
     var title =
-        element.querySelectorAll('td')[1].querySelector('a')!.text.trim();
-    var fileSize = element.querySelectorAll('td')[2].text.trim();
+        element.querySelectorAll('td')[2].querySelector('a')!.text.trim();
+    var fileSize = element.querySelectorAll('td')[3].text.trim();
     var updateDateTime =
-        element.querySelectorAll('td')[3].text.trim().parseDateTime();
+        element.querySelectorAll('td')[4].text.trim().parseDateTime();
     return SharedFile(
       subject,
       title,
@@ -68,14 +68,13 @@ class SharedFile implements Comparable<SharedFile> {
   void toDetail(Document document) {
     isAcquired = true;
     description = document
-            .querySelector(
-                '#right-box > div.right-module-bold.mt15 > div > div > div > table.ttb_entry > tbody > tr:nth-child(3) > td')
+            .querySelector('table.ttb_entry > tbody > tr:nth-child(4) > td')
             ?.text ??
         '';
     publicPeriod = document
-            .querySelector(
-                '#right-box > div.right-module-bold.mt15 > div > div > div > table.ttb_entry > tbody > tr:nth-child(4) > td')
-            ?.text ??
+            .querySelector('table.ttb_entry > tbody > tr:nth-child(5) > td')
+            ?.text
+            .trimWhiteSpace() ??
         '';
   }
 

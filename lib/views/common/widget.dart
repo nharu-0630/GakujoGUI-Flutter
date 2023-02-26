@@ -86,15 +86,17 @@ Icon _buildExtIcon(String ext) {
   }
 }
 
-SelectableAutoLinkText buildAutoLinkText(BuildContext context, String text) {
-  return SelectableAutoLinkText(
-    text,
-    style: Theme.of(context).textTheme.bodyMedium,
-    linkStyle: const TextStyle(color: Colors.blueAccent),
-    onTap: (url) => launchUrlString(url, mode: LaunchMode.inAppWebView),
-    onLongPress: (url) => Share.share(url),
-    linkRegExpPattern:
-        r'https?:\/\/(?:www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b(?:[-a-zA-Z0-9()@:%_\+.~#?&\/=]*)',
+Widget buildAutoLinkText(BuildContext context, String text) {
+  return Flexible(
+    child: SelectableAutoLinkText(
+      text,
+      style: Theme.of(context).textTheme.bodyMedium,
+      linkStyle: const TextStyle(color: Colors.blueAccent),
+      onTap: (url) => launchUrlString(url, mode: LaunchMode.inAppWebView),
+      onLongPress: (url) => Share.share(url),
+      linkRegExpPattern:
+          r'https?:\/\/(?:www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b(?:[-a-zA-Z0-9()@:%_\+.~#?&\/=]*)',
+    ),
   );
 }
 
@@ -183,7 +185,8 @@ Widget buildQuizModal(
       const SizedBox(height: 8.0),
       Padding(
         padding: const EdgeInsets.all(4.0),
-        child: SelectableText(
+        child: buildAutoLinkText(
+          context,
           quiz.isAcquired ? quiz.description : '未取得',
         ),
       ),
@@ -193,7 +196,8 @@ Widget buildQuizModal(
       ),
       Padding(
         padding: const EdgeInsets.all(4.0),
-        child: SelectableText(
+        child: buildAutoLinkText(
+          context,
           quiz.isAcquired ? quiz.message : '未取得',
         ),
       ),
@@ -345,7 +349,8 @@ Widget buildReportModal(
       const SizedBox(height: 8.0),
       Padding(
         padding: const EdgeInsets.all(4.0),
-        child: SelectableText(
+        child: buildAutoLinkText(
+          context,
           report.isAcquired ? report.description : '未取得',
         ),
       ),
@@ -355,7 +360,8 @@ Widget buildReportModal(
       ),
       Padding(
         padding: const EdgeInsets.all(4.0),
-        child: SelectableText(
+        child: buildAutoLinkText(
+          context,
           report.isAcquired ? report.message : '未取得',
         ),
       ),
@@ -439,18 +445,6 @@ Widget buildSharedFileModal(
       Padding(
         padding: const EdgeInsets.all(4.0),
         child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: [
-            Text(
-              sharedFile.publicPeriod,
-              style: Theme.of(context).textTheme.bodyLarge,
-            ),
-          ],
-        ),
-      ),
-      Padding(
-        padding: const EdgeInsets.all(4.0),
-        child: Row(
           mainAxisAlignment: MainAxisAlignment.end,
           children: [
             Container(
@@ -480,7 +474,20 @@ Widget buildSharedFileModal(
       const SizedBox(height: 8.0),
       Padding(
         padding: const EdgeInsets.all(4.0),
-        child: SelectableText(
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: [
+            Text(
+              sharedFile.publicPeriod,
+              style: Theme.of(context).textTheme.bodyLarge,
+            ),
+          ],
+        ),
+      ),
+      Padding(
+        padding: const EdgeInsets.all(4.0),
+        child: buildAutoLinkText(
+          context,
           sharedFile.isAcquired ? sharedFile.description : '未取得',
         ),
       ),

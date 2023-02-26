@@ -118,6 +118,27 @@ class Api {
         'gakujo.shizuoka.ac.jp',
         '/portal/',
       ),
+      options: Options(
+        headers: {
+          'Accept':
+              'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
+        },
+      ),
+    );
+
+    await Future.delayed(_interval);
+    _client.getUri<dynamic>(
+      Uri.https(
+        'gakujo.shizuoka.ac.jp',
+        '/UI/jsp/topPage/topPage.jsp',
+        {'_': DateTime.now().millisecondsSinceEpoch.toString()},
+      ),
+      options: Options(
+        headers: {
+          'Accept': 'text/html, */*; q=0.01',
+          'Referer': 'https://gakujo.shizuoka.ac.jp/portal/',
+        },
+      ),
     );
 
     await Future.delayed(_interval);
@@ -126,11 +147,26 @@ class Api {
         'gakujo.shizuoka.ac.jp',
         '/portal/login/preLogin/preLogin',
       ),
-      data: 'mistakeChecker=0',
+      data: {'mistakeChecker': '0'},
       options: Options(
-        followRedirects: false,
         headers: {
+          'Accept': 'application/json, text/javascript, */*; q=0.01',
           'Origin': 'https://gakujo.shizuoka.ac.jp',
+          'Referer': 'https://gakujo.shizuoka.ac.jp/portal/',
+        },
+      ),
+    );
+
+    await Future.delayed(_interval);
+    _client.getUri<dynamic>(
+      Uri.https(
+        'gakujo.shizuoka.ac.jp',
+        '/UI/jsp/topPage/topPage.jsp',
+        {'_': DateTime.now().millisecondsSinceEpoch.toString()},
+      ),
+      options: Options(
+        headers: {
+          'Accept': 'text/html, */*; q=0.01',
           'Referer': 'https://gakujo.shizuoka.ac.jp/portal/',
         },
       ),
@@ -142,9 +178,15 @@ class Api {
         'gakujo.shizuoka.ac.jp',
         '/portal/shibbolethlogin/shibbolethLogin/initLogin/sso',
       ),
-      data: 'selectLocale=ja&mistakeChecker=0&EXCLUDE_SET=',
+      data: {
+        'selectLocale': 'ja',
+        'mistakeChecker': '0',
+        'EXCLUDE_SET': '',
+      },
       options: Options(
         headers: {
+          'Accept':
+              'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
           'Origin': 'https://gakujo.shizuoka.ac.jp',
           'Referer': 'https://gakujo.shizuoka.ac.jp/portal/',
         },
@@ -158,6 +200,8 @@ class Api {
       response.headers.value('location')!,
       options: Options(
         headers: {
+          'Accept':
+              'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
           'Referer': 'https://gakujo.shizuoka.ac.jp/portal/',
         },
         followRedirects: false,
@@ -171,14 +215,13 @@ class Api {
         Uri.https(
           'idp.shizuoka.ac.jp',
           '/idp/profile/SAML2/Redirect/SSO',
-          {
-            'execution': 'e1s1',
-          },
+          {'execution': 'e1s1'},
         ),
         options: Options(
-          followRedirects: false,
           headers: {
-            'Referer': 'https://gakujo.shizuoka.ac.jp/portal/',
+            'Accept':
+                'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
+            'Referer': 'https://gakujo.shizuoka.ac.jp/',
           },
         ),
       );
@@ -188,16 +231,18 @@ class Api {
         Uri.https(
           'idp.shizuoka.ac.jp',
           '/idp/profile/SAML2/Redirect/SSO',
-          {
-            'execution': 'e1s1',
-          },
+          {'execution': 'e1s1'},
         ),
-        data:
-            'j_username=${await _username}&j_password=${await _password}&_eventId_proceed=',
+        data: {
+          'j_username': await _username,
+          'j_password': await _password,
+          '_eventId_proceed': '',
+        },
         options: Options(
-          followRedirects: false,
           headers: {
             'Origin': 'https://idp.shizuoka.ac.jp',
+            'Accept':
+                'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
             'Referer':
                 'https://idp.shizuoka.ac.jp/idp/profile/SAML2/Redirect/SSO?execution=e1s1',
           },
@@ -240,7 +285,7 @@ class Api {
       options: Options(
         headers: {
           'Accept':
-              'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
+              'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
           'Origin': 'https://idp.shizuoka.ac.jp',
           'Referer': 'https://idp.shizuoka.ac.jp/',
         },
@@ -258,7 +303,7 @@ class Api {
       options: Options(
         headers: {
           'Accept':
-              'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
+              'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
           'Referer': 'https://idp.shizuoka.ac.jp/',
         },
         followRedirects: false,
@@ -289,20 +334,60 @@ class Api {
           'gakujo.shizuoka.ac.jp',
           '/portal/common/accessEnvironmentRegist/goHome/',
         ),
-        data:
-            'org.apache.struts.taglib.html.TOKEN=$_token&accessEnvName=$accessEnvName&newAccessKey=',
-        options: Options(),
+        data: {
+          'org.apache.struts.taglib.html.TOKEN': _token,
+          'accessEnvName': accessEnvName,
+          'newAccessKey': '',
+        },
+        options: Options(
+          headers: {
+            'Accept':
+                'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
+            'Origin': 'https://gakujo.shizuoka.ac.jp',
+            'Referer':
+                'https://gakujo.shizuoka.ac.jp/portal/shibbolethlogin/shibbolethLogin/initLogin/sso',
+          },
+        ),
+      );
+
+      await Future.delayed(_interval);
+      response = await _client.postUri<dynamic>(
+        Uri.https(
+          'gakujo.shizuoka.ac.jp',
+          '/portal/home/home/initialize',
+          {'EXCLUDE_SET': ''},
+        ),
+        data: {'EXCLUDE_SET': ''},
+        options: Options(
+          headers: {
+            'Accept':
+                'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
+            'Origin': 'https://gakujo.shizuoka.ac.jp',
+            'Referer':
+                'https://gakujo.shizuoka.ac.jp/portal/common/accessEnvironmentRegist/goHome/',
+          },
+        ),
+      );
+    } else {
+      await Future.delayed(_interval);
+      response = await _client.postUri<dynamic>(
+        Uri.https(
+          'gakujo.shizuoka.ac.jp',
+          '/portal/home/home/initialize',
+          {'EXCLUDE_SET': ''},
+        ),
+        data: {'EXCLUDE_SET': ''},
+        options: Options(
+          headers: {
+            'Accept':
+                'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
+            'Origin': 'https://gakujo.shizuoka.ac.jp',
+            'Referer':
+                'https://gakujo.shizuoka.ac.jp/portal/shibbolethlogin/shibbolethLogin/initLogin/sso',
+          },
+        ),
       );
     }
-
-    await Future.delayed(_interval);
-    response = await _client.postUri<dynamic>(
-      Uri.https(
-        'gakujo.shizuoka.ac.jp',
-        '/portal/home/home/initialize',
-      ),
-      data: 'EXCLUDE_SET=',
-    );
 
     _updateToken(response.data, required: true);
 
