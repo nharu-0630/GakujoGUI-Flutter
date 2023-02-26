@@ -97,10 +97,9 @@ class SubjectRepository extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> addAll(List<Subject> subjects) async {
-    var box = await _subjectBox.box;
+  Future<void> addAll(List<Subject> subjects, {bool overwrite = false}) async {
     for (var subject in subjects) {
-      await box.put(subject.hashCode, subject);
+      await add(subject, overwrite: overwrite);
     }
     notifyListeners();
   }

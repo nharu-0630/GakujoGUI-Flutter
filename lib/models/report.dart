@@ -65,55 +65,6 @@ class Report implements Comparable<Report> {
     required this.isArchived,
   });
 
-  factory Report.fromDocument(String subject, Document document) {
-    var title =
-        document.querySelector('#area > table > tbody > tr > td')?.text ?? '';
-    var id = document
-            .querySelector(
-              '#right-box > form > input[type=hidden]:nth-child(2)',
-            )
-            ?.attributes['value'] ??
-        '';
-    var startDateTime = document
-        .querySelector('#area > table > tbody > tr:nth-child(1) > td')!
-        .text
-        .trimSpanDateTime(0);
-    var endDateTime = document
-        .querySelector('#area > table > tbody > tr:nth-child(1) > td')!
-        .text
-        .trimSpanDateTime(1);
-    var submittedDateTime = document
-            .querySelector(
-              '''
-#area > div > table > tbody > tr > td > table > tbody > tr > td > label''',
-            )
-            ?.text
-            .replaceAll(RegExp(r'.*comment by .*? '), '')
-            .parseDateTime() ??
-        DateTime.fromMicrosecondsSinceEpoch(0);
-    var report = Report(
-      subject.trimSubject(),
-      title,
-      id,
-      '',
-      '',
-      '',
-      '',
-      startDateTime,
-      endDateTime,
-      '',
-      '',
-      submittedDateTime,
-      '',
-      '',
-      null,
-      '',
-      isAcquired: false,
-      isArchived: false,
-    )..toDetail(document);
-    return report;
-  }
-
   factory Report.fromElement(Element element) {
     var subject =
         element.querySelectorAll('td')[0].text.trimWhiteSpace().trimSubject();
@@ -275,10 +226,9 @@ class ReportRepository extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> addAll(List<Report> reports) async {
-    var box = await _reportBox.box;
+  Future<void> addAll(List<Report> reports, {bool overwrite = false}) async {
     for (var report in reports) {
-      await box.put(report.id, report);
+      await add(report, overwrite: overwrite);
     }
     notifyListeners();
   }

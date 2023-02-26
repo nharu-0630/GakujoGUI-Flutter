@@ -5,6 +5,7 @@ import 'package:gakujo_task/app.dart';
 import 'package:gakujo_task/models/contact.dart';
 import 'package:gakujo_task/models/quiz.dart';
 import 'package:gakujo_task/models/report.dart';
+import 'package:gakujo_task/models/shared_file.dart';
 
 class ApiRepository extends ChangeNotifier {
   final _api = Api();
@@ -61,6 +62,7 @@ class ApiRepository extends ChangeNotifier {
       await _api.fetchContacts();
       await _api.fetchReports();
       await _api.fetchQuizzes();
+      await _api.fetchGrades();
       _toggleLoading();
     } catch (e) {
       _onError(e);
@@ -161,6 +163,28 @@ class ApiRepository extends ChangeNotifier {
     _toggleLoading();
     try {
       await _api.fetchDetailQuiz(quiz);
+      _toggleLoading();
+    } catch (e) {
+      _onError(e);
+    }
+  }
+
+  void fetchSharedFiles() async {
+    if (isLoading) return;
+    _toggleLoading();
+    try {
+      await _api.fetchSharedFiles();
+      _toggleLoading();
+    } catch (e) {
+      _onError(e);
+    }
+  }
+
+  void fetchDetailSharedFile(SharedFile sharedFile) async {
+    if (isLoading) return;
+    _toggleLoading();
+    try {
+      await _api.fetchDetailSharedFile(sharedFile);
       _toggleLoading();
     } catch (e) {
       _onError(e);

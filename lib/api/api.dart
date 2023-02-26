@@ -13,6 +13,7 @@ import 'package:gakujo_task/models/grade.dart';
 import 'package:gakujo_task/models/quiz.dart';
 import 'package:gakujo_task/models/report.dart';
 import 'package:gakujo_task/models/settings.dart';
+import 'package:gakujo_task/models/shared_file.dart';
 import 'package:gakujo_task/models/subject.dart';
 import 'package:html/parser.dart' show parse;
 import 'package:path/path.dart';
@@ -879,6 +880,183 @@ class Api {
         ?.read<QuizRepository>()
         .add(quiz, overwrite: true);
     return quiz;
+  }
+
+  Future<void> fetchSharedFiles() async {
+    var response = await _client.postUri<dynamic>(
+      Uri.https(
+        'gakujo.shizuoka.ac.jp',
+        '/portal/common/generalPurpose/',
+      ),
+      data: {
+        'org.apache.struts.taglib.html.TOKEN': _token,
+        'headTitle': '授業共有ファイル',
+        'menuCode': 'A08',
+        'nextPath': '/classfile/classFile/initialize'
+      },
+    );
+    _updateToken(response.data, required: true);
+
+    await Future.delayed(_interval);
+    response = await _client.postUri<dynamic>(
+      Uri.https(
+        'gakujo.shizuoka.ac.jp',
+        '/portal/classfile/classFile/selectClassFileList',
+      ),
+      data: {
+        'org.apache.struts.taglib.html.TOKEN': _token,
+        'schoolYear': await _schoolYear,
+        'semesterCode': await _semesterCode,
+        'subjectDispCode': '',
+        'searchKeyWord': '',
+        'searchScopeTitle': 'Y',
+        'lastUpdateDate': '',
+        'tbl_classFile_length': '-1',
+        'linkDetailIndex': '0',
+        'selectIndex': '',
+        'prevPageId': 'backToList',
+        'confirmMsg': '',
+        // '_searchConditionDisp.accordionSearchCondition': 'true',
+        // '_screenIdentifier': 'SC_A08_01',
+        // '_screenInfoDisp': 'true',
+        // '_scrollTop': '0',
+      },
+    );
+    _updateToken(response.data, required: true);
+
+    navigatorKey.currentContext?.read<SharedFileRepository>().addAll(
+        parse(response.data)
+            .querySelectorAll('#tbl_classFile > tbody > tr')
+            .map(SharedFile.fromElement)
+            .toList());
+  }
+
+  Future<SharedFile> fetchDetailSharedFile(SharedFile sharedFile,
+      {bool bypass = false}) async {
+    var index = -1;
+    if (!bypass) {
+      var response = await _client.postUri<dynamic>(
+        Uri.https(
+          'gakujo.shizuoka.ac.jp',
+          '/portal/common/generalPurpose/',
+        ),
+        data: {
+          'org.apache.struts.taglib.html.TOKEN': _token,
+          'headTitle': '授業共有ファイル',
+          'menuCode': 'A08',
+          'nextPath': '/classfile/classFile/initialize'
+        },
+      );
+      _updateToken(response.data, required: true);
+
+      await Future.delayed(_interval);
+      response = await _client.postUri<dynamic>(
+        Uri.https(
+          'gakujo.shizuoka.ac.jp',
+          '/portal/classfile/classFile/selectClassFileList',
+        ),
+        data: {
+          'org.apache.struts.taglib.html.TOKEN': _token,
+          'schoolYear': await _schoolYear,
+          'semesterCode': await _semesterCode,
+          'subjectDispCode': '',
+          'searchKeyWord': '',
+          'searchScopeTitle': 'Y',
+          'lastUpdateDate': '',
+          'tbl_classFile_length': '-1',
+          'linkDetailIndex': '0',
+          'selectIndex': '',
+          'prevPageId': 'backToList',
+          'confirmMsg': '',
+          // '_searchConditionDisp.accordionSearchCondition': 'true',
+          // '_screenIdentifier': 'SC_A08_01',
+          // '_screenInfoDisp': 'true',
+          // '_scrollTop': '0',
+        },
+      );
+      _updateToken(response.data, required: true);
+
+      index = parse(response.data)
+          .querySelectorAll('#tbl_classFile > tbody > tr')
+          .map(SharedFile.fromElement)
+          .toList()
+          .indexOf(sharedFile);
+      if (index == -1) {
+        return sharedFile;
+      }
+    }
+
+    await Future.delayed(_interval);
+    var response = await _client.postUri<dynamic>(
+      Uri.https(
+          'gakujo.shizuoka.ac.jp',
+          '/portal/classfile/classFile/showClassFileDetail/$index',
+          <String, dynamic>{
+            'org.apache.struts.taglib.html.TOKEN': _token,
+            'teacherCode': '',
+            'schoolYear': await _schoolYear,
+            'semesterCode': await _semesterCode,
+            'subjectDispCode': '',
+            'searchKeyWord': '',
+            'searchScopeTitle': 'Y',
+            'lastUpdateDate': '',
+            'tbl_classFile_length': '-1',
+            'linkDetailIndex': [
+              '0',
+              '1',
+              '2',
+              '3',
+              '4',
+              '5',
+              '6',
+              '7',
+              '8',
+              '9',
+            ],
+            'selectIndex': '',
+            'prevPageId': 'backToList',
+            'confirmMsg': '',
+            '_searchConditionDisp.accordionSearchCondition': 'true',
+            '_screenIdentifier': 'SC_A08_01',
+            '_screenInfoDisp': 'true',
+            '_scrollTop': '0',
+          }),
+    );
+    _updateToken(response.data, required: true);
+    var document = parse(response.data);
+    sharedFile.fileNames = [];
+    var dir = await getApplicationDocumentsDirectory();
+    for (var node in document
+        .querySelector('#fileList_CLASS_FILE_FILE')!
+        .querySelectorAll('div > a')) {
+      var prefix = node.attributes['onclick']!
+          .trimJsArgs(0)
+          .replaceAll('fileDownLoad', '');
+      var no = node.attributes['onclick']!.trimJsArgs(1);
+      await Future.delayed(_interval);
+      var response = await _client.postUri<dynamic>(
+        Uri.https(
+          'gakujo.shizuoka.ac.jp',
+          '/portal/common/fileUploadDownload/fileDownLoad',
+        ),
+        data: {
+          'org.apache.struts.taglib.html.TOKEN': _token,
+          'prefix': prefix,
+          'no': no,
+          'EXCLUDE_SET': '',
+        },
+        options: Options(responseType: ResponseType.bytes),
+      );
+      var file = File(join(dir.path, basename(node.text.trim())));
+      file.writeAsBytes(response.data);
+      sharedFile.fileNames?.add(basename(node.text.trim()));
+    }
+
+    sharedFile.toDetail(document);
+    navigatorKey.currentContext
+        ?.read<SharedFileRepository>()
+        .add(sharedFile, overwrite: true);
+    return sharedFile;
   }
 
   Future<bool> fetchAcademicSystem() async {

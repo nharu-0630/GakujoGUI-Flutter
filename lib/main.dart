@@ -7,6 +7,7 @@ import 'package:gakujo_task/models/grade.dart';
 import 'package:gakujo_task/models/quiz.dart';
 import 'package:gakujo_task/models/report.dart';
 import 'package:gakujo_task/models/settings.dart';
+import 'package:gakujo_task/models/shared_file.dart';
 import 'package:gakujo_task/models/subject.dart';
 import 'package:hive_flutter/adapters.dart';
 import 'package:intl/date_symbol_data_local.dart';
@@ -25,6 +26,7 @@ void main() async {
   Hive.registerAdapter(ReportAdapter());
   Hive.registerAdapter(QuizAdapter());
   Hive.registerAdapter(GradeAdapter());
+  Hive.registerAdapter(SharedFileAdapter());
   runApp(const MyApp());
 }
 
@@ -55,6 +57,7 @@ class _MyAppState extends State<MyApp> {
         ChangeNotifierProvider(create: (_) => ReportRepository(ReportBox())),
         ChangeNotifierProvider(create: (_) => QuizRepository(QuizBox())),
         ChangeNotifierProvider(create: (_) => GradeRepository(GradeBox())),
+        ChangeNotifierProvider(create: (_) => SharedFileRepository(SharedFileBox())),
       ],
       child: const App(),
     );

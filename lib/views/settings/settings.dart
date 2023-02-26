@@ -257,7 +257,7 @@ class _SettingsWidgetState extends State<SettingsWidget> {
                       showDialog(
                         context: context,
                         builder: (_) => CupertinoAlertDialog(
-                          content: const Text('科目更新には時間がかかります。更新しますか？'),
+                          content: const Text('実行しますか？'),
                           actions: [
                             CupertinoDialogAction(
                                 isDestructiveAction: true,
@@ -269,7 +269,7 @@ class _SettingsWidgetState extends State<SettingsWidget> {
                               child: const Text('取得'),
                               onPressed: () {
                                 Navigator.of(context).pop();
-                                context.read<ApiRepository>().fetchSubjects();
+                                context.read<ApiRepository>().fetchLogin();
                               },
                             )
                           ],
@@ -284,7 +284,7 @@ class _SettingsWidgetState extends State<SettingsWidget> {
                           const Icon(Icons.sync_rounded),
                           const SizedBox(width: 8.0),
                           Text(
-                            '科目更新',
+                            'ログイン',
                             style: Theme.of(context)
                                 .textTheme
                                 .bodyLarge!
@@ -400,7 +400,9 @@ class _SettingsWidgetState extends State<SettingsWidget> {
                               child: const Text('実行'),
                               onPressed: () async {
                                 Navigator.of(context).pop();
-                                context.read<ApiRepository>().fetchGrades();
+                                context
+                                    .read<ApiRepository>()
+                                    .fetchSharedFiles();
                               },
                             )
                           ],

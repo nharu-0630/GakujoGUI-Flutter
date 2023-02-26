@@ -171,10 +171,9 @@ class ContactRepository extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> addAll(List<Contact> contacts) async {
-    var box = await _contactBox.box;
+  Future<void> addAll(List<Contact> contacts, {bool overwrite = false}) async {
     for (var contact in contacts) {
-      await box.put(contact.hashCode, contact);
+      await add(contact, overwrite: overwrite);
     }
     notifyListeners();
   }

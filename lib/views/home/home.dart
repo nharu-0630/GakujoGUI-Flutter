@@ -10,6 +10,7 @@ import 'package:gakujo_task/views/home/widgets/task.dart';
 import 'package:gakujo_task/views/page/grade.dart';
 import 'package:gakujo_task/views/page/quiz.dart';
 import 'package:gakujo_task/views/page/report.dart';
+import 'package:gakujo_task/views/page/shared_file.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:sticky_headers/sticky_headers.dart';
@@ -52,11 +53,6 @@ class _HomeWidgetState extends State<HomeWidget> {
                               ),
                     ),
                     const Spacer(),
-                    IconButton(
-                      icon: const Icon(Icons.sync_rounded),
-                      onPressed: () async =>
-                          context.read<ApiRepository>().fetchTasks(),
-                    ),
                   ],
                 ),
               ),
@@ -80,11 +76,6 @@ class _HomeWidgetState extends State<HomeWidget> {
                               ),
                     ),
                     const Spacer(),
-                    IconButton(
-                      icon: const Icon(Icons.sync_rounded),
-                      onPressed: () async =>
-                          context.read<ApiRepository>().fetchContacts(),
-                    ),
                   ],
                 ),
               ),
@@ -238,6 +229,23 @@ class _HomeWidgetState extends State<HomeWidget> {
           ListTile(
             title: Row(
               children: [
+                const Icon(Icons.folder_shared_rounded),
+                const SizedBox(width: 8.0),
+                Text(
+                  '授業共有ファイル',
+                  style: Theme.of(context).textTheme.titleMedium,
+                ),
+              ],
+            ),
+            onTap: () {
+              Navigator.of(context).pop();
+              Navigator.of(context).push(MaterialPageRoute(
+                  builder: (context) => const SharedFilePage()));
+            },
+          ),
+          ListTile(
+            title: Row(
+              children: [
                 const Icon(Icons.school_rounded),
                 const SizedBox(width: 8.0),
                 Text(
@@ -297,7 +305,7 @@ class _HomeWidgetState extends State<HomeWidget> {
                 IconButton(
                   icon: const Icon(Icons.sync_rounded),
                   onPressed: () async =>
-                      context.read<ApiRepository>().fetchLogin(),
+                      context.read<ApiRepository>().fetchAll(),
                 ),
               ],
             );

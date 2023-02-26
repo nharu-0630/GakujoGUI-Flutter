@@ -7,6 +7,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gakujo_task/api/provide.dart';
 import 'package:gakujo_task/models/quiz.dart';
 import 'package:gakujo_task/models/report.dart';
+import 'package:gakujo_task/models/shared_file.dart';
 import 'package:intl/intl.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
@@ -408,6 +409,130 @@ Widget buildReportModal(
                 onPressed: () => Share.share(
                     '${report.description}\n\n${report.message}',
                     subject: report.title),
+                child: const Icon(Icons.share_rounded),
+              ),
+            ),
+          ),
+        ],
+      ),
+      const SizedBox(height: 8.0),
+    ],
+  );
+}
+
+Widget buildSharedFileModal(
+    BuildContext context, SharedFile sharedFile, ScrollController controller) {
+  return ListView(
+    controller: controller,
+    padding: const EdgeInsets.all(16.0),
+    children: [
+      Padding(
+        padding: const EdgeInsets.all(4.0),
+        child: Align(
+          alignment: Alignment.centerLeft,
+          child: Text(
+            sharedFile.title,
+            style: Theme.of(context).textTheme.titleLarge,
+          ),
+        ),
+      ),
+      Padding(
+        padding: const EdgeInsets.all(4.0),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: [
+            Text(
+              sharedFile.publicPeriod,
+              style: Theme.of(context).textTheme.bodyLarge,
+            ),
+          ],
+        ),
+      ),
+      Padding(
+        padding: const EdgeInsets.all(4.0),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: [
+            Container(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(8.0),
+                border: Border.all(
+                  color: Theme.of(context).colorScheme.primary,
+                  width: 2,
+                ),
+              ),
+              padding: const EdgeInsets.symmetric(
+                vertical: 2.0,
+                horizontal: 4.0,
+              ),
+              child: Text(
+                sharedFile.fileSize,
+                style: Theme.of(context).textTheme.bodyLarge,
+              ),
+            ),
+            Visibility(
+              visible: sharedFile.isArchived,
+              child: const Icon(Icons.archive_rounded),
+            )
+          ],
+        ),
+      ),
+      const SizedBox(height: 8.0),
+      Padding(
+        padding: const EdgeInsets.all(4.0),
+        child: SelectableText(
+          sharedFile.isAcquired ? sharedFile.description : '未取得',
+        ),
+      ),
+      Visibility(
+        visible: sharedFile.fileNames?.isNotEmpty ?? false,
+        child: const Padding(
+          padding: EdgeInsets.all(4.0),
+          child: Divider(thickness: 2.0),
+        ),
+      ),
+      Visibility(
+        visible: sharedFile.fileNames?.isNotEmpty ?? false,
+        child: Padding(
+          padding: const EdgeInsets.all(4.0),
+          child: buildFileList(sharedFile.fileNames),
+        ),
+      ),
+      const SizedBox(height: 8.0),
+      Row(
+        children: [
+          Expanded(
+            child: Container(
+              padding: const EdgeInsets.all(4.0),
+              child: ElevatedButton(
+                onPressed: () {
+                  context.read<SharedFileRepository>().setArchive(
+                      sharedFile.hashCode.toString(), !sharedFile.isArchived);
+                  Navigator.of(context).pop();
+                },
+                child: Icon(sharedFile.isArchived
+                    ? Icons.unarchive_rounded
+                    : Icons.archive_rounded),
+              ),
+            ),
+          ),
+          Expanded(
+            child: Container(
+              padding: const EdgeInsets.all(4.0),
+              child: ElevatedButton(
+                onPressed: () async => context
+                    .read<ApiRepository>()
+                    .fetchDetailSharedFile(sharedFile),
+                child: const Icon(Icons.sync_rounded),
+              ),
+            ),
+          ),
+          Expanded(
+            child: Container(
+              padding: const EdgeInsets.all(4.0),
+              child: ElevatedButton(
+                onPressed: () => Share.share(sharedFile.description,
+                    subject: sharedFile.title),
                 child: const Icon(Icons.share_rounded),
               ),
             ),

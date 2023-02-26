@@ -68,47 +68,6 @@ class Quiz implements Comparable<Quiz> {
     required this.isArchived,
   });
 
-  factory Quiz.fromDocument(String subject, Document document) {
-    var title =
-        document.querySelector('#area > table > tbody > tr > td')?.text ?? '';
-    var id = document
-            .querySelector(
-              '#right-box > form > input[type=hidden]:nth-child(3)',
-            )
-            ?.attributes['value'] ??
-        '';
-    var startDateTime = document
-        .querySelector('#area > table > tbody > tr:nth-child(1) > td')!
-        .text
-        .trimSpanDateTime(0);
-    var endDateTime = document
-        .querySelector('#area > table > tbody > tr:nth-child(1) > td')!
-        .text
-        .trimSpanDateTime(1);
-    var quiz = Quiz(
-      subject.trimSubject(),
-      title,
-      id,
-      '',
-      '',
-      '',
-      '',
-      startDateTime,
-      endDateTime,
-      '',
-      '',
-      '',
-      -1,
-      '',
-      '',
-      null,
-      '',
-      isAcquired: false,
-      isArchived: false,
-    )..toDetail(document);
-    return quiz;
-  }
-
   factory Quiz.fromElement(Element element) {
     var subject =
         element.querySelectorAll('td')[0].text.trimWhiteSpace().trimSubject();
@@ -272,10 +231,9 @@ class QuizRepository extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> addAll(List<Quiz> quizzes) async {
-    var box = await _quizBox.box;
+  Future<void> addAll(List<Quiz> quizzes, {bool overwrite = false}) async {
     for (var quiz in quizzes) {
-      await box.put(quiz.id, quiz);
+      await add(quiz, overwrite: overwrite);
     }
     notifyListeners();
   }
