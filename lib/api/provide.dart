@@ -63,19 +63,9 @@ class ApiRepository extends ChangeNotifier {
       await _api.fetchContacts();
       await _api.fetchReports();
       await _api.fetchQuizzes();
+      await _api.fetchSharedFiles();
+      await _api.fetchClassLinks();
       await _api.fetchGrades();
-      _toggleLoading();
-    } catch (e) {
-      _onError(e);
-    }
-  }
-
-  void fetchTasks() async {
-    if (isLoading) return;
-    _toggleLoading();
-    try {
-      await _api.fetchReports();
-      await _api.fetchQuizzes();
       _toggleLoading();
     } catch (e) {
       _onError(e);
@@ -208,17 +198,6 @@ class ApiRepository extends ChangeNotifier {
     _toggleLoading();
     try {
       await _api.fetchDetailClassLink(classLink);
-      _toggleLoading();
-    } catch (e) {
-      _onError(e);
-    }
-  }
-
-  void fetchAcademicSystem() async {
-    if (isLoading) return;
-    _toggleLoading();
-    try {
-      await _api.fetchAcademicSystem();
       _toggleLoading();
     } catch (e) {
       _onError(e);

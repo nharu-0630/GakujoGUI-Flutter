@@ -92,6 +92,7 @@ class Api {
         'User-Agent': 'Chrome/110.0.5481.104 GakujoTask/$version',
       },
       contentType: Headers.formUrlEncodedContentType,
+      followRedirects: false,
     ));
     _token = '';
     _cookieJar = CookieJar();
@@ -191,7 +192,6 @@ class Api {
           'Origin': 'https://gakujo.shizuoka.ac.jp',
           'Referer': 'https://gakujo.shizuoka.ac.jp/portal/',
         },
-        followRedirects: false,
         validateStatus: (status) => status == 302,
       ),
     );
@@ -205,7 +205,6 @@ class Api {
               'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
           'Referer': 'https://gakujo.shizuoka.ac.jp/portal/',
         },
-        followRedirects: false,
         validateStatus: (status) => status == 302 || status == 200,
       ),
     );
@@ -290,7 +289,6 @@ class Api {
           'Origin': 'https://idp.shizuoka.ac.jp',
           'Referer': 'https://idp.shizuoka.ac.jp/',
         },
-        followRedirects: false,
         validateStatus: (status) => status == 302,
       ),
     );
@@ -307,7 +305,6 @@ class Api {
               'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
           'Referer': 'https://idp.shizuoka.ac.jp/',
         },
-        followRedirects: false,
         validateStatus: (status) => status == 302 || status == 200,
       ),
     );
@@ -357,7 +354,6 @@ class Api {
             'Origin': 'https://idp.shizuoka.ac.jp',
             'Referer': 'https://idp.shizuoka.ac.jp/',
           },
-          followRedirects: false,
           validateStatus: (status) => status == 302,
         ),
       );
@@ -1358,7 +1354,6 @@ class Api {
           'Referer':
               'https://gakujo.shizuoka.ac.jp/portal/home/systemCooperationLink/initializeShibboleth?renkeiType=kyoumu'
         },
-        followRedirects: false,
         validateStatus: (status) => status == 302 || status == 200,
       ),
     );
@@ -1408,7 +1403,6 @@ class Api {
             'Origin': 'https://idp.shizuoka.ac.jp',
             'Referer': 'https://idp.shizuoka.ac.jp/',
           },
-          followRedirects: false,
           validateStatus: (status) => status == 302,
         ),
       );

@@ -291,15 +291,22 @@ class _HomeWidgetState extends State<HomeWidget> {
           if (snapshot.hasData) {
             return Padding(
               padding: const EdgeInsets.only(left: 16.0),
-              child: GestureDetector(
-                onTap: () => scaffoldKey.currentState?.openDrawer(),
-                child: snapshot.data?.profileImage == null
-                    ? const Icon(Icons.person_rounded, size: 36.0)
-                    : CircleAvatar(
-                        backgroundImage: CachedMemoryImageProvider(
+              child: MouseRegion(
+                cursor: SystemMouseCursors.click,
+                child: GestureDetector(
+                  onTap: () => scaffoldKey.currentState?.openDrawer(),
+                  child: snapshot.data?.profileImage == null
+                      ? const Icon(
+                          Icons.person_rounded,
+                          size: 36.0,
+                        )
+                      : CircleAvatar(
+                          backgroundImage: CachedMemoryImageProvider(
                             'ProfileImage',
-                            base64: snapshot.data?.profileImage),
-                      ),
+                            base64: snapshot.data?.profileImage,
+                          ),
+                        ),
+                ),
               ),
             );
           } else {
@@ -320,6 +327,11 @@ class _HomeWidgetState extends State<HomeWidget> {
                       : 'Hi, ${snapshot.data?.fullName}!',
                 ),
                 const Spacer(),
+                IconButton(
+                  icon: const Icon(Icons.login_rounded),
+                  onPressed: () async =>
+                      context.read<ApiRepository>().fetchLogin(),
+                ),
                 IconButton(
                   icon: const Icon(Icons.sync_rounded),
                   onPressed: () async =>

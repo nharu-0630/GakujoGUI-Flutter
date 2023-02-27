@@ -57,12 +57,6 @@ class ClassLink implements Comparable<ClassLink> {
 
   void toDetail(Document document) {
     isAcquired = true;
-    print(document
-        .querySelectorAll('table.ttb_entry > tbody > tr > td')
-        .map(
-          (e) => e.innerHtml,
-        )
-        .join(','));
     link = document
         .querySelectorAll('table.ttb_entry > tbody > tr > td')[1]
         .querySelector('a')!
