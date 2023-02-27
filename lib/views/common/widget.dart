@@ -16,8 +16,10 @@ import 'package:selectable_autolink_text/selectable_autolink_text.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
-ListView buildFileList(List<String>? fileNames) {
+ListView buildFileList(List<String>? fileNames,
+    {Axis scrollDirection = Axis.vertical}) {
   return ListView.builder(
+    scrollDirection: scrollDirection,
     padding: const EdgeInsets.all(0.0),
     shrinkWrap: true,
     physics: const NeverScrollableScrollPhysics(),
@@ -460,6 +462,24 @@ Widget buildSharedFileModal(
                 horizontal: 4.0,
               ),
               child: Text(
+                sharedFile.publicPeriod,
+                style: Theme.of(context).textTheme.bodyLarge,
+              ),
+            ),
+            Container(
+              margin: const EdgeInsets.only(left: 8.0),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(8.0),
+                border: Border.all(
+                  color: Theme.of(context).colorScheme.primary,
+                  width: 2,
+                ),
+              ),
+              padding: const EdgeInsets.symmetric(
+                vertical: 2.0,
+                horizontal: 4.0,
+              ),
+              child: Text(
                 sharedFile.fileSize,
                 style: Theme.of(context).textTheme.bodyLarge,
               ),
@@ -472,18 +492,6 @@ Widget buildSharedFileModal(
         ),
       ),
       const SizedBox(height: 8.0),
-      Padding(
-        padding: const EdgeInsets.all(4.0),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: [
-            Text(
-              sharedFile.publicPeriod,
-              style: Theme.of(context).textTheme.bodyLarge,
-            ),
-          ],
-        ),
-      ),
       Padding(
         padding: const EdgeInsets.all(4.0),
         child: buildAutoLinkText(

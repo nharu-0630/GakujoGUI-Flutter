@@ -67,15 +67,12 @@ class SharedFile implements Comparable<SharedFile> {
 
   void toDetail(Document document) {
     isAcquired = true;
-    description = document
-            .querySelector('table.ttb_entry > tbody > tr:nth-child(4) > td')
-            ?.text ??
-        '';
+    description =
+        document.querySelectorAll('table.ttb_entry > tbody > tr > td')[2].text;
     publicPeriod = document
-            .querySelector('table.ttb_entry > tbody > tr:nth-child(5) > td')
-            ?.text
-            .trimWhiteSpace() ??
-        '';
+        .querySelectorAll('table.ttb_entry > tbody > tr > td')[3]
+        .text
+        .trimWhiteSpace();
   }
 
   bool contains(String value) =>

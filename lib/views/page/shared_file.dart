@@ -223,7 +223,6 @@ class _SharedFilePageState extends State<SharedFilePage> {
           }
         },
         title: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Expanded(
               child: Text(
@@ -232,33 +231,39 @@ class _SharedFilePageState extends State<SharedFilePage> {
                 overflow: TextOverflow.ellipsis,
               ),
             ),
-            Text(
-              sharedFile.publicPeriod,
-              style: Theme.of(context).textTheme.bodyMedium,
-            ),
           ],
         ),
-        subtitle: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        subtitle: Column(
           children: [
-            Expanded(
-              child: Text(
-                sharedFile.title,
-                style: Theme.of(context)
-                    .textTheme
-                    .titleMedium
-                    ?.copyWith(fontWeight: FontWeight.bold),
-                overflow: TextOverflow.ellipsis,
-              ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Expanded(
+                  child: Text(
+                    sharedFile.title,
+                    style: Theme.of(context)
+                        .textTheme
+                        .titleMedium
+                        ?.copyWith(fontWeight: FontWeight.bold),
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+                Visibility(
+                  visible: sharedFile.isArchived,
+                  child: const Icon(Icons.archive_rounded),
+                )
+              ],
             ),
             Visibility(
               visible: sharedFile.fileNames?.isNotEmpty ?? false,
-              child: const Icon(Icons.file_present_rounded),
+              child: Padding(
+                padding: const EdgeInsets.all(4.0),
+                child: buildFileList(
+                  ['a', 'b', ...?sharedFile.fileNames],
+                  scrollDirection: Axis.horizontal,
+                ),
+              ),
             ),
-            Visibility(
-              visible: sharedFile.isArchived,
-              child: const Icon(Icons.archive_rounded),
-            )
           ],
         ),
       ),

@@ -320,11 +320,64 @@ class Api {
 
     _updateToken(response.data);
 
+    samlResponse = Uri.decodeFull(
+      RegExp(r'(?<=SAMLResponse" value=").*(?=")')
+              .firstMatch(response.data.toString())
+              ?.group(0) ??
+          '',
+    );
+    relayState = Uri.decodeFull(
+      RegExp(r'(?<=RelayState" value=").*(?=")')
+              .firstMatch(response.data.toString())
+              ?.group(0) ??
+          '',
+    ).replaceAll('&#x3a;', ':');
+
+    if (samlResponse.isNotEmpty && relayState.isNotEmpty) {
+      if (kDebugMode) {
+        print('SAMLResponse: ${samlResponse.substring(0, 10)} ...');
+        print('RelayState: ${relayState.substring(0, 10)} ...');
+      }
+
+      await Future.delayed(_interval);
+      await _client.postUri<dynamic>(
+        Uri.https(
+          'gakujo.shizuoka.ac.jp',
+          '/Shibboleth.sso/SAML2/POST',
+        ),
+        data: {
+          'RelayState': relayState,
+          'SAMLResponse': samlResponse,
+        },
+        options: Options(
+          headers: {
+            'Accept':
+                'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
+            'Origin': 'https://idp.shizuoka.ac.jp',
+            'Referer': 'https://idp.shizuoka.ac.jp/',
+          },
+          followRedirects: false,
+          validateStatus: (status) => status == 302,
+        ),
+      );
+
+      await Future.delayed(_interval);
+      response = await _client.getUri<dynamic>(
+        Uri.https(
+          'gakujo.shizuoka.ac.jp',
+          '/portal/shibbolethlogin/shibbolethLogin/initLogin/sso',
+        ),
+        options: Options(
+          headers: {
+            'Accept':
+                'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
+          },
+        ),
+      );
+    }
+
     final Settings? settings = await _settings;
-    if (parse(response.data)
-        .querySelectorAll(
-            '#container > div > form > div:nth-child(2) > div.access_env > table > tbody > tr > td > input[type=text]')
-        .isNotEmpty) {
+    if (parse(response.data).querySelector('title')!.text == 'アクセス環境登録') {
       var accessEnvName = 'GakujoTask ${(const Uuid()).v4().substring(0, 8)}';
 
       settings?.accessEnvironmentName = accessEnvName;
@@ -374,7 +427,6 @@ class Api {
         Uri.https(
           'gakujo.shizuoka.ac.jp',
           '/portal/home/home/initialize',
-          {'EXCLUDE_SET': ''},
         ),
         data: {'EXCLUDE_SET': ''},
         options: Options(
