@@ -35,9 +35,21 @@ class TaskWidget extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 16.0),
             child: tasks.isEmpty
                 ? Center(
-                    child: Text(
-                      'タスクはありません',
-                      style: Theme.of(context).textTheme.titleMedium,
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Padding(
+                          padding: EdgeInsets.all(8.0),
+                          child: Icon(
+                            Icons.task_rounded,
+                            size: 32.0,
+                          ),
+                        ),
+                        Text(
+                          'タスクはありません',
+                          style: Theme.of(context).textTheme.titleMedium,
+                        ),
+                      ],
                     ),
                   )
                 : ListView.builder(

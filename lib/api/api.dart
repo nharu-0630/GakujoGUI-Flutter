@@ -26,7 +26,7 @@ import 'package:version/version.dart';
 class Api {
   static final version = Version(1, 4, 0);
 
-  final _interval = const Duration(milliseconds: 2000);
+  final _interval = const Duration(milliseconds: 200);
 
   Future<Settings>? get _settings =>
       navigatorKey.currentContext?.read<SettingsRepository>().load();
@@ -1412,10 +1412,6 @@ class Api {
           validateStatus: (status) => status == 302,
         ),
       );
-    }
-
-    if (kDebugMode) {
-      print(response.data);
     }
     return true;
   }
