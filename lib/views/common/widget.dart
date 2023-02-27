@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gakujo_task/api/provide.dart';
+import 'package:gakujo_task/models/class_link.dart';
 import 'package:gakujo_task/models/quiz.dart';
 import 'package:gakujo_task/models/report.dart';
 import 'package:gakujo_task/models/shared_file.dart';
@@ -449,21 +450,24 @@ Widget buildSharedFileModal(
         child: Row(
           mainAxisAlignment: MainAxisAlignment.end,
           children: [
-            Container(
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(8.0),
-                border: Border.all(
-                  color: Theme.of(context).colorScheme.primary,
-                  width: 2,
+            Visibility(
+              visible: sharedFile.publicPeriod.isNotEmpty,
+              child: Container(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(8.0),
+                  border: Border.all(
+                    color: Theme.of(context).colorScheme.primary,
+                    width: 2,
+                  ),
                 ),
-              ),
-              padding: const EdgeInsets.symmetric(
-                vertical: 2.0,
-                horizontal: 4.0,
-              ),
-              child: Text(
-                sharedFile.publicPeriod,
-                style: Theme.of(context).textTheme.bodyLarge,
+                padding: const EdgeInsets.symmetric(
+                  vertical: 2.0,
+                  horizontal: 4.0,
+                ),
+                child: Text(
+                  sharedFile.publicPeriod,
+                  style: Theme.of(context).textTheme.bodyLarge,
+                ),
               ),
             ),
             Container(
@@ -548,6 +552,107 @@ Widget buildSharedFileModal(
               child: ElevatedButton(
                 onPressed: () => Share.share(sharedFile.description,
                     subject: sharedFile.title),
+                child: const Icon(Icons.share_rounded),
+              ),
+            ),
+          ),
+        ],
+      ),
+      const SizedBox(height: 8.0),
+    ],
+  );
+}
+
+Widget buildClassLinkModal(
+    BuildContext context, ClassLink classLink, ScrollController controller) {
+  return ListView(
+    controller: controller,
+    padding: const EdgeInsets.all(16.0),
+    children: [
+      Padding(
+        padding: const EdgeInsets.all(4.0),
+        child: Align(
+          alignment: Alignment.centerLeft,
+          child: Text(
+            classLink.title,
+            style: Theme.of(context).textTheme.titleLarge,
+          ),
+        ),
+      ),
+      Padding(
+        padding: const EdgeInsets.all(4.0),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: [
+            Visibility(
+              visible: classLink.isArchived,
+              child: const Icon(Icons.archive_rounded),
+            )
+          ],
+        ),
+      ),
+      const SizedBox(height: 8.0),
+      Padding(
+        padding: const EdgeInsets.all(4.0),
+        child: buildAutoLinkText(
+          context,
+          classLink.comment,
+        ),
+      ),
+      Visibility(
+        visible: classLink.isAcquired,
+        child: const Padding(
+          padding: EdgeInsets.all(4.0),
+          child: Divider(thickness: 2.0),
+        ),
+      ),
+      Visibility(
+        visible: classLink.isAcquired,
+        child: Padding(
+          padding: const EdgeInsets.all(4.0),
+          child: buildAutoLinkText(
+            context,
+            classLink.link,
+          ),
+        ),
+      ),
+      const SizedBox(height: 8.0),
+      Row(
+        children: [
+          Expanded(
+            child: Container(
+              padding: const EdgeInsets.all(4.0),
+              child: ElevatedButton(
+                onPressed: () {
+                  context
+                      .read<ClassLinkRepository>()
+                      .setArchive(classLink.id, !classLink.isArchived);
+                  Navigator.of(context).pop();
+                },
+                child: Icon(classLink.isArchived
+                    ? Icons.unarchive_rounded
+                    : Icons.archive_rounded),
+              ),
+            ),
+          ),
+          Expanded(
+            child: Container(
+              padding: const EdgeInsets.all(4.0),
+              child: ElevatedButton(
+                onPressed: () async => context
+                    .read<ApiRepository>()
+                    .fetchDetailClassLink(classLink),
+                child: const Icon(Icons.sync_rounded),
+              ),
+            ),
+          ),
+          Expanded(
+            child: Container(
+              padding: const EdgeInsets.all(4.0),
+              child: ElevatedButton(
+                onPressed: () => Share.share(
+                    '${classLink.comment}\n\n${classLink.link}',
+                    subject: classLink.title),
                 child: const Icon(Icons.share_rounded),
               ),
             ),

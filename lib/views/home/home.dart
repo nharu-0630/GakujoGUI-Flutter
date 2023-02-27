@@ -7,6 +7,7 @@ import 'package:gakujo_task/models/report.dart';
 import 'package:gakujo_task/models/settings.dart';
 import 'package:gakujo_task/views/home/widgets/contact.dart';
 import 'package:gakujo_task/views/home/widgets/task.dart';
+import 'package:gakujo_task/views/page/class_link.dart';
 import 'package:gakujo_task/views/page/grade.dart';
 import 'package:gakujo_task/views/page/quiz.dart';
 import 'package:gakujo_task/views/page/report.dart';
@@ -241,6 +242,23 @@ class _HomeWidgetState extends State<HomeWidget> {
               Navigator.of(context).pop();
               Navigator.of(context).push(MaterialPageRoute(
                   builder: (context) => const SharedFilePage()));
+            },
+          ),
+          ListTile(
+            title: Row(
+              children: [
+                const Icon(Icons.link_rounded),
+                const SizedBox(width: 8.0),
+                Text(
+                  '授業リンク',
+                  style: Theme.of(context).textTheme.titleMedium,
+                ),
+              ],
+            ),
+            onTap: () {
+              Navigator.of(context).pop();
+              Navigator.of(context).push(MaterialPageRoute(
+                  builder: (context) => const ClassLinkPage()));
             },
           ),
           ListTile(

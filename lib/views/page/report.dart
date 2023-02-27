@@ -273,6 +273,13 @@ class _ReportPageState extends State<ReportPage> {
             ),
             Visibility(
               visible: report.fileNames?.isNotEmpty ?? false,
+              child: Text(
+                '${report.fileNames?.length ?? ''}',
+                style: Theme.of(context).textTheme.bodyMedium,
+              ),
+            ),
+            Visibility(
+              visible: report.fileNames?.isNotEmpty ?? false,
               child: const Icon(Icons.file_present_rounded),
             ),
             Visibility(

@@ -2,6 +2,7 @@ import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
 import 'package:flutter/material.dart';
 import 'package:gakujo_task/api/api.dart';
 import 'package:gakujo_task/app.dart';
+import 'package:gakujo_task/models/class_link.dart';
 import 'package:gakujo_task/models/contact.dart';
 import 'package:gakujo_task/models/quiz.dart';
 import 'package:gakujo_task/models/report.dart';
@@ -172,12 +173,12 @@ class ApiRepository extends ChangeNotifier {
   void fetchSharedFiles() async {
     if (isLoading) return;
     _toggleLoading();
-    // try {
-    await _api.fetchSharedFiles();
-    _toggleLoading();
-    // } catch (e) {
-    //   _onError(e);
-    // }
+    try {
+      await _api.fetchSharedFiles();
+      _toggleLoading();
+    } catch (e) {
+      _onError(e);
+    }
   }
 
   void fetchDetailSharedFile(SharedFile sharedFile) async {
@@ -185,6 +186,28 @@ class ApiRepository extends ChangeNotifier {
     _toggleLoading();
     try {
       await _api.fetchDetailSharedFile(sharedFile);
+      _toggleLoading();
+    } catch (e) {
+      _onError(e);
+    }
+  }
+
+  void fetchClassLinks() async {
+    if (isLoading) return;
+    _toggleLoading();
+    try {
+      await _api.fetchClassLinks();
+      _toggleLoading();
+    } catch (e) {
+      _onError(e);
+    }
+  }
+
+  void fetchDetailClassLink(ClassLink classLink) async {
+    if (isLoading) return;
+    _toggleLoading();
+    try {
+      await _api.fetchDetailClassLink(classLink);
       _toggleLoading();
     } catch (e) {
       _onError(e);

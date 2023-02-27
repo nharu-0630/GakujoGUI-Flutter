@@ -7,11 +7,11 @@ part 'grade.g.dart';
 @HiveType(typeId: 6)
 class Grade implements Comparable<Grade> {
   @HiveField(0)
-  String subjectsName;
+  String subject;
   @HiveField(1)
-  String teacherName;
+  String teacher;
   @HiveField(2)
-  String subjectsSection;
+  String subjectSection;
   @HiveField(3)
   String selectionSection;
   @HiveField(4)
@@ -30,9 +30,9 @@ class Grade implements Comparable<Grade> {
   String testType;
 
   Grade(
-    this.subjectsName,
-    this.teacherName,
-    this.subjectsSection,
+    this.subject,
+    this.teacher,
+    this.subjectSection,
     this.selectionSection,
     this.credit,
     this.evaluation,
@@ -65,14 +65,14 @@ class Grade implements Comparable<Grade> {
       return true;
     }
     if (other is Grade) {
-      return subjectsName == other.subjectsName &&
+      return subject == other.subject &&
           acquisitionYear == other.acquisitionYear;
     }
     return false;
   }
 
   @override
-  int get hashCode => subjectsName.hashCode ^ acquisitionYear.hashCode;
+  int get hashCode => subject.hashCode ^ acquisitionYear.hashCode;
 
   @override
   int compareTo(Grade other) {
@@ -84,7 +84,7 @@ class Grade implements Comparable<Grade> {
     if (compare2 != 0) {
       return compare2;
     }
-    var compare3 = subjectsName.compareTo(other.subjectsName);
+    var compare3 = subject.compareTo(other.subject);
     return compare3;
   }
 }

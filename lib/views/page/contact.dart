@@ -28,7 +28,7 @@ class _ContactPageState extends State<ContactPage> {
     return FutureBuilder(
       future: context
           .watch<ContactRepository>()
-          .getSubjects(widget.subject.subjectsName),
+          .getSubjects(widget.subject.subject),
       builder: (context, AsyncSnapshot<List<Contact>> snapshot) {
         if (snapshot.hasData) {
           _contacts = snapshot.data!;
@@ -106,7 +106,7 @@ class _ContactPageState extends State<ContactPage> {
               autofocus: true,
               textInputAction: TextInputAction.search,
             )
-          : Text(widget.subject.subjectsName),
+          : Text(widget.subject.subject),
       actions: _searchStatus
           ? [
               IconButton(
@@ -224,8 +224,15 @@ class _ContactPageState extends State<ContactPage> {
             ),
             Visibility(
               visible: contact.fileNames?.isNotEmpty ?? false,
+              child: Text(
+                '${contact.fileNames?.length ?? ''}',
+                style: Theme.of(context).textTheme.bodyMedium,
+              ),
+            ),
+            Visibility(
+              visible: contact.fileNames?.isNotEmpty ?? false,
               child: const Icon(Icons.file_present_rounded),
-            )
+            ),
           ],
         ),
       ),

@@ -38,7 +38,7 @@ class ContactAdapter extends TypeAdapter<Contact> {
     writer
       ..writeByte(13)
       ..writeByte(0)
-      ..write(obj.subjects)
+      ..write(obj.subject)
       ..writeByte(1)
       ..write(obj.teacherName)
       ..writeByte(2)

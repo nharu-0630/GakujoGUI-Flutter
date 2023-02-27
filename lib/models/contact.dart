@@ -8,7 +8,7 @@ part 'contact.g.dart';
 @HiveType(typeId: 1)
 class Contact implements Comparable<Contact> {
   @HiveField(0)
-  String subjects;
+  String subject;
   @HiveField(1)
   String teacherName;
   @HiveField(2)
@@ -35,7 +35,7 @@ class Contact implements Comparable<Contact> {
   bool isAcquired;
 
   Contact(
-      this.subjects,
+      this.subject,
       this.teacherName,
       this.contactType,
       this.title,
@@ -110,7 +110,7 @@ class Contact implements Comparable<Contact> {
   }
 
   bool contains(String value) =>
-      subjects.toLowerCase().contains(value.toLowerCase()) ||
+      subject.toLowerCase().contains(value.toLowerCase()) ||
       title.toLowerCase().contains(value.toLowerCase()) ||
       (content).toLowerCase().contains(value.toLowerCase());
 
@@ -120,7 +120,7 @@ class Contact implements Comparable<Contact> {
       return true;
     }
     if (other is Contact) {
-      return subjects == other.subjects &&
+      return subject == other.subject &&
           title == other.title &&
           contactDateTime == other.contactDateTime;
     }
@@ -129,7 +129,7 @@ class Contact implements Comparable<Contact> {
 
   @override
   int get hashCode =>
-      subjects.hashCode ^ title.hashCode ^ contactDateTime.hashCode;
+      subject.hashCode ^ title.hashCode ^ contactDateTime.hashCode;
 
   @override
   int compareTo(Contact other) {
@@ -137,7 +137,7 @@ class Contact implements Comparable<Contact> {
     if (compare1 != 0) {
       return compare1;
     }
-    var compare2 = subjects.compareTo(other.subjects);
+    var compare2 = subject.compareTo(other.subject);
     if (compare2 != 0) {
       return compare2;
     }

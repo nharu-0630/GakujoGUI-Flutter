@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:gakujo_task/api/provide.dart';
 import 'package:gakujo_task/app.dart';
+import 'package:gakujo_task/models/class_link.dart';
 import 'package:gakujo_task/models/contact.dart';
 import 'package:gakujo_task/models/grade.dart';
 import 'package:gakujo_task/models/quiz.dart';
@@ -27,6 +28,7 @@ void main() async {
   Hive.registerAdapter(QuizAdapter());
   Hive.registerAdapter(GradeAdapter());
   Hive.registerAdapter(SharedFileAdapter());
+  Hive.registerAdapter(ClassLinkAdapter());
   runApp(const MyApp());
 }
 
@@ -57,7 +59,10 @@ class _MyAppState extends State<MyApp> {
         ChangeNotifierProvider(create: (_) => ReportRepository(ReportBox())),
         ChangeNotifierProvider(create: (_) => QuizRepository(QuizBox())),
         ChangeNotifierProvider(create: (_) => GradeRepository(GradeBox())),
-        ChangeNotifierProvider(create: (_) => SharedFileRepository(SharedFileBox())),
+        ChangeNotifierProvider(
+            create: (_) => SharedFileRepository(SharedFileBox())),
+        ChangeNotifierProvider(
+            create: (_) => ClassLinkRepository(ClassLinkBox())),
       ],
       child: const App(),
     );

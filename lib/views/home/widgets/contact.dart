@@ -20,10 +20,8 @@ class ContactWidget extends StatelessWidget {
           var subjects = snapshot.data![0] as List<Subject>;
           var contacts = snapshot.data![1] as List<Contact>;
           subjects.sort((a, b) {
-            var aContact =
-                contacts.firstWhere((e) => e.subjects == a.subjectsName);
-            var bContact =
-                contacts.firstWhere((e) => e.subjects == b.subjectsName);
+            var aContact = contacts.firstWhere((e) => e.subject == a.subject);
+            var bContact = contacts.firstWhere((e) => e.subject == b.subject);
             return bContact.contactDateTime.compareTo(aContact.contactDateTime);
           });
           return Container(
@@ -55,8 +53,8 @@ class ContactWidget extends StatelessWidget {
                           context,
                           subjects[index],
                           contacts
-                              .where((e) =>
-                                  e.subjects == subjects[index].subjectsName)
+                              .where(
+                                  (e) => e.subject == subjects[index].subject)
                               .toList(),
                         )),
                   ),
@@ -82,7 +80,7 @@ class ContactWidget extends StatelessWidget {
             child: Text(
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
-              subject.subjectsName,
+              subject.subject,
               style: Theme.of(context)
                   .textTheme
                   .titleMedium

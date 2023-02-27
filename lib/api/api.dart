@@ -8,6 +8,7 @@ import 'package:dio_smart_retry/dio_smart_retry.dart';
 import 'package:flutter/foundation.dart';
 import 'package:gakujo_task/api/parse.dart';
 import 'package:gakujo_task/app.dart';
+import 'package:gakujo_task/models/class_link.dart';
 import 'package:gakujo_task/models/contact.dart';
 import 'package:gakujo_task/models/grade.dart';
 import 'package:gakujo_task/models/quiz.dart';
@@ -23,7 +24,7 @@ import 'package:uuid/uuid.dart';
 import 'package:version/version.dart';
 
 class Api {
-  static final version = Version(1, 3, 0);
+  static final version = Version(1, 4, 0);
 
   final _interval = const Duration(milliseconds: 2000);
 
@@ -1053,10 +1054,6 @@ class Api {
         'selectIndex': '',
         'prevPageId': 'backToList',
         'confirmMsg': '',
-        // '_searchConditionDisp.accordionSearchCondition': 'true',
-        // '_screenIdentifier': 'SC_A08_01',
-        // '_screenInfoDisp': 'true',
-        // '_scrollTop': '0',
       },
     );
     _updateToken(response.data, required: true);
@@ -1105,10 +1102,6 @@ class Api {
           'selectIndex': '',
           'prevPageId': 'backToList',
           'confirmMsg': '',
-          // '_searchConditionDisp.accordionSearchCondition': 'true',
-          // '_screenIdentifier': 'SC_A08_01',
-          // '_screenInfoDisp': 'true',
-          // '_scrollTop': '0',
         },
       );
       _updateToken(response.data, required: true);
@@ -1194,6 +1187,126 @@ class Api {
         ?.read<SharedFileRepository>()
         .add(sharedFile, overwrite: true);
     return sharedFile;
+  }
+
+  Future<void> fetchClassLinks() async {
+    var response = await _client.postUri<dynamic>(
+      Uri.https(
+        'gakujo.shizuoka.ac.jp',
+        '/portal/common/generalPurpose/',
+      ),
+      data: {
+        'org.apache.struts.taglib.html.TOKEN': _token,
+        'headTitle': '授業リンク一覧',
+        'menuCode': 'A09',
+        'nextPath': '/classlink/classLinkList/initialize'
+      },
+    );
+    _updateToken(response.data, required: true);
+
+    await Future.delayed(_interval);
+    response = await _client.postUri<dynamic>(
+      Uri.https(
+        'gakujo.shizuoka.ac.jp',
+        '/portal/classlink/classLinkList/searchClassLinkList',
+      ),
+      data: {
+        'org.apache.struts.taglib.html.TOKEN': _token,
+        'searchTeacherName': '',
+        'searchTeacherCode': '',
+        'searchSchoolYear': await _schoolYear,
+        'searchEstablishSemester': await _semesterCode,
+        'searchClassSubject': '',
+        'searchKeyword': '',
+        'checkSearchLinkTitle': 'on',
+        'tbl_classLinkList_length': '-1',
+        'linkId': '',
+        'confirmMsg': '',
+      },
+    );
+    _updateToken(response.data, required: true);
+
+    navigatorKey.currentContext?.read<ClassLinkRepository>().addAll(
+        parse(response.data)
+            .querySelectorAll('#tbl_classLinkList > tbody > tr')
+            .map(ClassLink.fromElement)
+            .toList());
+  }
+
+  Future<ClassLink> fetchDetailClassLink(ClassLink classLink,
+      {bool bypass = false}) async {
+    if (!bypass) {
+      var response = await _client.postUri<dynamic>(
+        Uri.https(
+          'gakujo.shizuoka.ac.jp',
+          '/portal/common/generalPurpose/',
+        ),
+        data: {
+          'org.apache.struts.taglib.html.TOKEN': _token,
+          'headTitle': '授業リンク一覧',
+          'menuCode': 'A09',
+          'nextPath': '/classlink/classLinkList/initialize'
+        },
+      );
+      _updateToken(response.data, required: true);
+
+      await Future.delayed(_interval);
+      response = await _client.postUri<dynamic>(
+        Uri.https(
+          'gakujo.shizuoka.ac.jp',
+          '/portal/classlink/classLinkList/searchClassLinkList',
+        ),
+        data: {
+          'org.apache.struts.taglib.html.TOKEN': _token,
+          'searchTeacherName': '',
+          'searchTeacherCode': '',
+          'searchSchoolYear': await _schoolYear,
+          'searchEstablishSemester': await _semesterCode,
+          'searchClassSubject': '',
+          'searchKeyword': '',
+          'checkSearchLinkTitle': 'on',
+          'tbl_classLinkList_length': '-1',
+          'linkId': '',
+          'confirmMsg': '',
+        },
+      );
+      _updateToken(response.data, required: true);
+
+      if (parse(response.data)
+          .querySelectorAll('#tbl_classLinkList > tbody > tr')
+          .map(ClassLink.fromElement)
+          .where((e) => e == classLink)
+          .isEmpty) {
+        return classLink;
+      }
+    }
+    await Future.delayed(_interval);
+    var response = await _client.postUri<dynamic>(
+      Uri.https(
+        'gakujo.shizuoka.ac.jp',
+        '/portal/classlink/classLinkList/moveToDetail',
+      ),
+      data: {
+        'org.apache.struts.taglib.html.TOKEN': _token,
+        'searchTeacherName': '',
+        'searchTeacherCode': '',
+        'searchSchoolYear': await _schoolYear,
+        'searchEstablishSemester': await _semesterCode,
+        'searchClassSubject': '',
+        'searchKeyword': '',
+        'checkSearchLinkTitle': 'on',
+        'tbl_classLinkList_length': '-1',
+        'linkId': classLink.id,
+        'confirmMsg': '',
+      },
+    );
+    _updateToken(response.data, required: true);
+    var document = parse(response.data);
+    classLink.toDetail(document);
+    navigatorKey.currentContext
+        ?.read<ClassLinkRepository>()
+        .add(classLink, overwrite: true);
+    return classLink;
   }
 
   Future<bool> fetchAcademicSystem() async {

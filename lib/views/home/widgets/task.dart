@@ -130,6 +130,13 @@ class TaskWidget extends StatelessWidget {
           ),
           Visibility(
             visible: quiz.fileNames?.isNotEmpty ?? false,
+            child: Text(
+              '${quiz.fileNames?.length ?? ''}',
+              style: Theme.of(context).textTheme.bodyMedium,
+            ),
+          ),
+          Visibility(
+            visible: quiz.fileNames?.isNotEmpty ?? false,
             child: const Icon(Icons.file_present_rounded),
           ),
           Visibility(
@@ -211,6 +218,13 @@ class TaskWidget extends StatelessWidget {
                   .titleMedium
                   ?.copyWith(fontWeight: FontWeight.bold),
               overflow: TextOverflow.ellipsis,
+            ),
+          ),
+          Visibility(
+            visible: report.fileNames?.isNotEmpty ?? false,
+            child: Text(
+              '${report.fileNames?.length ?? ''}',
+              style: Theme.of(context).textTheme.bodyMedium,
             ),
           ),
           Visibility(

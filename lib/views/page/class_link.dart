@@ -3,32 +3,33 @@ import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:gakujo_task/api/provide.dart';
 import 'package:gakujo_task/app.dart';
+import 'package:gakujo_task/models/class_link.dart';
 import 'package:gakujo_task/models/shared_file.dart';
 import 'package:gakujo_task/views/common/widget.dart';
 import 'package:provider/provider.dart';
 
-class SharedFilePage extends StatefulWidget {
-  const SharedFilePage({Key? key}) : super(key: key);
+class ClassLinkPage extends StatefulWidget {
+  const ClassLinkPage({Key? key}) : super(key: key);
 
   @override
-  State<SharedFilePage> createState() => _SharedFilePageState();
+  State<ClassLinkPage> createState() => _ClassLinkPageState();
 }
 
-class _SharedFilePageState extends State<SharedFilePage> {
+class _ClassLinkPageState extends State<ClassLinkPage> {
   bool _searchStatus = false;
   bool _filterStatus = false;
-  List<SharedFile> _sharedFiles = [];
-  List<SharedFile> _suggestSharedFiles = [];
+  List<ClassLink> _classLinks = [];
+  List<ClassLink> _suggestClassLinks = [];
 
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
-      future: context.watch<SharedFileRepository>().getAll(),
-      builder: (context, AsyncSnapshot<List<SharedFile>> snapshot) {
+      future: context.watch<ClassLinkRepository>().getAll(),
+      builder: (context, AsyncSnapshot<List<ClassLink>> snapshot) {
         if (snapshot.hasData) {
-          _sharedFiles = snapshot.data!;
-          _sharedFiles.sort(((a, b) => b.compareTo(a)));
-          var filteredSharedFiles = _sharedFiles
+          _classLinks = snapshot.data!;
+          _classLinks.sort(((a, b) => b.compareTo(a)));
+          var filteredClassLinks = _classLinks
               .where((e) => _filterStatus ? !e.isArchived : true)
               .toList();
           return Scaffold(
@@ -37,8 +38,8 @@ class _SharedFilePageState extends State<SharedFilePage> {
                   [_buildAppBar(context)],
               body: RefreshIndicator(
                 onRefresh: () async =>
-                    context.read<ApiRepository>().fetchSharedFiles(),
-                child: filteredSharedFiles.isEmpty
+                    context.read<ApiRepository>().fetchClassLinks(),
+                child: filteredClassLinks.isEmpty
                     ? LayoutBuilder(
                         builder: (context, constraints) =>
                             SingleChildScrollView(
@@ -53,12 +54,12 @@ class _SharedFilePageState extends State<SharedFilePage> {
                                   const Padding(
                                     padding: EdgeInsets.all(8.0),
                                     child: Icon(
-                                      Icons.folder_shared_rounded,
+                                      Icons.link_rounded,
                                       size: 48.0,
                                     ),
                                   ),
                                   Text(
-                                    '授業共有ファイルはありません',
+                                    '授業リンクはありません',
                                     style:
                                         Theme.of(context).textTheme.titleMedium,
                                   ),
@@ -71,11 +72,11 @@ class _SharedFilePageState extends State<SharedFilePage> {
                     : ListView.builder(
                         padding: const EdgeInsets.only(top: 8),
                         itemCount: _searchStatus
-                            ? _suggestSharedFiles.length
-                            : _sharedFiles.length,
+                            ? _suggestClassLinks.length
+                            : _classLinks.length,
                         itemBuilder: (context, index) => _searchStatus
-                            ? _buildCard(context, _suggestSharedFiles[index])
-                            : _buildCard(context, _sharedFiles[index]),
+                            ? _buildCard(context, _suggestClassLinks[index])
+                            : _buildCard(context, _classLinks[index]),
                       ),
               ),
             ),
@@ -104,12 +105,12 @@ class _SharedFilePageState extends State<SharedFilePage> {
       ),
       title: _searchStatus
           ? TextField(
-              onChanged: (value) => setState(() => _suggestSharedFiles =
-                  _sharedFiles.where((e) => e.contains(value)).toList()),
+              onChanged: (value) => setState(() => _suggestClassLinks =
+                  _classLinks.where((e) => e.contains(value)).toList()),
               autofocus: true,
               textInputAction: TextInputAction.search,
             )
-          : const Text('授業共有ファイル'),
+          : const Text('授業リンク'),
       actions: _searchStatus
           ? [
               Padding(
@@ -136,7 +137,7 @@ class _SharedFilePageState extends State<SharedFilePage> {
                 child: IconButton(
                   onPressed: (() => setState(() {
                         _searchStatus = true;
-                        _suggestSharedFiles = [];
+                        _suggestClassLinks = [];
                       })),
                   icon: const Icon(Icons.search_rounded),
                 ),
@@ -146,24 +147,23 @@ class _SharedFilePageState extends State<SharedFilePage> {
     );
   }
 
-  Widget _buildCard(BuildContext context, SharedFile sharedFile) {
+  Widget _buildCard(BuildContext context, ClassLink classLink) {
     return Slidable(
-      key: Key(sharedFile.hashCode.toString()),
+      key: Key(classLink.id),
       startActionPane: ActionPane(
         motion: const DrawerMotion(),
         children: [
           SlidableAction(
             onPressed: (context) => context
                 .read<SharedFileRepository>()
-                .setArchive(
-                    sharedFile.hashCode.toString(), !sharedFile.isArchived)
+                .setArchive(classLink.id, !classLink.isArchived)
                 .then((value) => setState(() {})),
             backgroundColor: const Color(0xFF7BC043),
             foregroundColor: Colors.white,
-            icon: sharedFile.isArchived
+            icon: classLink.isArchived
                 ? Icons.unarchive_rounded
                 : Icons.archive_rounded,
-            label: sharedFile.isArchived ? 'アーカイブ解除' : 'アーカイブ',
+            label: classLink.isArchived ? 'アーカイブ解除' : 'アーカイブ',
           ),
         ],
       ),
@@ -172,7 +172,7 @@ class _SharedFilePageState extends State<SharedFilePage> {
         children: [
           SlidableAction(
             onPressed: (context) async =>
-                context.read<ApiRepository>().fetchDetailSharedFile(sharedFile),
+                context.read<ApiRepository>().fetchDetailClassLink(classLink),
             backgroundColor: const Color(0xFF0392CF),
             foregroundColor: Colors.white,
             icon: Icons.sync_rounded,
@@ -182,11 +182,11 @@ class _SharedFilePageState extends State<SharedFilePage> {
       ),
       child: ListTile(
         onTap: () {
-          if (!sharedFile.isAcquired) {
+          if (!classLink.isAcquired) {
             showDialog(
               context: context,
               builder: (_) => CupertinoAlertDialog(
-                content: const Text('未取得の授業共有ファイルです。取得しますか？'),
+                content: const Text('未取得の授業リンクです。取得しますか？'),
                 actions: [
                   CupertinoDialogAction(
                       isDestructiveAction: true,
@@ -200,7 +200,7 @@ class _SharedFilePageState extends State<SharedFilePage> {
                       Navigator.of(context).pop();
                       context
                           .read<ApiRepository>()
-                          .fetchDetailSharedFile(sharedFile);
+                          .fetchDetailClassLink(classLink);
                     },
                   )
                 ],
@@ -216,7 +216,7 @@ class _SharedFilePageState extends State<SharedFilePage> {
               builder: (context) => DraggableScrollableSheet(
                 expand: false,
                 builder: (context, controller) {
-                  return buildSharedFileModal(context, sharedFile, controller);
+                  return buildClassLinkModal(context, classLink, controller);
                 },
               ),
             );
@@ -226,7 +226,7 @@ class _SharedFilePageState extends State<SharedFilePage> {
           children: [
             Expanded(
               child: Text(
-                sharedFile.subject,
+                classLink.subject,
                 style: Theme.of(context).textTheme.bodyMedium,
                 overflow: TextOverflow.ellipsis,
               ),
@@ -240,7 +240,7 @@ class _SharedFilePageState extends State<SharedFilePage> {
               children: [
                 Expanded(
                   child: Text(
-                    sharedFile.title,
+                    classLink.title,
                     style: Theme.of(context)
                         .textTheme
                         .titleMedium
@@ -249,18 +249,7 @@ class _SharedFilePageState extends State<SharedFilePage> {
                   ),
                 ),
                 Visibility(
-                  visible: sharedFile.fileNames?.isNotEmpty ?? false,
-                  child: Text(
-                    '${sharedFile.fileNames?.length ?? ''}',
-                    style: Theme.of(context).textTheme.bodyMedium,
-                  ),
-                ),
-                Visibility(
-                  visible: sharedFile.fileNames?.isNotEmpty ?? false,
-                  child: const Icon(Icons.file_present_rounded),
-                ),
-                Visibility(
-                  visible: sharedFile.isArchived,
+                  visible: classLink.isArchived,
                   child: const Icon(Icons.archive_rounded),
                 )
               ],

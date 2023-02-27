@@ -10,7 +10,7 @@ part 'subject.g.dart';
 @HiveType(typeId: 2)
 class Subject implements Comparable<Subject> {
   @HiveField(0)
-  String subjectsName;
+  String subject;
   @HiveField(1)
   String teacherName;
   @HiveField(2)
@@ -19,7 +19,7 @@ class Subject implements Comparable<Subject> {
   int? subjectColor;
 
   Subject(
-    this.subjectsName,
+    this.subject,
     this.teacherName,
     this.classRoom,
     this.subjectColor,
@@ -46,7 +46,7 @@ class Subject implements Comparable<Subject> {
       return true;
     }
     if (other is Subject) {
-      return subjectsName == other.subjectsName &&
+      return subject == other.subject &&
           teacherName == other.teacherName &&
           classRoom == other.classRoom;
     }
@@ -55,11 +55,11 @@ class Subject implements Comparable<Subject> {
 
   @override
   int get hashCode =>
-      subjectsName.hashCode ^ teacherName.hashCode ^ classRoom.hashCode;
+      subject.hashCode ^ teacherName.hashCode ^ classRoom.hashCode;
 
   @override
   int compareTo(Subject other) {
-    var compare1 = subjectsName.compareTo(other.subjectsName);
+    var compare1 = subject.compareTo(other.subject);
     if (compare1 != 0) {
       return compare1;
     }

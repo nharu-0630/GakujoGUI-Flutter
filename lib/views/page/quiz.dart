@@ -273,6 +273,13 @@ class _QuizPageState extends State<QuizPage> {
             ),
             Visibility(
               visible: quiz.fileNames?.isNotEmpty ?? false,
+              child: Text(
+                '${quiz.fileNames?.length ?? ''}',
+                style: Theme.of(context).textTheme.bodyMedium,
+              ),
+            ),
+            Visibility(
+              visible: quiz.fileNames?.isNotEmpty ?? false,
               child: const Icon(Icons.file_present_rounded),
             ),
             Visibility(

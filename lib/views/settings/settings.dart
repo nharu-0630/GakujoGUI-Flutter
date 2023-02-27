@@ -4,7 +4,14 @@ import 'package:flutter/services.dart';
 import 'package:gakujo_task/api/api.dart';
 import 'package:gakujo_task/api/provide.dart';
 import 'package:gakujo_task/app.dart';
+import 'package:gakujo_task/models/class_link.dart';
+import 'package:gakujo_task/models/contact.dart';
+import 'package:gakujo_task/models/grade.dart';
+import 'package:gakujo_task/models/quiz.dart';
+import 'package:gakujo_task/models/report.dart';
 import 'package:gakujo_task/models/settings.dart';
+import 'package:gakujo_task/models/shared_file.dart';
+import 'package:gakujo_task/models/subject.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:provider/provider.dart';
 import 'package:sticky_headers/sticky_headers.dart';
@@ -321,9 +328,16 @@ class _SettingsWidgetState extends State<SettingsWidget> {
                               child: const Text('初期化'),
                               onPressed: () async {
                                 Navigator.of(context).pop();
-                                await context
-                                    .read<SettingsRepository>()
-                                    .delete();
+                                context.read<ContactRepository>().deleteAll();
+                                context.read<SubjectRepository>().deleteAll();
+                                context.read<SettingsRepository>().delete();
+                                context.read<ReportRepository>().deleteAll();
+                                context.read<QuizRepository>().deleteAll();
+                                context.read<GradeRepository>().deleteAll();
+                                context
+                                    .read<SharedFileRepository>()
+                                    .deleteAll();
+                                context.read<ClassLinkRepository>().deleteAll();
                               },
                             )
                           ],
@@ -400,9 +414,7 @@ class _SettingsWidgetState extends State<SettingsWidget> {
                               child: const Text('実行'),
                               onPressed: () async {
                                 Navigator.of(context).pop();
-                                context
-                                    .read<ApiRepository>()
-                                    .fetchSharedFiles();
+                                context.read<ApiRepository>().fetchClassLinks();
                               },
                             )
                           ],

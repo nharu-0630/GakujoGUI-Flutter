@@ -98,9 +98,8 @@ class _GradePageState extends State<GradePage> {
       ),
       title: _searchStatus
           ? TextField(
-              onChanged: (value) => setState(() => _suggestGrades = _grades
-                  .where((e) => e.subjectsName.contains(value))
-                  .toList()),
+              onChanged: (value) => setState(() => _suggestGrades =
+                  _grades.where((e) => e.subject.contains(value)).toList()),
               autofocus: true,
               textInputAction: TextInputAction.search,
             )
@@ -138,7 +137,7 @@ class _GradePageState extends State<GradePage> {
         children: [
           Expanded(
             child: Text(
-              grade.subjectsName,
+              grade.subject,
               style: Theme.of(context).textTheme.titleMedium,
               overflow: TextOverflow.ellipsis,
             ),
@@ -153,7 +152,7 @@ class _GradePageState extends State<GradePage> {
       subtitle: Row(
         children: [
           Text(
-            grade.teacherName.toString(),
+            grade.teacher.toString(),
             style: Theme.of(context).textTheme.bodyMedium,
           ),
           Padding(
