@@ -31,11 +31,11 @@ class SubjectAdapter extends TypeAdapter<Subject> {
       ..writeByte(0)
       ..write(obj.subject)
       ..writeByte(1)
-      ..write(obj.teacherName)
+      ..write(obj.teacher)
       ..writeByte(2)
-      ..write(obj.classRoom)
+      ..write(obj.className)
       ..writeByte(3)
-      ..write(obj.subjectColor);
+      ..write(obj.color);
   }
 
   @override

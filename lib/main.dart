@@ -10,6 +10,7 @@ import 'package:gakujo_task/models/report.dart';
 import 'package:gakujo_task/models/settings.dart';
 import 'package:gakujo_task/models/shared_file.dart';
 import 'package:gakujo_task/models/subject.dart';
+import 'package:gakujo_task/models/timetable.dart';
 import 'package:hive_flutter/adapters.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:provider/provider.dart';
@@ -29,6 +30,7 @@ void main() async {
   Hive.registerAdapter(GradeAdapter());
   Hive.registerAdapter(SharedFileAdapter());
   Hive.registerAdapter(ClassLinkAdapter());
+  Hive.registerAdapter(TimetableAdapter());
   runApp(const MyApp());
 }
 
@@ -63,6 +65,8 @@ class _MyAppState extends State<MyApp> {
             create: (_) => SharedFileRepository(SharedFileBox())),
         ChangeNotifierProvider(
             create: (_) => ClassLinkRepository(ClassLinkBox())),
+        ChangeNotifierProvider(
+            create: (_) => TimetableRepository(TimetableBox())),
       ],
       child: const App(),
     );

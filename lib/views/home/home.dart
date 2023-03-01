@@ -12,6 +12,7 @@ import 'package:gakujo_task/views/page/grade.dart';
 import 'package:gakujo_task/views/page/quiz.dart';
 import 'package:gakujo_task/views/page/report.dart';
 import 'package:gakujo_task/views/page/shared_file.dart';
+import 'package:gakujo_task/views/page/timetable.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:sticky_headers/sticky_headers.dart';
@@ -276,6 +277,23 @@ class _HomeWidgetState extends State<HomeWidget> {
               Navigator.of(context).pop();
               Navigator.of(context).push(
                   MaterialPageRoute(builder: (context) => const GradePage()));
+            },
+          ),
+          ListTile(
+            title: Row(
+              children: [
+                const Icon(Icons.calendar_month_rounded),
+                const SizedBox(width: 8.0),
+                Text(
+                  '個人時間割',
+                  style: Theme.of(context).textTheme.titleMedium,
+                ),
+              ],
+            ),
+            onTap: () {
+              Navigator.of(context).pop();
+              Navigator.of(context).push(MaterialPageRoute(
+                  builder: (context) => const TimetablePage()));
             },
           ),
         ],

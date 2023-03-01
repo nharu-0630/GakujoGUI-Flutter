@@ -12,17 +12,17 @@ class Subject implements Comparable<Subject> {
   @HiveField(0)
   String subject;
   @HiveField(1)
-  String teacherName;
+  String teacher;
   @HiveField(2)
-  String classRoom;
+  String className;
   @HiveField(3)
-  int? subjectColor;
+  int? color;
 
   Subject(
     this.subject,
-    this.teacherName,
-    this.classRoom,
-    this.subjectColor,
+    this.teacher,
+    this.className,
+    this.color,
   );
 
   factory Subject.fromElement(Element element) {
@@ -47,15 +47,14 @@ class Subject implements Comparable<Subject> {
     }
     if (other is Subject) {
       return subject == other.subject &&
-          teacherName == other.teacherName &&
-          classRoom == other.classRoom;
+          teacher == other.teacher &&
+          className == other.className;
     }
     return false;
   }
 
   @override
-  int get hashCode =>
-      subject.hashCode ^ teacherName.hashCode ^ classRoom.hashCode;
+  int get hashCode => subject.hashCode ^ teacher.hashCode ^ className.hashCode;
 
   @override
   int compareTo(Subject other) {
@@ -63,11 +62,11 @@ class Subject implements Comparable<Subject> {
     if (compare1 != 0) {
       return compare1;
     }
-    var compare2 = teacherName.compareTo(other.teacherName);
+    var compare2 = teacher.compareTo(other.teacher);
     if (compare2 != 0) {
       return compare2;
     }
-    var compare3 = classRoom.compareTo(other.classRoom);
+    var compare3 = className.compareTo(other.className);
     return compare3;
   }
 }

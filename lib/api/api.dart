@@ -16,6 +16,8 @@ import 'package:gakujo_task/models/report.dart';
 import 'package:gakujo_task/models/settings.dart';
 import 'package:gakujo_task/models/shared_file.dart';
 import 'package:gakujo_task/models/subject.dart';
+import 'package:gakujo_task/models/timetable.dart';
+import 'package:html/dom.dart';
 import 'package:html/parser.dart' show parse;
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
@@ -369,8 +371,16 @@ class Api {
             'Accept':
                 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
           },
+          validateStatus: (status) => status == 302 || status == 200,
         ),
       );
+
+      if (response.statusCode == 302) {
+        await Future.delayed(_interval);
+        response = await _client.get<dynamic>(
+          response.headers.value('location')!,
+        );
+      }
     }
 
     final Settings? settings = await _settings;
@@ -1377,17 +1387,17 @@ class Api {
             '',
       ).replaceAll('&#x3a;', ':');
 
+      if (samlResponse.isEmpty || relayState.isEmpty) {
+        throw Exception('SAMLResponse or RelayState is empty.');
+      }
+
       if (kDebugMode) {
         print('SAMLResponse: ${samlResponse.substring(0, 10)} ...');
         print('RelayState: ${relayState.substring(0, 10)} ...');
       }
 
-      if (samlResponse.isEmpty || relayState.isEmpty) {
-        throw Exception('SAMLResponse or RelayState is empty.');
-      }
-
       await Future.delayed(_interval);
-      await _client.postUri<dynamic>(
+      response = await _client.postUri<dynamic>(
         Uri.https(
           'gakujo.shizuoka.ac.jp',
           '/Shibboleth.sso/SAML2/POST',
@@ -1406,6 +1416,18 @@ class Api {
           validateStatus: (status) => status == 302,
         ),
       );
+
+      await Future.delayed(_interval);
+      response = await _client.get<dynamic>(response.headers.value('location')!,
+          options: Options(
+            validateStatus: (status) => status == 302 || status == 200,
+          ));
+
+      if (response.statusCode == 302) {
+        await Future.delayed(_interval);
+        response =
+            await _client.get<dynamic>(response.headers.value('location')!);
+      }
     }
     return true;
   }
@@ -1428,14 +1450,6 @@ class Api {
 
     if (document.querySelector('table.txt12') != null) {
       await navigatorKey.currentContext?.read<GradeRepository>().deleteAll();
-      if (kDebugMode) {
-        print(document
-            .querySelector('table.txt12')!
-            .querySelectorAll('tr')
-            .skip(1)
-            .map(Grade.fromElement)
-            .toList());
-      }
       navigatorKey.currentContext?.read<GradeRepository>().addAll(document
           .querySelector('table.txt12')!
           .querySelectorAll('tr')
@@ -1443,5 +1457,233 @@ class Api {
           .map(Grade.fromElement)
           .toList());
     }
+  }
+
+  Future<void> fetchTimetables() async {
+    await fetchAcademicSystem();
+
+    await Future.delayed(_interval);
+    var response = await _client.getUri<dynamic>(
+      Uri.https(
+        'gakujo.shizuoka.ac.jp',
+        '/kyoumu/rishuuInit.do',
+        {
+          'mainMenuCode': '005',
+          'parentMenuCode': '004',
+        },
+      ),
+    );
+    var document = parse(response.data);
+
+    await navigatorKey.currentContext?.read<TimetableRepository>().deleteAll();
+    var table = document
+        .querySelectorAll('table.txt12')[1]
+        .querySelector('tbody')!
+        .querySelectorAll('tr')
+        .where((e) => e.attributes['bgcolor']?.toString() == "#FFFFFF")
+        .toList();
+    for (var i = 0; i < 6; i++) {
+      for (var j = 1; j < 6; j++) {
+        var cell = table[j]
+            .querySelectorAll('td')
+            .where((e) =>
+                e.attributes['valign']?.toString() == "top" ||
+                e.attributes['valign']?.toString() == "middle")
+            .toList()[i];
+        for (var node in cell.querySelectorAll('td.txt12')) {
+          if (node.querySelector("a") != null) {
+            if ((node.innerHtml
+                        .contains("<font class=\"halfTime\">(前期前半)</font>") &&
+                    await _semesterCode != "0") ||
+                (node.innerHtml
+                        .contains("<font class=\"halfTime\">(前期後半)</font>") &&
+                    await _semesterCode != "1") ||
+                ((node.innerHtml.contains(
+                            "<font class=\"halfTime\">(後期前半)</font>") &&
+                        await _semesterCode != "2") ||
+                    (node.innerHtml.contains(
+                            "<font class=\"halfTime\">(後期後半)</font>") &&
+                        await _semesterCode != "3"))) continue;
+            var kamokuCode =
+                node.querySelector("a")!.attributes["onclick"]!.trimJsArgs(1);
+            var classCode =
+                node.querySelector("a")!.attributes["onclick"]!.trimJsArgs(2);
+            var classRoom = node.innerHtml
+                .split('<br>')
+                .last
+                .trimNewLines()
+                .trimWhiteSpace();
+            Timetable timetable = await fetchDetailTimetable(
+                i, j - 1, kamokuCode, classCode, classRoom);
+            await navigatorKey.currentContext
+                ?.read<TimetableRepository>()
+                .add(timetable);
+          }
+        }
+      }
+    }
+  }
+
+  Future<Timetable> fetchDetailTimetable(int weekday, int period,
+      String kamokuCode, String classCode, String classRoom) async {
+    Timetable timetable = Timetable(
+      weekday,
+      period,
+      '',
+      '',
+      '',
+      '',
+      '',
+      0,
+      '',
+      classRoom,
+      kamokuCode,
+      classCode,
+      '',
+      '',
+      '',
+      '',
+      '',
+      '',
+      '',
+      '',
+      '',
+      '',
+      '',
+      '',
+      '',
+      '',
+      '',
+      '',
+      '',
+      '',
+      '',
+      '',
+      '',
+      '',
+      '',
+      '',
+      '',
+      '',
+      '',
+      '',
+      '',
+      '',
+      '',
+    );
+
+    await Future.delayed(_interval);
+    var response = await _client.getUri<dynamic>(
+      Uri.https(
+        'gakujo.shizuoka.ac.jp',
+        '/kyoumu/detailKamoku.do',
+        {
+          'detailKamokuCode': timetable.kamokuCode,
+          'detailClassCode': timetable.classCode,
+          'gamen': 'jikanwari',
+        },
+      ),
+    );
+    var document = parse(response.data);
+
+    timetable.subject = trimTimetableValue(document, '科目名');
+    timetable.id = trimTimetableValue(document, '科目番号');
+    timetable.className = trimTimetableValue(document, 'クラス名');
+    timetable.teacher = trimTimetableValue(document, '担当教員');
+    timetable.subjectSection = trimTimetableValue(document, '科目区分');
+    timetable.selectionSection = trimTimetableValue(document, '必修選択区分');
+    timetable.credit =
+        int.parse(trimTimetableValue(document, '単位数').replaceAll('単位', ''));
+
+    await Future.delayed(_interval);
+    response = await _client.getUri<dynamic>(
+      Uri.https(
+        'gakujo.shizuoka.ac.jp',
+        '/syllabus2/rishuuSyllabusSearch.do',
+        {
+          'schoolYear': await _schoolYear,
+          'subjectCD': timetable.id,
+          'classCD': timetable.classCode,
+        },
+      ),
+    );
+    document = parse(response.data);
+
+    if (!response.data.contains('シラバスの詳細は以下となります。')) {
+      var subjectId =
+          RegExp(r'(?<=subjectID=)\d*').firstMatch(response.data)?[0];
+      var formatCd = RegExp(r'(?<=formatCD=)\d*').firstMatch(response.data)?[0];
+      if (subjectId == null || formatCd == null) {
+        return timetable;
+      }
+
+      await Future.delayed(_interval);
+      response = await _client.getUri<dynamic>(
+        Uri.https(
+          'gakujo.shizuoka.ac.jp',
+          '/syllabus2/rishuuSyllabusDetailEdit.do',
+          {
+            'subjectID': subjectId,
+            'formatCD': formatCd,
+            'rowIndex': '0',
+            'jikanwariSchoolYear': await _schoolYear,
+          },
+        ),
+      );
+      document = parse(response.data);
+    }
+
+    timetable.syllabusSubject = trimSyllabusValue(document, '授業科目名');
+    timetable.syllabusTeacher = trimSyllabusValue(document, '担当教員名');
+    timetable.syllabusAffiliation = trimSyllabusValue(document, '所属等');
+    timetable.syllabusResearchRoom = trimSyllabusValue(document, '研究室');
+    timetable.syllabusSharingTeacher = trimSyllabusValue(document, '分担教員名');
+    timetable.syllabusClassName = trimSyllabusValue(document, 'クラス');
+    timetable.syllabusSemesterName = trimSyllabusValue(document, '学期');
+    timetable.syllabusSelectionSection = trimSyllabusValue(document, '必修選択区分');
+    timetable.syllabusTargetGrade = trimSyllabusValue(document, '対象学年');
+    timetable.syllabusCredit = trimSyllabusValue(document, '単位数');
+    timetable.syllabusWeekdayPeriod = trimSyllabusValue(document, '曜日・時限');
+    timetable.syllabusClassRoom = trimSyllabusValue(document, '教室');
+    timetable.syllabusKeyword = trimSyllabusValue(document, 'キーワード');
+    timetable.syllabusClassTarget = trimSyllabusValue(document, '授業の目標');
+    timetable.syllabusLearningDetail = trimSyllabusValue(document, '学習内容');
+    timetable.syllabusClassPlan = trimSyllabusValue(document, '授業計画');
+    timetable.syllabusTextbook = trimSyllabusValue(document, 'テキスト');
+    timetable.syllabusReferenceBook = trimSyllabusValue(document, '参考書');
+    timetable.syllabusPreparationReview =
+        trimSyllabusValue(document, '予習・復習について');
+    timetable.syllabusEvaluationMethod =
+        trimSyllabusValue(document, '成績評価の方法･基準');
+    timetable.syllabusOfficeHour = trimSyllabusValue(document, 'オフィスアワー');
+    timetable.syllabusMessage = trimSyllabusValue(document, '担当教員からのメッセージ');
+    timetable.syllabusActiveLearning =
+        trimSyllabusValue(document, 'アクティブ・ラーニング');
+    timetable.syllabusTeacherPracticalExperience =
+        trimSyllabusValue(document, '実務経験のある教員の有無');
+    timetable.syllabusTeacherCareerClassDetail =
+        trimSyllabusValue(document, '実務経験のある教員の経歴と授業内容');
+    timetable.syllabusTeachingProfessionSection =
+        trimSyllabusValue(document, '教職科目区分');
+    timetable.syllabusRelatedClassSubjects =
+        trimSyllabusValue(document, '関連授業科目');
+    timetable.syllabusOther = trimSyllabusValue(document, 'その他');
+    timetable.syllabusHomeClassStyle = trimSyllabusValue(document, '在宅授業形態');
+    timetable.syllabusHomeClassStyleDetail =
+        trimSyllabusValue(document, '在宅授業形態（詳細）');
+    return timetable;
+  }
+
+  String trimTimetableValue(Document document, String key) {
+    var cells = document.querySelector('table.txt12')!.querySelectorAll('td');
+    var index = cells.indexWhere((e) => e.text.contains(key));
+    return cells[index + 1].text.trimWhiteSpace();
+  }
+
+  String trimSyllabusValue(Document document, String key) {
+    var cells = document.querySelectorAll('td');
+    var index = cells.indexWhere(
+        (e) => e.querySelector('font')?.text.contains(key) ?? false);
+    return cells[index + 1].text.trimWhiteSpace();
   }
 }

@@ -288,7 +288,7 @@ class _SettingsWidgetState extends State<SettingsWidget> {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          const Icon(Icons.sync_rounded),
+                          const Icon(Icons.login_rounded),
                           const SizedBox(width: 8.0),
                           Text(
                             'ログイン',
@@ -414,7 +414,7 @@ class _SettingsWidgetState extends State<SettingsWidget> {
                               child: const Text('実行'),
                               onPressed: () async {
                                 Navigator.of(context).pop();
-                                context.read<ApiRepository>().fetchClassLinks();
+                                context.read<ApiRepository>().fetchTimetables();
                               },
                             )
                           ],
