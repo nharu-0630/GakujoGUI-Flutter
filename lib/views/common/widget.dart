@@ -9,6 +9,7 @@ import 'package:gakujo_task/models/class_link.dart';
 import 'package:gakujo_task/models/quiz.dart';
 import 'package:gakujo_task/models/report.dart';
 import 'package:gakujo_task/models/shared_file.dart';
+import 'package:gakujo_task/models/timetable.dart';
 import 'package:intl/intl.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
@@ -90,16 +91,14 @@ Icon _buildExtIcon(String ext) {
 }
 
 Widget buildAutoLinkText(BuildContext context, String text) {
-  return Flexible(
-    child: SelectableAutoLinkText(
-      text,
-      style: Theme.of(context).textTheme.bodyMedium,
-      linkStyle: const TextStyle(color: Colors.blueAccent),
-      onTap: (url) => launchUrlString(url, mode: LaunchMode.inAppWebView),
-      onLongPress: (url) => Share.share(url),
-      linkRegExpPattern:
-          r'https?:\/\/(?:www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b(?:[-a-zA-Z0-9()@:%_\+.~#?&\/=]*)',
-    ),
+  return SelectableAutoLinkText(
+    text,
+    style: Theme.of(context).textTheme.bodyMedium,
+    linkStyle: const TextStyle(color: Colors.blueAccent),
+    onTap: (url) => launchUrlString(url, mode: LaunchMode.inAppWebView),
+    onLongPress: (url) => Share.share(url),
+    linkRegExpPattern:
+        r'https?:\/\/(?:www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b(?:[-a-zA-Z0-9()@:%_\+.~#?&\/=]*)',
   );
 }
 
@@ -658,6 +657,103 @@ Widget buildClassLinkModal(
             ),
           ),
         ],
+      ),
+      const SizedBox(height: 8.0),
+    ],
+  );
+}
+
+Widget buildTimetableModal(
+    BuildContext context, Timetable timetable, ScrollController controller) {
+  return ListView(
+    controller: controller,
+    padding: const EdgeInsets.all(16.0),
+    children: [
+      Padding(
+        padding: const EdgeInsets.all(4.0),
+        child: Text(
+          timetable.subject,
+          style: Theme.of(context).textTheme.titleLarge,
+        ),
+      ),
+      Padding(
+        padding: const EdgeInsets.all(4.0),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            const Icon(Icons.category_rounded),
+            const SizedBox(width: 8.0),
+            Text(
+              timetable.className,
+              style: Theme.of(context).textTheme.bodyLarge,
+            ),
+            const SizedBox(width: 16.0),
+            const Icon(Icons.pin_drop_rounded),
+            const SizedBox(width: 8.0),
+            Text(
+              timetable.classRoom,
+              style: Theme.of(context).textTheme.bodyLarge,
+            ),
+            const SizedBox(width: 16.0),
+            const Icon(Icons.person_rounded),
+            const SizedBox(width: 8.0),
+            Text(
+              timetable.teacher,
+              style: Theme.of(context).textTheme.bodyLarge,
+            ),
+          ],
+        ),
+      ),
+      const Padding(
+        padding: EdgeInsets.all(4.0),
+        child: Divider(thickness: 2.0),
+      ),
+      Text(
+        'キーワード',
+        style: Theme.of(context).textTheme.titleMedium,
+      ),
+      Padding(
+        padding: const EdgeInsets.all(4.0),
+        child: buildAutoLinkText(
+          context,
+          timetable.syllabusKeyword,
+        ),
+      ),
+      const SizedBox(height: 8.0),
+      Text(
+        '授業の目標',
+        style: Theme.of(context).textTheme.titleMedium,
+      ),
+      Padding(
+        padding: const EdgeInsets.all(4.0),
+        child: buildAutoLinkText(
+          context,
+          timetable.syllabusClassTarget,
+        ),
+      ),
+      const SizedBox(height: 8.0),
+      Text(
+        '学習内容',
+        style: Theme.of(context).textTheme.titleMedium,
+      ),
+      Padding(
+        padding: const EdgeInsets.all(4.0),
+        child: buildAutoLinkText(
+          context,
+          timetable.syllabusLearningDetail,
+        ),
+      ),
+      const SizedBox(height: 8.0),
+      Text(
+        '授業計画',
+        style: Theme.of(context).textTheme.titleMedium,
+      ),
+      Padding(
+        padding: const EdgeInsets.all(4.0),
+        child: buildAutoLinkText(
+          context,
+          timetable.syllabusClassPlan,
+        ),
       ),
       const SizedBox(height: 8.0),
     ],

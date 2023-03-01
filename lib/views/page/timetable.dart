@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:gakujo_task/app.dart';
 import 'package:gakujo_task/models/timetable.dart';
+import 'package:gakujo_task/views/common/widget.dart';
 import 'package:provider/provider.dart';
 
 class TimetablePage extends StatefulWidget {
@@ -92,9 +93,17 @@ class _TimetablePageState extends State<TimetablePage> {
   Widget _buildCell(BuildContext context, Timetable timetable) {
     return TableCell(
       child: GestureDetector(
-        onTap: () => showDialog(
+        onTap: () => showModalBottomSheet(
+          isScrollControlled: true,
+          shape: const RoundedRectangleBorder(
+              borderRadius: BorderRadius.vertical(top: Radius.circular(16.0))),
           context: context,
-          builder: (context) => _buildAlertDialog(timetable, context),
+          builder: (context) => DraggableScrollableSheet(
+            expand: false,
+            builder: (context, controller) {
+              return buildTimetableModal(context, timetable, controller);
+            },
+          ),
         ),
         child: Card(
           child: Padding(
@@ -155,119 +164,6 @@ class _TimetablePageState extends State<TimetablePage> {
           ),
         ),
       ),
-    );
-  }
-
-  AlertDialog _buildAlertDialog(Timetable timetable, BuildContext context) {
-    return AlertDialog(
-      title: Text(timetable.subject),
-      content: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Row(
-            children: [
-              const Icon(
-                Icons.location_on_rounded,
-                size: 16.0,
-              ),
-              const SizedBox(width: 8.0),
-              Expanded(
-                child: Text(
-                  timetable.classRoom,
-                  style: Theme.of(context).textTheme.bodyMedium,
-                  overflow: TextOverflow.visible,
-                ),
-              ),
-            ],
-          ),
-          Row(
-            children: [
-              const Icon(
-                Icons.person_rounded,
-                size: 16.0,
-              ),
-              const SizedBox(width: 8.0),
-              Expanded(
-                child: Text(
-                  timetable.teacher,
-                  style: Theme.of(context).textTheme.bodyMedium,
-                  overflow: TextOverflow.visible,
-                ),
-              ),
-            ],
-          ),
-          Row(
-            children: [
-              const Icon(
-                Icons.key_rounded,
-                size: 16.0,
-              ),
-              const SizedBox(width: 8.0),
-              Expanded(
-                child: Text(
-                  timetable.syllabusKeyword,
-                  style: Theme.of(context).textTheme.bodyMedium,
-                  overflow: TextOverflow.visible,
-                ),
-              ),
-            ],
-          ),
-          Row(
-            children: [
-              const Icon(
-                Icons.golf_course_rounded,
-                size: 16.0,
-              ),
-              const SizedBox(width: 8.0),
-              Expanded(
-                child: Text(
-                  timetable.syllabusClassTarget,
-                  style: Theme.of(context).textTheme.bodyMedium,
-                  overflow: TextOverflow.visible,
-                ),
-              ),
-            ],
-          ),
-          Row(
-            children: [
-              const Icon(
-                Icons.book_rounded,
-                size: 16.0,
-              ),
-              const SizedBox(width: 8.0),
-              Expanded(
-                child: Text(
-                  timetable.syllabusLearningDetail,
-                  style: Theme.of(context).textTheme.bodyMedium,
-                  overflow: TextOverflow.visible,
-                ),
-              ),
-            ],
-          ),
-          Row(
-            children: [
-              const Icon(
-                Icons.schedule_rounded,
-                size: 16.0,
-              ),
-              const SizedBox(width: 8.0),
-              Expanded(
-                child: Text(
-                  timetable.syllabusClassPlan,
-                  style: Theme.of(context).textTheme.bodyMedium,
-                  overflow: TextOverflow.visible,
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.of(context).pop(),
-          child: const Text('閉じる'),
-        ),
-      ],
     );
   }
 }
