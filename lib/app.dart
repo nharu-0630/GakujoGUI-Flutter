@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:gakujo_task/api/provide.dart';
+import 'package:gakujo_task/views/common/widget.dart';
 import 'package:gakujo_task/views/home/home.dart';
-import 'package:gakujo_task/views/settings/settings.dart';
-import 'package:provider/provider.dart';
+import 'package:gakujo_task/views/page/timetable.dart';
 
 class App extends StatefulWidget {
   const App({Key? key}) : super(key: key);
@@ -13,6 +12,7 @@ class App extends StatefulWidget {
 
 var scaffoldMessengerKey = GlobalKey<ScaffoldMessengerState>();
 var navigatorKey = GlobalKey<NavigatorState>();
+var scaffoldKey = GlobalKey<ScaffoldState>();
 
 class _AppState extends State<App> {
   var _index = 0;
@@ -34,9 +34,12 @@ class _AppState extends State<App> {
       debugShowCheckedModeBanner: false,
       title: 'Gakujo Task',
       home: Scaffold(
+        key: scaffoldKey,
+        drawer: buildDrawer(context),
+        appBar: buildAppBar(context, scaffoldKey),
         body: const [
           HomeWidget(),
-          SettingsWidget(),
+          TimetablePage(),
         ][_index],
         bottomNavigationBar: _buildBottomNavigationBar(),
       ),
@@ -55,28 +58,11 @@ class _AppState extends State<App> {
           tooltip: 'Home',
         ),
         NavigationDestination(
-          icon: Icon(Icons.settings_rounded),
-          label: 'Settings',
-          tooltip: 'Settings',
+          icon: Icon(Icons.calendar_month_rounded),
+          label: 'Timetable',
+          tooltip: 'Timetable',
         ),
       ],
     );
   }
-}
-
-PreferredSize buildAppBarBottom(BuildContext context) {
-  return PreferredSize(
-    preferredSize: const Size.fromHeight(6.0),
-    child: Visibility(
-      visible: context.watch<ApiRepository>().isLoading,
-      child: LinearProgressIndicator(
-        minHeight: 3.0,
-        valueColor: context.watch<ApiRepository>().isError
-            ? AlwaysStoppedAnimation<Color>(Theme.of(context).colorScheme.error)
-            : AlwaysStoppedAnimation<Color>(
-                Theme.of(context).colorScheme.primary,
-              ),
-      ),
-    ),
-  );
 }

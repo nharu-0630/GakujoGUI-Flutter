@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:gakujo_task/api/provide.dart';
-import 'package:gakujo_task/app.dart';
 import 'package:gakujo_task/models/grade.dart';
+import 'package:gakujo_task/views/common/widget.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 

@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:better_open_file/better_open_file.dart';
+import 'package:cached_memory_image/provider/cached_memory_image_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -8,8 +9,15 @@ import 'package:gakujo_task/api/provide.dart';
 import 'package:gakujo_task/models/class_link.dart';
 import 'package:gakujo_task/models/quiz.dart';
 import 'package:gakujo_task/models/report.dart';
+import 'package:gakujo_task/models/settings.dart';
 import 'package:gakujo_task/models/shared_file.dart';
 import 'package:gakujo_task/models/timetable.dart';
+import 'package:gakujo_task/views/page/class_link.dart';
+import 'package:gakujo_task/views/page/grade.dart';
+import 'package:gakujo_task/views/page/quiz.dart';
+import 'package:gakujo_task/views/page/report.dart';
+import 'package:gakujo_task/views/page/shared_file.dart';
+import 'package:gakujo_task/views/settings/settings.dart';
 import 'package:intl/intl.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
@@ -708,6 +716,122 @@ Widget buildTimetableModal(
         padding: EdgeInsets.all(4.0),
         child: Divider(thickness: 2.0),
       ),
+      Row(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: [
+          Column(
+            children: [
+              Text(
+                '担当教員名',
+                style: Theme.of(context).textTheme.titleMedium,
+              ),
+              Text(timetable.syllabusTeacher),
+            ],
+          ),
+          Column(
+            children: [
+              Text(
+                '所属等',
+                style: Theme.of(context).textTheme.titleMedium,
+              ),
+              Text(timetable.syllabusAffiliation),
+            ],
+          ),
+          Column(
+            children: [
+              Text(
+                '研究室',
+                style: Theme.of(context).textTheme.titleMedium,
+              ),
+              Text(timetable.syllabusResearchRoom),
+            ],
+          ),
+          Column(
+            children: [
+              Text(
+                '分担教員名',
+                style: Theme.of(context).textTheme.titleMedium,
+              ),
+              Text(timetable.syllabusSharingTeacher),
+            ],
+          ),
+        ],
+      ),
+      const SizedBox(height: 8.0),
+      Row(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: [
+          Column(
+            children: [
+              Text(
+                'クラス',
+                style: Theme.of(context).textTheme.titleMedium,
+              ),
+              Text(timetable.syllabusClassName),
+            ],
+          ),
+          Column(
+            children: [
+              Text(
+                '学期',
+                style: Theme.of(context).textTheme.titleMedium,
+              ),
+              Text(timetable.syllabusSemesterName),
+            ],
+          ),
+          Column(
+            children: [
+              Text(
+                '必修選択区分',
+                style: Theme.of(context).textTheme.titleMedium,
+              ),
+              Text(timetable.syllabusSelectionSection),
+            ],
+          ),
+        ],
+      ),
+      const SizedBox(height: 8.0),
+      Row(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: [
+          Column(
+            children: [
+              Text(
+                '対象学年',
+                style: Theme.of(context).textTheme.titleMedium,
+              ),
+              Text(timetable.syllabusTargetGrade),
+            ],
+          ),
+          Column(
+            children: [
+              Text(
+                '単位数',
+                style: Theme.of(context).textTheme.titleMedium,
+              ),
+              Text(timetable.syllabusCredit),
+            ],
+          ),
+          Column(
+            children: [
+              Text(
+                '曜日・時限',
+                style: Theme.of(context).textTheme.titleMedium,
+              ),
+              Text(timetable.syllabusWeekdayPeriod),
+            ],
+          ),
+          Column(
+            children: [
+              Text(
+                '教室',
+                style: Theme.of(context).textTheme.titleMedium,
+              ),
+              Text(timetable.syllabusClassRoom),
+            ],
+          ),
+        ],
+      ),
       Text(
         'キーワード',
         style: Theme.of(context).textTheme.titleMedium,
@@ -756,6 +880,456 @@ Widget buildTimetableModal(
         ),
       ),
       const SizedBox(height: 8.0),
+      Text(
+        'テキスト',
+        style: Theme.of(context).textTheme.titleMedium,
+      ),
+      Padding(
+        padding: const EdgeInsets.all(4.0),
+        child: buildAutoLinkText(
+          context,
+          timetable.syllabusTextbook,
+        ),
+      ),
+      const SizedBox(height: 8.0),
+      Text(
+        '参考書',
+        style: Theme.of(context).textTheme.titleMedium,
+      ),
+      Padding(
+        padding: const EdgeInsets.all(4.0),
+        child: buildAutoLinkText(
+          context,
+          timetable.syllabusReferenceBook,
+        ),
+      ),
+      const SizedBox(height: 8.0),
+      Text(
+        '予習・復習について',
+        style: Theme.of(context).textTheme.titleMedium,
+      ),
+      Padding(
+        padding: const EdgeInsets.all(4.0),
+        child: buildAutoLinkText(
+          context,
+          timetable.syllabusPreparationReview,
+        ),
+      ),
+      const SizedBox(height: 8.0),
+      Text(
+        '成績評価の方法･基準',
+        style: Theme.of(context).textTheme.titleMedium,
+      ),
+      Padding(
+        padding: const EdgeInsets.all(4.0),
+        child: buildAutoLinkText(
+          context,
+          timetable.syllabusEvaluationMethod,
+        ),
+      ),
+      const SizedBox(height: 8.0),
+      Text(
+        'オフィスアワー',
+        style: Theme.of(context).textTheme.titleMedium,
+      ),
+      Padding(
+        padding: const EdgeInsets.all(4.0),
+        child: buildAutoLinkText(
+          context,
+          timetable.syllabusOfficeHour,
+        ),
+      ),
+      const SizedBox(height: 8.0),
+      Text(
+        '担当教員からのメッセージ',
+        style: Theme.of(context).textTheme.titleMedium,
+      ),
+      Padding(
+        padding: const EdgeInsets.all(4.0),
+        child: buildAutoLinkText(
+          context,
+          timetable.syllabusMessage,
+        ),
+      ),
+      const SizedBox(height: 8.0),
+      Text(
+        'アクティブ・ラーニング',
+        style: Theme.of(context).textTheme.titleMedium,
+      ),
+      Padding(
+        padding: const EdgeInsets.all(4.0),
+        child: buildAutoLinkText(
+          context,
+          timetable.syllabusActiveLearning,
+        ),
+      ),
+      const SizedBox(height: 8.0),
+      Text(
+        '実務経験のある教員の有無',
+        style: Theme.of(context).textTheme.titleMedium,
+      ),
+      Padding(
+        padding: const EdgeInsets.all(4.0),
+        child: buildAutoLinkText(
+          context,
+          timetable.syllabusTeacherPracticalExperience,
+        ),
+      ),
+      const SizedBox(height: 8.0),
+      Text(
+        '実務経験のある教員の経歴と授業内容',
+        style: Theme.of(context).textTheme.titleMedium,
+      ),
+      Padding(
+        padding: const EdgeInsets.all(4.0),
+        child: buildAutoLinkText(
+          context,
+          timetable.syllabusTeacherCareerClassDetail,
+        ),
+      ),
+      const SizedBox(height: 8.0),
+      Text(
+        '教職科目区分',
+        style: Theme.of(context).textTheme.titleMedium,
+      ),
+      Padding(
+        padding: const EdgeInsets.all(4.0),
+        child: buildAutoLinkText(
+          context,
+          timetable.syllabusTeachingProfessionSection,
+        ),
+      ),
+      const SizedBox(height: 8.0),
+      Text(
+        '関連授業科目',
+        style: Theme.of(context).textTheme.titleMedium,
+      ),
+      Padding(
+        padding: const EdgeInsets.all(4.0),
+        child: buildAutoLinkText(
+          context,
+          timetable.syllabusRelatedClassSubjects,
+        ),
+      ),
+      const SizedBox(height: 8.0),
+      Text(
+        'その他',
+        style: Theme.of(context).textTheme.titleMedium,
+      ),
+      Padding(
+        padding: const EdgeInsets.all(4.0),
+        child: buildAutoLinkText(
+          context,
+          timetable.syllabusOther,
+        ),
+      ),
+      const SizedBox(height: 8.0),
+      Text(
+        '在宅授業形態',
+        style: Theme.of(context).textTheme.titleMedium,
+      ),
+      Padding(
+        padding: const EdgeInsets.all(4.0),
+        child: buildAutoLinkText(
+          context,
+          timetable.syllabusHomeClassStyle,
+        ),
+      ),
+      const SizedBox(height: 8.0),
+      Text(
+        '在宅授業形態（詳細）',
+        style: Theme.of(context).textTheme.titleMedium,
+      ),
+      Padding(
+        padding: const EdgeInsets.all(4.0),
+        child: buildAutoLinkText(
+          context,
+          timetable.syllabusHomeClassStyleDetail,
+        ),
+      ),
+      const SizedBox(height: 8.0),
     ],
+  );
+}
+
+Widget buildDrawer(BuildContext context) {
+  return FutureBuilder(
+      future: Future.wait([
+        context.watch<SettingsRepository>().load(),
+        context.watch<ReportRepository>().getAll(),
+        context.watch<QuizRepository>().getAll()
+      ]),
+      builder: (context, AsyncSnapshot<List<dynamic>> snapshot) {
+        return Drawer(
+          child: ListView(
+            children: [
+              SizedBox(
+                child: DrawerHeader(
+                  child: Column(
+                    children: [
+                      Text(
+                        'GakujoTask',
+                        style: Theme.of(context).textTheme.titleLarge,
+                      ),
+                      const SizedBox(height: 16.0),
+                      snapshot.hasData
+                          ? Column(
+                              children: [
+                                Row(
+                                  children: [
+                                    const Icon(Icons.lock_clock_rounded),
+                                    const SizedBox(width: 8.0),
+                                    Text(
+                                      DateFormat('yyyy/MM/dd HH:mm', 'ja')
+                                          .format(
+                                              snapshot.data![0].lastLoginTime),
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .titleMedium,
+                                    ),
+                                  ],
+                                ),
+                                Row(
+                                  children: [
+                                    const Icon(Icons.person_rounded),
+                                    const SizedBox(width: 8.0),
+                                    Text(
+                                      snapshot.data![0].username ?? '',
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .titleMedium,
+                                    ),
+                                  ],
+                                ),
+                                Row(
+                                  children: [
+                                    const Icon(Icons.security_rounded),
+                                    const SizedBox(width: 8.0),
+                                    Text(
+                                      snapshot.data![0].accessEnvironmentName ??
+                                          '',
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .titleMedium,
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            )
+                          : const SizedBox.shrink(),
+                    ],
+                  ),
+                ),
+              ),
+              ListTile(
+                title: Row(
+                  children: [
+                    const Icon(Icons.text_snippet_rounded),
+                    const SizedBox(width: 8.0),
+                    Text(
+                      'レポート',
+                      style: Theme.of(context).textTheme.titleMedium,
+                    ),
+                    const Expanded(child: SizedBox()),
+                    snapshot.hasData
+                        ? Text(
+                            snapshot.data![1]
+                                .where((e) => !(e.isArchived ||
+                                    !(!e.isSubmitted &&
+                                        e.endDateTime.isAfter(DateTime.now()))))
+                                .length
+                                .toString(),
+                            style: Theme.of(context).textTheme.titleMedium,
+                          )
+                        : const SizedBox.shrink(),
+                  ],
+                ),
+                onTap: () {
+                  Navigator.of(context).pop();
+                  Navigator.of(context).push(MaterialPageRoute(
+                      builder: (context) => const ReportPage()));
+                },
+              ),
+              ListTile(
+                title: Row(
+                  children: [
+                    const Icon(Icons.quiz_rounded),
+                    const SizedBox(width: 8.0),
+                    Text(
+                      '小テスト',
+                      style: Theme.of(context).textTheme.titleMedium,
+                    ),
+                    const Expanded(child: SizedBox()),
+                    snapshot.hasData
+                        ? Text(
+                            snapshot.data![2]
+                                .where((e) => !(e.isArchived ||
+                                    !(!e.isSubmitted &&
+                                        e.endDateTime.isAfter(DateTime.now()))))
+                                .length
+                                .toString(),
+                            style: Theme.of(context).textTheme.titleMedium,
+                          )
+                        : const SizedBox.shrink()
+                  ],
+                ),
+                onTap: () {
+                  Navigator.of(context).pop();
+                  Navigator.of(context).push(MaterialPageRoute(
+                      builder: (context) => const QuizPage()));
+                },
+              ),
+              ListTile(
+                title: Row(
+                  children: [
+                    const Icon(Icons.folder_shared_rounded),
+                    const SizedBox(width: 8.0),
+                    Text(
+                      '授業共有ファイル',
+                      style: Theme.of(context).textTheme.titleMedium,
+                    ),
+                  ],
+                ),
+                onTap: () {
+                  Navigator.of(context).pop();
+                  Navigator.of(context).push(MaterialPageRoute(
+                      builder: (context) => const SharedFilePage()));
+                },
+              ),
+              ListTile(
+                title: Row(
+                  children: [
+                    const Icon(Icons.link_rounded),
+                    const SizedBox(width: 8.0),
+                    Text(
+                      '授業リンク',
+                      style: Theme.of(context).textTheme.titleMedium,
+                    ),
+                  ],
+                ),
+                onTap: () {
+                  Navigator.of(context).pop();
+                  Navigator.of(context).push(MaterialPageRoute(
+                      builder: (context) => const ClassLinkPage()));
+                },
+              ),
+              ListTile(
+                title: Row(
+                  children: [
+                    const Icon(Icons.school_rounded),
+                    const SizedBox(width: 8.0),
+                    Text(
+                      '成績情報',
+                      style: Theme.of(context).textTheme.titleMedium,
+                    ),
+                  ],
+                ),
+                onTap: () {
+                  Navigator.of(context).pop();
+                  Navigator.of(context).push(MaterialPageRoute(
+                      builder: (context) => const GradePage()));
+                },
+              ),
+              ListTile(
+                title: Row(
+                  children: [
+                    const Icon(Icons.settings_rounded),
+                    const SizedBox(width: 8.0),
+                    Text(
+                      '設定',
+                      style: Theme.of(context).textTheme.titleMedium,
+                    ),
+                  ],
+                ),
+                onTap: () {
+                  Navigator.of(context).pop();
+                  Navigator.of(context).push(MaterialPageRoute(
+                      builder: (context) => const SettingsWidget()));
+                },
+              ),
+            ],
+          ),
+        );
+      });
+}
+
+AppBar buildAppBar(BuildContext context, GlobalKey<ScaffoldState> scaffoldKey) {
+  return AppBar(
+    leading: FutureBuilder(
+      future: context.watch<SettingsRepository>().load(),
+      builder: (context, AsyncSnapshot<Settings> snapshot) {
+        if (snapshot.hasData) {
+          return Padding(
+            padding: const EdgeInsets.only(left: 16.0),
+            child: MouseRegion(
+              cursor: SystemMouseCursors.click,
+              child: GestureDetector(
+                onTap: () => scaffoldKey.currentState?.openDrawer(),
+                child: snapshot.data?.profileImage == null
+                    ? const Icon(
+                        Icons.person_rounded,
+                        size: 36.0,
+                      )
+                    : CircleAvatar(
+                        backgroundImage: CachedMemoryImageProvider(
+                          'ProfileImage',
+                          base64: snapshot.data?.profileImage,
+                        ),
+                      ),
+              ),
+            ),
+          );
+        } else {
+          return const SizedBox.shrink();
+        }
+      },
+    ),
+    centerTitle: false,
+    title: FutureBuilder(
+      future: context.watch<SettingsRepository>().load(),
+      builder: (context, AsyncSnapshot<Settings> snapshot) {
+        if (snapshot.hasData) {
+          return Row(
+            children: [
+              Text(
+                snapshot.data?.fullName == null
+                    ? 'Hi!'
+                    : 'Hi, ${snapshot.data?.fullName}!',
+              ),
+              const Spacer(),
+              IconButton(
+                icon: const Icon(Icons.login_rounded),
+                onPressed: () async =>
+                    context.read<ApiRepository>().fetchLogin(),
+              ),
+              IconButton(
+                icon: const Icon(Icons.sync_rounded),
+                onPressed: () async => context.read<ApiRepository>().fetchAll(),
+              ),
+            ],
+          );
+        } else {
+          return const SizedBox.shrink();
+        }
+      },
+    ),
+    bottom: buildAppBarBottom(context),
+  );
+}
+
+PreferredSize buildAppBarBottom(BuildContext context) {
+  return PreferredSize(
+    preferredSize: const Size.fromHeight(6.0),
+    child: Visibility(
+      visible: context.watch<ApiRepository>().isLoading,
+      child: LinearProgressIndicator(
+        minHeight: 3.0,
+        valueColor: context.watch<ApiRepository>().isError
+            ? AlwaysStoppedAnimation<Color>(Theme.of(context).colorScheme.error)
+            : AlwaysStoppedAnimation<Color>(
+                Theme.of(context).colorScheme.primary,
+              ),
+      ),
+    ),
   );
 }
