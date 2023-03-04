@@ -1304,7 +1304,56 @@ AppBar buildAppBar(BuildContext context, GlobalKey<ScaffoldState> scaffoldKey) {
               ),
               IconButton(
                 icon: const Icon(Icons.sync_rounded),
-                onPressed: () async => context.read<ApiRepository>().fetchAll(),
+                onPressed: () async => showDialog(
+                  context: context,
+                  builder: (context) {
+                    return SimpleDialog(
+                      title: const Text('更新'),
+                      children: [
+                        SimpleDialogOption(
+                          onPressed: () async =>
+                              context.read<ApiRepository>().fetchSubjects(),
+                          child: const Text('授業科目'),
+                        ),
+                        SimpleDialogOption(
+                          onPressed: () async =>
+                              context.read<ApiRepository>().fetchContacts(),
+                          child: const Text('授業連絡'),
+                        ),
+                        SimpleDialogOption(
+                          onPressed: () async =>
+                              context.read<ApiRepository>().fetchReports(),
+                          child: const Text('レポート'),
+                        ),
+                        SimpleDialogOption(
+                          onPressed: () async =>
+                              context.read<ApiRepository>().fetchQuizzes(),
+                          child: const Text('小テスト'),
+                        ),
+                        SimpleDialogOption(
+                          onPressed: () async =>
+                              context.read<ApiRepository>().fetchSharedFiles(),
+                          child: const Text('授業共有ファイル'),
+                        ),
+                        SimpleDialogOption(
+                          onPressed: () async =>
+                              context.read<ApiRepository>().fetchClassLinks(),
+                          child: const Text('授業リンク'),
+                        ),
+                        SimpleDialogOption(
+                          onPressed: () async =>
+                              context.read<ApiRepository>().fetchGrades(),
+                          child: const Text('成績情報'),
+                        ),
+                        SimpleDialogOption(
+                          onPressed: () async =>
+                              context.read<ApiRepository>().fetchTimetables(),
+                          child: const Text('個人時間割'),
+                        ),
+                      ],
+                    );
+                  },
+                ),
               ),
             ],
           );

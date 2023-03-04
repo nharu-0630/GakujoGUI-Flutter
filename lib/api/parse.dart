@@ -1,3 +1,7 @@
+import 'dart:convert';
+import 'dart:ui';
+
+import 'package:crypto/crypto.dart';
 import 'package:html_unescape/html_unescape.dart';
 import 'package:intl/intl.dart';
 
@@ -38,4 +42,9 @@ extension StringParsing on String {
       .trim()
       .replaceAll(RegExp(r'[\r\n]+', multiLine: true), '\r\n')
       .trim();
+
+  Color parseColor() {
+    var bytes = md5.convert(utf8.encode(this));
+    return Color(int.parse('0xFF${bytes.toString().substring(0, 6)}'));
+  }
 }

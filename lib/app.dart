@@ -54,13 +54,13 @@ class _AppState extends State<App> {
       destinations: const [
         NavigationDestination(
           icon: Icon(Icons.home_rounded),
-          label: 'Home',
-          tooltip: 'Home',
+          label: 'ホーム',
+          tooltip: 'ホーム',
         ),
         NavigationDestination(
           icon: Icon(Icons.calendar_month_rounded),
-          label: 'Timetable',
-          tooltip: 'Timetable',
+          label: '時間割',
+          tooltip: '時間割',
         ),
       ],
     );
