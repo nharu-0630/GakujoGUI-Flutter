@@ -479,14 +479,11 @@ class _SettingsWidgetState extends State<SettingsWidget> {
                           future: PackageInfo.fromPlatform(),
                           builder:
                               (context, AsyncSnapshot<PackageInfo> snapshot) {
-                            if (!snapshot.hasData) {
-                              return const Text(
-                                'Client Version: \nAPI Version: ',
+                              return Text(
+                                snapshot.hasData
+                                    ? 'Client Version: ${snapshot.data!.version}\nAPI Version: ${Api.version}'
+                                    : 'Client Version: \nAPI Version: ',
                               );
-                            }
-                            return Text(
-                              'Client Version: ${snapshot.data!.version}\nAPI Version: ${Api.version}',
-                            );
                           },
                         ),
                       ),

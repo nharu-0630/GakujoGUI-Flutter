@@ -1258,30 +1258,28 @@ AppBar buildAppBar(BuildContext context, GlobalKey<ScaffoldState> scaffoldKey) {
     leading: FutureBuilder(
       future: context.watch<SettingsRepository>().load(),
       builder: (context, AsyncSnapshot<Settings> snapshot) {
-        if (snapshot.hasData) {
-          return Padding(
-            padding: const EdgeInsets.only(left: 16.0),
-            child: MouseRegion(
-              cursor: SystemMouseCursors.click,
-              child: GestureDetector(
-                onTap: () => scaffoldKey.currentState?.openDrawer(),
-                child: snapshot.data?.profileImage == null
-                    ? const Icon(
-                        Icons.person_rounded,
-                        size: 36.0,
-                      )
-                    : CircleAvatar(
-                        backgroundImage: CachedMemoryImageProvider(
-                          'ProfileImage',
-                          base64: snapshot.data?.profileImage,
-                        ),
-                      ),
-              ),
-            ),
-          );
-        } else {
-          return const SizedBox.shrink();
-        }
+        return snapshot.hasData
+            ? Padding(
+                padding: const EdgeInsets.only(left: 16.0),
+                child: MouseRegion(
+                  cursor: SystemMouseCursors.click,
+                  child: GestureDetector(
+                    onTap: () => scaffoldKey.currentState?.openDrawer(),
+                    child: snapshot.data?.profileImage == null
+                        ? const Icon(
+                            Icons.person_rounded,
+                            size: 36.0,
+                          )
+                        : CircleAvatar(
+                            backgroundImage: CachedMemoryImageProvider(
+                              'ProfileImage',
+                              base64: snapshot.data?.profileImage,
+                            ),
+                          ),
+                  ),
+                ),
+              )
+            : const SizedBox.shrink();
       },
     ),
     centerTitle: false,

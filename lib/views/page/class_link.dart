@@ -2,7 +2,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:gakujo_task/api/provide.dart';
-import 'package:gakujo_task/app.dart';
 import 'package:gakujo_task/models/class_link.dart';
 import 'package:gakujo_task/models/shared_file.dart';
 import 'package:gakujo_task/views/common/widget.dart';
@@ -182,7 +181,21 @@ class _ClassLinkPageState extends State<ClassLinkPage> {
       ),
       child: ListTile(
         onTap: () {
-          if (!classLink.isAcquired) {
+          if (classLink.isAcquired) {
+            showModalBottomSheet(
+              isScrollControlled: true,
+              shape: const RoundedRectangleBorder(
+                  borderRadius:
+                      BorderRadius.vertical(top: Radius.circular(16.0))),
+              context: context,
+              builder: (context) => DraggableScrollableSheet(
+                expand: false,
+                builder: (context, controller) {
+                  return buildClassLinkModal(context, classLink, controller);
+                },
+              ),
+            );
+          } else {
             showDialog(
               context: context,
               builder: (_) => CupertinoAlertDialog(
@@ -204,20 +217,6 @@ class _ClassLinkPageState extends State<ClassLinkPage> {
                     },
                   )
                 ],
-              ),
-            );
-          } else {
-            showModalBottomSheet(
-              isScrollControlled: true,
-              shape: const RoundedRectangleBorder(
-                  borderRadius:
-                      BorderRadius.vertical(top: Radius.circular(16.0))),
-              context: context,
-              builder: (context) => DraggableScrollableSheet(
-                expand: false,
-                builder: (context, controller) {
-                  return buildClassLinkModal(context, classLink, controller);
-                },
               ),
             );
           }

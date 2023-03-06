@@ -2,7 +2,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:gakujo_task/api/provide.dart';
-import 'package:gakujo_task/app.dart';
 import 'package:gakujo_task/models/contact.dart';
 import 'package:gakujo_task/models/subject.dart';
 import 'package:gakujo_task/views/common/widget.dart';
@@ -145,7 +144,21 @@ class _ContactPageState extends State<ContactPage> {
       ),
       child: ListTile(
         onTap: () {
-          if (!contact.isAcquired) {
+          if (contact.isAcquired) {
+            showModalBottomSheet(
+              isScrollControlled: true,
+              shape: const RoundedRectangleBorder(
+                  borderRadius:
+                      BorderRadius.vertical(top: Radius.circular(16.0))),
+              context: context,
+              builder: (context) => DraggableScrollableSheet(
+                expand: false,
+                builder: (context, controller) {
+                  return _buildModal(contact, controller);
+                },
+              ),
+            );
+          } else {
             showDialog(
               context: context,
               builder: (_) => CupertinoAlertDialog(
@@ -165,20 +178,6 @@ class _ContactPageState extends State<ContactPage> {
                     },
                   )
                 ],
-              ),
-            );
-          } else {
-            showModalBottomSheet(
-              isScrollControlled: true,
-              shape: const RoundedRectangleBorder(
-                  borderRadius:
-                      BorderRadius.vertical(top: Radius.circular(16.0))),
-              context: context,
-              builder: (context) => DraggableScrollableSheet(
-                expand: false,
-                builder: (context, controller) {
-                  return _buildModal(contact, controller);
-                },
               ),
             );
           }

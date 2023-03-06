@@ -2,7 +2,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:gakujo_task/api/provide.dart';
-import 'package:gakujo_task/app.dart';
 import 'package:gakujo_task/models/quiz.dart';
 import 'package:gakujo_task/views/common/widget.dart';
 import 'package:intl/intl.dart';
@@ -186,7 +185,21 @@ class _QuizPageState extends State<QuizPage> {
       ),
       child: ListTile(
         onTap: () {
-          if (!quiz.isAcquired) {
+          if (quiz.isAcquired) {
+            showModalBottomSheet(
+              isScrollControlled: true,
+              shape: const RoundedRectangleBorder(
+                  borderRadius:
+                      BorderRadius.vertical(top: Radius.circular(16.0))),
+              context: context,
+              builder: (context) => DraggableScrollableSheet(
+                expand: false,
+                builder: (context, controller) {
+                  return buildQuizModal(context, quiz, controller);
+                },
+              ),
+            );
+          } else {
             showDialog(
               context: context,
               builder: (_) => CupertinoAlertDialog(
@@ -206,20 +219,6 @@ class _QuizPageState extends State<QuizPage> {
                     },
                   )
                 ],
-              ),
-            );
-          } else {
-            showModalBottomSheet(
-              isScrollControlled: true,
-              shape: const RoundedRectangleBorder(
-                  borderRadius:
-                      BorderRadius.vertical(top: Radius.circular(16.0))),
-              context: context,
-              builder: (context) => DraggableScrollableSheet(
-                expand: false,
-                builder: (context, controller) {
-                  return buildQuizModal(context, quiz, controller);
-                },
               ),
             );
           }

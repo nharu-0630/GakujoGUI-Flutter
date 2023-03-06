@@ -71,7 +71,21 @@ class TaskWidget extends StatelessWidget {
   Widget _buildQuizCard(BuildContext context, Quiz quiz) {
     return ListTile(
       onTap: () async {
-        if (!quiz.isAcquired) {
+        if (quiz.isAcquired) {
+          showModalBottomSheet(
+            isScrollControlled: true,
+            shape: const RoundedRectangleBorder(
+                borderRadius:
+                    BorderRadius.vertical(top: Radius.circular(16.0))),
+            context: context,
+            builder: (context) => DraggableScrollableSheet(
+              expand: false,
+              builder: (context, controller) {
+                return buildQuizModal(context, quiz, controller);
+              },
+            ),
+          );
+        } else {
           await showDialog(
             context: context,
             builder: (_) => CupertinoAlertDialog(
@@ -91,20 +105,6 @@ class TaskWidget extends StatelessWidget {
                   },
                 )
               ],
-            ),
-          );
-        } else {
-          showModalBottomSheet(
-            isScrollControlled: true,
-            shape: const RoundedRectangleBorder(
-                borderRadius:
-                    BorderRadius.vertical(top: Radius.circular(16.0))),
-            context: context,
-            builder: (context) => DraggableScrollableSheet(
-              expand: false,
-              builder: (context, controller) {
-                return buildQuizModal(context, quiz, controller);
-              },
             ),
           );
         }
@@ -163,7 +163,21 @@ class TaskWidget extends StatelessWidget {
   Widget _buildReportTile(BuildContext context, Report report) {
     return ListTile(
       onTap: () async {
-        if (!report.isAcquired) {
+        if (report.isAcquired) {
+          showModalBottomSheet(
+            isScrollControlled: true,
+            shape: const RoundedRectangleBorder(
+                borderRadius:
+                    BorderRadius.vertical(top: Radius.circular(16.0))),
+            context: context,
+            builder: (context) => DraggableScrollableSheet(
+              expand: false,
+              builder: (context, controller) {
+                return buildReportModal(context, report, controller);
+              },
+            ),
+          );
+        } else {
           await showDialog(
             context: context,
             builder: (_) => CupertinoAlertDialog(
@@ -183,20 +197,6 @@ class TaskWidget extends StatelessWidget {
                   },
                 )
               ],
-            ),
-          );
-        } else {
-          showModalBottomSheet(
-            isScrollControlled: true,
-            shape: const RoundedRectangleBorder(
-                borderRadius:
-                    BorderRadius.vertical(top: Radius.circular(16.0))),
-            context: context,
-            builder: (context) => DraggableScrollableSheet(
-              expand: false,
-              builder: (context, controller) {
-                return buildReportModal(context, report, controller);
-              },
             ),
           );
         }
