@@ -82,4 +82,48 @@ class SettingsRepository extends ChangeNotifier {
             DateTime.fromMicrosecondsSinceEpoch(0), null, null, null));
     notifyListeners();
   }
+
+  Future<void> setUsername(String username) async {
+    await _settingsBox.open();
+    Box b = await _settingsBox.box;
+    Settings settings = b.get('settings') ??
+        Settings(null, null, null, null, null, null,
+            DateTime.fromMicrosecondsSinceEpoch(0), null, null, null);
+    settings.username = username;
+    await b.put('settings', settings);
+    notifyListeners();
+  }
+
+  Future<void> setPassword(String password) async {
+    await _settingsBox.open();
+    Box b = await _settingsBox.box;
+    Settings settings = b.get('settings') ??
+        Settings(null, null, null, null, null, null,
+            DateTime.fromMicrosecondsSinceEpoch(0), null, null, null);
+    settings.password = password;
+    await b.put('settings', settings);
+    notifyListeners();
+  }
+
+  Future<void> setYear(int year) async {
+    await _settingsBox.open();
+    Box b = await _settingsBox.box;
+    Settings settings = b.get('settings') ??
+        Settings(null, null, null, null, null, null,
+            DateTime.fromMicrosecondsSinceEpoch(0), null, null, null);
+    settings.year = year;
+    await b.put('settings', settings);
+    notifyListeners();
+  }
+
+  Future<void> setSemester(int semester) async {
+    await _settingsBox.open();
+    Box b = await _settingsBox.box;
+    Settings settings = b.get('settings') ??
+        Settings(null, null, null, null, null, null,
+            DateTime.fromMicrosecondsSinceEpoch(0), null, null, null);
+    settings.semester = semester;
+    await b.put('settings', settings);
+    notifyListeners();
+  }
 }
