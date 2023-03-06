@@ -109,7 +109,7 @@ class TaskWidget extends StatelessWidget {
           );
         }
       },
-      leading: const Icon(Icons.quiz_rounded),
+      leading: const Icon(Icons.checklist_rounded),
       title: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [

@@ -57,12 +57,12 @@ class _ReportPageState extends State<ReportPage> {
                                   const Padding(
                                     padding: EdgeInsets.all(8.0),
                                     child: Icon(
-                                      Icons.task_rounded,
+                                      Icons.text_snippet_rounded,
                                       size: 48.0,
                                     ),
                                   ),
                                   Text(
-                                    'タスクはありません',
+                                    'レポートはありません',
                                     style:
                                         Theme.of(context).textTheme.titleMedium,
                                   ),

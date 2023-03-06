@@ -57,12 +57,12 @@ class _QuizPageState extends State<QuizPage> {
                                   const Padding(
                                     padding: EdgeInsets.all(8.0),
                                     child: Icon(
-                                      Icons.task_rounded,
+                                      Icons.checklist_rounded,
                                       size: 48.0,
                                     ),
                                   ),
                                   Text(
-                                    'タスクはありません',
+                                    '小テストはありません',
                                     style:
                                         Theme.of(context).textTheme.titleMedium,
                                   ),

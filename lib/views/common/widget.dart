@@ -1153,7 +1153,7 @@ Widget buildDrawer(BuildContext context) {
               ListTile(
                 title: Row(
                   children: [
-                    const Icon(Icons.quiz_rounded),
+                    const Icon(Icons.checklist_rounded),
                     const SizedBox(width: 8.0),
                     Text(
                       '小テスト',
