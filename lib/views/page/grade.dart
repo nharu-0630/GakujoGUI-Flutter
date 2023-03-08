@@ -137,7 +137,7 @@ class _GradePageState extends State<GradePage> {
           children: [
             const TabBar(
               tabs: [
-                Tab(icon: Icon(Icons.list_rounded)),
+                Tab(icon: Icon(Icons.view_list_rounded)),
                 Tab(icon: Icon(Icons.bar_chart_rounded)),
               ],
             ),
