@@ -26,51 +26,14 @@ class _GradePageState extends State<GradePage> {
           _grades = snapshot.data!;
           _grades.sort(((a, b) => b.compareTo(a)));
           return Scaffold(
-            body: NestedScrollView(
-              headerSliverBuilder: (context, innerBoxScrolled) =>
-                  [_buildAppBar(context)],
-              body: RefreshIndicator(
-                onRefresh: () async =>
-                    context.read<ApiRepository>().fetchGrades(),
-                child: _grades.isEmpty
-                    ? LayoutBuilder(
-                        builder: (context, constraints) =>
-                            SingleChildScrollView(
-                          physics: const AlwaysScrollableScrollPhysics(),
-                          child: ConstrainedBox(
-                            constraints: BoxConstraints(
-                                minHeight: constraints.maxHeight),
-                            child: Center(
-                              child: Column(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  const Padding(
-                                    padding: EdgeInsets.all(8.0),
-                                    child: Icon(
-                                      Icons.school_rounded,
-                                      size: 48.0,
-                                    ),
-                                  ),
-                                  Text(
-                                    '成績情報はありません',
-                                    style:
-                                        Theme.of(context).textTheme.titleMedium,
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ),
-                      )
-                    : ListView.builder(
-                        padding: const EdgeInsets.only(top: 8),
-                        itemCount: _searchStatus
-                            ? _suggestGrades.length
-                            : _grades.length,
-                        itemBuilder: (context, index) => _searchStatus
-                            ? _buildCard(context, _suggestGrades[index])
-                            : _buildCard(context, _grades[index]),
-                      ),
+            body: DefaultTabController(
+              length: 2,
+              child: NestedScrollView(
+                headerSliverBuilder: (context, innerBoxScrolled) =>
+                    [_buildAppBar(context)],
+                body: TabBarView(
+                  children: [_buildList(context), Container()],
+                ),
               ),
             ),
           );
@@ -82,6 +45,46 @@ class _GradePageState extends State<GradePage> {
           );
         }
       },
+    );
+  }
+
+  Widget _buildList(BuildContext context) {
+    return RefreshIndicator(
+      onRefresh: () async => context.read<ApiRepository>().fetchGrades(),
+      child: _grades.isEmpty
+          ? LayoutBuilder(
+              builder: (context, constraints) => SingleChildScrollView(
+                physics: const AlwaysScrollableScrollPhysics(),
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(minHeight: constraints.maxHeight),
+                  child: Center(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Padding(
+                          padding: EdgeInsets.all(8.0),
+                          child: Icon(
+                            Icons.school_rounded,
+                            size: 48.0,
+                          ),
+                        ),
+                        Text(
+                          '成績情報はありません',
+                          style: Theme.of(context).textTheme.titleMedium,
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            )
+          : ListView.builder(
+              padding: const EdgeInsets.only(top: 8),
+              itemCount: _searchStatus ? _suggestGrades.length : _grades.length,
+              itemBuilder: (context, index) => _searchStatus
+                  ? _buildCard(context, _suggestGrades[index])
+                  : _buildCard(context, _grades[index]),
+            ),
     );
   }
 
@@ -98,8 +101,10 @@ class _GradePageState extends State<GradePage> {
       ),
       title: _searchStatus
           ? TextField(
-              onChanged: (value) => setState(() => _suggestGrades =
-                  _grades.where((e) => e.subject.contains(value)).toList()),
+              onChanged: (value) => setState(() => _suggestGrades = _grades
+                  .where((e) =>
+                      e.subject.toLowerCase().contains(value.toLowerCase()))
+                  .toList()),
               autofocus: true,
               textInputAction: TextInputAction.search,
             )
@@ -126,14 +131,26 @@ class _GradePageState extends State<GradePage> {
                 ),
               ),
             ],
-      bottom: buildAppBarBottom(context),
+      bottom: PreferredSize(
+        preferredSize: const Size.fromHeight(48.0),
+        child: Column(
+          children: [
+            const TabBar(
+              tabs: [
+                Tab(icon: Icon(Icons.list_rounded)),
+                Tab(icon: Icon(Icons.bar_chart_rounded)),
+              ],
+            ),
+            buildAppBarBottom(context),
+          ],
+        ),
+      ),
     );
   }
 
   Widget _buildCard(BuildContext context, Grade grade) {
     return ListTile(
       title: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Expanded(
             child: Text(
@@ -142,27 +159,6 @@ class _GradePageState extends State<GradePage> {
               overflow: TextOverflow.ellipsis,
             ),
           ),
-          Text(
-            DateFormat('yyyy/MM/dd', 'ja')
-                .format(grade.reportDateTime.toLocal()),
-            style: Theme.of(context).textTheme.bodyMedium,
-          ),
-        ],
-      ),
-      subtitle: Row(
-        children: [
-          Text(
-            grade.teacher.toString(),
-            style: Theme.of(context).textTheme.bodyMedium,
-          ),
-          Padding(
-            padding: const EdgeInsets.only(left: 8.0),
-            child: Text(
-              grade.selectionSection.toString(),
-              style: Theme.of(context).textTheme.bodyMedium,
-            ),
-          ),
-          const Expanded(child: SizedBox()),
           Text(
             grade.evaluation,
             style: Theme.of(context).textTheme.titleMedium,
@@ -186,6 +182,27 @@ class _GradePageState extends State<GradePage> {
                 style: Theme.of(context).textTheme.titleMedium,
               ),
             ),
+          ),
+        ],
+      ),
+      subtitle: Row(
+        children: [
+          Text(
+            grade.teacher.toString(),
+            style: Theme.of(context).textTheme.bodyMedium,
+          ),
+          Padding(
+            padding: const EdgeInsets.only(left: 8.0),
+            child: Text(
+              grade.selectionSection.toString(),
+              style: Theme.of(context).textTheme.bodyMedium,
+            ),
+          ),
+          const Expanded(child: SizedBox()),
+          Text(
+            DateFormat('yyyy/MM/dd', 'ja')
+                .format(grade.reportDateTime.toLocal()),
+            style: Theme.of(context).textTheme.bodyMedium,
           ),
         ],
       ),
