@@ -70,8 +70,8 @@ class Contact implements Comparable<Contact> {
               .replaceFirst('【', '')
               .replaceFirst('】', '') ??
           '通常',
-      element.querySelectorAll('td')[5].text.trim().trimDateTime(),
-      element.querySelectorAll('td')[6].text.trim().trimDateTime(),
+      element.querySelectorAll('td')[5].text.trim().toDateTime(),
+      element.querySelectorAll('td')[6].text.trim().toDateTime(),
       '',
       isAcquired: false,
     );

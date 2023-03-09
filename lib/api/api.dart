@@ -1510,7 +1510,7 @@ class Api {
     gpa.facultyGrade = rows[0].children[1].text.trimWhiteSpace();
     gpa.facultyGpa = double.parse(rows[1].children[1].text.trimWhiteSpace());
     gpa.facultyCalculationDate =
-        rows.last.children[1].text.trimWhiteSpace().trimDateTime();
+        rows.last.children[1].text.trimWhiteSpace().toDateTime();
     gpa.facultyGpas = {};
     rows.skip(2).toList().reversed.skip(3).forEach((e) {
       gpa.facultyGpas[e.children[0].text.trimWhiteSpace()] =
@@ -1535,7 +1535,7 @@ class Api {
         .children[1]
         .text
         .trimWhiteSpace()
-        .trimDateTime();
+        .toDateTime();
     gpa.departmentGpas = {};
     rows.skip(2).toList().reversed.skip(3).forEach((e) {
       gpa.departmentGpas[e.children[0].text.trimWhiteSpace()] =

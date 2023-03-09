@@ -95,9 +95,8 @@ class Quiz implements Comparable<Quiz> {
         .trimJsArgs(5);
     var status = element.querySelectorAll('td')[2].text.trim();
     var startDateTime =
-        element.querySelectorAll('td')[3].text.trimSpanDateTime(0);
-    var endDateTime =
-        element.querySelectorAll('td')[3].text.trimSpanDateTime(1);
+        element.querySelectorAll('td')[3].text.toSpanDateTime(0);
+    var endDateTime = element.querySelectorAll('td')[3].text.toSpanDateTime(1);
     var submissionStatus = element.querySelectorAll('td')[4].text.trim();
     var implementationFormat = element.querySelectorAll('td')[5].text.trim();
     var operation = element.querySelectorAll('td')[6].text.trim();

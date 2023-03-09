@@ -45,7 +45,7 @@ class SharedFile implements Comparable<SharedFile> {
         element.querySelectorAll('td')[2].querySelector('a')!.text.trim();
     var fileSize = element.querySelectorAll('td')[3].text.trim();
     var updateDateTime =
-        element.querySelectorAll('td')[4].text.trim().trimDateTime();
+        element.querySelectorAll('td')[4].text.trim().toDateTime();
     return SharedFile(
       subject,
       title,

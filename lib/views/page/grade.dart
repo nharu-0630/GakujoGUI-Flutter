@@ -1,3 +1,5 @@
+import 'dart:collection';
+
 import 'package:collection/collection.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
@@ -7,7 +9,6 @@ import 'package:gakujo_task/models/grade.dart';
 import 'package:gakujo_task/views/common/widget.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
-import 'package:sticky_headers/sticky_headers.dart';
 
 class GradePage extends StatefulWidget {
   const GradePage({Key? key}) : super(key: key);
@@ -117,122 +118,93 @@ class _GradePageState extends State<GradePage> {
     return RefreshIndicator(
       onRefresh: () async => context.read<ApiRepository>().fetchGrades(),
       child: ListView(
+        padding: const EdgeInsets.all(16.0),
         physics: const AlwaysScrollableScrollPhysics(),
         children: [
-          StickyHeader(
-            header: Container(
-              color: Theme.of(context).scaffoldBackgroundColor,
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-              child: Row(
-                children: [
-                  const Icon(Icons.account_circle_rounded),
-                  const SizedBox(width: 8.0),
-                  Text(
-                    '評価別単位',
-                    style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                          fontWeight: FontWeight.bold,
-                        ),
-                  ),
-                ],
+          Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              Text(
+                '算出日',
+                style: Theme.of(context).textTheme.titleMedium,
               ),
-            ),
-            content: Container(),
+              const SizedBox(width: 8.0),
+              Text(DateFormat('yyyy/MM/dd', 'ja')
+                  .format(_gpa.facultyCalculationDate.toLocal())),
+            ],
           ),
-          StickyHeader(
-            header: Container(
-              color: Theme.of(context).scaffoldBackgroundColor,
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-              child: Row(
-                children: [
-                  const Icon(Icons.account_circle_rounded),
-                  const SizedBox(width: 8.0),
-                  Text(
-                    '学部学科内GPA',
-                    style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                          fontWeight: FontWeight.bold,
-                        ),
-                  ),
-                ],
-              ),
-            ),
-            content: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0),
-              child: Column(
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      Text(
-                        '算出日',
-                        style: Theme.of(context).textTheme.titleMedium,
-                      ),
-                      const SizedBox(width: 8.0),
-                      Text(DateFormat('yyyy/MM/dd', 'ja')
-                          .format(_gpa.facultyCalculationDate.toLocal())),
-                    ],
-                  ),
-                  _buildGpaChart(_gpa.departmentGpas),
-                  const SizedBox(height: 16.0),
-                  const Padding(
-                    padding: EdgeInsets.all(4.0),
-                    child: Divider(thickness: 2.0),
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      Column(
-                        children: [
-                          Text(
-                            '学年',
-                            style: Theme.of(context).textTheme.titleMedium,
-                          ),
-                          Text(_gpa.facultyGrade),
-                        ],
-                      ),
-                      Column(
-                        children: [
-                          Text(
-                            '累積GPA',
-                            style: Theme.of(context).textTheme.titleMedium,
-                          ),
-                          Text(_gpa.facultyGpa.toString()),
-                        ],
-                      ),
-                      Column(
-                        children: [
-                          Text(
-                            '学科内順位',
-                            style: Theme.of(context).textTheme.titleMedium,
-                          ),
-                          Text(
-                              '${_gpa.departmentRankNumber} / ${_gpa.departmentRankDenom}'),
-                        ],
-                      ),
-                      Column(
-                        children: [
-                          Text(
-                            'コース内順位',
-                            style: Theme.of(context).textTheme.titleMedium,
-                          ),
-                          Text(
-                              '${_gpa.courseRankNumber} / ${_gpa.courseRankDenom}'),
-                        ],
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-          ),
+          _buildGpaChart(_gpa.departmentGpas),
           const SizedBox(height: 16.0),
+          const Padding(
+            padding: EdgeInsets.all(4.0),
+            child: Divider(thickness: 2.0),
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              Column(
+                children: [
+                  Text(
+                    '学年',
+                    style: Theme.of(context).textTheme.titleMedium,
+                  ),
+                  Text(_gpa.facultyGrade),
+                ],
+              ),
+              Column(
+                children: [
+                  Text(
+                    '累積GPA',
+                    style: Theme.of(context).textTheme.titleMedium,
+                  ),
+                  Text(_gpa.facultyGpa.toString()),
+                ],
+              ),
+              Column(
+                children: [
+                  Text(
+                    '学科内順位',
+                    style: Theme.of(context).textTheme.titleMedium,
+                  ),
+                  Text(
+                      '${_gpa.departmentRankNumber} / ${_gpa.departmentRankDenom}'),
+                ],
+              ),
+              Column(
+                children: [
+                  Text(
+                    'コース内順位',
+                    style: Theme.of(context).textTheme.titleMedium,
+                  ),
+                  Text('${_gpa.courseRankNumber} / ${_gpa.courseRankDenom}'),
+                ],
+              ),
+            ],
+          ),
+          const SizedBox(height: 8.0),
         ],
       ),
     );
   }
 
   Widget _buildGpaChart(Map<String, double> gpas) {
+    gpas = SplayTreeMap.from(gpas, (a, b) {
+      int yearA = int.parse(
+          a.replaceAll('GPA値', '').split('　')[0].replaceAll('年度', ''));
+      int yearB = int.parse(
+          b.replaceAll('GPA値', '').split('　')[0].replaceAll('年度', ''));
+      int compare1 = yearA.compareTo(yearB);
+      if (compare1 != 0) {
+        return compare1;
+      }
+      int termA = a.replaceAll('GPA値', '').split('　')[1] == '前期' ? 1 : 2;
+      int termB = b.replaceAll('GPA値', '').split('　')[1] == '前期' ? 1 : 2;
+      int compare2 = termA.compareTo(termB);
+      if (compare2 != 0) {
+        return compare2;
+      }
+      return 1;
+    });
     return gpas.isNotEmpty
         ? Padding(
             padding: const EdgeInsets.all(8.0),
@@ -246,11 +218,42 @@ class _GradePageState extends State<GradePage> {
                     minY: 0,
                     lineBarsData: [
                       LineChartBarData(
-                          spots: gpas.entries
-                              .mapIndexed((index, element) =>
-                                  FlSpot(index.toDouble(), element.value))
-                              .toList())
+                        spots: gpas.entries
+                            .mapIndexed((index, element) =>
+                                FlSpot(index.toDouble(), element.value))
+                            .toList(),
+                        gradient: const LinearGradient(
+                          colors: [
+                            Color(0xFF50E4FF),
+                            Color(0xFF2196F3),
+                          ],
+                        ),
+                        barWidth: 5,
+                        isStrokeCapRound: true,
+                        dotData: FlDotData(
+                          show: false,
+                        ),
+                        belowBarData: BarAreaData(
+                          show: true,
+                          gradient: LinearGradient(
+                            colors: [
+                              const Color(0xFF50E4FF),
+                              const Color(0xFF2196F3),
+                            ].map((color) => color.withOpacity(0.3)).toList(),
+                          ),
+                        ),
+                      )
                     ],
+                    borderData: FlBorderData(
+                      show: true,
+                      border: Border.all(color: const Color(0xFF333C43)),
+                    ),
+                    gridData: FlGridData(
+                      show: true,
+                      drawVerticalLine: true,
+                      horizontalInterval: 1,
+                      verticalInterval: 1,
+                    ),
                     titlesData: FlTitlesData(
                       bottomTitles: AxisTitles(
                         sideTitles: SideTitles(
@@ -266,6 +269,15 @@ class _GradePageState extends State<GradePage> {
                                 textAlign: TextAlign.center,
                                 maxLines: 2,
                                 overflow: TextOverflow.visible),
+                          ),
+                        ),
+                      ),
+                      leftTitles: AxisTitles(
+                        sideTitles: SideTitles(
+                          showTitles: true,
+                          interval: 1,
+                          getTitlesWidget: (value, meta) => Text(
+                            value.toString(),
                           ),
                         ),
                       ),

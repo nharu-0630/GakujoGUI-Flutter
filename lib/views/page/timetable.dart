@@ -123,7 +123,7 @@ class _TimetablePageState extends State<TimetablePage> {
               decoration: BoxDecoration(
                 border: Border(
                     left: BorderSide(
-                  color: timetable.subject.parseColor(),
+                  color: timetable.subject.toColor(),
                   width: 6.0,
                 )),
               ),

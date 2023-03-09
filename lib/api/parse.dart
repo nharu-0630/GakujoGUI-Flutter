@@ -23,10 +23,17 @@ extension StringParsing on String {
       .replaceAll(';', '')
       .trim();
 
-  DateTime trimSpanDateTime(int index) =>
+  String trimNewLines() => HtmlUnescape()
+      .convert(this)
+      .replaceAll('<br>', ' \r\n')
+      .trim()
+      .replaceAll(RegExp(r'[\r\n]+', multiLine: true), '\r\n')
+      .trim();
+
+  DateTime toSpanDateTime(int index) =>
       DateFormat('y/M/d HH:mm').parse(trim().split('～')[index].trim());
 
-  DateTime trimDateTime() {
+  DateTime toDateTime() {
     try {
       return DateFormat('y/M/d').parse(this);
     } on FormatException {
@@ -42,14 +49,7 @@ extension StringParsing on String {
     }
   }
 
-  String trimNewLines() => HtmlUnescape()
-      .convert(this)
-      .replaceAll('<br>', ' \r\n')
-      .trim()
-      .replaceAll(RegExp(r'[\r\n]+', multiLine: true), '\r\n')
-      .trim();
-
-  Color parseColor() {
+  Color toColor() {
     var bytes = md5.convert(utf8.encode(this));
     return Color(int.parse('0xFF${bytes.toString().substring(0, 6)}'));
   }
