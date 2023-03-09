@@ -233,50 +233,55 @@ class _GradePageState extends State<GradePage> {
   }
 
   Widget _buildGpaChart(Map<String, double> gpas) {
-    return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: SizedBox(
-        height: 320,
-        child: Padding(
-          padding: const EdgeInsets.only(right: 16.0),
-          child: LineChart(
-            LineChartData(
-              maxY: 4.5,
-              minY: 0,
-              lineBarsData: [
-                LineChartBarData(
-                    spots: gpas.entries
-                        .mapIndexed((index, element) =>
-                            FlSpot(index.toDouble(), element.value))
-                        .toList())
-              ],
-              titlesData: FlTitlesData(
-                bottomTitles: AxisTitles(
-                  sideTitles: SideTitles(
-                    showTitles: true,
-                    interval: 1,
-                    getTitlesWidget: (value, meta) => Text(
-                        gpas.keys
-                            .elementAt(value.toInt())
-                            .replaceAll('GPA値', '')
-                            .replaceAll('　', '\n'),
-                        textAlign: TextAlign.center,
-                        maxLines: 2,
-                        overflow: TextOverflow.visible),
+    return gpas.isNotEmpty
+        ? Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: SizedBox(
+              height: 320,
+              child: Padding(
+                padding: const EdgeInsets.only(right: 16.0),
+                child: LineChart(
+                  LineChartData(
+                    maxY: 4.5,
+                    minY: 0,
+                    lineBarsData: [
+                      LineChartBarData(
+                          spots: gpas.entries
+                              .mapIndexed((index, element) =>
+                                  FlSpot(index.toDouble(), element.value))
+                              .toList())
+                    ],
+                    titlesData: FlTitlesData(
+                      bottomTitles: AxisTitles(
+                        sideTitles: SideTitles(
+                          showTitles: true,
+                          interval: 1,
+                          getTitlesWidget: (value, meta) => Padding(
+                            padding: const EdgeInsets.only(top: 8.0),
+                            child: Text(
+                                gpas.keys
+                                    .elementAt(value.toInt())
+                                    .replaceAll('GPA値', '')
+                                    .replaceAll('　', '\n'),
+                                textAlign: TextAlign.center,
+                                maxLines: 2,
+                                overflow: TextOverflow.visible),
+                          ),
+                        ),
+                      ),
+                      rightTitles:
+                          AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                      topTitles:
+                          AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                    ),
                   ),
+                  swapAnimationDuration: const Duration(milliseconds: 150),
+                  swapAnimationCurve: Curves.linear,
                 ),
-                rightTitles:
-                    AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                topTitles:
-                    AxisTitles(sideTitles: SideTitles(showTitles: false)),
               ),
             ),
-            swapAnimationDuration: const Duration(milliseconds: 150),
-            swapAnimationCurve: Curves.linear,
-          ),
-        ),
-      ),
-    );
+          )
+        : const SizedBox();
   }
 
   Widget _buildAppBar(BuildContext context) {
