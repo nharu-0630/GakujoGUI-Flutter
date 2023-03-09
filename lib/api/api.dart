@@ -1505,53 +1505,85 @@ class Api {
     );
     document = parse(response.data);
 
-    
+    var rows =
+        document.querySelectorAll('table.txt12').first.querySelectorAll('tr');
+    gpa.facultyGrade = rows[0].children[1].text.trimWhiteSpace();
+    gpa.facultyGpa = double.parse(rows[1].children[1].text.trimWhiteSpace());
+    gpa.facultyCalculationDate =
+        rows.last.children[1].text.trimWhiteSpace().trimDateTime();
+    gpa.facultyGpas = {};
+    rows.skip(2).toList().reversed.skip(3).forEach((e) {
+      gpa.facultyGpas[e.children[0].text.trimWhiteSpace()] =
+          double.parse(e.children[1].text.trimWhiteSpace());
+    });
 
-    // SchoolGrade.DepartmentGpa.Grade = int.Parse(htmlDocument.DocumentNode.SelectSingleNode("/html/body/table[2]/tr/td/table/tr[1]/td[2]").InnerText.Replace("年", ""));
-    // SchoolGrade.DepartmentGpa.Gpa = double.Parse(htmlDocument.DocumentNode.SelectSingleNode("/html/body/table[2]/tr/td/table/tr[2]/td[2]").InnerText);
-    // SchoolGrade.DepartmentGpa.SemesterGpas.Clear();
-    // for (var i = 0; i < htmlDocument.DocumentNode.SelectSingleNode("/html/body/table[2]/tr/td/table").SelectNodes("tr").Count - 3; i++)
-    // {
-    //     SemesterGpa semesterGpa = new()
-    //     {
-    //         Year = htmlDocument.DocumentNode.SelectSingleNode("/html/body/table[2]/tr/td/table").SelectNodes("tr")[i + 2].SelectNodes("td")[0].InnerText.Split('　')[0].Replace("\n", "").Replace(" ", ""),
-    //         Semester = htmlDocument.DocumentNode.SelectSingleNode("/html/body/table[2]/tr/td/table").SelectNodes("tr")[i + 2].SelectNodes("td")[0].InnerText.Split('　')[1].Replace("\n", "").Replace(" ", ""),
-    //         Gpa = double.Parse(htmlDocument.DocumentNode.SelectSingleNode("/html/body/table[2]/tr/td/table").SelectNodes("tr")[i + 2].SelectNodes("td")[1].InnerText)
-    //     };
-    //     SchoolGrade.DepartmentGpa.SemesterGpas.Add(semesterGpa);
-    // }
-    // SchoolGrade.DepartmentGpa.CalculationDate = DateTime.ParseExact(htmlDocument.DocumentNode.SelectSingleNode("/html/body/table[2]/tr/td/table").SelectNodes("tr").Last().SelectNodes("td")[1].InnerText, "yyyy年 MM月 dd日", null);
-    // httpRequestMessage = new(new("GET"), "https://gakujo.shizuoka.ac.jp/kyoumu/gpaImage.do");
-    // httpRequestMessage.Headers.TryAddWithoutValidation("User-Agent", userAgent);
-    // httpResponseMessage = httpClient.SendAsync(httpRequestMessage).Result;
-    // Logger.Info("GET https://gakujo.shizuoka.ac.jp/kyoumu/gpaImage.do");
-    // Logger.Trace(httpResponseMessage.Content.ReadAsStringAsync().Result);
-    // SchoolGrade.DepartmentGpa.DepartmentImage = Convert.ToBase64String(httpResponseMessage.Content.ReadAsByteArrayAsync().Result);
-    // httpRequestMessage = new(new("GET"), "https://gakujo.shizuoka.ac.jp/kyoumu/departmentGpa.do");
-    // httpRequestMessage.Headers.TryAddWithoutValidation("User-Agent", userAgent);
-    // httpResponseMessage = httpClient.SendAsync(httpRequestMessage).Result;
-    // Logger.Info("GET https://gakujo.shizuoka.ac.jp/kyoumu/departmentGpa.do");
-    // Logger.Trace(httpResponseMessage.Content.ReadAsStringAsync().Result);
-    // htmlDocument.LoadHtml(httpResponseMessage.Content.ReadAsStringAsync().Result);
-    // SchoolGrade.DepartmentGpa.DepartmentRank[0] = int.Parse(htmlDocument.DocumentNode.SelectSingleNode("/html/body/table[2]/tr/td/table").SelectNodes("tr")[^2].SelectNodes("td")[1].InnerText.Trim(' ').Split('　')[1].Replace("位", ""));
-    // SchoolGrade.DepartmentGpa.DepartmentRank[1] = int.Parse(htmlDocument.DocumentNode.SelectSingleNode("/html/body/table[2]/tr/td/table").SelectNodes("tr")[^2].SelectNodes("td")[1].InnerText.Trim(' ').Split('　')[0].Replace("人中", ""));
-    // SchoolGrade.DepartmentGpa.CourseRank[0] = int.Parse(htmlDocument.DocumentNode.SelectSingleNode("/html/body/table[2]/tr/td/table").SelectNodes("tr")[^1].SelectNodes("td")[1].InnerText.Trim(' ').Split('　')[1].Replace("位", ""));
-    // SchoolGrade.DepartmentGpa.CourseRank[1] = int.Parse(htmlDocument.DocumentNode.SelectSingleNode("/html/body/table[2]/tr/td/table").SelectNodes("tr")[^1].SelectNodes("td")[1].InnerText.Trim(' ').Split('　')[0].Replace("人中", ""));
-    // httpRequestMessage = new(new("GET"), "https://gakujo.shizuoka.ac.jp/kyoumu/departmentGpaImage.do");
-    // httpRequestMessage.Headers.TryAddWithoutValidation("User-Agent", userAgent);
-    // httpResponseMessage = httpClient.SendAsync(httpRequestMessage).Result;
-    // Logger.Info("GET https://gakujo.shizuoka.ac.jp/kyoumu/departmentGpaImage.do");
-    // Logger.Trace(httpResponseMessage.Content.ReadAsStringAsync().Result);
-    // SchoolGrade.DepartmentGpa.CourseImage = Convert.ToBase64String(httpResponseMessage.Content.ReadAsByteArrayAsync().Result);
-    // httpRequestMessage = new(new("GET"), "https://gakujo.shizuoka.ac.jp/kyoumu/nenbetuTaniSearch.do");
-    // httpRequestMessage.Headers.TryAddWithoutValidation("User-Agent", userAgent);
-    // httpResponseMessage = httpClient.SendAsync(httpRequestMessage).Result;
-    // Logger.Info("GET https://gakujo.shizuoka.ac.jp/kyoumu/nenbetuTaniSearch.do");
-    // Logger.Trace(httpResponseMessage.Content.ReadAsStringAsync().Result);
-    // htmlDocument.LoadHtml(httpResponseMessage.Content.ReadAsStringAsync().Result);
-    // SchoolGrade.YearCredits.Clear();
-    // for (var i = 1; i < htmlDocument.DocumentNode.SelectSingleNode("/html/body/table[2]/tr/td/table").SelectNodes("tr").Count; i++)
-    //     SchoolGrade.YearCredits.Add(new() { Year = htmlDocument.DocumentNode.SelectSingleNode("/html/body/table[2]/tr/td/table").SelectNodes("tr")[i].SelectNodes("td")[0].InnerText.Replace("\n", "").Trim(), Credit = int.Parse(htmlDocument.DocumentNode.SelectSingleNode("/html/body/table[2]/tr/td/table").SelectNodes("tr")[i].SelectNodes("td")[1].InnerText) });
+    await Future.delayed(_interval);
+    response = await _client.getUri<dynamic>(
+      Uri.https(
+        'gakujo.shizuoka.ac.jp',
+        '/kyoumu/departmentGpa.do',
+      ),
+    );
+    document = parse(response.data);
+    rows =
+        document.querySelectorAll('table.txt12').first.querySelectorAll('tr');
+    gpa.departmentGrade = rows[0].children[1].text.trimWhiteSpace();
+    gpa.departmentGpa = double.parse(rows[1].children[1].text.trimWhiteSpace());
+    gpa.departmentCalculationDate = rows.reversed
+        .skip(2)
+        .last
+        .children[1]
+        .text
+        .trimWhiteSpace()
+        .trimDateTime();
+    gpa.departmentGpas = {};
+    rows.skip(2).toList().reversed.skip(3).forEach((e) {
+      gpa.departmentGpas[e.children[0].text.trimWhiteSpace()] =
+          double.parse(e.children[1].text.trimWhiteSpace());
+    });
+    gpa.departmentRankNumber = int.parse(rows.reversed
+        .toList()[1]
+        .children[1]
+        .text
+        .trimWhiteSpace()
+        .split('中')[1]
+        .replaceAll('位', ''));
+    gpa.departmentRankDenom = int.parse(rows.reversed
+        .toList()[1]
+        .children[1]
+        .text
+        .trimWhiteSpace()
+        .split('中')[0]
+        .replaceAll('人', ''));
+    gpa.courseRankNumber = int.parse(rows.last.children[1].text
+        .trimWhiteSpace()
+        .split('中')[1]
+        .replaceAll('位', ''));
+    gpa.courseRankDenom = int.parse(rows.last.children[1].text
+        .trimWhiteSpace()
+        .split('中')[0]
+        .replaceAll('人', ''));
+
+    await Future.delayed(_interval);
+    response = await _client.getUri<dynamic>(
+      Uri.https(
+        'gakujo.shizuoka.ac.jp',
+        '/kyoumu/nenbetuTaniSearch.do',
+      ),
+    );
+    document = parse(response.data);
+    gpa.evaluationCredits = {};
+    document
+        .querySelectorAll('table.txt12')
+        .first
+        .querySelectorAll('tr')
+        .skip(1)
+        .forEach((e) {
+      gpa.yearCredits[e.children[0].text.trimWhiteSpace()] =
+          int.parse(e.children[1].text.trimWhiteSpace());
+    });
+
+    await navigatorKey.currentContext?.read<GpaRepository>().save(gpa);
   }
 
   Future<void> fetchTimetables() async {
