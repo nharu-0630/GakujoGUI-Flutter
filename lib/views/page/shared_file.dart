@@ -1,10 +1,11 @@
-import 'package:flutter/cupertino.dart';
+import 'package:adaptive_dialog/adaptive_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:gakujo_task/api/provide.dart';
 import 'package:gakujo_task/models/shared_file.dart';
 import 'package:gakujo_task/views/common/widget.dart';
 import 'package:provider/provider.dart';
+import 'package:share_plus/share_plus.dart';
 
 class SharedFilePage extends StatefulWidget {
   const SharedFilePage({Key? key}) : super(key: key);
@@ -180,7 +181,7 @@ class _SharedFilePageState extends State<SharedFilePage> {
         ],
       ),
       child: ListTile(
-        onTap: () {
+        onTap: () async {
           if (sharedFile.isAcquired) {
             showModalBottomSheet(
               isScrollControlled: true,
@@ -196,29 +197,18 @@ class _SharedFilePageState extends State<SharedFilePage> {
               ),
             );
           } else {
-            showDialog(
-              context: context,
-              builder: (_) => CupertinoAlertDialog(
-                content: const Text('未取得の授業共有ファイルです。取得しますか？'),
-                actions: [
-                  CupertinoDialogAction(
-                      isDestructiveAction: true,
-                      onPressed: () {
-                        Navigator.of(context).pop();
-                      },
-                      child: const Text('キャンセル')),
-                  CupertinoDialogAction(
-                    child: const Text('取得'),
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                      context
-                          .read<ApiRepository>()
-                          .fetchDetailSharedFile(sharedFile);
-                    },
-                  )
-                ],
-              ),
-            );
+            await showOkCancelAlertDialog(
+                      context: context,
+                      title: '未取得の授業共有ファイルです。',
+                      message: '取得しますか？',
+                      okLabel: '取得',
+                      cancelLabel: 'キャンセル',
+                    ) ==
+                    OkCancelResult.ok
+                ? context
+                    .read<ApiRepository>()
+                    .fetchDetailSharedFile(sharedFile)
+                : null;
           }
         },
         title: Row(
@@ -269,4 +259,138 @@ class _SharedFilePageState extends State<SharedFilePage> {
       ),
     );
   }
+}
+
+Widget buildSharedFileModal(
+    BuildContext context, SharedFile sharedFile, ScrollController controller) {
+  return ListView(
+    controller: controller,
+    padding: const EdgeInsets.all(16.0),
+    children: [
+      Padding(
+        padding: const EdgeInsets.all(4.0),
+        child: Align(
+          alignment: Alignment.centerLeft,
+          child: Text(
+            sharedFile.title,
+            style: Theme.of(context).textTheme.titleLarge,
+          ),
+        ),
+      ),
+      Padding(
+        padding: const EdgeInsets.all(4.0),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: [
+            Visibility(
+              visible: sharedFile.publicPeriod.isNotEmpty,
+              child: Container(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(8.0),
+                  border: Border.all(
+                    color: Theme.of(context).colorScheme.primary,
+                    width: 2,
+                  ),
+                ),
+                padding: const EdgeInsets.symmetric(
+                  vertical: 2.0,
+                  horizontal: 4.0,
+                ),
+                child: Text(
+                  sharedFile.publicPeriod,
+                  style: Theme.of(context).textTheme.bodyLarge,
+                ),
+              ),
+            ),
+            Container(
+              margin: const EdgeInsets.only(left: 8.0),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(8.0),
+                border: Border.all(
+                  color: Theme.of(context).colorScheme.primary,
+                  width: 2,
+                ),
+              ),
+              padding: const EdgeInsets.symmetric(
+                vertical: 2.0,
+                horizontal: 4.0,
+              ),
+              child: Text(
+                sharedFile.fileSize,
+                style: Theme.of(context).textTheme.bodyLarge,
+              ),
+            ),
+            Visibility(
+              visible: sharedFile.isArchived,
+              child: const Icon(Icons.archive_rounded),
+            )
+          ],
+        ),
+      ),
+      const SizedBox(height: 8.0),
+      Padding(
+        padding: const EdgeInsets.all(4.0),
+        child: buildAutoLinkText(
+          context,
+          sharedFile.isAcquired ? sharedFile.description : '未取得',
+        ),
+      ),
+      Visibility(
+        visible: sharedFile.fileNames?.isNotEmpty ?? false,
+        child: const Padding(
+          padding: EdgeInsets.all(4.0),
+          child: Divider(thickness: 2.0),
+        ),
+      ),
+      Visibility(
+        visible: sharedFile.fileNames?.isNotEmpty ?? false,
+        child: Padding(
+          padding: const EdgeInsets.all(4.0),
+          child: buildFileList(sharedFile.fileNames),
+        ),
+      ),
+      const SizedBox(height: 8.0),
+      Row(
+        children: [
+          Expanded(
+            child: Container(
+              padding: const EdgeInsets.all(4.0),
+              child: ElevatedButton(
+                onPressed: () {
+                  context.read<SharedFileRepository>().setArchive(
+                      sharedFile.hashCode.toString(), !sharedFile.isArchived);
+                  Navigator.of(context).pop();
+                },
+                child: Icon(sharedFile.isArchived
+                    ? Icons.unarchive_rounded
+                    : Icons.archive_rounded),
+              ),
+            ),
+          ),
+          Expanded(
+            child: Container(
+              padding: const EdgeInsets.all(4.0),
+              child: ElevatedButton(
+                onPressed: () async => context
+                    .read<ApiRepository>()
+                    .fetchDetailSharedFile(sharedFile),
+                child: const Icon(Icons.sync_rounded),
+              ),
+            ),
+          ),
+          Expanded(
+            child: Container(
+              padding: const EdgeInsets.all(4.0),
+              child: ElevatedButton(
+                onPressed: () => Share.share(sharedFile.description,
+                    subject: sharedFile.title),
+                child: const Icon(Icons.share_rounded),
+              ),
+            ),
+          ),
+        ],
+      ),
+      const SizedBox(height: 8.0),
+    ],
+  );
 }

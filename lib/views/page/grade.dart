@@ -209,7 +209,7 @@ class _GradePageState extends State<GradePage> {
         ? Padding(
             padding: const EdgeInsets.all(8.0),
             child: SizedBox(
-              height: 320,
+              height: 300,
               child: Padding(
                 padding: const EdgeInsets.only(right: 16.0),
                 child: LineChart(

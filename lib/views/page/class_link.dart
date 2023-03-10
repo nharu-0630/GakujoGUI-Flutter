@@ -1,4 +1,4 @@
-import 'package:flutter/cupertino.dart';
+import 'package:adaptive_dialog/adaptive_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:gakujo_task/api/provide.dart';
@@ -6,6 +6,7 @@ import 'package:gakujo_task/models/class_link.dart';
 import 'package:gakujo_task/models/shared_file.dart';
 import 'package:gakujo_task/views/common/widget.dart';
 import 'package:provider/provider.dart';
+import 'package:share_plus/share_plus.dart';
 
 class ClassLinkPage extends StatefulWidget {
   const ClassLinkPage({Key? key}) : super(key: key);
@@ -180,7 +181,7 @@ class _ClassLinkPageState extends State<ClassLinkPage> {
         ],
       ),
       child: ListTile(
-        onTap: () {
+        onTap: () async {
           if (classLink.isAcquired) {
             showModalBottomSheet(
               isScrollControlled: true,
@@ -196,29 +197,16 @@ class _ClassLinkPageState extends State<ClassLinkPage> {
               ),
             );
           } else {
-            showDialog(
-              context: context,
-              builder: (_) => CupertinoAlertDialog(
-                content: const Text('未取得の授業リンクです。取得しますか？'),
-                actions: [
-                  CupertinoDialogAction(
-                      isDestructiveAction: true,
-                      onPressed: () {
-                        Navigator.of(context).pop();
-                      },
-                      child: const Text('キャンセル')),
-                  CupertinoDialogAction(
-                    child: const Text('取得'),
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                      context
-                          .read<ApiRepository>()
-                          .fetchDetailClassLink(classLink);
-                    },
-                  )
-                ],
-              ),
-            );
+            await showOkCancelAlertDialog(
+                      context: context,
+                      title: '未取得の授業リンクです。',
+                      message: '取得しますか？',
+                      okLabel: '取得',
+                      cancelLabel: 'キャンセル',
+                    ) ==
+                    OkCancelResult.ok
+                ? context.read<ApiRepository>().fetchDetailClassLink(classLink)
+                : null;
           }
         },
         title: Row(
@@ -258,4 +246,105 @@ class _ClassLinkPageState extends State<ClassLinkPage> {
       ),
     );
   }
+}
+
+Widget buildClassLinkModal(
+    BuildContext context, ClassLink classLink, ScrollController controller) {
+  return ListView(
+    controller: controller,
+    padding: const EdgeInsets.all(16.0),
+    children: [
+      Padding(
+        padding: const EdgeInsets.all(4.0),
+        child: Align(
+          alignment: Alignment.centerLeft,
+          child: Text(
+            classLink.title,
+            style: Theme.of(context).textTheme.titleLarge,
+          ),
+        ),
+      ),
+      Padding(
+        padding: const EdgeInsets.all(4.0),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: [
+            Visibility(
+              visible: classLink.isArchived,
+              child: const Icon(Icons.archive_rounded),
+            )
+          ],
+        ),
+      ),
+      const SizedBox(height: 8.0),
+      Padding(
+        padding: const EdgeInsets.all(4.0),
+        child: buildAutoLinkText(
+          context,
+          classLink.comment,
+        ),
+      ),
+      Visibility(
+        visible: classLink.isAcquired,
+        child: const Padding(
+          padding: EdgeInsets.all(4.0),
+          child: Divider(thickness: 2.0),
+        ),
+      ),
+      Visibility(
+        visible: classLink.isAcquired,
+        child: Padding(
+          padding: const EdgeInsets.all(4.0),
+          child: buildAutoLinkText(
+            context,
+            classLink.link,
+          ),
+        ),
+      ),
+      const SizedBox(height: 8.0),
+      Row(
+        children: [
+          Expanded(
+            child: Container(
+              padding: const EdgeInsets.all(4.0),
+              child: ElevatedButton(
+                onPressed: () {
+                  context
+                      .read<ClassLinkRepository>()
+                      .setArchive(classLink.id, !classLink.isArchived);
+                  Navigator.of(context).pop();
+                },
+                child: Icon(classLink.isArchived
+                    ? Icons.unarchive_rounded
+                    : Icons.archive_rounded),
+              ),
+            ),
+          ),
+          Expanded(
+            child: Container(
+              padding: const EdgeInsets.all(4.0),
+              child: ElevatedButton(
+                onPressed: () async => context
+                    .read<ApiRepository>()
+                    .fetchDetailClassLink(classLink),
+                child: const Icon(Icons.sync_rounded),
+              ),
+            ),
+          ),
+          Expanded(
+            child: Container(
+              padding: const EdgeInsets.all(4.0),
+              child: ElevatedButton(
+                onPressed: () => Share.share(
+                    '${classLink.comment}\n\n${classLink.link}',
+                    subject: classLink.title),
+                child: const Icon(Icons.share_rounded),
+              ),
+            ),
+          ),
+        ],
+      ),
+      const SizedBox(height: 8.0),
+    ],
+  );
 }

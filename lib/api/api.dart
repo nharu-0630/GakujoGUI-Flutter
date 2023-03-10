@@ -72,18 +72,17 @@ class Api {
 
   Future<void> loadSettings() async {
     var settings = await _settings;
-    if (settings?.accessEnvironmentKey != null &&
-        settings?.accessEnvironmentValue != null) {
-      _cookieJar.saveFromResponse(
-        Uri.https('gakujo.shizuoka.ac.jp', '/portal'),
-        [
-          Cookie(
-            settings!.accessEnvironmentKey!,
-            settings.accessEnvironmentValue!,
-          )
-        ],
-      );
-    }
+    if (settings?.accessEnvironmentKey == null) return;
+    if (settings?.accessEnvironmentValue == null) return;
+    _cookieJar.saveFromResponse(
+      Uri.https('gakujo.shizuoka.ac.jp', '/portal'),
+      [
+        Cookie(
+          settings!.accessEnvironmentKey!,
+          settings.accessEnvironmentValue!,
+        )
+      ],
+    );
   }
 
   Future<void> clearSettings() async =>
@@ -104,12 +103,8 @@ class Api {
     _client.interceptors.add(RetryInterceptor(
       dio: _client,
       logPrint: print,
-      retries: 3,
-      retryDelays: const [
-        Duration(seconds: 3),
-        Duration(seconds: 3),
-        Duration(seconds: 3),
-      ],
+      retries: 0,
+      retryDelays: const [],
     ));
   }
 
@@ -132,21 +127,6 @@ class Api {
     );
 
     await Future.delayed(_interval);
-    _client.getUri<dynamic>(
-      Uri.https(
-        'gakujo.shizuoka.ac.jp',
-        '/UI/jsp/topPage/topPage.jsp',
-        {'_': DateTime.now().millisecondsSinceEpoch.toString()},
-      ),
-      options: Options(
-        headers: {
-          'Accept': 'text/html, */*; q=0.01',
-          'Referer': 'https://gakujo.shizuoka.ac.jp/portal/',
-        },
-      ),
-    );
-
-    await Future.delayed(_interval);
     await _client.postUri<dynamic>(
       Uri.https(
         'gakujo.shizuoka.ac.jp',
@@ -157,21 +137,6 @@ class Api {
         headers: {
           'Accept': 'application/json, text/javascript, */*; q=0.01',
           'Origin': 'https://gakujo.shizuoka.ac.jp',
-          'Referer': 'https://gakujo.shizuoka.ac.jp/portal/',
-        },
-      ),
-    );
-
-    await Future.delayed(_interval);
-    _client.getUri<dynamic>(
-      Uri.https(
-        'gakujo.shizuoka.ac.jp',
-        '/UI/jsp/topPage/topPage.jsp',
-        {'_': DateTime.now().millisecondsSinceEpoch.toString()},
-      ),
-      options: Options(
-        headers: {
-          'Accept': 'text/html, */*; q=0.01',
           'Referer': 'https://gakujo.shizuoka.ac.jp/portal/',
         },
       ),
@@ -385,7 +350,7 @@ class Api {
     }
 
     final Settings? settings = await _settings;
-    if (parse(response.data).querySelector('title')!.text == 'アクセス環境登録') {
+    if (parse(response.data).querySelector('title')?.text == 'アクセス環境登録') {
       var accessEnvName = 'GakujoTask ${(const Uuid()).v4().substring(0, 8)}';
 
       settings?.accessEnvironmentName = accessEnvName;

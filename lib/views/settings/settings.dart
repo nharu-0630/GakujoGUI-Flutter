@@ -1,4 +1,4 @@
-import 'package:flutter/cupertino.dart';
+import 'package:adaptive_dialog/adaptive_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:gakujo_task/api/api.dart';
 import 'package:gakujo_task/api/provide.dart';
@@ -397,29 +397,17 @@ class _SettingsWidgetState extends State<SettingsWidget> {
                                       Theme.of(context).colorScheme.onPrimary,
                                 ),
                                 onPressed: () async {
-                                  showDialog(
-                                    context: context,
-                                    builder: (_) => CupertinoAlertDialog(
-                                      content: const Text('実行しますか？'),
-                                      actions: [
-                                        CupertinoDialogAction(
-                                            isDestructiveAction: true,
-                                            onPressed: () {
-                                              Navigator.of(context).pop();
-                                            },
-                                            child: const Text('キャンセル')),
-                                        CupertinoDialogAction(
-                                          child: const Text('取得'),
-                                          onPressed: () {
-                                            Navigator.of(context).pop();
-                                            context
-                                                .read<ApiRepository>()
-                                                .fetchLogin();
-                                          },
-                                        )
-                                      ],
-                                    ),
-                                  );
+                                  await showOkCancelAlertDialog(
+                                            context: context,
+                                            message: '実行しますか？',
+                                            okLabel: '実行',
+                                            cancelLabel: 'キャンセル',
+                                          ) ==
+                                          OkCancelResult.ok
+                                      ? context
+                                          .read<ApiRepository>()
+                                          .fetchLogin()
+                                      : null;
                                 },
                                 child: Padding(
                                   padding: const EdgeInsets.all(8.0),
@@ -453,51 +441,42 @@ class _SettingsWidgetState extends State<SettingsWidget> {
                                       Theme.of(context).colorScheme.onError,
                                 ),
                                 onPressed: () async {
-                                  showDialog(
+                                  var result = await showOkCancelAlertDialog(
+                                    isDestructiveAction: true,
                                     context: context,
-                                    builder: (_) => CupertinoAlertDialog(
-                                      content: const Text(
-                                          '初期化するとすべてのデータが削除されます。初期化しますか？'),
-                                      actions: [
-                                        CupertinoDialogAction(
-                                            onPressed: () {
-                                              Navigator.of(context).pop();
-                                            },
-                                            child: const Text('キャンセル')),
-                                        CupertinoDialogAction(
-                                          isDestructiveAction: true,
-                                          child: const Text('初期化'),
-                                          onPressed: () async {
-                                            Navigator.of(context).pop();
-                                            context
-                                                .read<ContactRepository>()
-                                                .deleteAll();
-                                            context
-                                                .read<SubjectRepository>()
-                                                .deleteAll();
-                                            context
-                                                .read<SettingsRepository>()
-                                                .delete();
-                                            context
-                                                .read<ReportRepository>()
-                                                .deleteAll();
-                                            context
-                                                .read<QuizRepository>()
-                                                .deleteAll();
-                                            context
-                                                .read<GradeRepository>()
-                                                .deleteAll();
-                                            context
-                                                .read<SharedFileRepository>()
-                                                .deleteAll();
-                                            context
-                                                .read<ClassLinkRepository>()
-                                                .deleteAll();
-                                          },
-                                        )
-                                      ],
-                                    ),
+                                    title: '初期化するとすべてのデータが削除されます。',
+                                    message: '初期化しますか？',
+                                    okLabel: '初期化',
+                                    cancelLabel: 'キャンセル',
                                   );
+                                  if (result == OkCancelResult.ok) {
+                                    {
+                                      navigatorKey.currentContext
+                                          ?.read<ContactRepository>()
+                                          .deleteAll();
+                                      navigatorKey.currentContext
+                                          ?.read<SubjectRepository>()
+                                          .deleteAll();
+                                      navigatorKey.currentContext
+                                          ?.read<SettingsRepository>()
+                                          .delete();
+                                      navigatorKey.currentContext
+                                          ?.read<ReportRepository>()
+                                          .deleteAll();
+                                      navigatorKey.currentContext
+                                          ?.read<QuizRepository>()
+                                          .deleteAll();
+                                      navigatorKey.currentContext
+                                          ?.read<GradeRepository>()
+                                          .deleteAll();
+                                      navigatorKey.currentContext
+                                          ?.read<SharedFileRepository>()
+                                          .deleteAll();
+                                      navigatorKey.currentContext
+                                          ?.read<ClassLinkRepository>()
+                                          .deleteAll();
+                                    }
+                                  }
                                 },
                                 child: Padding(
                                   padding: const EdgeInsets.all(8.0),
@@ -560,29 +539,17 @@ class _SettingsWidgetState extends State<SettingsWidget> {
                                       Theme.of(context).colorScheme.onError,
                                 ),
                                 onPressed: () async {
-                                  showDialog(
-                                    context: context,
-                                    builder: (_) => CupertinoAlertDialog(
-                                      content: const Text('実行しますか？'),
-                                      actions: [
-                                        CupertinoDialogAction(
-                                            onPressed: () {
-                                              Navigator.of(context).pop();
-                                            },
-                                            child: const Text('キャンセル')),
-                                        CupertinoDialogAction(
-                                          isDestructiveAction: true,
-                                          child: const Text('実行'),
-                                          onPressed: () async {
-                                            Navigator.of(context).pop();
-                                            context
-                                                .read<ApiRepository>()
-                                                .fetchTimetables();
-                                          },
-                                        )
-                                      ],
-                                    ),
-                                  );
+                                  await showOkCancelAlertDialog(
+                                            context: context,
+                                            message: '取得しますか？',
+                                            okLabel: '取得',
+                                            cancelLabel: 'キャンセル',
+                                          ) ==
+                                          OkCancelResult.ok
+                                      ? context
+                                          .read<ApiRepository>()
+                                          .fetchTimetables()
+                                      : null;
                                 },
                                 child: Padding(
                                   padding: const EdgeInsets.all(8.0),

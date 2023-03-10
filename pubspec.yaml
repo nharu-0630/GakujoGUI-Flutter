@@ -49,6 +49,7 @@ dependencies:
   hive_flutter: ^1.1.0
   awesome_snackbar_content: ^0.1.0
   fl_chart: ^0.61.0
+  adaptive_dialog: ^1.8.2
 
 dev_dependencies:
   flutter_test:

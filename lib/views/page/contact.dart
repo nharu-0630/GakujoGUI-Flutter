@@ -1,4 +1,4 @@
-import 'package:flutter/cupertino.dart';
+import 'package:adaptive_dialog/adaptive_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:gakujo_task/api/provide.dart';
@@ -143,7 +143,7 @@ class _ContactPageState extends State<ContactPage> {
         ],
       ),
       child: ListTile(
-        onTap: () {
+        onTap: () async {
           if (contact.isAcquired) {
             showModalBottomSheet(
               isScrollControlled: true,
@@ -159,27 +159,16 @@ class _ContactPageState extends State<ContactPage> {
               ),
             );
           } else {
-            showDialog(
-              context: context,
-              builder: (_) => CupertinoAlertDialog(
-                content: const Text('未取得の授業です。取得しますか？'),
-                actions: [
-                  CupertinoDialogAction(
-                      isDestructiveAction: true,
-                      onPressed: () {
-                        Navigator.of(context).pop();
-                      },
-                      child: const Text('キャンセル')),
-                  CupertinoDialogAction(
-                    child: const Text('取得'),
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                      context.read<ApiRepository>().fetchDetailContact(contact);
-                    },
-                  )
-                ],
-              ),
-            );
+            await showOkCancelAlertDialog(
+                      context: context,
+                      title: '未取得の授業連絡です。',
+                      message: '取得しますか？',
+                      okLabel: '取得',
+                      cancelLabel: 'キャンセル',
+                    ) ==
+                    OkCancelResult.ok
+                ? context.read<ApiRepository>().fetchDetailContact(contact)
+                : null;
           }
         },
         title: Row(

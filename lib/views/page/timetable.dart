@@ -164,3 +164,384 @@ class _TimetablePageState extends State<TimetablePage> {
     );
   }
 }
+
+Widget buildTimetableModal(
+    BuildContext context, Timetable timetable, ScrollController controller) {
+  return ListView(
+    controller: controller,
+    padding: const EdgeInsets.all(16.0),
+    children: [
+      Padding(
+        padding: const EdgeInsets.all(4.0),
+        child: Text(
+          timetable.subject,
+          style: Theme.of(context).textTheme.titleLarge,
+        ),
+      ),
+      Padding(
+        padding: const EdgeInsets.all(4.0),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            const Icon(Icons.category_rounded),
+            const SizedBox(width: 8.0),
+            Text(
+              timetable.className,
+              style: Theme.of(context).textTheme.bodyLarge,
+            ),
+            const SizedBox(width: 16.0),
+            const Icon(Icons.pin_drop_rounded),
+            const SizedBox(width: 8.0),
+            Text(
+              timetable.classRoom,
+              style: Theme.of(context).textTheme.bodyLarge,
+            ),
+            const SizedBox(width: 16.0),
+            const Icon(Icons.person_rounded),
+            const SizedBox(width: 8.0),
+            Text(
+              timetable.teacher,
+              style: Theme.of(context).textTheme.bodyLarge,
+            ),
+          ],
+        ),
+      ),
+      const Padding(
+        padding: EdgeInsets.all(4.0),
+        child: Divider(thickness: 2.0),
+      ),
+      Row(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: [
+          Column(
+            children: [
+              Text(
+                '担当教員名',
+                style: Theme.of(context).textTheme.titleMedium,
+              ),
+              Text(timetable.syllabusTeacher),
+            ],
+          ),
+          Column(
+            children: [
+              Text(
+                '所属等',
+                style: Theme.of(context).textTheme.titleMedium,
+              ),
+              Text(timetable.syllabusAffiliation),
+            ],
+          ),
+          Column(
+            children: [
+              Text(
+                '研究室',
+                style: Theme.of(context).textTheme.titleMedium,
+              ),
+              Text(timetable.syllabusResearchRoom),
+            ],
+          ),
+          Column(
+            children: [
+              Text(
+                '分担教員名',
+                style: Theme.of(context).textTheme.titleMedium,
+              ),
+              Text(timetable.syllabusSharingTeacher),
+            ],
+          ),
+        ],
+      ),
+      const SizedBox(height: 8.0),
+      Row(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: [
+          Column(
+            children: [
+              Text(
+                'クラス',
+                style: Theme.of(context).textTheme.titleMedium,
+              ),
+              Text(timetable.syllabusClassName),
+            ],
+          ),
+          Column(
+            children: [
+              Text(
+                '学期',
+                style: Theme.of(context).textTheme.titleMedium,
+              ),
+              Text(timetable.syllabusSemesterName),
+            ],
+          ),
+          Column(
+            children: [
+              Text(
+                '必修選択区分',
+                style: Theme.of(context).textTheme.titleMedium,
+              ),
+              Text(timetable.syllabusSelectionSection),
+            ],
+          ),
+        ],
+      ),
+      const SizedBox(height: 8.0),
+      Row(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: [
+          Column(
+            children: [
+              Text(
+                '対象学年',
+                style: Theme.of(context).textTheme.titleMedium,
+              ),
+              Text(timetable.syllabusTargetGrade),
+            ],
+          ),
+          Column(
+            children: [
+              Text(
+                '単位数',
+                style: Theme.of(context).textTheme.titleMedium,
+              ),
+              Text(timetable.syllabusCredit),
+            ],
+          ),
+          Column(
+            children: [
+              Text(
+                '曜日・時限',
+                style: Theme.of(context).textTheme.titleMedium,
+              ),
+              Text(timetable.syllabusWeekdayPeriod),
+            ],
+          ),
+          Column(
+            children: [
+              Text(
+                '教室',
+                style: Theme.of(context).textTheme.titleMedium,
+              ),
+              Text(timetable.syllabusClassRoom),
+            ],
+          ),
+        ],
+      ),
+      Text(
+        'キーワード',
+        style: Theme.of(context).textTheme.titleMedium,
+      ),
+      Padding(
+        padding: const EdgeInsets.all(4.0),
+        child: buildAutoLinkText(
+          context,
+          timetable.syllabusKeyword,
+        ),
+      ),
+      const SizedBox(height: 8.0),
+      Text(
+        '授業の目標',
+        style: Theme.of(context).textTheme.titleMedium,
+      ),
+      Padding(
+        padding: const EdgeInsets.all(4.0),
+        child: buildAutoLinkText(
+          context,
+          timetable.syllabusClassTarget,
+        ),
+      ),
+      const SizedBox(height: 8.0),
+      Text(
+        '学習内容',
+        style: Theme.of(context).textTheme.titleMedium,
+      ),
+      Padding(
+        padding: const EdgeInsets.all(4.0),
+        child: buildAutoLinkText(
+          context,
+          timetable.syllabusLearningDetail,
+        ),
+      ),
+      const SizedBox(height: 8.0),
+      Text(
+        '授業計画',
+        style: Theme.of(context).textTheme.titleMedium,
+      ),
+      Padding(
+        padding: const EdgeInsets.all(4.0),
+        child: buildAutoLinkText(
+          context,
+          timetable.syllabusClassPlan,
+        ),
+      ),
+      const SizedBox(height: 8.0),
+      Text(
+        'テキスト',
+        style: Theme.of(context).textTheme.titleMedium,
+      ),
+      Padding(
+        padding: const EdgeInsets.all(4.0),
+        child: buildAutoLinkText(
+          context,
+          timetable.syllabusTextbook,
+        ),
+      ),
+      const SizedBox(height: 8.0),
+      Text(
+        '参考書',
+        style: Theme.of(context).textTheme.titleMedium,
+      ),
+      Padding(
+        padding: const EdgeInsets.all(4.0),
+        child: buildAutoLinkText(
+          context,
+          timetable.syllabusReferenceBook,
+        ),
+      ),
+      const SizedBox(height: 8.0),
+      Text(
+        '予習・復習について',
+        style: Theme.of(context).textTheme.titleMedium,
+      ),
+      Padding(
+        padding: const EdgeInsets.all(4.0),
+        child: buildAutoLinkText(
+          context,
+          timetable.syllabusPreparationReview,
+        ),
+      ),
+      const SizedBox(height: 8.0),
+      Text(
+        '成績評価の方法･基準',
+        style: Theme.of(context).textTheme.titleMedium,
+      ),
+      Padding(
+        padding: const EdgeInsets.all(4.0),
+        child: buildAutoLinkText(
+          context,
+          timetable.syllabusEvaluationMethod,
+        ),
+      ),
+      const SizedBox(height: 8.0),
+      Text(
+        'オフィスアワー',
+        style: Theme.of(context).textTheme.titleMedium,
+      ),
+      Padding(
+        padding: const EdgeInsets.all(4.0),
+        child: buildAutoLinkText(
+          context,
+          timetable.syllabusOfficeHour,
+        ),
+      ),
+      const SizedBox(height: 8.0),
+      Text(
+        '担当教員からのメッセージ',
+        style: Theme.of(context).textTheme.titleMedium,
+      ),
+      Padding(
+        padding: const EdgeInsets.all(4.0),
+        child: buildAutoLinkText(
+          context,
+          timetable.syllabusMessage,
+        ),
+      ),
+      const SizedBox(height: 8.0),
+      Text(
+        'アクティブ・ラーニング',
+        style: Theme.of(context).textTheme.titleMedium,
+      ),
+      Padding(
+        padding: const EdgeInsets.all(4.0),
+        child: buildAutoLinkText(
+          context,
+          timetable.syllabusActiveLearning,
+        ),
+      ),
+      const SizedBox(height: 8.0),
+      Text(
+        '実務経験のある教員の有無',
+        style: Theme.of(context).textTheme.titleMedium,
+      ),
+      Padding(
+        padding: const EdgeInsets.all(4.0),
+        child: buildAutoLinkText(
+          context,
+          timetable.syllabusTeacherPracticalExperience,
+        ),
+      ),
+      const SizedBox(height: 8.0),
+      Text(
+        '実務経験のある教員の経歴と授業内容',
+        style: Theme.of(context).textTheme.titleMedium,
+      ),
+      Padding(
+        padding: const EdgeInsets.all(4.0),
+        child: buildAutoLinkText(
+          context,
+          timetable.syllabusTeacherCareerClassDetail,
+        ),
+      ),
+      const SizedBox(height: 8.0),
+      Text(
+        '教職科目区分',
+        style: Theme.of(context).textTheme.titleMedium,
+      ),
+      Padding(
+        padding: const EdgeInsets.all(4.0),
+        child: buildAutoLinkText(
+          context,
+          timetable.syllabusTeachingProfessionSection,
+        ),
+      ),
+      const SizedBox(height: 8.0),
+      Text(
+        '関連授業科目',
+        style: Theme.of(context).textTheme.titleMedium,
+      ),
+      Padding(
+        padding: const EdgeInsets.all(4.0),
+        child: buildAutoLinkText(
+          context,
+          timetable.syllabusRelatedClassSubjects,
+        ),
+      ),
+      const SizedBox(height: 8.0),
+      Text(
+        'その他',
+        style: Theme.of(context).textTheme.titleMedium,
+      ),
+      Padding(
+        padding: const EdgeInsets.all(4.0),
+        child: buildAutoLinkText(
+          context,
+          timetable.syllabusOther,
+        ),
+      ),
+      const SizedBox(height: 8.0),
+      Text(
+        '在宅授業形態',
+        style: Theme.of(context).textTheme.titleMedium,
+      ),
+      Padding(
+        padding: const EdgeInsets.all(4.0),
+        child: buildAutoLinkText(
+          context,
+          timetable.syllabusHomeClassStyle,
+        ),
+      ),
+      const SizedBox(height: 8.0),
+      Text(
+        '在宅授業形態（詳細）',
+        style: Theme.of(context).textTheme.titleMedium,
+      ),
+      Padding(
+        padding: const EdgeInsets.all(4.0),
+        child: buildAutoLinkText(
+          context,
+          timetable.syllabusHomeClassStyleDetail,
+        ),
+      ),
+      const SizedBox(height: 8.0),
+    ],
+  );
+}

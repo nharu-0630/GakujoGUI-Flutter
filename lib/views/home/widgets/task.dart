@@ -1,9 +1,10 @@
-import 'package:flutter/cupertino.dart';
+import 'package:adaptive_dialog/adaptive_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:gakujo_task/api/provide.dart';
 import 'package:gakujo_task/models/quiz.dart';
 import 'package:gakujo_task/models/report.dart';
-import 'package:gakujo_task/views/common/widget.dart';
+import 'package:gakujo_task/views/page/quiz.dart';
+import 'package:gakujo_task/views/page/report.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
@@ -86,27 +87,16 @@ class TaskWidget extends StatelessWidget {
             ),
           );
         } else {
-          await showDialog(
-            context: context,
-            builder: (_) => CupertinoAlertDialog(
-              content: const Text('未取得の小テストです。取得しますか？'),
-              actions: [
-                CupertinoDialogAction(
-                    isDestructiveAction: true,
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                    },
-                    child: const Text('キャンセル')),
-                CupertinoDialogAction(
-                  child: const Text('取得'),
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                    context.read<ApiRepository>().fetchDetailQuiz(quiz);
-                  },
-                )
-              ],
-            ),
-          );
+          await showOkCancelAlertDialog(
+                    context: context,
+                    title: '未取得の小テストです。',
+                    message: '取得しますか？',
+                    okLabel: '取得',
+                    cancelLabel: 'キャンセル',
+                  ) ==
+                  OkCancelResult.ok
+              ? context.read<ApiRepository>().fetchDetailQuiz(quiz)
+              : null;
         }
       },
       leading: const Icon(Icons.checklist_rounded),
@@ -178,27 +168,16 @@ class TaskWidget extends StatelessWidget {
             ),
           );
         } else {
-          await showDialog(
-            context: context,
-            builder: (_) => CupertinoAlertDialog(
-              content: const Text('未取得のレポートです。取得しますか？'),
-              actions: [
-                CupertinoDialogAction(
-                    isDestructiveAction: true,
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                    },
-                    child: const Text('キャンセル')),
-                CupertinoDialogAction(
-                  child: const Text('取得'),
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                    context.read<ApiRepository>().fetchDetailReport(report);
-                  },
-                )
-              ],
-            ),
-          );
+          await showOkCancelAlertDialog(
+                    context: context,
+                    title: '未取得のレポートです。',
+                    message: '取得しますか？',
+                    okLabel: '取得',
+                    cancelLabel: 'キャンセル',
+                  ) ==
+                  OkCancelResult.ok
+              ? context.read<ApiRepository>().fetchDetailReport(report)
+              : null;
         }
       },
       leading: const Icon(Icons.text_snippet_rounded),
