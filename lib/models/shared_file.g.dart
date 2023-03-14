@@ -17,13 +17,13 @@ class SharedFileAdapter extends TypeAdapter<SharedFile> {
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
     return SharedFile(
-      fields[0] as String,
-      fields[1] as String,
-      fields[2] as String,
-      (fields[3] as List?)?.cast<String>(),
-      fields[4] as String,
-      fields[5] as String,
-      fields[6] as DateTime,
+      subject: fields[0] as String,
+      title: fields[1] as String,
+      fileSize: fields[2] as String,
+      fileNames: (fields[3] as List?)?.cast<String>(),
+      description: fields[4] as String,
+      publicPeriod: fields[5] as String,
+      updateDateTime: fields[6] as DateTime,
       isAcquired: fields[7] as bool,
       isArchived: fields[8] as bool,
     );

@@ -29,33 +29,34 @@ class Grade implements Comparable<Grade> {
   @HiveField(10)
   String testType;
 
-  Grade(
-    this.subject,
-    this.teacher,
-    this.subjectSection,
-    this.selectionSection,
-    this.credit,
-    this.evaluation,
-    this.score,
-    this.gp,
-    this.acquisitionYear,
-    this.reportDateTime,
-    this.testType,
-  );
+  Grade({
+    required this.subject,
+    required this.teacher,
+    required this.subjectSection,
+    required this.selectionSection,
+    required this.credit,
+    required this.evaluation,
+    required this.score,
+    required this.gp,
+    required this.acquisitionYear,
+    required this.reportDateTime,
+    required this.testType,
+  });
 
   factory Grade.fromElement(Element element) {
     return Grade(
-      element.querySelectorAll('td')[0].text.trim(),
-      element.querySelectorAll('td')[1].text.trim(),
-      element.querySelectorAll('td')[2].text.trim(),
-      element.querySelectorAll('td')[3].text.trim(),
-      int.parse(element.querySelectorAll('td')[4].text.trim()),
-      element.querySelectorAll('td')[5].text.trim(),
-      double.tryParse(element.querySelectorAll('td')[6].text.trim()),
-      double.tryParse(element.querySelectorAll('td')[7].text.trim()),
-      element.querySelectorAll('td')[8].text.trim(),
-      DateTime.parse(element.querySelectorAll('td')[9].text.trim()),
-      element.querySelectorAll('td')[10].text.trim(),
+      subject: element.querySelectorAll('td')[0].text.trim(),
+      teacher: element.querySelectorAll('td')[1].text.trim(),
+      subjectSection: element.querySelectorAll('td')[2].text.trim(),
+      selectionSection: element.querySelectorAll('td')[3].text.trim(),
+      credit: int.parse(element.querySelectorAll('td')[4].text.trim()),
+      evaluation: element.querySelectorAll('td')[5].text.trim(),
+      score: double.tryParse(element.querySelectorAll('td')[6].text.trim()),
+      gp: double.tryParse(element.querySelectorAll('td')[7].text.trim()),
+      acquisitionYear: element.querySelectorAll('td')[8].text.trim(),
+      reportDateTime:
+          DateTime.parse(element.querySelectorAll('td')[9].text.trim()),
+      testType: element.querySelectorAll('td')[10].text.trim(),
     );
   }
 

@@ -26,34 +26,29 @@ class SharedFile implements Comparable<SharedFile> {
   @HiveField(8)
   bool isArchived = false;
 
-  SharedFile(
-    this.subject,
-    this.title,
-    this.fileSize,
-    this.fileNames,
-    this.description,
-    this.publicPeriod,
-    this.updateDateTime, {
+  SharedFile({
+    required this.subject,
+    required this.title,
+    required this.fileSize,
+    required this.fileNames,
+    required this.description,
+    required this.publicPeriod,
+    required this.updateDateTime,
     required this.isAcquired,
     required this.isArchived,
   });
 
   factory SharedFile.fromElement(Element element) {
-    var subject =
-        element.querySelectorAll('td')[1].text.trimWhiteSpace().trimSubject();
-    var title =
-        element.querySelectorAll('td')[2].querySelector('a')!.text.trim();
-    var fileSize = element.querySelectorAll('td')[3].text.trim();
-    var updateDateTime =
-        element.querySelectorAll('td')[4].text.trim().toDateTime();
     return SharedFile(
-      subject,
-      title,
-      fileSize,
-      null,
-      '',
-      '',
-      updateDateTime,
+      subject:
+          element.querySelectorAll('td')[1].text.trimWhiteSpace().trimSubject(),
+      title: element.querySelectorAll('td')[2].querySelector('a')!.text.trim(),
+      fileSize: element.querySelectorAll('td')[3].text.trim(),
+      fileNames: null,
+      description: '',
+      publicPeriod: '',
+      updateDateTime:
+          element.querySelectorAll('td')[4].text.trim().toDateTime(),
       isAcquired: false,
       isArchived: false,
     );

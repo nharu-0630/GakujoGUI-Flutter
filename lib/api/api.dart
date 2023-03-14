@@ -1425,23 +1425,7 @@ class Api {
     }
 
     Gpa gpa = await navigatorKey.currentContext?.read<GpaRepository>().load() ??
-        Gpa(
-            {},
-            '',
-            0.0,
-            {},
-            DateTime.fromMicrosecondsSinceEpoch(0),
-            null,
-            '',
-            0.0,
-            {},
-            DateTime.fromMicrosecondsSinceEpoch(0),
-            0,
-            0,
-            0,
-            0,
-            null,
-            {});
+        Gpa.init();
 
     await Future.delayed(_interval);
     response = await _client.getUri<dynamic>(
@@ -1618,51 +1602,12 @@ class Api {
 
   Future<Timetable> fetchDetailTimetable(int weekday, int period,
       String kamokuCode, String classCode, String classRoom) async {
-    Timetable timetable = Timetable(
-      weekday,
-      period,
-      '',
-      '',
-      '',
-      '',
-      '',
-      0,
-      '',
-      classRoom,
-      kamokuCode,
-      classCode,
-      '',
-      '',
-      '',
-      '',
-      '',
-      '',
-      '',
-      '',
-      '',
-      '',
-      '',
-      '',
-      '',
-      '',
-      '',
-      '',
-      '',
-      '',
-      '',
-      '',
-      '',
-      '',
-      '',
-      '',
-      '',
-      '',
-      '',
-      '',
-      '',
-      '',
-      '',
-    );
+    Timetable timetable = Timetable.init();
+    timetable.weekday = weekday;
+    timetable.period = period;
+    timetable.kamokuCode = kamokuCode;
+    timetable.classCode = classCode;
+    timetable.classRoom = classRoom;
 
     await Future.delayed(_interval);
     var response = await _client.getUri<dynamic>(

@@ -35,44 +35,46 @@ class Contact implements Comparable<Contact> {
   bool isAcquired;
 
   Contact(
-      this.subject,
-      this.teacherName,
-      this.contactType,
-      this.title,
-      this.content,
-      this.fileNames,
-      this.fileLinkRelease,
-      this.referenceUrl,
-      this.severity,
-      this.targetDateTime,
-      this.contactDateTime,
-      this.webReplyRequest,
-      {required this.isAcquired});
+      {required this.subject,
+      required this.teacherName,
+      required this.contactType,
+      required this.title,
+      required this.content,
+      required this.fileNames,
+      required this.fileLinkRelease,
+      required this.referenceUrl,
+      required this.severity,
+      required this.targetDateTime,
+      required this.contactDateTime,
+      required this.webReplyRequest,
+      required this.isAcquired});
 
   factory Contact.fromElement(Element element) {
     return Contact(
-      element
+      subject: element
           .querySelectorAll('td')[1]
           .text
           .trimWhiteSpace()
           .replaceAll(RegExp(r'（.*）(前|後)期.*'), ''),
-      element.querySelectorAll('td')[2].text.trim(),
-      element.querySelectorAll('td')[4].text.trim(),
-      element.querySelectorAll('td')[3].querySelector('a')!.text.trim(),
-      '',
-      null,
-      '',
-      '',
-      element
+      teacherName: element.querySelectorAll('td')[2].text.trim(),
+      contactType: element.querySelectorAll('td')[4].text.trim(),
+      title: element.querySelectorAll('td')[3].querySelector('a')!.text.trim(),
+      content: '',
+      fileNames: null,
+      fileLinkRelease: '',
+      referenceUrl: '',
+      severity: element
               .querySelectorAll('td')[3]
               .querySelector('span')
               ?.text
               .replaceFirst('【', '')
               .replaceFirst('】', '') ??
           '通常',
-      element.querySelectorAll('td')[5].text.trim().toDateTime(),
-      element.querySelectorAll('td')[6].text.trim().toDateTime(),
-      '',
+      targetDateTime:
+          element.querySelectorAll('td')[5].text.trim().toDateTime(),
+      contactDateTime:
+          element.querySelectorAll('td')[6].text.trim().toDateTime(),
+      webReplyRequest: '',
       isAcquired: false,
     );
   }

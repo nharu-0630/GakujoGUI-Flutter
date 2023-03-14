@@ -17,17 +17,17 @@ class GradeAdapter extends TypeAdapter<Grade> {
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
     return Grade(
-      fields[0] as String,
-      fields[1] as String,
-      fields[2] as String,
-      fields[3] as String,
-      fields[4] as int,
-      fields[5] as String,
-      fields[6] as double?,
-      fields[7] as double?,
-      fields[8] as String,
-      fields[9] as DateTime,
-      fields[10] as String,
+      subject: fields[0] as String,
+      teacher: fields[1] as String,
+      subjectSection: fields[2] as String,
+      selectionSection: fields[3] as String,
+      credit: fields[4] as int,
+      evaluation: fields[5] as String,
+      score: fields[6] as double?,
+      gp: fields[7] as double?,
+      acquisitionYear: fields[8] as String,
+      reportDateTime: fields[9] as DateTime,
+      testType: fields[10] as String,
     );
   }
 

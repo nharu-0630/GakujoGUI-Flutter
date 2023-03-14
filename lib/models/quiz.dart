@@ -46,78 +46,64 @@ class Quiz implements Comparable<Quiz> {
   @HiveField(18)
   bool isArchived = false;
 
-  Quiz(
-    this.subject,
-    this.title,
-    this.id,
-    this.schoolYear,
-    this.subjectCode,
-    this.classCode,
-    this.status,
-    this.startDateTime,
-    this.endDateTime,
-    this.submissionStatus,
-    this.implementationFormat,
-    this.operation,
-    this.questionsCount,
-    this.evaluationMethod,
-    this.description,
-    this.fileNames,
-    this.message, {
+  Quiz({
+    required this.subject,
+    required this.title,
+    required this.id,
+    required this.schoolYear,
+    required this.subjectCode,
+    required this.classCode,
+    required this.status,
+    required this.startDateTime,
+    required this.endDateTime,
+    required this.submissionStatus,
+    required this.implementationFormat,
+    required this.operation,
+    required this.questionsCount,
+    required this.evaluationMethod,
+    required this.description,
+    required this.fileNames,
+    required this.message,
     required this.isAcquired,
     required this.isArchived,
   });
 
   factory Quiz.fromElement(Element element) {
-    var subject =
-        element.querySelectorAll('td')[0].text.trimWhiteSpace().trimSubject();
-    var title =
-        element.querySelectorAll('td')[1].querySelector('a')!.text.trim();
-    var id = element
-        .querySelectorAll('td')[1]
-        .querySelector('a')!
-        .attributes['onclick']!
-        .trimJsArgs(1);
-    var schoolYear = element
-        .querySelectorAll('td')[1]
-        .querySelector('a')!
-        .attributes['onclick']!
-        .trimJsArgs(3);
-    var subjectCode = element
-        .querySelectorAll('td')[1]
-        .querySelector('a')!
-        .attributes['onclick']!
-        .trimJsArgs(4);
-    var classCode = element
-        .querySelectorAll('td')[1]
-        .querySelector('a')!
-        .attributes['onclick']!
-        .trimJsArgs(5);
-    var status = element.querySelectorAll('td')[2].text.trim();
-    var startDateTime =
-        element.querySelectorAll('td')[3].text.toSpanDateTime(0);
-    var endDateTime = element.querySelectorAll('td')[3].text.toSpanDateTime(1);
-    var submissionStatus = element.querySelectorAll('td')[4].text.trim();
-    var implementationFormat = element.querySelectorAll('td')[5].text.trim();
-    var operation = element.querySelectorAll('td')[6].text.trim();
     return Quiz(
-      subject,
-      title,
-      id,
-      schoolYear,
-      subjectCode,
-      classCode,
-      status,
-      startDateTime,
-      endDateTime,
-      submissionStatus,
-      implementationFormat,
-      operation,
-      -1,
-      '',
-      '',
-      null,
-      '',
+      subject:
+          element.querySelectorAll('td')[0].text.trimWhiteSpace().trimSubject(),
+      title: element.querySelectorAll('td')[1].querySelector('a')!.text.trim(),
+      id: element
+          .querySelectorAll('td')[1]
+          .querySelector('a')!
+          .attributes['onclick']!
+          .trimJsArgs(1),
+      schoolYear: element
+          .querySelectorAll('td')[1]
+          .querySelector('a')!
+          .attributes['onclick']!
+          .trimJsArgs(3),
+      subjectCode: element
+          .querySelectorAll('td')[1]
+          .querySelector('a')!
+          .attributes['onclick']!
+          .trimJsArgs(4),
+      classCode: element
+          .querySelectorAll('td')[1]
+          .querySelector('a')!
+          .attributes['onclick']!
+          .trimJsArgs(5),
+      status: element.querySelectorAll('td')[2].text.trim(),
+      startDateTime: element.querySelectorAll('td')[3].text.toSpanDateTime(0),
+      endDateTime: element.querySelectorAll('td')[3].text.toSpanDateTime(1),
+      submissionStatus: element.querySelectorAll('td')[4].text.trim(),
+      implementationFormat: element.querySelectorAll('td')[5].text.trim(),
+      operation: element.querySelectorAll('td')[6].text.trim(),
+      questionsCount: -1,
+      evaluationMethod: '',
+      description: '',
+      fileNames: null,
+      message: '',
       isAcquired: false,
       isArchived: false,
     );

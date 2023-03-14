@@ -38,24 +38,44 @@ class Gpa {
   @HiveField(15)
   Map<String, dynamic> yearCredits;
 
-  Gpa(
-    this.evaluationCredits,
-    this.facultyGrade,
-    this.facultyGpa,
-    this.facultyGpas,
-    this.facultyCalculationDate,
-    this.facultyImage,
-    this.departmentGrade,
-    this.departmentGpa,
-    this.departmentGpas,
-    this.departmentCalculationDate,
-    this.departmentRankNumber,
-    this.departmentRankDenom,
-    this.courseRankNumber,
-    this.courseRankDenom,
-    this.departmentImage,
-    this.yearCredits,
-  );
+  Gpa({
+    required this.evaluationCredits,
+    required this.facultyGrade,
+    required this.facultyGpa,
+    required this.facultyGpas,
+    required this.facultyCalculationDate,
+    required this.facultyImage,
+    required this.departmentGrade,
+    required this.departmentGpa,
+    required this.departmentGpas,
+    required this.departmentCalculationDate,
+    required this.departmentRankNumber,
+    required this.departmentRankDenom,
+    required this.courseRankNumber,
+    required this.courseRankDenom,
+    required this.departmentImage,
+    required this.yearCredits,
+  });
+
+  Gpa.init()
+      : this(
+          evaluationCredits: {},
+          facultyGrade: '',
+          facultyGpa: 0.0,
+          facultyGpas: {},
+          facultyCalculationDate: DateTime.fromMicrosecondsSinceEpoch(0),
+          facultyImage: null,
+          departmentGrade: '',
+          departmentGpa: 0.0,
+          departmentGpas: {},
+          departmentCalculationDate: DateTime.fromMicrosecondsSinceEpoch(0),
+          departmentRankNumber: 0,
+          departmentRankDenom: 0,
+          courseRankNumber: 0,
+          courseRankDenom: 0,
+          departmentImage: null,
+          yearCredits: {},
+        );
 }
 
 class GpaBox {
@@ -86,48 +106,13 @@ class GpaRepository extends ChangeNotifier {
   Future<Gpa> load() async {
     await _gpaBox.open();
     Box b = await _gpaBox.box;
-    return b.get('gpa') ??
-        Gpa(
-            {},
-            '',
-            0.0,
-            {},
-            DateTime.fromMicrosecondsSinceEpoch(0),
-            null,
-            '',
-            0.0,
-            {},
-            DateTime.fromMicrosecondsSinceEpoch(0),
-            0,
-            0,
-            0,
-            0,
-            null,
-            {});
+    return b.get('gpa') ?? Gpa.init();
   }
 
   Future<void> delete() async {
     await _gpaBox.open();
     Box b = await _gpaBox.box;
-    await b.put(
-        'gpa',
-        Gpa(
-            {},
-            '',
-            0.0,
-            {},
-            DateTime.fromMicrosecondsSinceEpoch(0),
-            null,
-            '',
-            0.0,
-            {},
-            DateTime.fromMicrosecondsSinceEpoch(0),
-            0,
-            0,
-            0,
-            0,
-            null,
-            {}));
+    await b.put('gpa', Gpa.init());
     notifyListeners();
   }
 }

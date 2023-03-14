@@ -26,18 +26,32 @@ class Settings {
   @HiveField(9)
   String? accessEnvironmentValue;
 
-  Settings(
-    this.username,
-    this.password,
-    this.year,
-    this.semester,
-    this.fullName,
-    this.profileImage,
-    this.lastLoginTime,
-    this.accessEnvironmentName,
-    this.accessEnvironmentKey,
-    this.accessEnvironmentValue,
-  );
+  Settings({
+    required this.username,
+    required this.password,
+    required this.year,
+    required this.semester,
+    required this.fullName,
+    required this.profileImage,
+    required this.lastLoginTime,
+    required this.accessEnvironmentName,
+    required this.accessEnvironmentKey,
+    required this.accessEnvironmentValue,
+  });
+
+  Settings.init()
+      : this(
+          username: null,
+          password: null,
+          year: null,
+          semester: null,
+          fullName: null,
+          profileImage: null,
+          lastLoginTime: DateTime.fromMicrosecondsSinceEpoch(0),
+          accessEnvironmentName: null,
+          accessEnvironmentKey: null,
+          accessEnvironmentValue: null,
+        );
 }
 
 class SettingsBox {
@@ -68,27 +82,20 @@ class SettingsRepository extends ChangeNotifier {
   Future<Settings> load() async {
     await _settingsBox.open();
     Box b = await _settingsBox.box;
-    return b.get('settings') ??
-        Settings(null, null, null, null, null, null,
-            DateTime.fromMicrosecondsSinceEpoch(0), null, null, null);
+    return b.get('settings') ?? Settings.init();
   }
 
   Future<void> delete() async {
     await _settingsBox.open();
     Box b = await _settingsBox.box;
-    await b.put(
-        'settings',
-        Settings(null, null, null, null, null, null,
-            DateTime.fromMicrosecondsSinceEpoch(0), null, null, null));
+    await b.put('settings', Settings.init());
     notifyListeners();
   }
 
   Future<void> setUsername(String username) async {
     await _settingsBox.open();
     Box b = await _settingsBox.box;
-    Settings settings = b.get('settings') ??
-        Settings(null, null, null, null, null, null,
-            DateTime.fromMicrosecondsSinceEpoch(0), null, null, null);
+    Settings settings = b.get('settings') ?? Settings.init();
     settings.username = username;
     await b.put('settings', settings);
     notifyListeners();
@@ -97,9 +104,7 @@ class SettingsRepository extends ChangeNotifier {
   Future<void> setPassword(String password) async {
     await _settingsBox.open();
     Box b = await _settingsBox.box;
-    Settings settings = b.get('settings') ??
-        Settings(null, null, null, null, null, null,
-            DateTime.fromMicrosecondsSinceEpoch(0), null, null, null);
+    Settings settings = b.get('settings') ?? Settings.init();
     settings.password = password;
     await b.put('settings', settings);
     notifyListeners();
@@ -108,9 +113,7 @@ class SettingsRepository extends ChangeNotifier {
   Future<void> setYear(int year) async {
     await _settingsBox.open();
     Box b = await _settingsBox.box;
-    Settings settings = b.get('settings') ??
-        Settings(null, null, null, null, null, null,
-            DateTime.fromMicrosecondsSinceEpoch(0), null, null, null);
+    Settings settings = b.get('settings') ?? Settings.init();
     settings.year = year;
     await b.put('settings', settings);
     notifyListeners();
@@ -119,9 +122,7 @@ class SettingsRepository extends ChangeNotifier {
   Future<void> setSemester(int semester) async {
     await _settingsBox.open();
     Box b = await _settingsBox.box;
-    Settings settings = b.get('settings') ??
-        Settings(null, null, null, null, null, null,
-            DateTime.fromMicrosecondsSinceEpoch(0), null, null, null);
+    Settings settings = b.get('settings') ?? Settings.init();
     settings.semester = semester;
     await b.put('settings', settings);
     notifyListeners();

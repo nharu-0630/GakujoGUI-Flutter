@@ -17,11 +17,11 @@ class ClassLinkAdapter extends TypeAdapter<ClassLink> {
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
     return ClassLink(
-      fields[0] as String,
-      fields[1] as String,
-      fields[2] as String,
-      fields[3] as String,
-      fields[4] as String,
+      subject: fields[0] as String,
+      title: fields[1] as String,
+      id: fields[2] as String,
+      comment: fields[3] as String,
+      link: fields[4] as String,
       isAcquired: fields[5] as bool,
       isArchived: fields[6] as bool,
     );

@@ -21,23 +21,7 @@ class _GradePageState extends State<GradePage> {
   bool _searchStatus = false;
   List<Grade> _grades = [];
   List<Grade> _suggestGrades = [];
-  Gpa _gpa = Gpa(
-      {},
-      '',
-      0.0,
-      {},
-      DateTime.fromMicrosecondsSinceEpoch(0),
-      null,
-      '',
-      0.0,
-      {},
-      DateTime.fromMicrosecondsSinceEpoch(0),
-      0,
-      0,
-      0,
-      0,
-      null,
-      {});
+  Gpa _gpa = Gpa.init();
 
   @override
   Widget build(BuildContext context) {

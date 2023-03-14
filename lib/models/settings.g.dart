@@ -17,16 +17,16 @@ class SettingsAdapter extends TypeAdapter<Settings> {
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
     return Settings(
-      fields[0] as String?,
-      fields[1] as String?,
-      fields[2] as int?,
-      fields[3] as int?,
-      fields[4] as String?,
-      fields[5] as String?,
-      fields[6] as DateTime,
-      fields[7] as String?,
-      fields[8] as String?,
-      fields[9] as String?,
+      username: fields[0] as String?,
+      password: fields[1] as String?,
+      year: fields[2] as int?,
+      semester: fields[3] as int?,
+      fullName: fields[4] as String?,
+      profileImage: fields[5] as String?,
+      lastLoginTime: fields[6] as DateTime,
+      accessEnvironmentName: fields[7] as String?,
+      accessEnvironmentKey: fields[8] as String?,
+      accessEnvironmentValue: fields[9] as String?,
     );
   }
 

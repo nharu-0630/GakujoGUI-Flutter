@@ -1,6 +1,3 @@
-import 'dart:convert';
-
-import 'package:crypto/crypto.dart' show md5;
 import 'package:flutter/material.dart' show ChangeNotifier;
 import 'package:hive/hive.dart';
 import 'package:html/dom.dart';
@@ -15,28 +12,22 @@ class Subject implements Comparable<Subject> {
   String teacher;
   @HiveField(2)
   String className;
-  @HiveField(3)
-  int? color;
 
-  Subject(
-    this.subject,
-    this.teacher,
-    this.className,
-    this.color,
-  );
+  Subject({
+    required this.subject,
+    required this.teacher,
+    required this.className,
+  });
 
   factory Subject.fromElement(Element element) {
-    var bytes =
-        md5.convert(utf8.encode(element.querySelectorAll('li')[0].text.trim()));
     return Subject(
-      element
+      subject: element
           .querySelectorAll('li')[0]
           .text
           .trim()
           .replaceAll(RegExp(r'（.*）(.*)'), ''),
-      element.querySelectorAll('li')[1].text.trim(),
-      element.querySelectorAll('li')[2].text.trim(),
-      int.parse('0xFF${bytes.toString().substring(0, 6)}'),
+      teacher: element.querySelectorAll('li')[1].text.trim(),
+      className: element.querySelectorAll('li')[2].text.trim(),
     );
   }
 

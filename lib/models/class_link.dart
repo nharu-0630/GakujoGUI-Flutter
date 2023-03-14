@@ -22,34 +22,29 @@ class ClassLink implements Comparable<ClassLink> {
   @HiveField(6)
   bool isArchived = false;
 
-  ClassLink(
-    this.subject,
-    this.title,
-    this.id,
-    this.comment,
-    this.link, {
+  ClassLink({
+    required this.subject,
+    required this.title,
+    required this.id,
+    required this.comment,
+    required this.link,
     required this.isAcquired,
     required this.isArchived,
   });
 
   factory ClassLink.fromElement(Element element) {
-    var subject =
-        element.querySelectorAll('td')[1].text.trimWhiteSpace().trimSubject();
-    var title =
-        element.querySelectorAll('td')[2].querySelector('a')!.text.trim();
-    var comment = element.querySelectorAll('td')[3].text.trim();
-    var id = element
-        .querySelectorAll('td')[2]
-        .querySelector('a')!
-        .attributes['onclick']!
-        .trimJsArgs(0)
-        .replaceAll('javascript:moveToDetail', '');
     return ClassLink(
-      subject,
-      title,
-      id,
-      comment,
-      '',
+      subject:
+          element.querySelectorAll('td')[1].text.trimWhiteSpace().trimSubject(),
+      title: element.querySelectorAll('td')[2].querySelector('a')!.text.trim(),
+      id: element
+          .querySelectorAll('td')[2]
+          .querySelector('a')!
+          .attributes['onclick']!
+          .trimJsArgs(0)
+          .replaceAll('javascript:moveToDetail', ''),
+      comment: element.querySelectorAll('td')[3].text.trim(),
+      link: '',
       isAcquired: false,
       isArchived: false,
     );

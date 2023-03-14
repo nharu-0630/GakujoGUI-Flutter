@@ -44,80 +44,64 @@ class Report implements Comparable<Report> {
   @HiveField(17)
   bool isArchived = false;
 
-  Report(
-    this.subject,
-    this.title,
-    this.id,
-    this.schoolYear,
-    this.subjectCode,
-    this.classCode,
-    this.status,
-    this.startDateTime,
-    this.endDateTime,
-    this.implementationFormat,
-    this.operation,
-    this.submittedDateTime,
-    this.evaluationMethod,
-    this.description,
-    this.fileNames,
-    this.message, {
+  Report({
+    required this.subject,
+    required this.title,
+    required this.id,
+    required this.schoolYear,
+    required this.subjectCode,
+    required this.classCode,
+    required this.status,
+    required this.startDateTime,
+    required this.endDateTime,
+    required this.implementationFormat,
+    required this.operation,
+    required this.submittedDateTime,
+    required this.evaluationMethod,
+    required this.description,
+    required this.fileNames,
+    required this.message,
     required this.isAcquired,
     required this.isArchived,
   });
 
   factory Report.fromElement(Element element) {
-    var subject =
-        element.querySelectorAll('td')[0].text.trimWhiteSpace().trimSubject();
-    var title =
-        element.querySelectorAll('td')[1].querySelector('a')!.text.trim();
-    var id = element
-        .querySelectorAll('td')[1]
-        .querySelector('a')!
-        .attributes['onclick']!
-        .trimJsArgs(1);
-    var schoolYear = element
-        .querySelectorAll('td')[1]
-        .querySelector('a')!
-        .attributes['onclick']!
-        .trimJsArgs(3);
-    var subjectCode = element
-        .querySelectorAll('td')[1]
-        .querySelector('a')!
-        .attributes['onclick']!
-        .trimJsArgs(4);
-    var classCode = element
-        .querySelectorAll('td')[1]
-        .querySelector('a')!
-        .attributes['onclick']!
-        .trimJsArgs(5);
-    var status = element.querySelectorAll('td')[2].text.trim();
-    var startDateTime =
-        element.querySelectorAll('td')[3].text.toSpanDateTime(0);
-    var endDateTime = element.querySelectorAll('td')[3].text.toSpanDateTime(1);
-    var implementationFormat = element.querySelectorAll('td')[5].text.trim();
-    var operation = element.querySelectorAll('td')[6].text.trim();
-    var submittedDateTime = DateTime.fromMicrosecondsSinceEpoch(0);
-    if (element.querySelectorAll('td')[4].text != '') {
-      submittedDateTime =
-          element.querySelectorAll('td')[4].text.trim().toDateTime();
-    }
     return Report(
-      subject,
-      title,
-      id,
-      schoolYear,
-      subjectCode,
-      classCode,
-      status,
-      startDateTime,
-      endDateTime,
-      implementationFormat,
-      operation,
-      submittedDateTime,
-      '',
-      '',
-      null,
-      '',
+      subject:
+          element.querySelectorAll('td')[0].text.trimWhiteSpace().trimSubject(),
+      title: element.querySelectorAll('td')[1].querySelector('a')!.text.trim(),
+      id: element
+          .querySelectorAll('td')[1]
+          .querySelector('a')!
+          .attributes['onclick']!
+          .trimJsArgs(1),
+      schoolYear: element
+          .querySelectorAll('td')[1]
+          .querySelector('a')!
+          .attributes['onclick']!
+          .trimJsArgs(3),
+      subjectCode: element
+          .querySelectorAll('td')[1]
+          .querySelector('a')!
+          .attributes['onclick']!
+          .trimJsArgs(4),
+      classCode: element
+          .querySelectorAll('td')[1]
+          .querySelector('a')!
+          .attributes['onclick']!
+          .trimJsArgs(5),
+      status: element.querySelectorAll('td')[2].text.trim(),
+      startDateTime: element.querySelectorAll('td')[3].text.toSpanDateTime(0),
+      endDateTime: element.querySelectorAll('td')[3].text.toSpanDateTime(1),
+      implementationFormat: element.querySelectorAll('td')[5].text.trim(),
+      operation: element.querySelectorAll('td')[6].text.trim(),
+      submittedDateTime: element.querySelectorAll('td')[4].text != ''
+          ? element.querySelectorAll('td')[4].text.trim().toDateTime()
+          : DateTime.fromMicrosecondsSinceEpoch(0),
+      evaluationMethod: '',
+      description: '',
+      fileNames: null,
+      message: '',
       isAcquired: false,
       isArchived: false,
     );
