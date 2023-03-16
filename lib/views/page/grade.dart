@@ -100,6 +100,17 @@ class _GradePageState extends State<GradePage> {
     );
   }
 
+  Widget _buildShortItem(BuildContext context, String title, String body) =>
+      Column(
+        children: [
+          Text(
+            title,
+            style: Theme.of(context).textTheme.titleMedium,
+          ),
+          Text(body),
+        ],
+      );
+
   Widget _buildGpas(BuildContext context) {
     return RefreshIndicator(
       onRefresh: () async => context.read<ApiRepository>().fetchGrades(),
@@ -107,63 +118,26 @@ class _GradePageState extends State<GradePage> {
         padding: const EdgeInsets.all(16.0),
         physics: const AlwaysScrollableScrollPhysics(),
         children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.end,
-            children: [
-              Text(
-                '算出日',
-                style: Theme.of(context).textTheme.titleMedium,
-              ),
-              const SizedBox(width: 8.0),
-              Text(_gpa.facultyCalculationDate.toLocal().toDateString()),
-            ],
-          ),
           _buildGpaChart(_gpa.departmentGpas),
           const SizedBox(height: 16.0),
           const Padding(
             padding: EdgeInsets.all(4.0),
             child: Divider(thickness: 2.0),
           ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          Wrap(
+            alignment: WrapAlignment.spaceAround,
+            direction: Axis.horizontal,
+            spacing: 32.0,
+            runSpacing: 8.0,
             children: [
-              Column(
-                children: [
-                  Text(
-                    '学年',
-                    style: Theme.of(context).textTheme.titleMedium,
-                  ),
-                  Text(_gpa.facultyGrade),
-                ],
-              ),
-              Column(
-                children: [
-                  Text(
-                    '累積GPA',
-                    style: Theme.of(context).textTheme.titleMedium,
-                  ),
-                  Text(_gpa.facultyGpa.toString()),
-                ],
-              ),
-              Column(
-                children: [
-                  Text(
-                    '学科内順位',
-                    style: Theme.of(context).textTheme.titleMedium,
-                  ),
-                  Text(
-                      '${_gpa.departmentRankNumber} / ${_gpa.departmentRankDenom}'),
-                ],
-              ),
-              Column(
-                children: [
-                  Text(
-                    'コース内順位',
-                    style: Theme.of(context).textTheme.titleMedium,
-                  ),
-                  Text('${_gpa.courseRankNumber} / ${_gpa.courseRankDenom}'),
-                ],
-              ),
+              _buildShortItem(context, '学年', _gpa.facultyGrade),
+              _buildShortItem(context, '累積GPA', _gpa.facultyGpa.toString()),
+              _buildShortItem(context, '学科内順位',
+                  '${_gpa.departmentRankNumber} / ${_gpa.departmentRankDenom}'),
+              _buildShortItem(context, 'コース内順位',
+                  '${_gpa.courseRankNumber} / ${_gpa.courseRankDenom}'),
+              _buildShortItem(context, '算出日',
+                  _gpa.facultyCalculationDate.toLocal().toDateString()),
             ],
           ),
           const SizedBox(height: 8.0),

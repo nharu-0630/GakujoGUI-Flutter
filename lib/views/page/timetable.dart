@@ -1,4 +1,3 @@
-import 'dart:io';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
@@ -144,57 +143,29 @@ class _TimetablePageState extends State<TimetablePage> {
                     width: 6.0,
                   )),
                 ),
-                child: OrientationBuilder(
-                  builder: (context, orientation) {
-                    return orientation == Orientation.portrait ||
-                            Platform.isWindows ||
-                            Platform.isLinux ||
-                            Platform.isMacOS
-                        ? Padding(
-                            padding: const EdgeInsets.all(4.0),
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  timetable.subject,
-                                  style: Theme.of(context)
-                                      .textTheme
-                                      .titleSmall
-                                      ?.copyWith(fontWeight: FontWeight.bold),
-                                  overflow: TextOverflow.visible,
-                                ),
-                                Flexible(
-                                  child: Text(
-                                    '${timetable.className}\n${timetable.classRoom}\n${timetable.teacher}',
-                                    style:
-                                        Theme.of(context).textTheme.bodySmall,
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          )
-                        : Padding(
-                            padding: const EdgeInsets.all(4.0),
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Align(
-                                  alignment: Alignment.centerLeft,
-                                  child: Text(
-                                    timetable.subject,
-                                    style: Theme.of(context)
-                                        .textTheme
-                                        .titleSmall
-                                        ?.copyWith(fontWeight: FontWeight.bold),
-                                    overflow: TextOverflow.visible,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          );
-                  },
+                child: Padding(
+                  padding: const EdgeInsets.all(4.0),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        timetable.subject,
+                        style: Theme.of(context)
+                            .textTheme
+                            .titleSmall
+                            ?.copyWith(fontWeight: FontWeight.bold),
+                        overflow: TextOverflow.visible,
+                      ),
+                      Flexible(
+                        child: Text(
+                          '${timetable.className}\n${timetable.classRoom}\n${timetable.teacher}',
+                          style: Theme.of(context).textTheme.bodySmall,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),
