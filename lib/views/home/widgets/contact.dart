@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:gakujo_gui/api/parse.dart';
 import 'package:gakujo_gui/constants/KIcons.dart';
 import 'package:gakujo_gui/models/contact.dart';
 import 'package:gakujo_gui/models/subject.dart';
 import 'package:gakujo_gui/views/page/contact.dart';
-import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 class ContactWidget extends StatelessWidget {
@@ -90,8 +90,7 @@ class ContactWidget extends StatelessWidget {
           ),
           Text(
             contacts.isNotEmpty
-                ? DateFormat('yyyy/MM/dd HH:mm', 'ja')
-                    .format(contacts.first.contactDateTime.toLocal())
+                ? contacts.first.contactDateTime.toLocal().toDetailString()
                 : '',
             style: Theme.of(context).textTheme.bodyMedium,
           )

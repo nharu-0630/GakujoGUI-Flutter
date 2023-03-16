@@ -3,12 +3,12 @@ import 'dart:collection';
 import 'package:collection/collection.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
+import 'package:gakujo_gui/api/parse.dart';
 import 'package:gakujo_gui/api/provide.dart';
 import 'package:gakujo_gui/constants/kicons.dart';
 import 'package:gakujo_gui/models/gpa.dart';
 import 'package:gakujo_gui/models/grade.dart';
 import 'package:gakujo_gui/views/common/widget.dart';
-import 'package:intl/intl.dart';
 import 'package:line_icons/line_icons.dart';
 import 'package:provider/provider.dart';
 
@@ -115,8 +115,7 @@ class _GradePageState extends State<GradePage> {
                 style: Theme.of(context).textTheme.titleMedium,
               ),
               const SizedBox(width: 8.0),
-              Text(DateFormat('yyyy/MM/dd', 'ja')
-                  .format(_gpa.facultyCalculationDate.toLocal())),
+              Text(_gpa.facultyCalculationDate.toLocal().toDateString()),
             ],
           ),
           _buildGpaChart(_gpa.departmentGpas),
@@ -394,8 +393,7 @@ class _GradePageState extends State<GradePage> {
           ),
           const Expanded(child: SizedBox()),
           Text(
-            DateFormat('yyyy/MM/dd', 'ja')
-                .format(grade.reportDateTime.toLocal()),
+            grade.reportDateTime.toLocal().toDateString(),
             style: Theme.of(context).textTheme.bodyMedium,
           ),
         ],

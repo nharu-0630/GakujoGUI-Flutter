@@ -1,11 +1,11 @@
 import 'package:adaptive_dialog/adaptive_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
+import 'package:gakujo_gui/api/parse.dart';
 import 'package:gakujo_gui/api/provide.dart';
 import 'package:gakujo_gui/constants/kicons.dart';
 import 'package:gakujo_gui/models/quiz.dart';
 import 'package:gakujo_gui/views/common/widget.dart';
-import 'package:intl/intl.dart';
 import 'package:line_icons/line_icons.dart';
 import 'package:provider/provider.dart';
 import 'package:share_plus/share_plus.dart';
@@ -240,8 +240,7 @@ class _QuizPageState extends State<QuizPage> {
               ),
             ),
             Text(
-              DateFormat('yyyy/MM/dd HH:mm', 'ja')
-                  .format(quiz.endDateTime.toLocal()),
+              quiz.endDateTime.toLocal().toDetailString(),
               style: Theme.of(context).textTheme.bodyMedium,
             ),
           ],
@@ -303,14 +302,12 @@ Widget buildQuizModal(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
             Text(
-              DateFormat('yyyy/MM/dd HH:mm', 'ja')
-                  .format(quiz.startDateTime.toLocal()),
+              quiz.startDateTime.toLocal().toDetailString(),
               style: Theme.of(context).textTheme.bodyLarge,
             ),
             const Icon(LineIcons.arrowRight),
             Text(
-              DateFormat('yyyy/MM/dd HH:mm', 'ja')
-                  .format(quiz.endDateTime.toLocal()),
+              quiz.endDateTime.toLocal().toDetailString(),
               style: Theme.of(context).textTheme.bodyLarge,
             ),
           ],

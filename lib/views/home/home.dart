@@ -44,7 +44,7 @@ class _HomeWidgetState extends State<HomeWidget> {
               ),
               content: const TaskWidget(),
             ),
-            const SizedBox(height: 16.0),
+            const SizedBox(height: 24.0),
             StickyHeader(
               header: Container(
                 color: Theme.of(context).scaffoldBackgroundColor,

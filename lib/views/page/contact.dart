@@ -1,12 +1,12 @@
 import 'package:adaptive_dialog/adaptive_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
+import 'package:gakujo_gui/api/parse.dart';
 import 'package:gakujo_gui/api/provide.dart';
 import 'package:gakujo_gui/constants/kicons.dart';
 import 'package:gakujo_gui/models/contact.dart';
 import 'package:gakujo_gui/models/subject.dart';
 import 'package:gakujo_gui/views/common/widget.dart';
-import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:share_plus/share_plus.dart';
 
@@ -193,8 +193,7 @@ class _ContactPageState extends State<ContactPage> {
               ),
             ),
             Text(
-              DateFormat('yyyy/MM/dd HH:mm', 'ja')
-                  .format(contact.contactDateTime.toLocal()),
+              contact.contactDateTime.toLocal().toDetailString(),
               style: Theme.of(context).textTheme.bodyMedium,
             ),
           ],
@@ -248,8 +247,7 @@ class _ContactPageState extends State<ContactPage> {
           child: Align(
             alignment: Alignment.centerRight,
             child: Text(
-              DateFormat('yyyy/MM/dd HH:mm', 'ja')
-                  .format(contact.contactDateTime.toLocal()),
+              contact.contactDateTime.toLocal().toDetailString(),
               style: Theme.of(context).textTheme.bodyLarge,
             ),
           ),

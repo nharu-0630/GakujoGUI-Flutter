@@ -23,8 +23,7 @@ class _AppState extends State<App> {
     return MaterialApp(
       scaffoldMessengerKey: scaffoldMessengerKey,
       navigatorKey: navigatorKey,
-      // themeMode: ThemeMode.system,
-      themeMode: ThemeMode.light,
+      themeMode: ThemeMode.system,
       theme: ThemeData(
         useMaterial3: true,
         brightness: Brightness.light,
@@ -60,8 +59,7 @@ class _AppState extends State<App> {
           tooltip: 'ホーム',
         ),
         NavigationDestination(
-          icon: Icon(LineIcons.tasks),
-          // icon: Icon(LineIcons.calendar),
+          icon: Icon(LineIcons.calendar),
           label: '時間割',
           tooltip: '時間割',
         ),

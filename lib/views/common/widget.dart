@@ -4,6 +4,7 @@ import 'package:better_open_file/better_open_file.dart';
 import 'package:cached_memory_image/provider/cached_memory_image_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:gakujo_gui/api/parse.dart';
 import 'package:gakujo_gui/api/provide.dart';
 import 'package:gakujo_gui/constants/kicons.dart';
 import 'package:gakujo_gui/models/quiz.dart';
@@ -15,7 +16,6 @@ import 'package:gakujo_gui/views/page/quiz.dart';
 import 'package:gakujo_gui/views/page/report.dart';
 import 'package:gakujo_gui/views/page/shared_file.dart';
 import 'package:gakujo_gui/views/settings/settings.dart';
-import 'package:intl/intl.dart';
 import 'package:line_icons/line_icons.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
@@ -136,9 +136,10 @@ Widget buildDrawer(BuildContext context) {
                                     const Icon(LineIcons.userClock),
                                     const SizedBox(width: 8.0),
                                     Text(
-                                      DateFormat('yyyy/MM/dd HH:mm', 'ja')
-                                          .format(
-                                              snapshot.data![0].lastLoginTime),
+                                      (snapshot.data![0] as Settings)
+                                          .lastLoginTime
+                                          .toLocal()
+                                          .toDetailString(),
                                       style: Theme.of(context)
                                           .textTheme
                                           .titleMedium,
@@ -150,7 +151,9 @@ Widget buildDrawer(BuildContext context) {
                                     const Icon(LineIcons.identificationBadge),
                                     const SizedBox(width: 8.0),
                                     Text(
-                                      snapshot.data![0].username ?? '',
+                                      (snapshot.data![0] as Settings)
+                                              .username ??
+                                          '',
                                       style: Theme.of(context)
                                           .textTheme
                                           .titleMedium,
@@ -162,7 +165,8 @@ Widget buildDrawer(BuildContext context) {
                                     const Icon(LineIcons.userShield),
                                     const SizedBox(width: 8.0),
                                     Text(
-                                      snapshot.data![0].accessEnvironmentName ??
+                                      (snapshot.data![0] as Settings)
+                                              .accessEnvironmentName ??
                                           '',
                                       style: Theme.of(context)
                                           .textTheme
@@ -189,7 +193,7 @@ Widget buildDrawer(BuildContext context) {
                     const Expanded(child: SizedBox()),
                     snapshot.hasData
                         ? Text(
-                            snapshot.data![1]
+                            (snapshot.data![1] as List<Report>)
                                 .where((e) => !(e.isArchived ||
                                     !(!e.isSubmitted &&
                                         e.endDateTime.isAfter(DateTime.now()))))
@@ -218,7 +222,7 @@ Widget buildDrawer(BuildContext context) {
                     const Expanded(child: SizedBox()),
                     snapshot.hasData
                         ? Text(
-                            snapshot.data![2]
+                            (snapshot.data![2] as List<Quiz>)
                                 .where((e) => !(e.isArchived ||
                                     !(!e.isSubmitted &&
                                         e.endDateTime.isAfter(DateTime.now()))))

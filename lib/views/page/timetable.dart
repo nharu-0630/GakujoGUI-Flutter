@@ -42,7 +42,7 @@ class _TimetablePageState extends State<TimetablePage> {
                                 const TableCell(child: SizedBox()),
                                 for (var i = 0; i < 5; i++)
                                   TableCell(
-                                    child: Container(
+                                    child: Padding(
                                       padding: const EdgeInsets.all(8.0),
                                       child: Align(
                                         alignment: Alignment.center,
@@ -63,13 +63,16 @@ class _TimetablePageState extends State<TimetablePage> {
                               TableRow(
                                 children: [
                                   TableCell(
-                                    child: Text(
-                                      '${i + 1}',
-                                      style: Theme.of(context)
-                                          .textTheme
-                                          .titleMedium
-                                          ?.copyWith(
-                                              fontWeight: FontWeight.bold),
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(8.0),
+                                      child: Text(
+                                        '${i + 1}',
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .titleMedium
+                                            ?.copyWith(
+                                                fontWeight: FontWeight.bold),
+                                      ),
                                     ),
                                   ),
                                   for (var j = 0; j < 5; j++)
@@ -97,65 +100,74 @@ class _TimetablePageState extends State<TimetablePage> {
 
   Widget _buildCell(BuildContext context, Timetable timetable) {
     return TableCell(
-      child: Card(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12.0),
-        ),
-        child: InkWell(
-          borderRadius: BorderRadius.circular(12.0),
-          onTap: () => showModalBottomSheet(
-            isScrollControlled: true,
-            shape: const RoundedRectangleBorder(
-                borderRadius:
-                    BorderRadius.vertical(top: Radius.circular(16.0))),
-            context: context,
-            builder: (context) => DraggableScrollableSheet(
-              expand: false,
-              builder: (context, controller) {
-                return buildTimetableModal(context, timetable, controller);
-              },
-            ),
+      child: SizedBox(
+        height: MediaQuery.of(context).size.height * .8 / 5,
+        child: Card(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12.0),
           ),
-          child: ClipPath(
-            clipper: ShapeBorderClipper(
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12.0))),
-            child: Container(
-              decoration: BoxDecoration(
-                border: Border(
-                    left: BorderSide(
-                  color: timetable.subject.toColor(),
-                  width: 6.0,
-                )),
+          child: InkWell(
+            borderRadius: BorderRadius.circular(12.0),
+            onTap: () => showModalBottomSheet(
+              isScrollControlled: true,
+              shape: const RoundedRectangleBorder(
+                  borderRadius:
+                      BorderRadius.vertical(top: Radius.circular(16.0))),
+              context: context,
+              builder: (context) => DraggableScrollableSheet(
+                expand: false,
+                builder: (context, controller) {
+                  return buildTimetableModal(context, timetable, controller);
+                },
               ),
-              child: Padding(
-                padding: const EdgeInsets.all(4.0),
-                child: Column(
-                  children: [
-                    Text(
-                      timetable.subject,
-                      style: Theme.of(context)
-                          .textTheme
-                          .titleSmall
-                          ?.copyWith(fontWeight: FontWeight.bold),
-                      overflow: TextOverflow.visible,
-                    ),
-                    Text(
-                      timetable.className,
-                      style: Theme.of(context).textTheme.bodySmall,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    Text(
-                      timetable.classRoom,
-                      style: Theme.of(context).textTheme.bodySmall,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    Text(
-                      timetable.teacher,
-                      style: Theme.of(context).textTheme.bodySmall,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ],
+            ),
+            child: ClipPath(
+              clipper: ShapeBorderClipper(
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12.0))),
+              child: Container(
+                decoration: BoxDecoration(
+                  border: Border(
+                      left: BorderSide(
+                    color: timetable.subject.toColor(),
+                    width: 6.0,
+                  )),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(4.0),
+                  child: Column(
+                    children: [
+                      Text(
+                        timetable.subject,
+                        style: Theme.of(context)
+                            .textTheme
+                            .titleSmall
+                            ?.copyWith(fontWeight: FontWeight.bold),
+                        overflow: TextOverflow.visible,
+                      ),
+                      Flexible(
+                        child: Text(
+                          timetable.className,
+                          style: Theme.of(context).textTheme.bodySmall,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                      Flexible(
+                        child: Text(
+                          timetable.classRoom,
+                          style: Theme.of(context).textTheme.bodySmall,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                      Flexible(
+                        child: Text(
+                          timetable.teacher,
+                          style: Theme.of(context).textTheme.bodySmall,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),
@@ -211,50 +223,55 @@ Widget buildTimetableModal(
         padding: EdgeInsets.all(4.0),
         child: Divider(thickness: 2.0),
       ),
-      Row(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        children: [
-          Column(
-            children: [
-              Text(
-                '担当教員名',
-                style: Theme.of(context).textTheme.titleMedium,
-              ),
-              Text(timetable.syllabusTeacher),
-            ],
-          ),
-          Column(
-            children: [
-              Text(
-                '所属等',
-                style: Theme.of(context).textTheme.titleMedium,
-              ),
-              Text(timetable.syllabusAffiliation),
-            ],
-          ),
-          Column(
-            children: [
-              Text(
-                '研究室',
-                style: Theme.of(context).textTheme.titleMedium,
-              ),
-              Text(timetable.syllabusResearchRoom),
-            ],
-          ),
-          Column(
-            children: [
-              Text(
-                '分担教員名',
-                style: Theme.of(context).textTheme.titleMedium,
-              ),
-              Text(timetable.syllabusSharingTeacher),
-            ],
-          ),
-        ],
+      SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        child: Row(
+          children: [
+            Column(
+              children: [
+                Text(
+                  '担当教員名',
+                  style: Theme.of(context).textTheme.titleMedium,
+                ),
+                Text(timetable.syllabusTeacher),
+              ],
+            ),
+            const SizedBox(width: 16.0),
+            Column(
+              children: [
+                Text(
+                  '所属等',
+                  style: Theme.of(context).textTheme.titleMedium,
+                ),
+                Text(timetable.syllabusAffiliation),
+              ],
+            ),
+            const SizedBox(width: 16.0),
+            Column(
+              children: [
+                Text(
+                  '研究室',
+                  style: Theme.of(context).textTheme.titleMedium,
+                ),
+                Text(timetable.syllabusResearchRoom),
+              ],
+            ),
+            const SizedBox(width: 16.0),
+            Column(
+              children: [
+                Text(
+                  '分担教員名',
+                  style: Theme.of(context).textTheme.titleMedium,
+                ),
+                Text(timetable.syllabusSharingTeacher),
+              ],
+            ),
+          ],
+        ),
       ),
       const SizedBox(height: 8.0),
       Row(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        mainAxisAlignment: MainAxisAlignment.start,
         children: [
           Column(
             children: [
@@ -265,6 +282,7 @@ Widget buildTimetableModal(
               Text(timetable.syllabusClassName),
             ],
           ),
+          const SizedBox(width: 16.0),
           Column(
             children: [
               Text(
@@ -274,6 +292,7 @@ Widget buildTimetableModal(
               Text(timetable.syllabusSemesterName),
             ],
           ),
+          const SizedBox(width: 16.0),
           Column(
             children: [
               Text(
@@ -286,46 +305,55 @@ Widget buildTimetableModal(
         ],
       ),
       const SizedBox(height: 8.0),
-      Row(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        children: [
-          Column(
-            children: [
-              Text(
-                '対象学年',
-                style: Theme.of(context).textTheme.titleMedium,
-              ),
-              Text(timetable.syllabusTargetGrade),
-            ],
-          ),
-          Column(
-            children: [
-              Text(
-                '単位数',
-                style: Theme.of(context).textTheme.titleMedium,
-              ),
-              Text(timetable.syllabusCredit),
-            ],
-          ),
-          Column(
-            children: [
-              Text(
-                '曜日・時限',
-                style: Theme.of(context).textTheme.titleMedium,
-              ),
-              Text(timetable.syllabusWeekdayPeriod),
-            ],
-          ),
-          Column(
-            children: [
-              Text(
-                '教室',
-                style: Theme.of(context).textTheme.titleMedium,
-              ),
-              Text(timetable.syllabusClassRoom),
-            ],
-          ),
-        ],
+      SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        child: Row(
+          children: [
+            Column(
+              children: [
+                Text(
+                  '対象学年',
+                  style: Theme.of(context).textTheme.titleMedium,
+                ),
+                Text(timetable.syllabusTargetGrade),
+              ],
+            ),
+            const SizedBox(width: 16.0),
+            Column(
+              children: [
+                Text(
+                  '単位数',
+                  style: Theme.of(context).textTheme.titleMedium,
+                ),
+                Text(timetable.syllabusCredit),
+              ],
+            ),
+            const SizedBox(width: 16.0),
+            Column(
+              children: [
+                Text(
+                  '曜日・時限',
+                  style: Theme.of(context).textTheme.titleMedium,
+                ),
+                Text(timetable.syllabusWeekdayPeriod),
+              ],
+            ),
+            const SizedBox(width: 16.0),
+            Column(
+              children: [
+                Text(
+                  '教室',
+                  style: Theme.of(context).textTheme.titleMedium,
+                ),
+                Text(timetable.syllabusClassRoom),
+              ],
+            ),
+          ],
+        ),
+      ),
+      const Padding(
+        padding: EdgeInsets.all(4.0),
+        child: Divider(thickness: 2.0),
       ),
       Text(
         'キーワード',

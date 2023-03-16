@@ -1,12 +1,12 @@
 import 'package:adaptive_dialog/adaptive_dialog.dart';
 import 'package:flutter/material.dart';
+import 'package:gakujo_gui/api/parse.dart';
 import 'package:gakujo_gui/api/provide.dart';
 import 'package:gakujo_gui/constants/KIcons.dart';
 import 'package:gakujo_gui/models/quiz.dart';
 import 'package:gakujo_gui/models/report.dart';
 import 'package:gakujo_gui/views/page/quiz.dart';
 import 'package:gakujo_gui/views/page/report.dart';
-import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 class TaskWidget extends StatelessWidget {
@@ -112,8 +112,7 @@ class TaskWidget extends StatelessWidget {
             ),
           ),
           Text(
-            DateFormat('yyyy/MM/dd HH:mm', 'ja')
-                .format(quiz.endDateTime.toLocal()),
+            quiz.endDateTime.toLocal().toDetailString(),
             style: Theme.of(context).textTheme.bodyMedium,
           ),
         ],
@@ -193,8 +192,7 @@ class TaskWidget extends StatelessWidget {
             ),
           ),
           Text(
-            DateFormat('yyyy/MM/dd HH:mm', 'ja')
-                .format(report.endDateTime.toLocal()),
+            report.endDateTime.toLocal().toDetailString(),
             style: Theme.of(context).textTheme.bodyMedium,
           ),
         ],

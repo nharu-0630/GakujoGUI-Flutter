@@ -5,6 +5,12 @@ import 'package:crypto/crypto.dart';
 import 'package:html_unescape/html_unescape.dart';
 import 'package:intl/intl.dart';
 
+extension DateTimeParsing on DateTime {
+  String toDetailString() => DateFormat('yyyy/MM/dd HH:mm', 'ja').format(this);
+
+  String toDateString() => DateFormat('yyyy/MM/dd', 'ja').format(this);
+}
+
 extension StringParsing on String {
   String trimWhiteSpace() => replaceAll('\r', '')
       .replaceAll('\n', '')
