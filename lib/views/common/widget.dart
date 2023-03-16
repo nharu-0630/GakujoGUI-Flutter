@@ -146,6 +146,7 @@ Widget buildDrawer(BuildContext context) {
                                     ),
                                   ],
                                 ),
+                                const SizedBox(height: 4.0),
                                 Row(
                                   children: [
                                     const Icon(LineIcons.identificationBadge),
@@ -160,6 +161,7 @@ Widget buildDrawer(BuildContext context) {
                                     ),
                                   ],
                                 ),
+                                const SizedBox(height: 4.0),
                                 Row(
                                   children: [
                                     const Icon(LineIcons.userShield),

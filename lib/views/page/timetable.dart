@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:gakujo_gui/api/parse.dart';
@@ -104,7 +105,7 @@ class _TimetablePageState extends State<TimetablePage> {
   Widget _buildCell(BuildContext context, Timetable timetable) {
     return TableCell(
       child: SizedBox(
-        height: MediaQuery.of(context).size.height * .8 / 5,
+        height: max(MediaQuery.of(context).size.height * .8 / 5, 120.0),
         child: Card(
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12.0),
@@ -165,23 +166,7 @@ class _TimetablePageState extends State<TimetablePage> {
                                 ),
                                 Flexible(
                                   child: Text(
-                                    timetable.className,
-                                    style:
-                                        Theme.of(context).textTheme.bodySmall,
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                ),
-                                Flexible(
-                                  child: Text(
-                                    timetable.classRoom,
-                                    style:
-                                        Theme.of(context).textTheme.bodySmall,
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                ),
-                                Flexible(
-                                  child: Text(
-                                    timetable.teacher,
+                                    '${timetable.className}\n${timetable.classRoom}\n${timetable.teacher}',
                                     style:
                                         Theme.of(context).textTheme.bodySmall,
                                     overflow: TextOverflow.ellipsis,
@@ -220,6 +205,48 @@ class _TimetablePageState extends State<TimetablePage> {
   }
 }
 
+Widget _buildIconItem(BuildContext context, IconData icon, String text) =>
+    Column(
+      children: [
+        Icon(icon),
+        const SizedBox(width: 8.0),
+        Text(
+          text,
+          style: Theme.of(context).textTheme.bodyLarge,
+        ),
+      ],
+    );
+
+Widget _buildShortItem(BuildContext context, String title, String body) =>
+    Column(
+      children: [
+        Text(
+          title,
+          style: Theme.of(context).textTheme.titleMedium,
+        ),
+        Text(body),
+      ],
+    );
+
+List<Widget> _buildLongItem(BuildContext context, String title, String body) =>
+    [
+      Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 8.0),
+        child: Text(
+          title,
+          style: Theme.of(context).textTheme.titleMedium,
+        ),
+      ),
+      Padding(
+        padding: const EdgeInsets.all(4.0),
+        child: buildAutoLinkText(
+          context,
+          body,
+        ),
+      ),
+      const SizedBox(height: 8.0)
+    ];
+
 Widget buildTimetableModal(BuildContext context, Timetable timetable) {
   return ListView(
     padding: const EdgeInsets.all(16.0),
@@ -231,386 +258,73 @@ Widget buildTimetableModal(BuildContext context, Timetable timetable) {
           style: Theme.of(context).textTheme.titleLarge,
         ),
       ),
-      Padding(
-        padding: const EdgeInsets.all(4.0),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: [
-            const Icon(LineIcons.shapes),
-            const SizedBox(width: 8.0),
-            Text(
-              timetable.className,
-              style: Theme.of(context).textTheme.bodyLarge,
-            ),
-            const SizedBox(width: 16.0),
-            const Icon(LineIcons.mapPin),
-            const SizedBox(width: 8.0),
-            Text(
-              timetable.classRoom,
-              style: Theme.of(context).textTheme.bodyLarge,
-            ),
-            const SizedBox(width: 16.0),
-            const Icon(LineIcons.userGraduate),
-            const SizedBox(width: 8.0),
-            Text(
-              timetable.teacher,
-              style: Theme.of(context).textTheme.bodyLarge,
-            ),
-          ],
-        ),
-      ),
       const Padding(
         padding: EdgeInsets.all(4.0),
         child: Divider(thickness: 2.0),
       ),
-      SingleChildScrollView(
-        scrollDirection: Axis.horizontal,
-        child: Row(
-          children: [
-            Column(
-              children: [
-                Text(
-                  '担当教員名',
-                  style: Theme.of(context).textTheme.titleMedium,
-                ),
-                Text(timetable.syllabusTeacher),
-              ],
-            ),
-            const SizedBox(width: 16.0),
-            Column(
-              children: [
-                Text(
-                  '所属等',
-                  style: Theme.of(context).textTheme.titleMedium,
-                ),
-                Text(timetable.syllabusAffiliation),
-              ],
-            ),
-            const SizedBox(width: 16.0),
-            Column(
-              children: [
-                Text(
-                  '研究室',
-                  style: Theme.of(context).textTheme.titleMedium,
-                ),
-                Text(timetable.syllabusResearchRoom),
-              ],
-            ),
-            const SizedBox(width: 16.0),
-            Column(
-              children: [
-                Text(
-                  '分担教員名',
-                  style: Theme.of(context).textTheme.titleMedium,
-                ),
-                Text(timetable.syllabusSharingTeacher),
-              ],
-            ),
-          ],
-        ),
-      ),
-      const SizedBox(height: 8.0),
-      Row(
-        mainAxisAlignment: MainAxisAlignment.start,
+      Wrap(
+        alignment: WrapAlignment.spaceAround,
+        direction: Axis.horizontal,
         children: [
-          Column(
-            children: [
-              Text(
-                'クラス',
-                style: Theme.of(context).textTheme.titleMedium,
-              ),
-              Text(timetable.syllabusClassName),
-            ],
-          ),
-          const SizedBox(width: 16.0),
-          Column(
-            children: [
-              Text(
-                '学期',
-                style: Theme.of(context).textTheme.titleMedium,
-              ),
-              Text(timetable.syllabusSemesterName),
-            ],
-          ),
-          const SizedBox(width: 16.0),
-          Column(
-            children: [
-              Text(
-                '必修選択区分',
-                style: Theme.of(context).textTheme.titleMedium,
-              ),
-              Text(timetable.syllabusSelectionSection),
-            ],
-          ),
+          _buildIconItem(context, LineIcons.shapes, timetable.className),
+          _buildIconItem(context, LineIcons.mapPin, timetable.classRoom),
+          _buildIconItem(context, LineIcons.userGraduate, timetable.teacher),
         ],
       ),
-      const SizedBox(height: 8.0),
-      SingleChildScrollView(
-        scrollDirection: Axis.horizontal,
-        child: Row(
-          children: [
-            Column(
-              children: [
-                Text(
-                  '対象学年',
-                  style: Theme.of(context).textTheme.titleMedium,
-                ),
-                Text(timetable.syllabusTargetGrade),
-              ],
-            ),
-            const SizedBox(width: 16.0),
-            Column(
-              children: [
-                Text(
-                  '単位数',
-                  style: Theme.of(context).textTheme.titleMedium,
-                ),
-                Text(timetable.syllabusCredit),
-              ],
-            ),
-            const SizedBox(width: 16.0),
-            Column(
-              children: [
-                Text(
-                  '曜日・時限',
-                  style: Theme.of(context).textTheme.titleMedium,
-                ),
-                Text(timetable.syllabusWeekdayPeriod),
-              ],
-            ),
-            const SizedBox(width: 16.0),
-            Column(
-              children: [
-                Text(
-                  '教室',
-                  style: Theme.of(context).textTheme.titleMedium,
-                ),
-                Text(timetable.syllabusClassRoom),
-              ],
-            ),
-          ],
-        ),
+      const Padding(
+        padding: EdgeInsets.all(4.0),
+        child: Divider(thickness: 2.0),
+      ),
+      Wrap(
+        alignment: WrapAlignment.spaceAround,
+        direction: Axis.horizontal,
+        spacing: 32.0,
+        runSpacing: 8.0,
+        children: [
+          _buildShortItem(context, '担当教員名', timetable.syllabusTeacher),
+          _buildShortItem(context, '所属等', timetable.syllabusAffiliation),
+          _buildShortItem(context, '研究室', timetable.syllabusResearchRoom),
+          _buildShortItem(context, '分担教員名', timetable.syllabusSharingTeacher),
+          _buildShortItem(context, 'クラス', timetable.syllabusClassName),
+          _buildShortItem(context, '学期', timetable.syllabusSemesterName),
+          _buildShortItem(
+              context, '必修選択区分', timetable.syllabusSelectionSection),
+          _buildShortItem(context, '対象学年', timetable.syllabusTargetGrade),
+          _buildShortItem(context, '単位数', timetable.syllabusCredit),
+          _buildShortItem(context, '曜日・時限', timetable.syllabusWeekdayPeriod),
+          _buildShortItem(context, '教室', timetable.syllabusClassRoom),
+        ],
       ),
       const Padding(
         padding: EdgeInsets.all(4.0),
         child: Divider(thickness: 2.0),
       ),
-      Text(
-        'キーワード',
-        style: Theme.of(context).textTheme.titleMedium,
-      ),
-      Padding(
-        padding: const EdgeInsets.all(4.0),
-        child: buildAutoLinkText(
-          context,
-          timetable.syllabusKeyword,
-        ),
-      ),
-      const SizedBox(height: 8.0),
-      Text(
-        '授業の目標',
-        style: Theme.of(context).textTheme.titleMedium,
-      ),
-      Padding(
-        padding: const EdgeInsets.all(4.0),
-        child: buildAutoLinkText(
-          context,
-          timetable.syllabusClassTarget,
-        ),
-      ),
-      const SizedBox(height: 8.0),
-      Text(
-        '学習内容',
-        style: Theme.of(context).textTheme.titleMedium,
-      ),
-      Padding(
-        padding: const EdgeInsets.all(4.0),
-        child: buildAutoLinkText(
-          context,
-          timetable.syllabusLearningDetail,
-        ),
-      ),
-      const SizedBox(height: 8.0),
-      Text(
-        '授業計画',
-        style: Theme.of(context).textTheme.titleMedium,
-      ),
-      Padding(
-        padding: const EdgeInsets.all(4.0),
-        child: buildAutoLinkText(
-          context,
-          timetable.syllabusClassPlan,
-        ),
-      ),
-      const SizedBox(height: 8.0),
-      Text(
-        'テキスト',
-        style: Theme.of(context).textTheme.titleMedium,
-      ),
-      Padding(
-        padding: const EdgeInsets.all(4.0),
-        child: buildAutoLinkText(
-          context,
-          timetable.syllabusTextbook,
-        ),
-      ),
-      const SizedBox(height: 8.0),
-      Text(
-        '参考書',
-        style: Theme.of(context).textTheme.titleMedium,
-      ),
-      Padding(
-        padding: const EdgeInsets.all(4.0),
-        child: buildAutoLinkText(
-          context,
-          timetable.syllabusReferenceBook,
-        ),
-      ),
-      const SizedBox(height: 8.0),
-      Text(
-        '予習・復習について',
-        style: Theme.of(context).textTheme.titleMedium,
-      ),
-      Padding(
-        padding: const EdgeInsets.all(4.0),
-        child: buildAutoLinkText(
-          context,
-          timetable.syllabusPreparationReview,
-        ),
-      ),
-      const SizedBox(height: 8.0),
-      Text(
-        '成績評価の方法･基準',
-        style: Theme.of(context).textTheme.titleMedium,
-      ),
-      Padding(
-        padding: const EdgeInsets.all(4.0),
-        child: buildAutoLinkText(
-          context,
-          timetable.syllabusEvaluationMethod,
-        ),
-      ),
-      const SizedBox(height: 8.0),
-      Text(
-        'オフィスアワー',
-        style: Theme.of(context).textTheme.titleMedium,
-      ),
-      Padding(
-        padding: const EdgeInsets.all(4.0),
-        child: buildAutoLinkText(
-          context,
-          timetable.syllabusOfficeHour,
-        ),
-      ),
-      const SizedBox(height: 8.0),
-      Text(
-        '担当教員からのメッセージ',
-        style: Theme.of(context).textTheme.titleMedium,
-      ),
-      Padding(
-        padding: const EdgeInsets.all(4.0),
-        child: buildAutoLinkText(
-          context,
-          timetable.syllabusMessage,
-        ),
-      ),
-      const SizedBox(height: 8.0),
-      Text(
-        'アクティブ・ラーニング',
-        style: Theme.of(context).textTheme.titleMedium,
-      ),
-      Padding(
-        padding: const EdgeInsets.all(4.0),
-        child: buildAutoLinkText(
-          context,
-          timetable.syllabusActiveLearning,
-        ),
-      ),
-      const SizedBox(height: 8.0),
-      Text(
-        '実務経験のある教員の有無',
-        style: Theme.of(context).textTheme.titleMedium,
-      ),
-      Padding(
-        padding: const EdgeInsets.all(4.0),
-        child: buildAutoLinkText(
-          context,
-          timetable.syllabusTeacherPracticalExperience,
-        ),
-      ),
-      const SizedBox(height: 8.0),
-      Text(
-        '実務経験のある教員の経歴と授業内容',
-        style: Theme.of(context).textTheme.titleMedium,
-      ),
-      Padding(
-        padding: const EdgeInsets.all(4.0),
-        child: buildAutoLinkText(
-          context,
-          timetable.syllabusTeacherCareerClassDetail,
-        ),
-      ),
-      const SizedBox(height: 8.0),
-      Text(
-        '教職科目区分',
-        style: Theme.of(context).textTheme.titleMedium,
-      ),
-      Padding(
-        padding: const EdgeInsets.all(4.0),
-        child: buildAutoLinkText(
-          context,
-          timetable.syllabusTeachingProfessionSection,
-        ),
-      ),
-      const SizedBox(height: 8.0),
-      Text(
-        '関連授業科目',
-        style: Theme.of(context).textTheme.titleMedium,
-      ),
-      Padding(
-        padding: const EdgeInsets.all(4.0),
-        child: buildAutoLinkText(
-          context,
-          timetable.syllabusRelatedClassSubjects,
-        ),
-      ),
-      const SizedBox(height: 8.0),
-      Text(
-        'その他',
-        style: Theme.of(context).textTheme.titleMedium,
-      ),
-      Padding(
-        padding: const EdgeInsets.all(4.0),
-        child: buildAutoLinkText(
-          context,
-          timetable.syllabusOther,
-        ),
-      ),
-      const SizedBox(height: 8.0),
-      Text(
-        '在宅授業形態',
-        style: Theme.of(context).textTheme.titleMedium,
-      ),
-      Padding(
-        padding: const EdgeInsets.all(4.0),
-        child: buildAutoLinkText(
-          context,
-          timetable.syllabusHomeClassStyle,
-        ),
-      ),
-      const SizedBox(height: 8.0),
-      Text(
-        '在宅授業形態（詳細）',
-        style: Theme.of(context).textTheme.titleMedium,
-      ),
-      Padding(
-        padding: const EdgeInsets.all(4.0),
-        child: buildAutoLinkText(
-          context,
-          timetable.syllabusHomeClassStyleDetail,
-        ),
-      ),
-      const SizedBox(height: 8.0),
+      ..._buildLongItem(context, 'キーワード', timetable.syllabusKeyword),
+      ..._buildLongItem(context, '授業の目標', timetable.syllabusClassTarget),
+      ..._buildLongItem(context, '学習内容', timetable.syllabusLearningDetail),
+      ..._buildLongItem(context, '授業計画', timetable.syllabusClassPlan),
+      ..._buildLongItem(context, 'テキスト', timetable.syllabusTextbook),
+      ..._buildLongItem(context, '参考書', timetable.syllabusReferenceBook),
+      ..._buildLongItem(
+          context, '予習・復習について', timetable.syllabusPreparationReview),
+      ..._buildLongItem(
+          context, '成績評価の方法･基準', timetable.syllabusEvaluationMethod),
+      ..._buildLongItem(context, 'オフィスアワー', timetable.syllabusOfficeHour),
+      ..._buildLongItem(context, '担当教員からのメッセージ', timetable.syllabusMessage),
+      ..._buildLongItem(
+          context, 'アクティブ・ラーニング', timetable.syllabusActiveLearning),
+      ..._buildLongItem(context, '実務経験のある教員の有無',
+          timetable.syllabusTeacherPracticalExperience),
+      ..._buildLongItem(context, '実務経験のある教員の経歴と授業内容',
+          timetable.syllabusTeacherCareerClassDetail),
+      ..._buildLongItem(
+          context, '教職科目区分', timetable.syllabusTeachingProfessionSection),
+      ..._buildLongItem(
+          context, '関連授業科目', timetable.syllabusRelatedClassSubjects),
+      ..._buildLongItem(context, 'その他', timetable.syllabusOther),
+      ..._buildLongItem(context, '在宅授業形態', timetable.syllabusHomeClassStyle),
+      ..._buildLongItem(
+          context, '在宅授業形態（詳細）', timetable.syllabusHomeClassStyleDetail),
     ],
   );
 }

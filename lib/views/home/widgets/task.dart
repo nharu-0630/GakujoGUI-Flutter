@@ -65,7 +65,11 @@ class TaskWidget extends StatelessWidget {
                   ),
           );
         } else {
-          return const SizedBox();
+          return const Center(
+              child: Padding(
+            padding: EdgeInsets.all(8.0),
+            child: CircularProgressIndicator(),
+          ));
         }
       },
     );

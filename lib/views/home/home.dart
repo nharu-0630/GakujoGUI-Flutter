@@ -24,6 +24,26 @@ class _HomeWidgetState extends State<HomeWidget> {
     }));
   }
 
+  Widget _buildHeader(BuildContext context, IconData icon, String title) {
+    return Container(
+      color: Theme.of(context).scaffoldBackgroundColor,
+      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+      child: Row(
+        children: [
+          Icon(icon),
+          const SizedBox(width: 8.0),
+          Text(
+            title,
+            style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                  fontWeight: FontWeight.bold,
+                ),
+          ),
+          const Spacer(),
+        ],
+      ),
+    );
+  }
+
   Widget _buildVertical(BuildContext context) {
     return RefreshIndicator(
       onRefresh: () async => context.read<ApiRepository>().fetchAll(),
@@ -31,49 +51,14 @@ class _HomeWidgetState extends State<HomeWidget> {
         physics: const AlwaysScrollableScrollPhysics(),
         children: [
           StickyHeader(
-            header: Container(
-              color: Theme.of(context).scaffoldBackgroundColor,
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-              child: Row(
-                children: [
-                  Icon(KIcons.task),
-                  const SizedBox(width: 8.0),
-                  Text(
-                    'タスク',
-                    style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                          fontWeight: FontWeight.bold,
-                        ),
-                  ),
-                  const Spacer(),
-                ],
-              ),
-            ),
+            header: _buildHeader(context, KIcons.task, 'タスク'),
             content: const TaskWidget(),
           ),
           const SizedBox(height: 24.0),
           StickyHeader(
-            header: Container(
-              color: Theme.of(context).scaffoldBackgroundColor,
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-              child: Row(
-                children: [
-                  Icon(KIcons.contact),
-                  const SizedBox(width: 8.0),
-                  Text(
-                    'メッセージ',
-                    style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                          fontWeight: FontWeight.bold,
-                        ),
-                  ),
-                  const Spacer(),
-                ],
-              ),
-            ),
+            header: _buildHeader(context, KIcons.contact, 'メッセージ'),
             content: const ContactWidget(),
           ),
-          const SizedBox(height: 16.0),
         ],
       ),
     );
@@ -89,27 +74,7 @@ class _HomeWidgetState extends State<HomeWidget> {
               physics: const AlwaysScrollableScrollPhysics(),
               children: [
                 StickyHeader(
-                  header: Container(
-                    color: Theme.of(context).scaffoldBackgroundColor,
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 16.0, vertical: 8.0),
-                    child: Row(
-                      children: [
-                        Icon(KIcons.task),
-                        const SizedBox(width: 8.0),
-                        Text(
-                          'タスク',
-                          style: Theme.of(context)
-                              .textTheme
-                              .headlineSmall
-                              ?.copyWith(
-                                fontWeight: FontWeight.bold,
-                              ),
-                        ),
-                        const Spacer(),
-                      ],
-                    ),
-                  ),
+                  header: _buildHeader(context, KIcons.task, 'タスク'),
                   content: const TaskWidget(),
                 ),
               ],
@@ -118,27 +83,7 @@ class _HomeWidgetState extends State<HomeWidget> {
               physics: const AlwaysScrollableScrollPhysics(),
               children: [
                 StickyHeader(
-                  header: Container(
-                    color: Theme.of(context).scaffoldBackgroundColor,
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 16.0, vertical: 8.0),
-                    child: Row(
-                      children: [
-                        Icon(KIcons.contact),
-                        const SizedBox(width: 8.0),
-                        Text(
-                          'メッセージ',
-                          style: Theme.of(context)
-                              .textTheme
-                              .headlineSmall
-                              ?.copyWith(
-                                fontWeight: FontWeight.bold,
-                              ),
-                        ),
-                        const Spacer(),
-                      ],
-                    ),
-                  ),
+                  header: _buildHeader(context, KIcons.contact, 'メッセージ'),
                   content: const ContactWidget(),
                 ),
               ],
