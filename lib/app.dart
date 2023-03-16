@@ -3,6 +3,7 @@ import 'package:gakujo_gui/views/common/widget.dart';
 import 'package:gakujo_gui/views/home/home.dart';
 import 'package:gakujo_gui/views/page/timetable.dart';
 import 'package:line_icons/line_icons.dart';
+import 'package:nested_side_sheet/nested_side_sheet.dart';
 
 class App extends StatefulWidget {
   const App({Key? key}) : super(key: key);
@@ -34,15 +35,17 @@ class _AppState extends State<App> {
       ),
       debugShowCheckedModeBanner: false,
       title: 'Gakujo Task',
-      home: Scaffold(
-        key: scaffoldKey,
-        drawer: buildDrawer(context),
-        appBar: buildAppBar(context, scaffoldKey),
-        body: const [
-          HomeWidget(),
-          TimetablePage(),
-        ][_index],
-        bottomNavigationBar: _buildBottomNavigationBar(),
+      home: NestedSideSheet(
+        child: Scaffold(
+          key: scaffoldKey,
+          drawer: buildDrawer(context),
+          appBar: buildAppBar(context, scaffoldKey),
+          body: const [
+            HomeWidget(),
+            TimetablePage(),
+          ][_index],
+          bottomNavigationBar: _buildBottomNavigationBar(),
+        ),
       ),
     );
   }

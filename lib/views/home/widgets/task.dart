@@ -8,6 +8,7 @@ import 'package:gakujo_gui/models/report.dart';
 import 'package:gakujo_gui/views/page/quiz.dart';
 import 'package:gakujo_gui/views/page/report.dart';
 import 'package:provider/provider.dart';
+import 'package:side_sheet/side_sheet.dart';
 
 class TaskWidget extends StatelessWidget {
   const TaskWidget({Key? key}) : super(key: key);
@@ -74,19 +75,24 @@ class TaskWidget extends StatelessWidget {
     return ListTile(
       onTap: () async {
         if (quiz.isAcquired) {
-          showModalBottomSheet(
-            isScrollControlled: true,
-            shape: const RoundedRectangleBorder(
-                borderRadius:
-                    BorderRadius.vertical(top: Radius.circular(16.0))),
-            context: context,
-            builder: (context) => DraggableScrollableSheet(
-              expand: false,
-              builder: (context, controller) {
-                return buildQuizModal(context, quiz, controller);
-              },
-            ),
-          );
+          MediaQuery.of(context).orientation == Orientation.portrait
+              ? showModalBottomSheet(
+                  backgroundColor: Theme.of(context).colorScheme.surface,
+                  isScrollControlled: false,
+                  shape: const RoundedRectangleBorder(
+                      borderRadius:
+                          BorderRadius.vertical(top: Radius.circular(0.0))),
+                  context: context,
+                  builder: (context) => buildQuizModal(context, quiz),
+                )
+              : SideSheet.right(
+                  sheetColor: Theme.of(context).colorScheme.surface,
+                  body: SizedBox(
+                    width: MediaQuery.of(context).size.width * .6,
+                    child: buildQuizModal(context, quiz),
+                  ),
+                  context: context,
+                );
         } else {
           await showOkCancelAlertDialog(
                     context: context,
@@ -154,19 +160,24 @@ class TaskWidget extends StatelessWidget {
     return ListTile(
       onTap: () async {
         if (report.isAcquired) {
-          showModalBottomSheet(
-            isScrollControlled: true,
-            shape: const RoundedRectangleBorder(
-                borderRadius:
-                    BorderRadius.vertical(top: Radius.circular(16.0))),
-            context: context,
-            builder: (context) => DraggableScrollableSheet(
-              expand: false,
-              builder: (context, controller) {
-                return buildReportModal(context, report, controller);
-              },
-            ),
-          );
+          MediaQuery.of(context).orientation == Orientation.portrait
+              ? showModalBottomSheet(
+                  backgroundColor: Theme.of(context).colorScheme.surface,
+                  isScrollControlled: false,
+                  shape: const RoundedRectangleBorder(
+                      borderRadius:
+                          BorderRadius.vertical(top: Radius.circular(0.0))),
+                  context: context,
+                  builder: (context) => buildReportModal(context, report),
+                )
+              : SideSheet.right(
+                  sheetColor: Theme.of(context).colorScheme.surface,
+                  body: SizedBox(
+                    width: MediaQuery.of(context).size.width * .6,
+                    child: buildReportModal(context, report),
+                  ),
+                  context: context,
+                );
         } else {
           await showOkCancelAlertDialog(
                     context: context,

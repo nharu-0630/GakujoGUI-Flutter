@@ -75,12 +75,12 @@ class ApiRepository extends ChangeNotifier {
   void fetchLogin() async {
     if (isLoading) return;
     _toggleLoading();
-    // try {
-    await _api.fetchLogin();
-    _toggleLoading();
-    // } catch (e) {
-    //   _onError(e);
-    // }
+    try {
+      await _api.fetchLogin();
+      _toggleLoading();
+    } catch (e) {
+      _onError(e);
+    }
   }
 
   void fetchSubjects() async {

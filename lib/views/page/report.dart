@@ -9,6 +9,7 @@ import 'package:gakujo_gui/views/common/widget.dart';
 import 'package:line_icons/line_icons.dart';
 import 'package:provider/provider.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:side_sheet/side_sheet.dart';
 
 class ReportPage extends StatefulWidget {
   const ReportPage({Key? key}) : super(key: key);
@@ -186,19 +187,24 @@ class _ReportPageState extends State<ReportPage> {
       child: ListTile(
         onTap: () async {
           if (report.isAcquired) {
-            showModalBottomSheet(
-              isScrollControlled: true,
-              shape: const RoundedRectangleBorder(
-                  borderRadius:
-                      BorderRadius.vertical(top: Radius.circular(16.0))),
-              context: context,
-              builder: (context) => DraggableScrollableSheet(
-                expand: false,
-                builder: (context, controller) {
-                  return buildReportModal(context, report, controller);
-                },
-              ),
-            );
+            MediaQuery.of(context).orientation == Orientation.portrait
+                ? showModalBottomSheet(
+                    backgroundColor: Theme.of(context).colorScheme.surface,
+                    isScrollControlled: false,
+                    shape: const RoundedRectangleBorder(
+                        borderRadius:
+                            BorderRadius.vertical(top: Radius.circular(0.0))),
+                    context: context,
+                    builder: (context) => buildReportModal(context, report),
+                  )
+                : SideSheet.right(
+                    sheetColor: Theme.of(context).colorScheme.surface,
+                    body: SizedBox(
+                      width: MediaQuery.of(context).size.width * .6,
+                      child: buildReportModal(context, report),
+                    ),
+                    context: context,
+                  );
           } else {
             await showOkCancelAlertDialog(
                       context: context,
@@ -280,10 +286,8 @@ class _ReportPageState extends State<ReportPage> {
   }
 }
 
-Widget buildReportModal(
-    BuildContext context, Report report, ScrollController controller) {
+Widget buildReportModal(BuildContext context, Report report) {
   return ListView(
-    controller: controller,
     padding: const EdgeInsets.all(16.0),
     children: [
       Padding(

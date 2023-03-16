@@ -9,6 +9,7 @@ import 'package:gakujo_gui/views/common/widget.dart';
 import 'package:line_icons/line_icons.dart';
 import 'package:provider/provider.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:side_sheet/side_sheet.dart';
 
 class QuizPage extends StatefulWidget {
   const QuizPage({Key? key}) : super(key: key);
@@ -186,19 +187,24 @@ class _QuizPageState extends State<QuizPage> {
       child: ListTile(
         onTap: () async {
           if (quiz.isAcquired) {
-            showModalBottomSheet(
-              isScrollControlled: true,
-              shape: const RoundedRectangleBorder(
-                  borderRadius:
-                      BorderRadius.vertical(top: Radius.circular(16.0))),
-              context: context,
-              builder: (context) => DraggableScrollableSheet(
-                expand: false,
-                builder: (context, controller) {
-                  return buildQuizModal(context, quiz, controller);
-                },
-              ),
-            );
+            MediaQuery.of(context).orientation == Orientation.portrait
+                ? showModalBottomSheet(
+                    backgroundColor: Theme.of(context).colorScheme.surface,
+                    isScrollControlled: false,
+                    shape: const RoundedRectangleBorder(
+                        borderRadius:
+                            BorderRadius.vertical(top: Radius.circular(0.0))),
+                    context: context,
+                    builder: (context) => buildQuizModal(context, quiz),
+                  )
+                : SideSheet.right(
+                    sheetColor: Theme.of(context).colorScheme.surface,
+                    body: SizedBox(
+                      width: MediaQuery.of(context).size.width * .6,
+                      child: buildQuizModal(context, quiz),
+                    ),
+                    context: context,
+                  );
           } else {
             await showOkCancelAlertDialog(
                       context: context,
@@ -280,10 +286,8 @@ class _QuizPageState extends State<QuizPage> {
   }
 }
 
-Widget buildQuizModal(
-    BuildContext context, Quiz quiz, ScrollController controller) {
+Widget buildQuizModal(BuildContext context, Quiz quiz) {
   return ListView(
-    controller: controller,
     padding: const EdgeInsets.all(16.0),
     children: [
       Padding(

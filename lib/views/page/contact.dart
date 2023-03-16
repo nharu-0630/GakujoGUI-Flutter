@@ -9,6 +9,7 @@ import 'package:gakujo_gui/models/subject.dart';
 import 'package:gakujo_gui/views/common/widget.dart';
 import 'package:provider/provider.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:side_sheet/side_sheet.dart';
 
 class ContactPage extends StatefulWidget {
   final Subject subject;
@@ -146,19 +147,24 @@ class _ContactPageState extends State<ContactPage> {
       child: ListTile(
         onTap: () async {
           if (contact.isAcquired) {
-            showModalBottomSheet(
-              isScrollControlled: true,
-              shape: const RoundedRectangleBorder(
-                  borderRadius:
-                      BorderRadius.vertical(top: Radius.circular(16.0))),
-              context: context,
-              builder: (context) => DraggableScrollableSheet(
-                expand: false,
-                builder: (context, controller) {
-                  return _buildModal(contact, controller);
-                },
-              ),
-            );
+            MediaQuery.of(context).orientation == Orientation.portrait
+                ? showModalBottomSheet(
+                    backgroundColor: Theme.of(context).colorScheme.surface,
+                    isScrollControlled: false,
+                    shape: const RoundedRectangleBorder(
+                        borderRadius:
+                            BorderRadius.vertical(top: Radius.circular(0.0))),
+                    context: context,
+                    builder: (context) => buildContact(context, contact),
+                  )
+                : SideSheet.right(
+                    sheetColor: Theme.of(context).colorScheme.surface,
+                    body: SizedBox(
+                      width: MediaQuery.of(context).size.width * .6,
+                      child: buildContact(context, contact),
+                    ),
+                    context: context,
+                  );
           } else {
             await showOkCancelAlertDialog(
                       context: context,
@@ -227,9 +233,8 @@ class _ContactPageState extends State<ContactPage> {
     );
   }
 
-  Widget _buildModal(Contact contact, ScrollController controller) {
+  Widget buildContact(BuildContext context, Contact contact) {
     return ListView(
-      controller: controller,
       padding: const EdgeInsets.all(16.0),
       children: [
         Padding(

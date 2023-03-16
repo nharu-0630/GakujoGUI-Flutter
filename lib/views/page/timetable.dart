@@ -1,9 +1,12 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:gakujo_gui/api/parse.dart';
 import 'package:gakujo_gui/models/timetable.dart';
 import 'package:gakujo_gui/views/common/widget.dart';
 import 'package:line_icons/line_icons.dart';
 import 'package:provider/provider.dart';
+import 'package:side_sheet/side_sheet.dart';
 
 class TimetablePage extends StatefulWidget {
   const TimetablePage({Key? key}) : super(key: key);
@@ -108,19 +111,26 @@ class _TimetablePageState extends State<TimetablePage> {
           ),
           child: InkWell(
             borderRadius: BorderRadius.circular(12.0),
-            onTap: () => showModalBottomSheet(
-              isScrollControlled: true,
-              shape: const RoundedRectangleBorder(
-                  borderRadius:
-                      BorderRadius.vertical(top: Radius.circular(16.0))),
-              context: context,
-              builder: (context) => DraggableScrollableSheet(
-                expand: false,
-                builder: (context, controller) {
-                  return buildTimetableModal(context, timetable, controller);
-                },
-              ),
-            ),
+            onTap: () async => MediaQuery.of(context).orientation ==
+                    Orientation.portrait
+                ? showModalBottomSheet(
+                    backgroundColor: Theme.of(context).colorScheme.surface,
+                    isScrollControlled: false,
+                    shape: const RoundedRectangleBorder(
+                        borderRadius:
+                            BorderRadius.vertical(top: Radius.circular(0.0))),
+                    context: context,
+                    builder: (context) =>
+                        buildTimetableModal(context, timetable),
+                  )
+                : SideSheet.right(
+                    sheetColor: Theme.of(context).colorScheme.surface,
+                    body: SizedBox(
+                      width: MediaQuery.of(context).size.width * .6,
+                      child: buildTimetableModal(context, timetable),
+                    ),
+                    context: context,
+                  ),
             child: ClipPath(
               clipper: ShapeBorderClipper(
                   shape: RoundedRectangleBorder(
@@ -133,41 +143,73 @@ class _TimetablePageState extends State<TimetablePage> {
                     width: 6.0,
                   )),
                 ),
-                child: Padding(
-                  padding: const EdgeInsets.all(4.0),
-                  child: Column(
-                    children: [
-                      Text(
-                        timetable.subject,
-                        style: Theme.of(context)
-                            .textTheme
-                            .titleSmall
-                            ?.copyWith(fontWeight: FontWeight.bold),
-                        overflow: TextOverflow.visible,
-                      ),
-                      Flexible(
-                        child: Text(
-                          timetable.className,
-                          style: Theme.of(context).textTheme.bodySmall,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
-                      Flexible(
-                        child: Text(
-                          timetable.classRoom,
-                          style: Theme.of(context).textTheme.bodySmall,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
-                      Flexible(
-                        child: Text(
-                          timetable.teacher,
-                          style: Theme.of(context).textTheme.bodySmall,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
-                    ],
-                  ),
+                child: OrientationBuilder(
+                  builder: (context, orientation) {
+                    return orientation == Orientation.portrait ||
+                            Platform.isWindows ||
+                            Platform.isLinux ||
+                            Platform.isMacOS
+                        ? Padding(
+                            padding: const EdgeInsets.all(4.0),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  timetable.subject,
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .titleSmall
+                                      ?.copyWith(fontWeight: FontWeight.bold),
+                                  overflow: TextOverflow.visible,
+                                ),
+                                Flexible(
+                                  child: Text(
+                                    timetable.className,
+                                    style:
+                                        Theme.of(context).textTheme.bodySmall,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
+                                Flexible(
+                                  child: Text(
+                                    timetable.classRoom,
+                                    style:
+                                        Theme.of(context).textTheme.bodySmall,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
+                                Flexible(
+                                  child: Text(
+                                    timetable.teacher,
+                                    style:
+                                        Theme.of(context).textTheme.bodySmall,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          )
+                        : Padding(
+                            padding: const EdgeInsets.all(4.0),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Align(
+                                  alignment: Alignment.centerLeft,
+                                  child: Text(
+                                    timetable.subject,
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .titleSmall
+                                        ?.copyWith(fontWeight: FontWeight.bold),
+                                    overflow: TextOverflow.visible,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          );
+                  },
                 ),
               ),
             ),
@@ -178,10 +220,8 @@ class _TimetablePageState extends State<TimetablePage> {
   }
 }
 
-Widget buildTimetableModal(
-    BuildContext context, Timetable timetable, ScrollController controller) {
+Widget buildTimetableModal(BuildContext context, Timetable timetable) {
   return ListView(
-    controller: controller,
     padding: const EdgeInsets.all(16.0),
     children: [
       Padding(

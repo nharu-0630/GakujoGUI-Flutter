@@ -17,16 +17,11 @@ import 'package:gakujo_gui/models/timetable.dart';
 import 'package:hive_flutter/adapters.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:provider/provider.dart';
-import 'package:window_size/window_size.dart';
 
 void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
   if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
-    setWindowTitle('GakujoGUI');
+    // setWindowTitle('GakujoGUI');
   }
-  SystemChrome.setPreferredOrientations([
-    DeviceOrientation.portraitUp,
-  ]);
   initializeDateFormatting('ja');
   await Hive.initFlutter();
   Hive.registerAdapter(ContactAdapter());

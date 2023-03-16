@@ -8,6 +8,7 @@ import 'package:gakujo_gui/models/shared_file.dart';
 import 'package:gakujo_gui/views/common/widget.dart';
 import 'package:provider/provider.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:side_sheet/side_sheet.dart';
 
 class ClassLinkPage extends StatefulWidget {
   const ClassLinkPage({Key? key}) : super(key: key);
@@ -181,19 +182,25 @@ class _ClassLinkPageState extends State<ClassLinkPage> {
       child: ListTile(
         onTap: () async {
           if (classLink.isAcquired) {
-            showModalBottomSheet(
-              isScrollControlled: true,
-              shape: const RoundedRectangleBorder(
-                  borderRadius:
-                      BorderRadius.vertical(top: Radius.circular(16.0))),
-              context: context,
-              builder: (context) => DraggableScrollableSheet(
-                expand: false,
-                builder: (context, controller) {
-                  return buildClassLinkModal(context, classLink, controller);
-                },
-              ),
-            );
+            MediaQuery.of(context).orientation == Orientation.portrait
+                ? showModalBottomSheet(
+                    backgroundColor: Theme.of(context).colorScheme.surface,
+                    isScrollControlled: false,
+                    shape: const RoundedRectangleBorder(
+                        borderRadius:
+                            BorderRadius.vertical(top: Radius.circular(0.0))),
+                    context: context,
+                    builder: (context) =>
+                        buildClassLinkModal(context, classLink),
+                  )
+                : SideSheet.right(
+                    sheetColor: Theme.of(context).colorScheme.surface,
+                    body: SizedBox(
+                      width: MediaQuery.of(context).size.width * .6,
+                      child: buildClassLinkModal(context, classLink),
+                    ),
+                    context: context,
+                  );
           } else {
             await showOkCancelAlertDialog(
                       context: context,
@@ -246,10 +253,8 @@ class _ClassLinkPageState extends State<ClassLinkPage> {
   }
 }
 
-Widget buildClassLinkModal(
-    BuildContext context, ClassLink classLink, ScrollController controller) {
+Widget buildClassLinkModal(BuildContext context, ClassLink classLink) {
   return ListView(
-    controller: controller,
     padding: const EdgeInsets.all(16.0),
     children: [
       Padding(
