@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:gakujo_task/api/provide.dart';
-import 'package:gakujo_task/views/home/widgets/contact.dart';
-import 'package:gakujo_task/views/home/widgets/task.dart';
+import 'package:gakujo_gui/api/provide.dart';
+import 'package:gakujo_gui/views/home/widgets/contact.dart';
+import 'package:gakujo_gui/views/home/widgets/task.dart';
 import 'package:provider/provider.dart';
 import 'package:sticky_headers/sticky_headers.dart';
 

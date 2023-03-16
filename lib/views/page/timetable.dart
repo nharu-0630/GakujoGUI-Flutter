@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:gakujo_task/api/parse.dart';
-import 'package:gakujo_task/models/timetable.dart';
-import 'package:gakujo_task/views/common/widget.dart';
+import 'package:gakujo_gui/api/parse.dart';
+import 'package:gakujo_gui/models/timetable.dart';
+import 'package:gakujo_gui/views/common/widget.dart';
 import 'package:provider/provider.dart';
 
 class TimetablePage extends StatefulWidget {

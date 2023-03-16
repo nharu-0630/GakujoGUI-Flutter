@@ -1,10 +1,10 @@
 import 'package:adaptive_dialog/adaptive_dialog.dart';
 import 'package:flutter/material.dart';
-import 'package:gakujo_task/api/provide.dart';
-import 'package:gakujo_task/models/quiz.dart';
-import 'package:gakujo_task/models/report.dart';
-import 'package:gakujo_task/views/page/quiz.dart';
-import 'package:gakujo_task/views/page/report.dart';
+import 'package:gakujo_gui/api/provide.dart';
+import 'package:gakujo_gui/models/quiz.dart';
+import 'package:gakujo_gui/models/report.dart';
+import 'package:gakujo_gui/views/page/quiz.dart';
+import 'package:gakujo_gui/views/page/report.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 

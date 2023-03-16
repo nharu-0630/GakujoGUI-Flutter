@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart' show ChangeNotifier;
-import 'package:gakujo_task/api/parse.dart';
+import 'package:gakujo_gui/api/parse.dart';
 import 'package:hive/hive.dart';
 import 'package:html/dom.dart';
 

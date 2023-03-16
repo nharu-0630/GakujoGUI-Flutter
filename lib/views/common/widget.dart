@@ -5,16 +5,16 @@ import 'package:cached_memory_image/provider/cached_memory_image_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:gakujo_task/api/provide.dart';
-import 'package:gakujo_task/models/quiz.dart';
-import 'package:gakujo_task/models/report.dart';
-import 'package:gakujo_task/models/settings.dart';
-import 'package:gakujo_task/views/page/class_link.dart';
-import 'package:gakujo_task/views/page/grade.dart';
-import 'package:gakujo_task/views/page/quiz.dart';
-import 'package:gakujo_task/views/page/report.dart';
-import 'package:gakujo_task/views/page/shared_file.dart';
-import 'package:gakujo_task/views/settings/settings.dart';
+import 'package:gakujo_gui/api/provide.dart';
+import 'package:gakujo_gui/models/quiz.dart';
+import 'package:gakujo_gui/models/report.dart';
+import 'package:gakujo_gui/models/settings.dart';
+import 'package:gakujo_gui/views/page/class_link.dart';
+import 'package:gakujo_gui/views/page/grade.dart';
+import 'package:gakujo_gui/views/page/quiz.dart';
+import 'package:gakujo_gui/views/page/report.dart';
+import 'package:gakujo_gui/views/page/shared_file.dart';
+import 'package:gakujo_gui/views/settings/settings.dart';
 import 'package:intl/intl.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
@@ -123,7 +123,7 @@ Widget buildDrawer(BuildContext context) {
                   child: Column(
                     children: [
                       Text(
-                        'GakujoTask',
+                        'GakujoGUI',
                         style: Theme.of(context).textTheme.titleLarge,
                       ),
                       const SizedBox(height: 16.0),

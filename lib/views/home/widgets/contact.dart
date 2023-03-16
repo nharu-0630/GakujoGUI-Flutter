@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:gakujo_task/models/contact.dart';
-import 'package:gakujo_task/models/subject.dart';
-import 'package:gakujo_task/views/page/contact.dart';
+import 'package:gakujo_gui/models/contact.dart';
+import 'package:gakujo_gui/models/subject.dart';
+import 'package:gakujo_gui/views/page/contact.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 

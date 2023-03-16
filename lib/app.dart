@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:gakujo_task/views/common/widget.dart';
-import 'package:gakujo_task/views/home/home.dart';
-import 'package:gakujo_task/views/page/timetable.dart';
+import 'package:gakujo_gui/views/common/widget.dart';
+import 'package:gakujo_gui/views/home/home.dart';
+import 'package:gakujo_gui/views/page/timetable.dart';
 
 class App extends StatefulWidget {
   const App({Key? key}) : super(key: key);

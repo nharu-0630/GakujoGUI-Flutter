@@ -6,18 +6,18 @@ import 'package:dio/dio.dart';
 import 'package:dio_cookie_manager/dio_cookie_manager.dart';
 import 'package:dio_smart_retry/dio_smart_retry.dart';
 import 'package:flutter/foundation.dart';
-import 'package:gakujo_task/api/parse.dart';
-import 'package:gakujo_task/app.dart';
-import 'package:gakujo_task/models/class_link.dart';
-import 'package:gakujo_task/models/contact.dart';
-import 'package:gakujo_task/models/gpa.dart';
-import 'package:gakujo_task/models/grade.dart';
-import 'package:gakujo_task/models/quiz.dart';
-import 'package:gakujo_task/models/report.dart';
-import 'package:gakujo_task/models/settings.dart';
-import 'package:gakujo_task/models/shared_file.dart';
-import 'package:gakujo_task/models/subject.dart';
-import 'package:gakujo_task/models/timetable.dart';
+import 'package:gakujo_gui/api/parse.dart';
+import 'package:gakujo_gui/app.dart';
+import 'package:gakujo_gui/models/class_link.dart';
+import 'package:gakujo_gui/models/contact.dart';
+import 'package:gakujo_gui/models/gpa.dart';
+import 'package:gakujo_gui/models/grade.dart';
+import 'package:gakujo_gui/models/quiz.dart';
+import 'package:gakujo_gui/models/report.dart';
+import 'package:gakujo_gui/models/settings.dart';
+import 'package:gakujo_gui/models/shared_file.dart';
+import 'package:gakujo_gui/models/subject.dart';
+import 'package:gakujo_gui/models/timetable.dart';
 import 'package:html/dom.dart';
 import 'package:html/parser.dart' show parse;
 import 'package:path/path.dart';
@@ -91,7 +91,8 @@ class Api {
   void _initialize() {
     _client = Dio(BaseOptions(
       headers: {
-        'User-Agent': 'Chrome/110.0.5481.104 GakujoTask/$version',
+        'User-Agent':
+            'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/111.0.0.0 Safari/537.36 GakujoGUI/$version',
       },
       contentType: Headers.formUrlEncodedContentType,
       followRedirects: false,
@@ -351,7 +352,8 @@ class Api {
 
     final Settings? settings = await _settings;
     if (parse(response.data).querySelector('title')?.text == 'アクセス環境登録') {
-      var accessEnvName = 'GakujoTask ${(const Uuid()).v4().substring(0, 8)}';
+      var accessEnvName =
+          'GakujoGUI Flutter ${(const Uuid()).v4().substring(0, 8)}';
 
       settings?.accessEnvironmentName = accessEnvName;
       await Future.delayed(_interval);

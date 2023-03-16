@@ -3,10 +3,10 @@ import 'dart:collection';
 import 'package:collection/collection.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
-import 'package:gakujo_task/api/provide.dart';
-import 'package:gakujo_task/models/gpa.dart';
-import 'package:gakujo_task/models/grade.dart';
-import 'package:gakujo_task/views/common/widget.dart';
+import 'package:gakujo_gui/api/provide.dart';
+import 'package:gakujo_gui/models/gpa.dart';
+import 'package:gakujo_gui/models/grade.dart';
+import 'package:gakujo_gui/views/common/widget.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 

@@ -1,4 +1,4 @@
-# gakujo_task
+# gakujo_gui
 
 A new Flutter project.
 

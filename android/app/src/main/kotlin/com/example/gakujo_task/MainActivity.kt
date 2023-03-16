@@ -1,4 +1,4 @@
-package com.example.gakujo_task
+package com.example.gakujo_gui
 
 import io.flutter.embedding.android.FlutterActivity
 

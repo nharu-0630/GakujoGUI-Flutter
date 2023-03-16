@@ -1,5 +1,5 @@
-name: gakujo_task
-description: GakujoTask
+name: gakujo_gui
+description: GakujoGUI
 
 publish_to: "none"
 

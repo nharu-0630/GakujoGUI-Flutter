@@ -1,12 +1,12 @@
 import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
 import 'package:flutter/material.dart';
-import 'package:gakujo_task/api/api.dart';
-import 'package:gakujo_task/app.dart';
-import 'package:gakujo_task/models/class_link.dart';
-import 'package:gakujo_task/models/contact.dart';
-import 'package:gakujo_task/models/quiz.dart';
-import 'package:gakujo_task/models/report.dart';
-import 'package:gakujo_task/models/shared_file.dart';
+import 'package:gakujo_gui/api/api.dart';
+import 'package:gakujo_gui/app.dart';
+import 'package:gakujo_gui/models/class_link.dart';
+import 'package:gakujo_gui/models/contact.dart';
+import 'package:gakujo_gui/models/quiz.dart';
+import 'package:gakujo_gui/models/report.dart';
+import 'package:gakujo_gui/models/shared_file.dart';
 
 class ApiRepository extends ChangeNotifier {
   final _api = Api();
