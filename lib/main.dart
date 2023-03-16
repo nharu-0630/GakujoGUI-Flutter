@@ -17,10 +17,17 @@ import 'package:gakujo_gui/models/timetable.dart';
 import 'package:hive_flutter/adapters.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:provider/provider.dart';
+import 'package:window_size/window_size.dart';
+import 'package:windows_taskbar/windows_taskbar.dart';
 
 void main() async {
-  if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
-    // setWindowTitle('GakujoGUI');
+  WidgetsFlutterBinding.ensureInitialized();
+  if (Platform.isLinux || Platform.isMacOS) {
+    setWindowTitle('GakujoGUI');
+  } else if (Platform.isWindows) {
+    WindowsTaskbar.setWindowTitle('GakujoGUI');
+    WindowsTaskbar.setProgress(1, 1);
+    WindowsTaskbar.setProgressMode(TaskbarProgressMode.noProgress);
   }
   initializeDateFormatting('ja');
   await Hive.initFlutter();

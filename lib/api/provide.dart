@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
 import 'package:flutter/material.dart';
 import 'package:gakujo_gui/api/api.dart';
@@ -7,6 +9,7 @@ import 'package:gakujo_gui/models/contact.dart';
 import 'package:gakujo_gui/models/quiz.dart';
 import 'package:gakujo_gui/models/report.dart';
 import 'package:gakujo_gui/models/shared_file.dart';
+import 'package:windows_taskbar/windows_taskbar.dart';
 
 class ApiRepository extends ChangeNotifier {
   final _api = Api();
@@ -27,9 +30,19 @@ class ApiRepository extends ChangeNotifier {
 
   void _onError(Object e) {
     _isError = true;
+    if (Platform.isWindows) {
+      WindowsTaskbar.setFlashTaskbarAppIcon(
+        mode: TaskbarFlashMode.all,
+        timeout: const Duration(milliseconds: 500),
+      );
+      WindowsTaskbar.setProgressMode(TaskbarProgressMode.error);
+    }
     notifyListeners();
     Future<void>.delayed(const Duration(seconds: 2), () {
       _isError = false;
+      if (Platform.isWindows) {
+        WindowsTaskbar.setProgressMode(TaskbarProgressMode.noProgress);
+      }
       _toggleLoading();
     });
     scaffoldMessengerKey.currentState!
@@ -51,6 +64,13 @@ class ApiRepository extends ChangeNotifier {
 
   void _toggleLoading() {
     _isLoading = !isLoading;
+    if (Platform.isWindows) {
+      if (isLoading) {
+        WindowsTaskbar.setProgressMode(TaskbarProgressMode.indeterminate);
+      } else {
+        WindowsTaskbar.setProgressMode(TaskbarProgressMode.noProgress);
+      }
+    }
     notifyListeners();
   }
 

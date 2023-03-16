@@ -59,6 +59,7 @@ dependencies:
   multi_split_view: ^2.4.0
   nested_side_sheet: ^1.1.2
   side_sheet: ^1.0.4
+  windows_taskbar: ^1.1.1
 
 dev_dependencies:
   flutter_test:
