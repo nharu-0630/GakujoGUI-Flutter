@@ -2,6 +2,7 @@ import 'package:adaptive_dialog/adaptive_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:gakujo_gui/api/provide.dart';
+import 'package:gakujo_gui/constants/KIcons.dart';
 import 'package:gakujo_gui/models/class_link.dart';
 import 'package:gakujo_gui/models/shared_file.dart';
 import 'package:gakujo_gui/views/common/widget.dart';
@@ -51,10 +52,10 @@ class _ClassLinkPageState extends State<ClassLinkPage> {
                               child: Column(
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
-                                  const Padding(
-                                    padding: EdgeInsets.all(8.0),
+                                  Padding(
+                                    padding: const EdgeInsets.all(8.0),
                                     child: Icon(
-                                      Icons.link_rounded,
+                                      KIcons.classLink,
                                       size: 48.0,
                                     ),
                                   ),
@@ -100,7 +101,7 @@ class _ClassLinkPageState extends State<ClassLinkPage> {
         padding: const EdgeInsets.all(8.0),
         child: IconButton(
           onPressed: () => Navigator.of(context).pop(),
-          icon: const Icon(Icons.arrow_back_ios_new_rounded),
+          icon: Icon(KIcons.back),
         ),
       ),
       title: _searchStatus
@@ -117,7 +118,7 @@ class _ClassLinkPageState extends State<ClassLinkPage> {
                 padding: const EdgeInsets.all(8.0),
                 child: IconButton(
                   onPressed: (() => setState(() => _searchStatus = false)),
-                  icon: const Icon(Icons.close_rounded),
+                  icon: Icon(KIcons.close),
                 ),
               ),
             ]
@@ -127,9 +128,8 @@ class _ClassLinkPageState extends State<ClassLinkPage> {
                 child: IconButton(
                   onPressed: (() =>
                       setState(() => _filterStatus = !_filterStatus)),
-                  icon: Icon(_filterStatus
-                      ? Icons.filter_alt_rounded
-                      : Icons.filter_alt_off_rounded),
+                  icon:
+                      Icon(_filterStatus ? KIcons.filterOn : KIcons.filterOff),
                 ),
               ),
               Padding(
@@ -139,7 +139,7 @@ class _ClassLinkPageState extends State<ClassLinkPage> {
                         _searchStatus = true;
                         _suggestClassLinks = [];
                       })),
-                  icon: const Icon(Icons.search_rounded),
+                  icon: Icon(KIcons.search),
                 ),
               ),
             ],
@@ -160,9 +160,7 @@ class _ClassLinkPageState extends State<ClassLinkPage> {
                 .then((value) => setState(() {})),
             backgroundColor: const Color(0xFF7BC043),
             foregroundColor: Colors.white,
-            icon: classLink.isArchived
-                ? Icons.unarchive_rounded
-                : Icons.archive_rounded,
+            icon: classLink.isArchived ? KIcons.unarchive : KIcons.archive,
             label: classLink.isArchived ? 'アーカイブ解除' : 'アーカイブ',
           ),
         ],
@@ -175,7 +173,7 @@ class _ClassLinkPageState extends State<ClassLinkPage> {
                 context.read<ApiRepository>().fetchDetailClassLink(classLink),
             backgroundColor: const Color(0xFF0392CF),
             foregroundColor: Colors.white,
-            icon: Icons.sync_rounded,
+            icon: KIcons.sync,
             label: '更新',
           ),
         ],
@@ -237,7 +235,7 @@ class _ClassLinkPageState extends State<ClassLinkPage> {
                 ),
                 Visibility(
                   visible: classLink.isArchived,
-                  child: const Icon(Icons.archive_rounded),
+                  child: Icon(KIcons.archive),
                 )
               ],
             ),
@@ -271,7 +269,7 @@ Widget buildClassLinkModal(
           children: [
             Visibility(
               visible: classLink.isArchived,
-              child: const Icon(Icons.archive_rounded),
+              child: Icon(KIcons.archive),
             )
           ],
         ),
@@ -314,9 +312,8 @@ Widget buildClassLinkModal(
                       .setArchive(classLink.id, !classLink.isArchived);
                   Navigator.of(context).pop();
                 },
-                child: Icon(classLink.isArchived
-                    ? Icons.unarchive_rounded
-                    : Icons.archive_rounded),
+                child: Icon(
+                    classLink.isArchived ? KIcons.unarchive : KIcons.archive),
               ),
             ),
           ),
@@ -327,7 +324,7 @@ Widget buildClassLinkModal(
                 onPressed: () async => context
                     .read<ApiRepository>()
                     .fetchDetailClassLink(classLink),
-                child: const Icon(Icons.sync_rounded),
+                child: Icon(KIcons.sync),
               ),
             ),
           ),
@@ -338,7 +335,7 @@ Widget buildClassLinkModal(
                 onPressed: () => Share.share(
                     '${classLink.comment}\n\n${classLink.link}',
                     subject: classLink.title),
-                child: const Icon(Icons.share_rounded),
+                child: Icon(KIcons.share),
               ),
             ),
           ),

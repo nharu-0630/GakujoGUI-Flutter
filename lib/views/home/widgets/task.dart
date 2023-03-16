@@ -1,6 +1,7 @@
 import 'package:adaptive_dialog/adaptive_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:gakujo_gui/api/provide.dart';
+import 'package:gakujo_gui/constants/KIcons.dart';
 import 'package:gakujo_gui/models/quiz.dart';
 import 'package:gakujo_gui/models/report.dart';
 import 'package:gakujo_gui/views/page/quiz.dart';
@@ -39,10 +40,10 @@ class TaskWidget extends StatelessWidget {
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        const Padding(
-                          padding: EdgeInsets.all(8.0),
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
                           child: Icon(
-                            Icons.task_rounded,
+                            KIcons.task,
                             size: 32.0,
                           ),
                         ),
@@ -99,7 +100,7 @@ class TaskWidget extends StatelessWidget {
               : null;
         }
       },
-      leading: const Icon(Icons.checklist_rounded),
+      leading: Icon(KIcons.quiz),
       title: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
@@ -139,11 +140,11 @@ class TaskWidget extends StatelessWidget {
           ),
           Visibility(
             visible: quiz.fileNames?.isNotEmpty ?? false,
-            child: const Icon(Icons.file_present_rounded),
+            child: Icon(KIcons.attachment),
           ),
           Visibility(
             visible: quiz.isArchived,
-            child: const Icon(Icons.archive_rounded),
+            child: Icon(KIcons.archive),
           )
         ],
       ),
@@ -180,7 +181,7 @@ class TaskWidget extends StatelessWidget {
               : null;
         }
       },
-      leading: const Icon(Icons.text_snippet_rounded),
+      leading: Icon(KIcons.report),
       title: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
@@ -220,11 +221,11 @@ class TaskWidget extends StatelessWidget {
           ),
           Visibility(
             visible: report.fileNames?.isNotEmpty ?? false,
-            child: const Icon(Icons.file_present_rounded),
+            child: Icon(KIcons.attachment),
           ),
           Visibility(
             visible: report.isArchived,
-            child: const Icon(Icons.archive_rounded),
+            child: Icon(KIcons.archive),
           )
         ],
       ),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gakujo_gui/constants/KIcons.dart';
 import 'package:gakujo_gui/models/contact.dart';
 import 'package:gakujo_gui/models/subject.dart';
 import 'package:gakujo_gui/views/page/contact.dart';
@@ -31,10 +32,10 @@ class ContactWidget extends StatelessWidget {
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        const Padding(
-                          padding: EdgeInsets.all(8.0),
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
                           child: Icon(
-                            Icons.message_rounded,
+                            KIcons.contact,
                             size: 32.0,
                           ),
                         ),

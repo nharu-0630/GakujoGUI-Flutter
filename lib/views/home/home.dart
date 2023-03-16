@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:gakujo_gui/api/provide.dart';
+import 'package:gakujo_gui/constants/KIcons.dart';
 import 'package:gakujo_gui/views/home/widgets/contact.dart';
 import 'package:gakujo_gui/views/home/widgets/task.dart';
 import 'package:provider/provider.dart';
@@ -28,7 +29,7 @@ class _HomeWidgetState extends State<HomeWidget> {
                     const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
                 child: Row(
                   children: [
-                    const Icon(Icons.task_rounded),
+                    Icon(KIcons.task),
                     const SizedBox(width: 8.0),
                     Text(
                       'タスク',
@@ -51,7 +52,7 @@ class _HomeWidgetState extends State<HomeWidget> {
                     const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
                 child: Row(
                   children: [
-                    const Icon(Icons.message_rounded),
+                    Icon(KIcons.contact),
                     const SizedBox(width: 8.0),
                     Text(
                       'メッセージ',

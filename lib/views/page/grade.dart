@@ -4,10 +4,12 @@ import 'package:collection/collection.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:gakujo_gui/api/provide.dart';
+import 'package:gakujo_gui/constants/kicons.dart';
 import 'package:gakujo_gui/models/gpa.dart';
 import 'package:gakujo_gui/models/grade.dart';
 import 'package:gakujo_gui/views/common/widget.dart';
 import 'package:intl/intl.dart';
+import 'package:line_icons/line_icons.dart';
 import 'package:provider/provider.dart';
 
 class GradePage extends StatefulWidget {
@@ -71,10 +73,10 @@ class _GradePageState extends State<GradePage> {
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        const Padding(
-                          padding: EdgeInsets.all(8.0),
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
                           child: Icon(
-                            Icons.school_rounded,
+                            KIcons.grade,
                             size: 48.0,
                           ),
                         ),
@@ -288,7 +290,7 @@ class _GradePageState extends State<GradePage> {
         padding: const EdgeInsets.all(8.0),
         child: IconButton(
           onPressed: () => Navigator.of(context).pop(),
-          icon: const Icon(Icons.arrow_back_ios_new_rounded),
+          icon: Icon(KIcons.back),
         ),
       ),
       title: _searchStatus
@@ -307,7 +309,7 @@ class _GradePageState extends State<GradePage> {
                 padding: const EdgeInsets.all(8.0),
                 child: IconButton(
                   onPressed: (() => setState(() => _searchStatus = false)),
-                  icon: const Icon(Icons.close_rounded),
+                  icon: Icon(KIcons.close),
                 ),
               ),
             ]
@@ -319,7 +321,7 @@ class _GradePageState extends State<GradePage> {
                         _searchStatus = true;
                         _suggestGrades = [];
                       })),
-                  icon: const Icon(Icons.search_rounded),
+                  icon: Icon(KIcons.search),
                 ),
               ),
             ],
@@ -329,8 +331,8 @@ class _GradePageState extends State<GradePage> {
           children: [
             const TabBar(
               tabs: [
-                Tab(icon: Icon(Icons.view_list_rounded)),
-                Tab(icon: Icon(Icons.bar_chart_rounded)),
+                Tab(icon: Icon(LineIcons.bars)),
+                Tab(icon: Icon(LineIcons.barChart)),
               ],
             ),
             buildAppBarBottom(context),

@@ -2,6 +2,7 @@ import 'package:adaptive_dialog/adaptive_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:gakujo_gui/api/provide.dart';
+import 'package:gakujo_gui/constants/kicons.dart';
 import 'package:gakujo_gui/models/contact.dart';
 import 'package:gakujo_gui/models/subject.dart';
 import 'package:gakujo_gui/views/common/widget.dart';
@@ -42,10 +43,10 @@ class _ContactPageState extends State<ContactPage> {
                           child: Column(
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              const Padding(
-                                padding: EdgeInsets.all(8.0),
+                              Padding(
+                                padding: const EdgeInsets.all(8.0),
                                 child: Icon(
-                                  Icons.message_rounded,
+                                  KIcons.contact,
                                   size: 48.0,
                                 ),
                               ),
@@ -95,7 +96,7 @@ class _ContactPageState extends State<ContactPage> {
         padding: const EdgeInsets.all(8.0),
         child: IconButton(
           onPressed: () => Navigator.of(context).pop(),
-          icon: const Icon(Icons.arrow_back_ios_new_rounded),
+          icon: Icon(KIcons.back),
         ),
       ),
       title: _searchStatus
@@ -110,7 +111,7 @@ class _ContactPageState extends State<ContactPage> {
           ? [
               IconButton(
                 onPressed: (() => setState(() => _searchStatus = false)),
-                icon: const Icon(Icons.close_rounded),
+                icon: Icon(KIcons.close),
               ),
             ]
           : [
@@ -119,7 +120,7 @@ class _ContactPageState extends State<ContactPage> {
                       _searchStatus = true;
                       _suggestContacts = [];
                     })),
-                icon: const Icon(Icons.search_rounded),
+                icon: Icon(KIcons.search),
               ),
             ],
       bottom: buildAppBarBottom(context),
@@ -137,7 +138,7 @@ class _ContactPageState extends State<ContactPage> {
                 context.read<ApiRepository>().fetchDetailContact(contact),
             backgroundColor: const Color(0xFF0392CF),
             foregroundColor: Colors.white,
-            icon: Icons.sync_rounded,
+            icon: KIcons.sync,
             label: '更新',
           ),
         ],
@@ -176,9 +177,9 @@ class _ContactPageState extends State<ContactPage> {
           children: [
             Visibility(
               visible: contact.severity == '重要',
-              child: const Padding(
-                padding: EdgeInsets.only(right: 4.0),
-                child: Icon(Icons.label_important_rounded),
+              child: Padding(
+                padding: const EdgeInsets.only(right: 4.0),
+                child: Icon(KIcons.important),
               ),
             ),
             Expanded(
@@ -219,7 +220,7 @@ class _ContactPageState extends State<ContactPage> {
             ),
             Visibility(
               visible: contact.fileNames?.isNotEmpty ?? false,
-              child: const Icon(Icons.file_present_rounded),
+              child: Icon(KIcons.attachment),
             ),
           ],
         ),
@@ -307,7 +308,7 @@ class _ContactPageState extends State<ContactPage> {
                 child: ElevatedButton(
                   onPressed: () async =>
                       context.read<ApiRepository>().fetchDetailContact(contact),
-                  child: const Icon(Icons.sync_rounded),
+                  child: Icon(KIcons.sync),
                 ),
               ),
             ),
@@ -317,7 +318,7 @@ class _ContactPageState extends State<ContactPage> {
                 child: ElevatedButton(
                   onPressed: () =>
                       Share.share(contact.content, subject: contact.title),
-                  child: const Icon(Icons.share_rounded),
+                  child: Icon(KIcons.share),
                 ),
               ),
             ),

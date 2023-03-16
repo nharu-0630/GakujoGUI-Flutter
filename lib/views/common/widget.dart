@@ -4,8 +4,8 @@ import 'package:better_open_file/better_open_file.dart';
 import 'package:cached_memory_image/provider/cached_memory_image_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gakujo_gui/api/provide.dart';
+import 'package:gakujo_gui/constants/kicons.dart';
 import 'package:gakujo_gui/models/quiz.dart';
 import 'package:gakujo_gui/models/report.dart';
 import 'package:gakujo_gui/models/settings.dart';
@@ -16,6 +16,7 @@ import 'package:gakujo_gui/views/page/report.dart';
 import 'package:gakujo_gui/views/page/shared_file.dart';
 import 'package:gakujo_gui/views/settings/settings.dart';
 import 'package:intl/intl.dart';
+import 'package:line_icons/line_icons.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
@@ -62,36 +63,36 @@ void _openFile(String filename) async {
 Icon _buildExtIcon(String ext) {
   switch (ext) {
     case 'pdf':
-      return const Icon(FontAwesomeIcons.filePdf);
+      return const Icon(LineIcons.pdfFile);
     case 'doc':
     case 'docx':
-      return const Icon(FontAwesomeIcons.fileWord);
+      return const Icon(LineIcons.wordFile);
     case 'xls':
     case 'xlsx':
-      return const Icon(FontAwesomeIcons.fileExcel);
+      return const Icon(LineIcons.excelFile);
     case 'ppt':
     case 'pptx':
-      return const Icon(FontAwesomeIcons.filePowerpoint);
+      return const Icon(LineIcons.powerpointFile);
     case 'zip':
     case 'rar':
-      return const Icon(FontAwesomeIcons.fileZipper);
+      return const Icon(LineIcons.archiveFile);
     case 'csv':
-      return const Icon(FontAwesomeIcons.fileCsv);
+      return const Icon(LineIcons.fileCsv);
     case 'txt':
-      return const Icon(FontAwesomeIcons.fileLines);
+      return const Icon(LineIcons.alternateFile);
     case 'jpg':
     case 'jpeg':
     case 'png':
     case 'gif':
-      return const Icon(FontAwesomeIcons.fileImage);
+      return const Icon(LineIcons.imageFile);
     case 'mp4':
     case 'mov':
-      return const Icon(FontAwesomeIcons.fileVideo);
+      return const Icon(LineIcons.videoFile);
     case 'mp3':
     case 'wav':
-      return const Icon(FontAwesomeIcons.fileAudio);
+      return const Icon(LineIcons.audioFile);
     default:
-      return const Icon(FontAwesomeIcons.file);
+      return const Icon(LineIcons.file);
   }
 }
 
@@ -132,7 +133,7 @@ Widget buildDrawer(BuildContext context) {
                               children: [
                                 Row(
                                   children: [
-                                    const Icon(Icons.lock_clock_rounded),
+                                    const Icon(LineIcons.userClock),
                                     const SizedBox(width: 8.0),
                                     Text(
                                       DateFormat('yyyy/MM/dd HH:mm', 'ja')
@@ -146,7 +147,7 @@ Widget buildDrawer(BuildContext context) {
                                 ),
                                 Row(
                                   children: [
-                                    const Icon(Icons.person_rounded),
+                                    const Icon(LineIcons.identificationBadge),
                                     const SizedBox(width: 8.0),
                                     Text(
                                       snapshot.data![0].username ?? '',
@@ -158,7 +159,7 @@ Widget buildDrawer(BuildContext context) {
                                 ),
                                 Row(
                                   children: [
-                                    const Icon(Icons.security_rounded),
+                                    const Icon(LineIcons.userShield),
                                     const SizedBox(width: 8.0),
                                     Text(
                                       snapshot.data![0].accessEnvironmentName ??
@@ -179,7 +180,7 @@ Widget buildDrawer(BuildContext context) {
               ListTile(
                 title: Row(
                   children: [
-                    const Icon(Icons.text_snippet_rounded),
+                    Icon(KIcons.report),
                     const SizedBox(width: 8.0),
                     Text(
                       'レポート',
@@ -208,7 +209,7 @@ Widget buildDrawer(BuildContext context) {
               ListTile(
                 title: Row(
                   children: [
-                    const Icon(Icons.checklist_rounded),
+                    Icon(KIcons.quiz),
                     const SizedBox(width: 8.0),
                     Text(
                       '小テスト',
@@ -237,7 +238,7 @@ Widget buildDrawer(BuildContext context) {
               ListTile(
                 title: Row(
                   children: [
-                    const Icon(Icons.folder_shared_rounded),
+                    Icon(KIcons.sharedFile),
                     const SizedBox(width: 8.0),
                     Text(
                       '授業共有ファイル',
@@ -254,7 +255,7 @@ Widget buildDrawer(BuildContext context) {
               ListTile(
                 title: Row(
                   children: [
-                    const Icon(Icons.link_rounded),
+                    Icon(KIcons.classLink),
                     const SizedBox(width: 8.0),
                     Text(
                       '授業リンク',
@@ -271,7 +272,7 @@ Widget buildDrawer(BuildContext context) {
               ListTile(
                 title: Row(
                   children: [
-                    const Icon(Icons.school_rounded),
+                    Icon(KIcons.grade),
                     const SizedBox(width: 8.0),
                     Text(
                       '成績情報',
@@ -288,7 +289,7 @@ Widget buildDrawer(BuildContext context) {
               ListTile(
                 title: Row(
                   children: [
-                    const Icon(Icons.settings_rounded),
+                    Icon(KIcons.settings),
                     const SizedBox(width: 8.0),
                     Text(
                       '設定',
@@ -323,7 +324,7 @@ AppBar buildAppBar(BuildContext context, GlobalKey<ScaffoldState> scaffoldKey) {
                     onTap: () => scaffoldKey.currentState?.openDrawer(),
                     child: snapshot.data?.profileImage == null
                         ? const Icon(
-                            Icons.person_rounded,
+                            LineIcons.user,
                             size: 36.0,
                           )
                         : CircleAvatar(
@@ -352,12 +353,12 @@ AppBar buildAppBar(BuildContext context, GlobalKey<ScaffoldState> scaffoldKey) {
               ),
               const Spacer(),
               IconButton(
-                icon: const Icon(Icons.login_rounded),
+                icon: const Icon(LineIcons.alternateSignIn),
                 onPressed: () async =>
                     context.read<ApiRepository>().fetchLogin(),
               ),
               IconButton(
-                icon: const Icon(Icons.sync_rounded),
+                icon: const Icon(LineIcons.syncIcon),
                 onPressed: () async => showDialog(
                   context: context,
                   builder: (context) {

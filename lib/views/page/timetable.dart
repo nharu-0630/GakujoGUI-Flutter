@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:gakujo_gui/api/parse.dart';
 import 'package:gakujo_gui/models/timetable.dart';
 import 'package:gakujo_gui/views/common/widget.dart';
+import 'package:line_icons/line_icons.dart';
 import 'package:provider/provider.dart';
 
 class TimetablePage extends StatefulWidget {
@@ -183,21 +184,21 @@ Widget buildTimetableModal(
         child: Row(
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
-            const Icon(Icons.category_rounded),
+            const Icon(LineIcons.shapes),
             const SizedBox(width: 8.0),
             Text(
               timetable.className,
               style: Theme.of(context).textTheme.bodyLarge,
             ),
             const SizedBox(width: 16.0),
-            const Icon(Icons.pin_drop_rounded),
+            const Icon(LineIcons.mapPin),
             const SizedBox(width: 8.0),
             Text(
               timetable.classRoom,
               style: Theme.of(context).textTheme.bodyLarge,
             ),
             const SizedBox(width: 16.0),
-            const Icon(Icons.person_rounded),
+            const Icon(LineIcons.userGraduate),
             const SizedBox(width: 8.0),
             Text(
               timetable.teacher,

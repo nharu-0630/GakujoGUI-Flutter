@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:gakujo_gui/api/api.dart';
 import 'package:gakujo_gui/api/provide.dart';
 import 'package:gakujo_gui/app.dart';
+import 'package:gakujo_gui/constants/kicons.dart';
 import 'package:gakujo_gui/models/class_link.dart';
 import 'package:gakujo_gui/models/contact.dart';
 import 'package:gakujo_gui/models/grade.dart';
@@ -12,6 +13,7 @@ import 'package:gakujo_gui/models/settings.dart';
 import 'package:gakujo_gui/models/shared_file.dart';
 import 'package:gakujo_gui/models/subject.dart';
 import 'package:gakujo_gui/views/common/widget.dart';
+import 'package:line_icons/line_icons.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:provider/provider.dart';
 import 'package:sticky_headers/sticky_headers.dart';
@@ -68,7 +70,7 @@ class _SettingsWidgetState extends State<SettingsWidget> {
                             horizontal: 16.0, vertical: 8.0),
                         child: Row(
                           children: [
-                            const Icon(Icons.account_circle_rounded),
+                            const Icon(LineIcons.userCog),
                             const SizedBox(width: 8.0),
                             Text(
                               'アカウント',
@@ -123,8 +125,8 @@ class _SettingsWidgetState extends State<SettingsWidget> {
                                     decoration: InputDecoration(
                                       suffixIcon: IconButton(
                                         icon: Icon(_isObscure
-                                            ? Icons.visibility_off_rounded
-                                            : Icons.visibility_rounded),
+                                            ? LineIcons.eyeSlash
+                                            : LineIcons.eye),
                                         onPressed: () => setState(
                                             () => _isObscure = !_isObscure),
                                       ),
@@ -155,7 +157,7 @@ class _SettingsWidgetState extends State<SettingsWidget> {
                                   child: Row(
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
-                                      const Icon(Icons.save_rounded),
+                                      const Icon(LineIcons.save),
                                       const SizedBox(width: 8.0),
                                       Text(
                                         '保存',
@@ -414,7 +416,7 @@ class _SettingsWidgetState extends State<SettingsWidget> {
                                   child: Row(
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
-                                      const Icon(Icons.login_rounded),
+                                      const Icon(LineIcons.alternateSignIn),
                                       const SizedBox(width: 8.0),
                                       Text(
                                         'ログイン',
@@ -483,7 +485,7 @@ class _SettingsWidgetState extends State<SettingsWidget> {
                                   child: Row(
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
-                                      const Icon(Icons.delete_rounded),
+                                      const Icon(LineIcons.trash),
                                       const SizedBox(width: 8.0),
                                       Text(
                                         '初期化',
@@ -511,7 +513,7 @@ class _SettingsWidgetState extends State<SettingsWidget> {
                             horizontal: 16.0, vertical: 8.0),
                         child: Row(
                           children: [
-                            const Icon(Icons.developer_mode_rounded),
+                            const Icon(LineIcons.terminal),
                             const SizedBox(width: 8.0),
                             Text(
                               '開発者向け',
@@ -556,7 +558,7 @@ class _SettingsWidgetState extends State<SettingsWidget> {
                                   child: Row(
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
-                                      const Icon(Icons.developer_board_rounded),
+                                      const Icon(LineIcons.rocket),
                                       const SizedBox(width: 8.0),
                                       Text(
                                         'テスト',
@@ -610,7 +612,7 @@ class _SettingsWidgetState extends State<SettingsWidget> {
         padding: const EdgeInsets.all(8.0),
         child: IconButton(
           onPressed: () => Navigator.of(context).pop(),
-          icon: const Icon(Icons.arrow_back_ios_new_rounded),
+          icon: Icon(KIcons.back),
         ),
       ),
       title: const Text('設定'),

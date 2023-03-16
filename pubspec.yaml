@@ -50,6 +50,12 @@ dependencies:
   awesome_snackbar_content: ^0.1.0
   fl_chart: ^0.61.0
   adaptive_dialog: ^1.8.2
+  window_size:
+    git:
+      url: https://github.com/google/flutter-desktop-embedding
+      path: plugins/window_size
+      ref: 6c66ad2
+  line_icons: ^2.0.1
 
 dev_dependencies:
   flutter_test:

@@ -2,6 +2,7 @@ import 'package:adaptive_dialog/adaptive_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:gakujo_gui/api/provide.dart';
+import 'package:gakujo_gui/constants/kicons.dart';
 import 'package:gakujo_gui/models/shared_file.dart';
 import 'package:gakujo_gui/views/common/widget.dart';
 import 'package:provider/provider.dart';
@@ -50,10 +51,10 @@ class _SharedFilePageState extends State<SharedFilePage> {
                               child: Column(
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
-                                  const Padding(
-                                    padding: EdgeInsets.all(8.0),
+                                  Padding(
+                                    padding: const EdgeInsets.all(8.0),
                                     child: Icon(
-                                      Icons.folder_shared_rounded,
+                                      KIcons.sharedFile,
                                       size: 48.0,
                                     ),
                                   ),
@@ -99,7 +100,7 @@ class _SharedFilePageState extends State<SharedFilePage> {
         padding: const EdgeInsets.all(8.0),
         child: IconButton(
           onPressed: () => Navigator.of(context).pop(),
-          icon: const Icon(Icons.arrow_back_ios_new_rounded),
+          icon: Icon(KIcons.back),
         ),
       ),
       title: _searchStatus
@@ -116,7 +117,7 @@ class _SharedFilePageState extends State<SharedFilePage> {
                 padding: const EdgeInsets.all(8.0),
                 child: IconButton(
                   onPressed: (() => setState(() => _searchStatus = false)),
-                  icon: const Icon(Icons.close_rounded),
+                  icon: Icon(KIcons.close),
                 ),
               ),
             ]
@@ -126,9 +127,8 @@ class _SharedFilePageState extends State<SharedFilePage> {
                 child: IconButton(
                   onPressed: (() =>
                       setState(() => _filterStatus = !_filterStatus)),
-                  icon: Icon(_filterStatus
-                      ? Icons.filter_alt_rounded
-                      : Icons.filter_alt_off_rounded),
+                  icon:
+                      Icon(_filterStatus ? KIcons.filterOn : KIcons.filterOff),
                 ),
               ),
               Padding(
@@ -138,7 +138,7 @@ class _SharedFilePageState extends State<SharedFilePage> {
                         _searchStatus = true;
                         _suggestSharedFiles = [];
                       })),
-                  icon: const Icon(Icons.search_rounded),
+                  icon: Icon(KIcons.search),
                 ),
               ),
             ],
@@ -160,9 +160,7 @@ class _SharedFilePageState extends State<SharedFilePage> {
                 .then((value) => setState(() {})),
             backgroundColor: const Color(0xFF7BC043),
             foregroundColor: Colors.white,
-            icon: sharedFile.isArchived
-                ? Icons.unarchive_rounded
-                : Icons.archive_rounded,
+            icon: sharedFile.isArchived ? KIcons.unarchive : KIcons.archive,
             label: sharedFile.isArchived ? 'アーカイブ解除' : 'アーカイブ',
           ),
         ],
@@ -175,7 +173,7 @@ class _SharedFilePageState extends State<SharedFilePage> {
                 context.read<ApiRepository>().fetchDetailSharedFile(sharedFile),
             backgroundColor: const Color(0xFF0392CF),
             foregroundColor: Colors.white,
-            icon: Icons.sync_rounded,
+            icon: KIcons.sync,
             label: '更新',
           ),
         ],
@@ -246,11 +244,11 @@ class _SharedFilePageState extends State<SharedFilePage> {
                 ),
                 Visibility(
                   visible: sharedFile.fileNames?.isNotEmpty ?? false,
-                  child: const Icon(Icons.file_present_rounded),
+                  child: Icon(KIcons.attachment),
                 ),
                 Visibility(
                   visible: sharedFile.isArchived,
-                  child: const Icon(Icons.archive_rounded),
+                  child: Icon(KIcons.archive),
                 )
               ],
             ),
@@ -322,7 +320,7 @@ Widget buildSharedFileModal(
             ),
             Visibility(
               visible: sharedFile.isArchived,
-              child: const Icon(Icons.archive_rounded),
+              child: Icon(KIcons.archive),
             )
           ],
         ),
@@ -361,9 +359,8 @@ Widget buildSharedFileModal(
                       sharedFile.hashCode.toString(), !sharedFile.isArchived);
                   Navigator.of(context).pop();
                 },
-                child: Icon(sharedFile.isArchived
-                    ? Icons.unarchive_rounded
-                    : Icons.archive_rounded),
+                child: Icon(
+                    sharedFile.isArchived ? KIcons.unarchive : KIcons.archive),
               ),
             ),
           ),
@@ -374,7 +371,7 @@ Widget buildSharedFileModal(
                 onPressed: () async => context
                     .read<ApiRepository>()
                     .fetchDetailSharedFile(sharedFile),
-                child: const Icon(Icons.sync_rounded),
+                child: Icon(KIcons.sync),
               ),
             ),
           ),
@@ -384,7 +381,7 @@ Widget buildSharedFileModal(
               child: ElevatedButton(
                 onPressed: () => Share.share(sharedFile.description,
                     subject: sharedFile.title),
-                child: const Icon(Icons.share_rounded),
+                child: Icon(KIcons.share),
               ),
             ),
           ),

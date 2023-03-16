@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:gakujo_gui/views/common/widget.dart';
 import 'package:gakujo_gui/views/home/home.dart';
 import 'package:gakujo_gui/views/page/timetable.dart';
+import 'package:line_icons/line_icons.dart';
 
 class App extends StatefulWidget {
   const App({Key? key}) : super(key: key);
@@ -22,7 +23,8 @@ class _AppState extends State<App> {
     return MaterialApp(
       scaffoldMessengerKey: scaffoldMessengerKey,
       navigatorKey: navigatorKey,
-      themeMode: ThemeMode.system,
+      // themeMode: ThemeMode.system,
+      themeMode: ThemeMode.light,
       theme: ThemeData(
         useMaterial3: true,
         brightness: Brightness.light,
@@ -53,12 +55,13 @@ class _AppState extends State<App> {
       labelBehavior: NavigationDestinationLabelBehavior.onlyShowSelected,
       destinations: const [
         NavigationDestination(
-          icon: Icon(Icons.home_rounded),
+          icon: Icon(LineIcons.home),
           label: 'ホーム',
           tooltip: 'ホーム',
         ),
         NavigationDestination(
-          icon: Icon(Icons.calendar_month_rounded),
+          icon: Icon(LineIcons.tasks),
+          // icon: Icon(LineIcons.calendar),
           label: '時間割',
           tooltip: '時間割',
         ),

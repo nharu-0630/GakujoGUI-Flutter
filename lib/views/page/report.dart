@@ -2,9 +2,11 @@ import 'package:adaptive_dialog/adaptive_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:gakujo_gui/api/provide.dart';
+import 'package:gakujo_gui/constants/kicons.dart';
 import 'package:gakujo_gui/models/report.dart';
 import 'package:gakujo_gui/views/common/widget.dart';
 import 'package:intl/intl.dart';
+import 'package:line_icons/line_icons.dart';
 import 'package:provider/provider.dart';
 import 'package:share_plus/share_plus.dart';
 
@@ -55,10 +57,10 @@ class _ReportPageState extends State<ReportPage> {
                               child: Column(
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
-                                  const Padding(
-                                    padding: EdgeInsets.all(8.0),
+                                  Padding(
+                                    padding: const EdgeInsets.all(8.0),
                                     child: Icon(
-                                      Icons.text_snippet_rounded,
+                                      KIcons.report,
                                       size: 48.0,
                                     ),
                                   ),
@@ -104,7 +106,7 @@ class _ReportPageState extends State<ReportPage> {
         padding: const EdgeInsets.all(8.0),
         child: IconButton(
           onPressed: () => Navigator.of(context).pop(),
-          icon: const Icon(Icons.arrow_back_ios_new_rounded),
+          icon: Icon(KIcons.back),
         ),
       ),
       title: _searchStatus
@@ -121,7 +123,7 @@ class _ReportPageState extends State<ReportPage> {
                 padding: const EdgeInsets.all(8.0),
                 child: IconButton(
                   onPressed: (() => setState(() => _searchStatus = false)),
-                  icon: const Icon(Icons.close_rounded),
+                  icon: Icon(KIcons.close),
                 ),
               ),
             ]
@@ -131,9 +133,8 @@ class _ReportPageState extends State<ReportPage> {
                 child: IconButton(
                   onPressed: (() =>
                       setState(() => _filterStatus = !_filterStatus)),
-                  icon: Icon(_filterStatus
-                      ? Icons.filter_alt_rounded
-                      : Icons.filter_alt_off_rounded),
+                  icon:
+                      Icon(_filterStatus ? KIcons.filterOn : KIcons.filterOff),
                 ),
               ),
               Padding(
@@ -143,7 +144,7 @@ class _ReportPageState extends State<ReportPage> {
                         _searchStatus = true;
                         _suggestReports = [];
                       })),
-                  icon: const Icon(Icons.search_rounded),
+                  icon: Icon(KIcons.search),
                 ),
               ),
             ],
@@ -164,9 +165,7 @@ class _ReportPageState extends State<ReportPage> {
                 .then((value) => setState(() {})),
             backgroundColor: const Color(0xFF7BC043),
             foregroundColor: Colors.white,
-            icon: report.isArchived
-                ? Icons.unarchive_rounded
-                : Icons.archive_rounded,
+            icon: report.isArchived ? KIcons.unarchive : KIcons.archive,
             label: report.isArchived ? 'アーカイブ解除' : 'アーカイブ',
           ),
         ],
@@ -179,7 +178,7 @@ class _ReportPageState extends State<ReportPage> {
                 context.read<ApiRepository>().fetchDetailReport(report),
             backgroundColor: const Color(0xFF0392CF),
             foregroundColor: Colors.white,
-            icon: Icons.sync_rounded,
+            icon: KIcons.sync,
             label: '更新',
           ),
         ],
@@ -217,15 +216,15 @@ class _ReportPageState extends State<ReportPage> {
           (() {
             if (report.isSubmitted) {
               if (report.endDateTime.isAfter(DateTime.now())) {
-                return Icons.check_box_outlined;
+                return KIcons.checkedAfter;
               } else {
-                return Icons.check_box_rounded;
+                return KIcons.checkedBefore;
               }
             } else {
               if (report.endDateTime.isAfter(DateTime.now())) {
-                return Icons.crop_square_outlined;
+                return KIcons.uncheckedAfter;
               } else {
-                return Icons.square_rounded;
+                return KIcons.uncheckedBefore;
               }
             }
           })(),
@@ -269,11 +268,11 @@ class _ReportPageState extends State<ReportPage> {
             ),
             Visibility(
               visible: report.fileNames?.isNotEmpty ?? false,
-              child: const Icon(Icons.file_present_rounded),
+              child: Icon(KIcons.attachment),
             ),
             Visibility(
               visible: report.isArchived,
-              child: const Icon(Icons.archive_rounded),
+              child: Icon(KIcons.archive),
             )
           ],
         ),
@@ -308,7 +307,7 @@ Widget buildReportModal(
                   .format(report.startDateTime.toLocal()),
               style: Theme.of(context).textTheme.bodyLarge,
             ),
-            const Icon(Icons.arrow_right_alt_rounded),
+            const Icon(LineIcons.arrowRight),
             Text(
               DateFormat('yyyy/MM/dd HH:mm', 'ja')
                   .format(report.endDateTime.toLocal()),
@@ -361,7 +360,7 @@ Widget buildReportModal(
             ),
             Visibility(
               visible: report.isArchived,
-              child: const Icon(Icons.archive_rounded),
+              child: Icon(KIcons.archive),
             )
           ],
         ),
@@ -412,9 +411,8 @@ Widget buildReportModal(
                       .setArchive(report.id, !report.isArchived);
                   Navigator.of(context).pop();
                 },
-                child: Icon(report.isArchived
-                    ? Icons.unarchive_rounded
-                    : Icons.archive_rounded),
+                child:
+                    Icon(report.isArchived ? KIcons.unarchive : KIcons.archive),
               ),
             ),
           ),
@@ -424,7 +422,7 @@ Widget buildReportModal(
               child: ElevatedButton(
                 onPressed: () async =>
                     context.read<ApiRepository>().fetchDetailReport(report),
-                child: const Icon(Icons.sync_rounded),
+                child: Icon(KIcons.sync),
               ),
             ),
           ),
@@ -435,7 +433,7 @@ Widget buildReportModal(
                 onPressed: () => Share.share(
                     '${report.description}\n\n${report.message}',
                     subject: report.title),
-                child: const Icon(Icons.share_rounded),
+                child: Icon(KIcons.share),
               ),
             ),
           ),

@@ -2,9 +2,11 @@ import 'package:adaptive_dialog/adaptive_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:gakujo_gui/api/provide.dart';
+import 'package:gakujo_gui/constants/kicons.dart';
 import 'package:gakujo_gui/models/quiz.dart';
 import 'package:gakujo_gui/views/common/widget.dart';
 import 'package:intl/intl.dart';
+import 'package:line_icons/line_icons.dart';
 import 'package:provider/provider.dart';
 import 'package:share_plus/share_plus.dart';
 
@@ -55,10 +57,10 @@ class _QuizPageState extends State<QuizPage> {
                               child: Column(
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
-                                  const Padding(
-                                    padding: EdgeInsets.all(8.0),
+                                  Padding(
+                                    padding: const EdgeInsets.all(8.0),
                                     child: Icon(
-                                      Icons.checklist_rounded,
+                                      KIcons.quiz,
                                       size: 48.0,
                                     ),
                                   ),
@@ -104,7 +106,7 @@ class _QuizPageState extends State<QuizPage> {
         padding: const EdgeInsets.all(8.0),
         child: IconButton(
           onPressed: () => Navigator.of(context).pop(),
-          icon: const Icon(Icons.arrow_back_ios_new_rounded),
+          icon: Icon(KIcons.back),
         ),
       ),
       title: _searchStatus
@@ -121,7 +123,7 @@ class _QuizPageState extends State<QuizPage> {
                 padding: const EdgeInsets.all(8.0),
                 child: IconButton(
                   onPressed: (() => setState(() => _searchStatus = false)),
-                  icon: const Icon(Icons.close_rounded),
+                  icon: Icon(KIcons.close),
                 ),
               ),
             ]
@@ -131,9 +133,8 @@ class _QuizPageState extends State<QuizPage> {
                 child: IconButton(
                   onPressed: (() =>
                       setState(() => _filterStatus = !_filterStatus)),
-                  icon: Icon(_filterStatus
-                      ? Icons.filter_alt_rounded
-                      : Icons.filter_alt_off_rounded),
+                  icon:
+                      Icon(_filterStatus ? KIcons.filterOn : KIcons.filterOff),
                 ),
               ),
               Padding(
@@ -143,7 +144,7 @@ class _QuizPageState extends State<QuizPage> {
                         _searchStatus = true;
                         _suggestQuizzes = [];
                       })),
-                  icon: const Icon(Icons.search_rounded),
+                  icon: Icon(KIcons.search),
                 ),
               ),
             ],
@@ -164,9 +165,7 @@ class _QuizPageState extends State<QuizPage> {
                 .then((value) => setState(() {})),
             backgroundColor: const Color(0xFF7BC043),
             foregroundColor: Colors.white,
-            icon: quiz.isArchived
-                ? Icons.unarchive_rounded
-                : Icons.archive_rounded,
+            icon: quiz.isArchived ? KIcons.unarchive : KIcons.archive,
             label: quiz.isArchived ? 'アーカイブ解除' : 'アーカイブ',
           ),
         ],
@@ -179,7 +178,7 @@ class _QuizPageState extends State<QuizPage> {
                 context.read<ApiRepository>().fetchDetailQuiz(quiz),
             backgroundColor: const Color(0xFF0392CF),
             foregroundColor: Colors.white,
-            icon: Icons.sync_rounded,
+            icon: KIcons.sync,
             label: '更新',
           ),
         ],
@@ -217,15 +216,15 @@ class _QuizPageState extends State<QuizPage> {
           (() {
             if (quiz.isSubmitted) {
               if (quiz.endDateTime.isAfter(DateTime.now())) {
-                return Icons.check_box_outlined;
+                return KIcons.checkedAfter;
               } else {
-                return Icons.check_box_rounded;
+                return KIcons.checkedBefore;
               }
             } else {
               if (quiz.endDateTime.isAfter(DateTime.now())) {
-                return Icons.crop_square_outlined;
+                return KIcons.uncheckedAfter;
               } else {
-                return Icons.square_rounded;
+                return KIcons.uncheckedBefore;
               }
             }
           })(),
@@ -269,11 +268,11 @@ class _QuizPageState extends State<QuizPage> {
             ),
             Visibility(
               visible: quiz.fileNames?.isNotEmpty ?? false,
-              child: const Icon(Icons.file_present_rounded),
+              child: Icon(KIcons.attachment),
             ),
             Visibility(
               visible: quiz.isArchived,
-              child: const Icon(Icons.archive_rounded),
+              child: Icon(KIcons.archive),
             )
           ],
         ),
@@ -308,7 +307,7 @@ Widget buildQuizModal(
                   .format(quiz.startDateTime.toLocal()),
               style: Theme.of(context).textTheme.bodyLarge,
             ),
-            const Icon(Icons.arrow_right_alt_rounded),
+            const Icon(LineIcons.arrowRight),
             Text(
               DateFormat('yyyy/MM/dd HH:mm', 'ja')
                   .format(quiz.endDateTime.toLocal()),
@@ -359,7 +358,7 @@ Widget buildQuizModal(
             ),
             Visibility(
               visible: quiz.isArchived,
-              child: const Icon(Icons.archive_rounded),
+              child: Icon(KIcons.archive),
             )
           ],
         ),
@@ -410,9 +409,8 @@ Widget buildQuizModal(
                       .setArchive(quiz.id, !quiz.isArchived);
                   Navigator.of(context).pop();
                 },
-                child: Icon(quiz.isArchived
-                    ? Icons.unarchive_rounded
-                    : Icons.archive_rounded),
+                child:
+                    Icon(quiz.isArchived ? KIcons.unarchive : KIcons.archive),
               ),
             ),
           ),
@@ -422,7 +420,7 @@ Widget buildQuizModal(
               child: ElevatedButton(
                 onPressed: () async =>
                     context.read<ApiRepository>().fetchDetailQuiz(quiz),
-                child: const Icon(Icons.sync_rounded),
+                child: Icon(KIcons.sync),
               ),
             ),
           ),
@@ -433,7 +431,7 @@ Widget buildQuizModal(
                 onPressed: () => Share.share(
                     '${quiz.description}\n\n${quiz.message}',
                     subject: quiz.title),
-                child: const Icon(Icons.share_rounded),
+                child: Icon(KIcons.share),
               ),
             ),
           ),
