@@ -29,7 +29,7 @@ import 'package:version/version.dart';
 class Api {
   static final version = Version(1, 4, 0);
 
-  final _interval = const Duration(milliseconds: 200);
+  final _interval = const Duration(milliseconds: 500);
 
   Future<Settings>? get _settings =>
       navigatorKey.currentContext?.read<SettingsRepository>().load();
@@ -209,9 +209,9 @@ class Api {
         },
         options: Options(
           headers: {
-            'Origin': 'https://idp.shizuoka.ac.jp',
             'Accept':
                 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
+            'Origin': 'https://idp.shizuoka.ac.jp',
             'Referer':
                 'https://idp.shizuoka.ac.jp/idp/profile/SAML2/Redirect/SSO?execution=e1s1',
           },
@@ -232,13 +232,13 @@ class Api {
           '',
     ).replaceAll('&#x3a;', ':');
 
+    if (samlResponse.isEmpty || relayState.isEmpty) {
+      throw Exception('SAMLResponse or RelayState is empty.');
+    }
+
     if (kDebugMode) {
       print('SAMLResponse: ${samlResponse.substring(0, 10)} ...');
       print('RelayState: ${relayState.substring(0, 10)} ...');
-    }
-
-    if (samlResponse.isEmpty || relayState.isEmpty) {
-      throw Exception('SAMLResponse or RelayState is empty.');
     }
 
     await Future.delayed(_interval);
@@ -299,13 +299,11 @@ class Api {
               ?.group(0) ??
           '',
     ).replaceAll('&#x3a;', ':');
-
     if (samlResponse.isNotEmpty && relayState.isNotEmpty) {
       if (kDebugMode) {
         print('SAMLResponse: ${samlResponse.substring(0, 10)} ...');
         print('RelayState: ${relayState.substring(0, 10)} ...');
       }
-
       await Future.delayed(_interval);
       await _client.postUri<dynamic>(
         Uri.https(
@@ -326,7 +324,6 @@ class Api {
           validateStatus: (status) => status == 302,
         ),
       );
-
       await Future.delayed(_interval);
       response = await _client.getUri<dynamic>(
         Uri.https(
@@ -341,7 +338,6 @@ class Api {
           validateStatus: (status) => status == 302 || status == 200,
         ),
       );
-
       if (response.statusCode == 302) {
         await Future.delayed(_interval);
         response = await _client.get<dynamic>(
@@ -350,7 +346,7 @@ class Api {
       }
     }
 
-    final Settings? settings = await _settings;
+    var settings = await _settings;
     if (parse(response.data).querySelector('title')?.text == 'アクセス環境登録') {
       var accessEnvName =
           'GakujoGUI Flutter ${(const Uuid()).v4().substring(0, 8)}';
@@ -378,43 +374,32 @@ class Api {
         ),
       );
 
-      await Future.delayed(_interval);
-      response = await _client.postUri<dynamic>(
-        Uri.https(
-          'gakujo.shizuoka.ac.jp',
-          '/portal/home/home/initialize',
-          {'EXCLUDE_SET': ''},
-        ),
-        data: {'EXCLUDE_SET': ''},
-        options: Options(
-          headers: {
-            'Accept':
-                'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
-            'Origin': 'https://gakujo.shizuoka.ac.jp',
-            'Referer':
-                'https://gakujo.shizuoka.ac.jp/portal/common/accessEnvironmentRegist/goHome/',
-          },
-        ),
-      );
-    } else {
-      await Future.delayed(_interval);
-      response = await _client.postUri<dynamic>(
-        Uri.https(
-          'gakujo.shizuoka.ac.jp',
-          '/portal/home/home/initialize',
-        ),
-        data: {'EXCLUDE_SET': ''},
-        options: Options(
-          headers: {
-            'Accept':
-                'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
-            'Origin': 'https://gakujo.shizuoka.ac.jp',
-            'Referer':
-                'https://gakujo.shizuoka.ac.jp/portal/shibbolethlogin/shibbolethLogin/initLogin/sso',
-          },
-        ),
-      );
+      if (response.headers.value('set-cookie') != null) {
+        var cookies =
+            response.headers.value('set-cookie')!.split(';')[0].split('=');
+        settings?.accessEnvironmentKey = cookies[0];
+        settings?.accessEnvironmentValue = cookies[1];
+      }
     }
+
+    await Future.delayed(_interval);
+    response = await _client.postUri<dynamic>(
+      Uri.https(
+        'gakujo.shizuoka.ac.jp',
+        '/portal/home/home/initialize',
+        {'EXCLUDE_SET': ''},
+      ),
+      data: {'EXCLUDE_SET': ''},
+      options: Options(
+        headers: {
+          'Accept':
+              'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
+          'Origin': 'https://gakujo.shizuoka.ac.jp',
+          'Referer':
+              'https://gakujo.shizuoka.ac.jp/portal/common/accessEnvironmentRegist/goHome/',
+        },
+      ),
+    );
 
     _updateToken(response.data, required: true);
 
@@ -439,21 +424,6 @@ class Api {
       settings?.profileImage = base64.encode(response.data);
     }
     settings?.lastLoginTime = DateTime.now();
-    List<Cookie> cookies = (await _cookieJar
-        .loadForRequest(Uri.https('gakujo.shizuoka.ac.jp', '/portal')));
-    if (cookies
-        .where(
-          (element) => element.name.contains('Access-Environment-Cookie'),
-        )
-        .isNotEmpty) {
-      Cookie cookie = cookies
-          .where(
-            (element) => element.name.contains('Access-Environment-Cookie'),
-          )
-          .first;
-      settings?.accessEnvironmentKey = cookie.name;
-      settings?.accessEnvironmentValue = cookie.value;
-    }
     navigatorKey.currentContext?.read<SettingsRepository>().save(settings!);
   }
 

@@ -34,7 +34,7 @@ class _AppState extends State<App> {
         brightness: Brightness.dark,
       ),
       debugShowCheckedModeBanner: false,
-      title: 'Gakujo Task',
+      title: 'GakujoGUI',
       home: NestedSideSheet(
         child: Scaffold(
           key: scaffoldKey,

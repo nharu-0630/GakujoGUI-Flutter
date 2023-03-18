@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:gakujo_gui/api/api.dart';
 import 'package:gakujo_gui/app.dart';
@@ -95,11 +96,16 @@ class ApiRepository extends ChangeNotifier {
   void fetchLogin() async {
     if (isLoading) return;
     _toggleLoading();
-    try {
+    if (kDebugMode) {
       await _api.fetchLogin();
       _toggleLoading();
-    } catch (e) {
-      _onError(e);
+    } else {
+      try {
+        await _api.fetchLogin();
+        _toggleLoading();
+      } catch (e) {
+        _onError(e);
+      }
     }
   }
 
