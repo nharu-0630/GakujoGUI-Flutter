@@ -22,12 +22,12 @@ class ApiRepository extends ChangeNotifier {
   bool _isError = false;
 
   ApiRepository() {
-    loadSettings();
+    // loadSettings();
   }
 
-  void loadSettings() {
-    _api.loadSettings().then((value) => notifyListeners());
-  }
+  // void loadSettings() {
+  //   _api.loadSettings().then((value) => notifyListeners());
+  // }
 
   void _onError(Object e) {
     _isError = true;

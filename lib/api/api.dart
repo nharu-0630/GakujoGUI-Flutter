@@ -40,10 +40,10 @@ class Api {
   Future<int> get _semester async => (await _settings)?.semester ?? 3;
 
   Dio _client = Dio();
-  CookieJar _cookieJar = CookieJar();
+  late PersistCookieJar _cookieJar;
 
   Api() {
-    loadSettings();
+    // loadSettings();
   }
 
   Future<String> get _schoolYear async => (await _year).toString();
@@ -70,25 +70,25 @@ class Api {
     return _token.isNotEmpty;
   }
 
-  Future<void> loadSettings() async {
-    var settings = await _settings;
-    if (settings?.accessEnvironmentKey == null) return;
-    if (settings?.accessEnvironmentValue == null) return;
-    _cookieJar.saveFromResponse(
-      Uri.https('gakujo.shizuoka.ac.jp', '/portal'),
-      [
-        Cookie(
-          settings!.accessEnvironmentKey!,
-          settings.accessEnvironmentValue!,
-        )
-      ],
-    );
-  }
+  // Future<void> loadSettings() async {
+  //   var settings = await _settings;
+  //   if (settings?.accessEnvironmentKey == null) return;
+  //   if (settings?.accessEnvironmentValue == null) return;
+  //   _cookieJar.saveFromResponse(
+  //     Uri.https('gakujo.shizuoka.ac.jp', '/portal'),
+  //     [
+  //       Cookie(
+  //         settings!.accessEnvironmentKey!,
+  //         settings.accessEnvironmentValue!,
+  //       )
+  //     ],
+  //   );
+  // }
 
   Future<void> clearSettings() async =>
       await navigatorKey.currentContext?.watch<SettingsRepository>().delete();
 
-  void _initialize() {
+  Future<void> _initialize() async {
     _client = Dio(BaseOptions(
       headers: {
         'User-Agent':
@@ -98,7 +98,11 @@ class Api {
       followRedirects: false,
     ));
     _token = '';
-    _cookieJar = CookieJar();
+    _cookieJar = PersistCookieJar(
+      ignoreExpires: true,
+      storage: FileStorage(
+          join((await getApplicationDocumentsDirectory()).path, '.cookies')),
+    );
     _client.interceptors.add(CookieManager(_cookieJar));
     _client.interceptors.add(LogInterceptor());
     _client.interceptors.add(RetryInterceptor(
@@ -110,8 +114,8 @@ class Api {
   }
 
   Future<void> fetchLogin() async {
-    _initialize();
-    await loadSettings();
+    await _initialize();
+    // await loadSettings();
 
     await Future.delayed(_interval);
     _client.getUri<dynamic>(
