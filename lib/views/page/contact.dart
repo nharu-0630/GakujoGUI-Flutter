@@ -110,18 +110,24 @@ class _ContactPageState extends State<ContactPage> {
           : Text(widget.subject.subject),
       actions: _searchStatus
           ? [
-              IconButton(
-                onPressed: (() => setState(() => _searchStatus = false)),
-                icon: Icon(KIcons.close),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: IconButton(
+                  onPressed: (() => setState(() => _searchStatus = false)),
+                  icon: Icon(KIcons.close),
+                ),
               ),
             ]
           : [
-              IconButton(
-                onPressed: (() => setState(() {
-                      _searchStatus = true;
-                      _suggestContacts = [];
-                    })),
-                icon: Icon(KIcons.search),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: IconButton(
+                  onPressed: (() => setState(() {
+                        _searchStatus = true;
+                        _suggestContacts = [];
+                      })),
+                  icon: Icon(KIcons.search),
+                ),
               ),
             ],
       bottom: buildAppBarBottom(context),

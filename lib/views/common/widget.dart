@@ -1,11 +1,12 @@
 import 'dart:io';
 
+import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
 import 'package:better_open_file/better_open_file.dart';
 import 'package:cached_memory_image/provider/cached_memory_image_provider.dart';
 import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:gakujo_gui/api/parse.dart';
 import 'package:gakujo_gui/api/provide.dart';
+import 'package:gakujo_gui/app.dart';
 import 'package:gakujo_gui/constants/kicons.dart';
 import 'package:gakujo_gui/models/quiz.dart';
 import 'package:gakujo_gui/models/report.dart';
@@ -52,11 +53,21 @@ void _openFile(String filename) async {
   if (File(path).existsSync()) {
     OpenFile.open(path);
   } else {
-    Fluttertoast.showToast(
-      msg: 'Not exist file.',
-      toastLength: Toast.LENGTH_LONG,
-      timeInSecForIosWeb: 5,
-    );
+    scaffoldMessengerKey.currentState!
+      ..hideCurrentSnackBar()
+      ..showSnackBar(
+        SnackBar(
+          elevation: 0,
+          behavior: SnackBarBehavior.floating,
+          backgroundColor: Colors.transparent,
+          content: AwesomeSnackbarContent(
+            title: 'Error',
+            message: 'Not exist file.',
+            contentType: ContentType.failure,
+            inMaterialBanner: true,
+          ),
+        ),
+      );
   }
 }
 
@@ -364,7 +375,7 @@ AppBar buildAppBar(BuildContext context, GlobalKey<ScaffoldState> scaffoldKey) {
                     context.read<ApiRepository>().fetchLogin(),
               ),
               IconButton(
-                icon: const Icon(LineIcons.syncIcon),
+                icon: Icon(KIcons.update),
                 onPressed: () async => showDialog(
                   context: context,
                   builder: (context) {
