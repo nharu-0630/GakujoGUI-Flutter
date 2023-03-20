@@ -139,7 +139,7 @@ class _ContactPageState extends State<ContactPage> {
                 context.read<ApiRepository>().fetchDetailContact(contact),
             backgroundColor: const Color(0xFF0392CF),
             foregroundColor: Colors.white,
-            icon: KIcons.sync,
+            icon: KIcons.update,
             label: '更新',
           ),
         ],
@@ -311,7 +311,7 @@ class _ContactPageState extends State<ContactPage> {
                 child: ElevatedButton(
                   onPressed: () async =>
                       context.read<ApiRepository>().fetchDetailContact(contact),
-                  child: Icon(KIcons.sync),
+                  child: Icon(KIcons.update),
                 ),
               ),
             ),

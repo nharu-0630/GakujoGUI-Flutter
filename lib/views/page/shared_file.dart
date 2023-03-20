@@ -174,7 +174,7 @@ class _SharedFilePageState extends State<SharedFilePage> {
                 context.read<ApiRepository>().fetchDetailSharedFile(sharedFile),
             backgroundColor: const Color(0xFF0392CF),
             foregroundColor: Colors.white,
-            icon: KIcons.sync,
+            icon: KIcons.update,
             label: '更新',
           ),
         ],
@@ -376,7 +376,7 @@ Widget buildSharedFileModal(BuildContext context, SharedFile sharedFile) {
                 onPressed: () async => context
                     .read<ApiRepository>()
                     .fetchDetailSharedFile(sharedFile),
-                child: Icon(KIcons.sync),
+                child: Icon(KIcons.update),
               ),
             ),
           ),

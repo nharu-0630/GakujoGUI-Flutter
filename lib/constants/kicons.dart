@@ -18,9 +18,9 @@ class KIcons {
   static IconData filterOn = LineIcons.calendarCheck;
   static IconData filterOff = LineIcons.calendarMinus;
   static IconData search = LineIcons.search;
-  static IconData sync = LineIcons.syncIcon;
+  static IconData update = LineIcons.syncIcon;
   static IconData share = LineIcons.share;
-  static IconData important = LineIcons.exclamationTriangle;
+  static IconData important = LineIcons.tag;
   static IconData checkedAfter = LineIcons.checkSquare;
   static IconData uncheckedAfter = LineIcons.square;
   static IconData checkedBefore = LineIcons.checkCircle;

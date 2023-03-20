@@ -2,7 +2,7 @@ import 'package:adaptive_dialog/adaptive_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:gakujo_gui/api/provide.dart';
-import 'package:gakujo_gui/constants/KIcons.dart';
+import 'package:gakujo_gui/constants/kicons.dart';
 import 'package:gakujo_gui/models/class_link.dart';
 import 'package:gakujo_gui/models/shared_file.dart';
 import 'package:gakujo_gui/views/common/widget.dart';
@@ -174,7 +174,7 @@ class _ClassLinkPageState extends State<ClassLinkPage> {
                 context.read<ApiRepository>().fetchDetailClassLink(classLink),
             backgroundColor: const Color(0xFF0392CF),
             foregroundColor: Colors.white,
-            icon: KIcons.sync,
+            icon: KIcons.update,
             label: '更新',
           ),
         ],
@@ -329,7 +329,7 @@ Widget buildClassLinkModal(BuildContext context, ClassLink classLink) {
                 onPressed: () async => context
                     .read<ApiRepository>()
                     .fetchDetailClassLink(classLink),
-                child: Icon(KIcons.sync),
+                child: Icon(KIcons.update),
               ),
             ),
           ),

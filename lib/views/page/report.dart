@@ -179,7 +179,7 @@ class _ReportPageState extends State<ReportPage> {
                 context.read<ApiRepository>().fetchDetailReport(report),
             backgroundColor: const Color(0xFF0392CF),
             foregroundColor: Colors.white,
-            icon: KIcons.sync,
+            icon: KIcons.update,
             label: '更新',
           ),
         ],
@@ -423,7 +423,7 @@ Widget buildReportModal(BuildContext context, Report report) {
               child: ElevatedButton(
                 onPressed: () async =>
                     context.read<ApiRepository>().fetchDetailReport(report),
-                child: Icon(KIcons.sync),
+                child: Icon(KIcons.update),
               ),
             ),
           ),

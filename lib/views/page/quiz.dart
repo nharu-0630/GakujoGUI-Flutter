@@ -179,7 +179,7 @@ class _QuizPageState extends State<QuizPage> {
                 context.read<ApiRepository>().fetchDetailQuiz(quiz),
             backgroundColor: const Color(0xFF0392CF),
             foregroundColor: Colors.white,
-            icon: KIcons.sync,
+            icon: KIcons.update,
             label: '更新',
           ),
         ],
@@ -421,7 +421,7 @@ Widget buildQuizModal(BuildContext context, Quiz quiz) {
               child: ElevatedButton(
                 onPressed: () async =>
                     context.read<ApiRepository>().fetchDetailQuiz(quiz),
-                child: Icon(KIcons.sync),
+                child: Icon(KIcons.update),
               ),
             ),
           ),

@@ -206,7 +206,7 @@ class ContactRepository extends ChangeNotifier {
   Future<List<Contact>> getSubjects(String subject) async {
     var box = await _contactBox.box;
     return box.values
-        .where((contact) => contact.subjects == subject)
+        .where((contact) => contact.subject == subject)
         .toList()
         .cast<Contact>();
   }
