@@ -197,7 +197,10 @@ Widget buildDrawer(BuildContext context) {
               ListTile(
                 title: Row(
                   children: [
-                    Icon(KIcons.report),
+                    Icon(
+                      KIcons.report,
+                      color: Theme.of(context).iconTheme.color,
+                    ),
                     const SizedBox(width: 8.0),
                     Text(
                       'レポート',
@@ -226,7 +229,10 @@ Widget buildDrawer(BuildContext context) {
               ListTile(
                 title: Row(
                   children: [
-                    Icon(KIcons.quiz),
+                    Icon(
+                      KIcons.quiz,
+                      color: Theme.of(context).iconTheme.color,
+                    ),
                     const SizedBox(width: 8.0),
                     Text(
                       '小テスト',
@@ -255,7 +261,10 @@ Widget buildDrawer(BuildContext context) {
               ListTile(
                 title: Row(
                   children: [
-                    Icon(KIcons.sharedFile),
+                    Icon(
+                      KIcons.sharedFile,
+                      color: Theme.of(context).iconTheme.color,
+                    ),
                     const SizedBox(width: 8.0),
                     Text(
                       '授業共有ファイル',
@@ -272,7 +281,10 @@ Widget buildDrawer(BuildContext context) {
               ListTile(
                 title: Row(
                   children: [
-                    Icon(KIcons.classLink),
+                    Icon(
+                      KIcons.classLink,
+                      color: Theme.of(context).iconTheme.color,
+                    ),
                     const SizedBox(width: 8.0),
                     Text(
                       '授業リンク',
@@ -289,7 +301,10 @@ Widget buildDrawer(BuildContext context) {
               ListTile(
                 title: Row(
                   children: [
-                    Icon(KIcons.grade),
+                    Icon(
+                      KIcons.grade,
+                      color: Theme.of(context).iconTheme.color,
+                    ),
                     const SizedBox(width: 8.0),
                     Text(
                       '成績情報',
@@ -306,7 +321,10 @@ Widget buildDrawer(BuildContext context) {
               ListTile(
                 title: Row(
                   children: [
-                    Icon(KIcons.settings),
+                    Icon(
+                      KIcons.settings,
+                      color: Theme.of(context).iconTheme.color,
+                    ),
                     const SizedBox(width: 8.0),
                     Text(
                       '設定',
