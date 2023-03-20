@@ -1,3 +1,4 @@
+import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:gakujo_gui/api/parse.dart';
 import 'package:gakujo_gui/constants/KIcons.dart';
@@ -21,8 +22,11 @@ class ContactWidget extends StatelessWidget {
           var subjects = snapshot.data![0] as List<Subject>;
           var contacts = snapshot.data![1] as List<Contact>;
           subjects.sort((a, b) {
-            var aContact = contacts.firstWhere((e) => e.subject == a.subject);
-            var bContact = contacts.firstWhere((e) => e.subject == b.subject);
+            var aContact =
+                contacts.firstWhereOrNull((e) => e.subject == a.subject);
+            var bContact =
+                contacts.firstWhereOrNull((e) => e.subject == b.subject);
+            if (aContact == null || bContact == null) return 0;
             return bContact.contactDateTime.compareTo(aContact.contactDateTime);
           });
           return Container(

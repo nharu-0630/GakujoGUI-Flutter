@@ -466,7 +466,7 @@ class Api {
     );
     _updateToken(response.data, required: true);
 
-    navigatorKey.currentContext?.watch<ContactRepository>().addAll(
+    navigatorKey.currentContext?.read<ContactRepository>().addAll(
         parse(response.data)
             .querySelectorAll('#tbl_A01_01 > tbody > tr')
             .map(Contact.fromElement)
@@ -627,11 +627,12 @@ class Api {
     );
     _updateToken(response.data, required: true);
 
-    await navigatorKey.currentContext?.watch<SubjectRepository>().deleteAll();
-    navigatorKey.currentContext?.watch<SubjectRepository>().addAll(
+    await navigatorKey.currentContext?.read<SubjectRepository>().deleteAll();
+    navigatorKey.currentContext?.read<SubjectRepository>().addAll(
         parse(response.data)
             .querySelector('#st1')!
             .querySelectorAll('ul')
+            .where((element) => element.querySelectorAll('li').length > 2)
             .map(Subject.fromElement)
             .toSet()
             .toList());
