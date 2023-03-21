@@ -330,6 +330,7 @@ class Api {
 
     var settings = await _settings;
     if (parse(response.data).querySelector('title')?.text == 'アクセス環境登録') {
+      _updateToken(response.data, required: true);
       var accessEnvName =
           'GakujoGUI Flutter ${(const Uuid()).v4().substring(0, 8)}';
 
