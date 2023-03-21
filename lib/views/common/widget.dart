@@ -352,24 +352,24 @@ AppBar buildAppBar(BuildContext context, GlobalKey<ScaffoldState> scaffoldKey) {
       builder: (context, AsyncSnapshot<Settings> snapshot) {
         return snapshot.hasData
             ? Padding(
-                padding: const EdgeInsets.only(left: 16.0),
-                child: MouseRegion(
-                  cursor: SystemMouseCursors.click,
-                  child: GestureDetector(
-                    onTap: () => scaffoldKey.currentState?.openDrawer(),
-                    child: snapshot.data?.profileImage == null
-                        ? const Icon(
-                            LineIcons.user,
-                            size: 36.0,
-                          )
-                        : CircleAvatar(
+                padding: const EdgeInsets.all(8.0),
+                child: snapshot.data?.profileImage != null
+                    ? MouseRegion(
+                        cursor: SystemMouseCursors.click,
+                        child: GestureDetector(
+                          onTap: () => scaffoldKey.currentState?.openDrawer(),
+                          child: CircleAvatar(
                             backgroundImage: CachedMemoryImageProvider(
                               'ProfileImage',
                               base64: snapshot.data?.profileImage,
                             ),
                           ),
-                  ),
-                ),
+                        ),
+                      )
+                    : IconButton(
+                        onPressed: () => scaffoldKey.currentState?.openDrawer(),
+                        icon: const Icon(LineIcons.user),
+                      ),
               )
             : const SizedBox.shrink();
       },
@@ -377,81 +377,79 @@ AppBar buildAppBar(BuildContext context, GlobalKey<ScaffoldState> scaffoldKey) {
     centerTitle: false,
     title: FutureBuilder(
       future: context.watch<SettingsRepository>().load(),
-      builder: (context, AsyncSnapshot<Settings> snapshot) {
-        if (snapshot.hasData) {
-          return Row(
-            children: [
-              Text(
-                snapshot.data?.fullName == null
-                    ? 'アカウント情報なし'
-                    : '${snapshot.data?.fullName}さん',
-              ),
-              const Spacer(),
-              IconButton(
-                icon: const Icon(LineIcons.alternateSignIn),
-                onPressed: () async =>
-                    context.read<ApiRepository>().fetchLogin(),
-              ),
-              IconButton(
-                icon: Icon(KIcons.update),
-                onPressed: () async => showDialog(
-                  context: context,
-                  builder: (context) {
-                    return SimpleDialog(
-                      title: const Text('更新'),
-                      children: [
-                        SimpleDialogOption(
-                          onPressed: () async =>
-                              context.read<ApiRepository>().fetchSubjects(),
-                          child: const Text('授業科目'),
-                        ),
-                        SimpleDialogOption(
-                          onPressed: () async =>
-                              context.read<ApiRepository>().fetchContacts(),
-                          child: const Text('授業連絡'),
-                        ),
-                        SimpleDialogOption(
-                          onPressed: () async =>
-                              context.read<ApiRepository>().fetchReports(),
-                          child: const Text('レポート'),
-                        ),
-                        SimpleDialogOption(
-                          onPressed: () async =>
-                              context.read<ApiRepository>().fetchQuizzes(),
-                          child: const Text('小テスト'),
-                        ),
-                        SimpleDialogOption(
-                          onPressed: () async =>
-                              context.read<ApiRepository>().fetchSharedFiles(),
-                          child: const Text('授業共有ファイル'),
-                        ),
-                        SimpleDialogOption(
-                          onPressed: () async =>
-                              context.read<ApiRepository>().fetchClassLinks(),
-                          child: const Text('授業リンク'),
-                        ),
-                        SimpleDialogOption(
-                          onPressed: () async =>
-                              context.read<ApiRepository>().fetchGrades(),
-                          child: const Text('成績情報'),
-                        ),
-                        SimpleDialogOption(
-                          onPressed: () async =>
-                              context.read<ApiRepository>().fetchTimetables(),
-                          child: const Text('個人時間割'),
-                        ),
-                      ],
-                    );
-                  },
-                ),
-              ),
-            ],
-          );
-        } else {
-          return const SizedBox.shrink();
-        }
-      },
+      builder: (context, AsyncSnapshot<Settings> snapshot) => Text(
+        snapshot.hasData
+            ? snapshot.data?.fullName == null
+                ? 'アカウント情報なし'
+                : '${snapshot.data?.fullName}さん'
+            : 'アカウント情報なし',
+      ),
     ),
+    actions: [
+      Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: IconButton(
+          icon: const Icon(LineIcons.alternateSignIn),
+          onPressed: () async => context.read<ApiRepository>().fetchLogin(),
+        ),
+      ),
+      Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: IconButton(
+          icon: Icon(KIcons.update),
+          onPressed: () async => showDialog(
+            context: context,
+            builder: (context) {
+              return SimpleDialog(
+                title: const Text('更新'),
+                children: [
+                  SimpleDialogOption(
+                    onPressed: () async =>
+                        context.read<ApiRepository>().fetchSubjects(),
+                    child: const Text('授業科目'),
+                  ),
+                  SimpleDialogOption(
+                    onPressed: () async =>
+                        context.read<ApiRepository>().fetchContacts(),
+                    child: const Text('授業連絡'),
+                  ),
+                  SimpleDialogOption(
+                    onPressed: () async =>
+                        context.read<ApiRepository>().fetchReports(),
+                    child: const Text('レポート'),
+                  ),
+                  SimpleDialogOption(
+                    onPressed: () async =>
+                        context.read<ApiRepository>().fetchQuizzes(),
+                    child: const Text('小テスト'),
+                  ),
+                  SimpleDialogOption(
+                    onPressed: () async =>
+                        context.read<ApiRepository>().fetchSharedFiles(),
+                    child: const Text('授業共有ファイル'),
+                  ),
+                  SimpleDialogOption(
+                    onPressed: () async =>
+                        context.read<ApiRepository>().fetchClassLinks(),
+                    child: const Text('授業リンク'),
+                  ),
+                  SimpleDialogOption(
+                    onPressed: () async =>
+                        context.read<ApiRepository>().fetchGrades(),
+                    child: const Text('成績情報'),
+                  ),
+                  SimpleDialogOption(
+                    onPressed: () async =>
+                        context.read<ApiRepository>().fetchTimetables(),
+                    child: const Text('個人時間割'),
+                  ),
+                ],
+              );
+            },
+          ),
+        ),
+      ),
+    ],
     bottom: buildAppBarBottom(context),
   );
 }
