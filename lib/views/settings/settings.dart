@@ -38,7 +38,7 @@ class _SettingsWidgetState extends State<SettingsWidget> {
   }
 
   void initValue() {
-    navigatorKey.currentContext?.watch<SettingsRepository>().load().then(
+    App.navigatorKey.currentContext?.watch<SettingsRepository>().load().then(
       (value) {
         setState(
           () {
@@ -453,28 +453,28 @@ class _SettingsWidgetState extends State<SettingsWidget> {
                                   );
                                   if (result == OkCancelResult.ok) {
                                     {
-                                      navigatorKey.currentContext
+                                      App.navigatorKey.currentContext
                                           ?.read<ContactRepository>()
                                           .deleteAll();
-                                      navigatorKey.currentContext
+                                      App.navigatorKey.currentContext
                                           ?.read<SubjectRepository>()
                                           .deleteAll();
-                                      navigatorKey.currentContext
+                                      App.navigatorKey.currentContext
                                           ?.read<SettingsRepository>()
                                           .delete();
-                                      navigatorKey.currentContext
+                                      App.navigatorKey.currentContext
                                           ?.read<ReportRepository>()
                                           .deleteAll();
-                                      navigatorKey.currentContext
+                                      App.navigatorKey.currentContext
                                           ?.read<QuizRepository>()
                                           .deleteAll();
-                                      navigatorKey.currentContext
+                                      App.navigatorKey.currentContext
                                           ?.read<GradeRepository>()
                                           .deleteAll();
-                                      navigatorKey.currentContext
+                                      App.navigatorKey.currentContext
                                           ?.read<SharedFileRepository>()
                                           .deleteAll();
-                                      navigatorKey.currentContext
+                                      App.navigatorKey.currentContext
                                           ?.read<ClassLinkRepository>()
                                           .deleteAll();
                                     }

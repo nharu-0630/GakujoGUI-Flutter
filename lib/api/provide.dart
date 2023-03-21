@@ -20,9 +20,16 @@ class ApiRepository extends ChangeNotifier {
   bool _isLoading = false;
   bool get isError => _isError;
   bool _isError = false;
+  double get progress => _progress;
+  double _progress = -1;
 
   ApiRepository() {
     _api.initialize();
+  }
+
+  void setProgress(double value) {
+    _progress = value;
+    notifyListeners();
   }
 
   void _onError(Object e) {
@@ -42,7 +49,7 @@ class ApiRepository extends ChangeNotifier {
       }
       _toggleLoading();
     });
-    scaffoldMessengerKey.currentState!
+    App.scaffoldMessengerKey.currentState!
       ..hideCurrentSnackBar()
       ..showSnackBar(
         SnackBar(
@@ -61,6 +68,7 @@ class ApiRepository extends ChangeNotifier {
 
   void _toggleLoading() {
     _isLoading = !isLoading;
+    _progress = -1;
     if (Platform.isWindows) {
       if (isLoading) {
         WindowsTaskbar.setProgressMode(TaskbarProgressMode.indeterminate);

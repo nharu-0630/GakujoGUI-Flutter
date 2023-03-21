@@ -53,7 +53,7 @@ void _openFile(String filename) async {
   if (File(path).existsSync()) {
     OpenFile.open(path);
   } else {
-    scaffoldMessengerKey.currentState!
+    App.scaffoldMessengerKey.currentState!
       ..hideCurrentSnackBar()
       ..showSnackBar(
         SnackBar(
@@ -398,7 +398,7 @@ AppBar buildAppBar(BuildContext context, GlobalKey<ScaffoldState> scaffoldKey) {
         child: IconButton(
           icon: Icon(KIcons.update),
           onPressed: () async => showDialog(
-            context: context,
+            context: App.navigatorKey.currentState!.overlay!.context,
             builder: (context) {
               return SimpleDialog(
                 title: const Text('更新'),
@@ -466,6 +466,9 @@ PreferredSize buildAppBarBottom(BuildContext context) {
             : AlwaysStoppedAnimation<Color>(
                 Theme.of(context).colorScheme.primary,
               ),
+        value: context.watch<ApiRepository>().progress != -1
+            ? context.watch<ApiRepository>().progress
+            : null,
       ),
     ),
   );

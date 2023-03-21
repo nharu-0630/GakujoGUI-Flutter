@@ -7,13 +7,13 @@ import 'package:line_icons/line_icons.dart';
 class App extends StatefulWidget {
   const App({Key? key}) : super(key: key);
 
+  static final scaffoldMessengerKey = GlobalKey<ScaffoldMessengerState>();
+  static final navigatorKey = GlobalKey<NavigatorState>();
+  static final scaffoldKey = GlobalKey<ScaffoldState>();
+
   @override
   State<App> createState() => _AppState();
 }
-
-var scaffoldMessengerKey = GlobalKey<ScaffoldMessengerState>();
-var navigatorKey = GlobalKey<NavigatorState>();
-var scaffoldKey = GlobalKey<ScaffoldState>();
 
 class _AppState extends State<App> {
   var _index = 0;
@@ -21,8 +21,8 @@ class _AppState extends State<App> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      scaffoldMessengerKey: scaffoldMessengerKey,
-      navigatorKey: navigatorKey,
+      scaffoldMessengerKey: App.scaffoldMessengerKey,
+      navigatorKey: App.navigatorKey,
       themeMode: ThemeMode.system,
       theme: ThemeData(
         useMaterial3: true,
@@ -35,9 +35,9 @@ class _AppState extends State<App> {
       debugShowCheckedModeBanner: false,
       title: 'GakujoGUI',
       home: Scaffold(
-        key: scaffoldKey,
+        key: App.scaffoldKey,
         drawer: buildDrawer(context),
-        appBar: buildAppBar(context, scaffoldKey),
+        appBar: buildAppBar(context, App.scaffoldKey),
         body: const [
           HomeWidget(),
           TimetablePage(),

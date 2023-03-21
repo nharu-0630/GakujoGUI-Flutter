@@ -7,6 +7,7 @@ import 'package:dio_cookie_manager/dio_cookie_manager.dart';
 import 'package:dio_smart_retry/dio_smart_retry.dart';
 import 'package:flutter/foundation.dart';
 import 'package:gakujo_gui/api/parse.dart';
+import 'package:gakujo_gui/api/provide.dart';
 import 'package:gakujo_gui/app.dart';
 import 'package:gakujo_gui/models/class_link.dart';
 import 'package:gakujo_gui/models/contact.dart';
@@ -36,7 +37,7 @@ class Api {
   String get token => _token;
 
   Future<Settings>? get _settings =>
-      navigatorKey.currentContext?.read<SettingsRepository>().load();
+      App.navigatorKey.currentContext?.read<SettingsRepository>().load();
 
   Future<String?> get _username async => (await _settings)?.username;
   Future<String?> get _password async => (await _settings)?.password;
@@ -64,8 +65,8 @@ class Api {
     return _token.isNotEmpty;
   }
 
-  Future<void> clearSettings() async =>
-      await navigatorKey.currentContext?.watch<SettingsRepository>().delete();
+  void _setProgress(double value) =>
+      App.navigatorKey.currentContext?.read<ApiRepository>().setProgress(value);
 
   Future<void> initialize() async {
     _client = Dio(BaseOptions(
@@ -93,6 +94,7 @@ class Api {
   }
 
   Future<void> fetchLogin() async {
+    _setProgress(0 / 15);
     await Future.delayed(_interval);
     _client.getUri<dynamic>(
       Uri.https(
@@ -107,6 +109,7 @@ class Api {
       ),
     );
 
+    _setProgress(1 / 15);
     await Future.delayed(_interval);
     await _client.postUri<dynamic>(
       Uri.https(
@@ -123,6 +126,7 @@ class Api {
       ),
     );
 
+    _setProgress(2 / 15);
     await Future.delayed(_interval);
     var response = await _client.postUri<dynamic>(
       Uri.https(
@@ -146,6 +150,7 @@ class Api {
     );
 
     if (response.statusCode == 302) {
+      _setProgress(3 / 15);
       await Future.delayed(_interval);
       response = await _client.get<dynamic>(
         response.headers.value('location')!,
@@ -160,6 +165,7 @@ class Api {
       );
 
       if (response.statusCode == 302) {
+        _setProgress(4 / 15);
         await Future.delayed(_interval);
         await _client.getUri<dynamic>(
           Uri.https(
@@ -176,6 +182,7 @@ class Api {
           ),
         );
 
+        _setProgress(5 / 15);
         await Future.delayed(_interval);
         response = await _client.postUri<dynamic>(
           Uri.https(
@@ -222,6 +229,7 @@ class Api {
         print('RelayState: ${relayState.substring(0, 10)} ...');
       }
 
+      _setProgress(6 / 15);
       await Future.delayed(_interval);
       await _client.postUri<dynamic>(
         Uri.https(
@@ -243,6 +251,9 @@ class Api {
         ),
       );
 
+      App.navigatorKey.currentContext
+          ?.read<ApiRepository>()
+          .setProgress(7 / 15);
       await Future.delayed(_interval);
       response = await _client.getUri<dynamic>(
         Uri.https(
@@ -260,6 +271,9 @@ class Api {
       );
 
       if (response.statusCode == 302) {
+        App.navigatorKey.currentContext
+            ?.read<ApiRepository>()
+            .setProgress(8 / 15);
         await Future.delayed(_interval);
         response = await _client.get<dynamic>(
           response.headers.value('location')!,
@@ -285,6 +299,8 @@ class Api {
           print('SAMLResponse: ${samlResponse.substring(0, 10)} ...');
           print('RelayState: ${relayState.substring(0, 10)} ...');
         }
+
+        _setProgress(9 / 15);
         await Future.delayed(_interval);
         await _client.postUri<dynamic>(
           Uri.https(
@@ -305,6 +321,8 @@ class Api {
             validateStatus: (status) => status == 302,
           ),
         );
+
+        _setProgress(10 / 15);
         await Future.delayed(_interval);
         response = await _client.getUri<dynamic>(
           Uri.https(
@@ -320,6 +338,9 @@ class Api {
           ),
         );
         if (response.statusCode == 302) {
+          App.navigatorKey.currentContext
+              ?.read<ApiRepository>()
+              .setProgress(11 / 15);
           await Future.delayed(_interval);
           response = await _client.get<dynamic>(
             response.headers.value('location')!,
@@ -333,8 +354,9 @@ class Api {
       _updateToken(response.data, required: true);
       var accessEnvName =
           'GakujoGUI Flutter ${(const Uuid()).v4().substring(0, 8)}';
-
       settings?.accessEnvironmentName = accessEnvName;
+
+      _setProgress(12 / 15);
       await Future.delayed(_interval);
       response = await _client.postUri<dynamic>(
         Uri.https(
@@ -365,6 +387,7 @@ class Api {
       }
     }
 
+    _setProgress(13 / 15);
     await Future.delayed(_interval);
     response = await _client.postUri<dynamic>(
       Uri.https(
@@ -393,6 +416,7 @@ class Api {
         name?.substring(0, name.indexOf('さん')).replaceAll('　', '');
 
     if (settings?.profileImage == null) {
+      _setProgress(14 / 15);
       await Future.delayed(_interval);
       response = await _client.getUri<dynamic>(
         Uri.https(
@@ -407,10 +431,12 @@ class Api {
       settings?.profileImage = base64.encode(response.data);
     }
     settings?.lastLoginTime = DateTime.now();
-    navigatorKey.currentContext?.read<SettingsRepository>().save(settings!);
+    App.navigatorKey.currentContext?.read<SettingsRepository>().save(settings!);
+    _setProgress(15 / 15);
   }
 
   Future<void> fetchContacts() async {
+    _setProgress(0 / 2);
     var response = await _client.postUri<dynamic>(
       Uri.https(
         'gakujo.shizuoka.ac.jp',
@@ -425,6 +451,7 @@ class Api {
     );
     _updateToken(response.data, required: true);
 
+    _setProgress(1 / 2);
     await Future.delayed(_interval);
     response = await _client.postUri<dynamic>(
       Uri.https(
@@ -444,20 +471,22 @@ class Api {
         'contactKindCode': '',
         'targetDateStart': '',
         'targetDateEnd': '',
-        'reportDateStart': _reportDateStart
+        'reportDateStart': await _reportDateStart
       },
     );
     _updateToken(response.data, required: true);
 
-    navigatorKey.currentContext?.read<ContactRepository>().addAll(
+    App.navigatorKey.currentContext?.read<ContactRepository>().addAll(
         parse(response.data)
             .querySelectorAll('#tbl_A01_01 > tbody > tr')
             .map(Contact.fromElement)
             .toList());
+    _setProgress(2 / 2);
   }
 
   Future<Contact> fetchDetailContact(Contact contact,
       {bool bypass = false}) async {
+    _setProgress(0 / 3);
     var index = -1;
     if (!bypass) {
       var response = await _client.postUri<dynamic>(
@@ -474,6 +503,7 @@ class Api {
       );
       _updateToken(response.data, required: true);
 
+      _setProgress(1 / 3);
       await Future.delayed(_interval);
       response = await _client.postUri<dynamic>(
         Uri.https(
@@ -492,7 +522,7 @@ class Api {
             'contactKindCode': '',
             'targetDateStart': '',
             'targetDateEnd': '',
-            'reportDateStart': _reportDateStart
+            'reportDateStart': await _reportDateStart
           },
         ),
       );
@@ -508,6 +538,7 @@ class Api {
       }
     }
 
+    _setProgress(2 / 3);
     await Future.delayed(_interval);
     var response = await _client.postUri<dynamic>(
       Uri.https(
@@ -526,7 +557,7 @@ class Api {
             'contactKindCode': '',
             'targetDateStart': '',
             'targetDateEnd': '',
-            'reportDateStart': _reportDateStart,
+            'reportDateStart': await _reportDateStart,
             'reportDateEnd': '',
             'requireResponse': '',
             'studentCode': '',
@@ -550,6 +581,7 @@ class Api {
             .trimJsArgs(0)
             .replaceAll('fileDownLoad', '');
         var no = node.attributes['onclick']!.trimJsArgs(1);
+
         await Future.delayed(_interval);
         var response = await _client.postUri<dynamic>(
           Uri.https(
@@ -576,13 +608,15 @@ class Api {
     }
 
     contact.toDetail(document);
-    navigatorKey.currentContext
-        ?.watch<ContactRepository>()
+    App.navigatorKey.currentContext
+        ?.read<ContactRepository>()
         .add(contact, overwrite: true);
+    _setProgress(3 / 3);
     return contact;
   }
 
   Future<void> fetchSubjects() async {
+    _setProgress(0 / 2);
     var response = await _client.postUri<dynamic>(
       Uri.https(
         'gakujo.shizuoka.ac.jp',
@@ -597,6 +631,7 @@ class Api {
     );
     _updateToken(response.data, required: true);
 
+    _setProgress(1 / 2);
     await Future.delayed(_interval);
     response = await _client.postUri<dynamic>(
       Uri.https(
@@ -610,8 +645,10 @@ class Api {
     );
     _updateToken(response.data, required: true);
 
-    await navigatorKey.currentContext?.read<SubjectRepository>().deleteAll();
-    navigatorKey.currentContext?.read<SubjectRepository>().addAll(
+    await App.navigatorKey.currentContext
+        ?.read<SubjectRepository>()
+        .deleteAll();
+    App.navigatorKey.currentContext?.read<SubjectRepository>().addAll(
         parse(response.data)
             .querySelector('#st1')!
             .querySelectorAll('ul')
@@ -619,9 +656,11 @@ class Api {
             .map(Subject.fromElement)
             .toSet()
             .toList());
+    _setProgress(2 / 2);
   }
 
   Future<void> fetchReports() async {
+    _setProgress(0 / 2);
     var response = await _client.postUri<dynamic>(
       Uri.https(
         'gakujo.shizuoka.ac.jp',
@@ -636,6 +675,7 @@ class Api {
     );
     _updateToken(response.data, required: true);
 
+    _setProgress(1 / 2);
     await Future.delayed(_interval);
     response = await _client.postUri<dynamic>(
       Uri.https(
@@ -663,14 +703,16 @@ class Api {
     );
     _updateToken(response.data, required: true);
 
-    navigatorKey.currentContext?.read<ReportRepository>().addAll(
+    App.navigatorKey.currentContext?.read<ReportRepository>().addAll(
         parse(response.data)
             .querySelectorAll('#searchList > tbody > tr')
             .map(Report.fromElement)
             .toList());
+    _setProgress(2 / 2);
   }
 
   Future<Report> fetchDetailReport(Report report, {bool bypass = false}) async {
+    _setProgress(0 / 3);
     if (!bypass) {
       var response = await _client.postUri<dynamic>(
         Uri.https(
@@ -686,6 +728,7 @@ class Api {
       );
       _updateToken(response.data, required: true);
 
+      _setProgress(1 / 3);
       await Future.delayed(_interval);
       response = await _client.postUri<dynamic>(
         Uri.https(
@@ -721,6 +764,8 @@ class Api {
         return report;
       }
     }
+
+    _setProgress(2 / 3);
     await Future.delayed(_interval);
     var response = await _client.postUri<dynamic>(
       Uri.https(
@@ -780,13 +825,15 @@ class Api {
     }
 
     report.toDetail(document);
-    navigatorKey.currentContext
+    App.navigatorKey.currentContext
         ?.read<ReportRepository>()
         .add(report, overwrite: true);
+    _setProgress(3 / 3);
     return report;
   }
 
   Future<void> fetchQuizzes() async {
+    _setProgress(0 / 2);
     var response = await _client.postUri<dynamic>(
       Uri.https(
         'gakujo.shizuoka.ac.jp',
@@ -801,6 +848,7 @@ class Api {
     );
     _updateToken(response.data, required: true);
 
+    _setProgress(1 / 2);
     await Future.delayed(_interval);
     response = await _client.postUri<dynamic>(
       Uri.https(
@@ -828,14 +876,16 @@ class Api {
     );
     _updateToken(response.data, required: true);
 
-    navigatorKey.currentContext?.read<QuizRepository>().addAll(
+    App.navigatorKey.currentContext?.read<QuizRepository>().addAll(
         parse(response.data)
             .querySelectorAll('#searchList > tbody > tr')
             .map(Quiz.fromElement)
             .toList());
+    _setProgress(2 / 2);
   }
 
   Future<Quiz> fetchDetailQuiz(Quiz quiz, {bool bypass = false}) async {
+    _setProgress(0 / 3);
     if (!bypass) {
       var response = await _client.postUri<dynamic>(
         Uri.https(
@@ -851,6 +901,7 @@ class Api {
       );
       _updateToken(response.data, required: true);
 
+      _setProgress(1 / 3);
       await Future.delayed(_interval);
       response = await _client.postUri<dynamic>(
         Uri.https(
@@ -886,6 +937,8 @@ class Api {
         return quiz;
       }
     }
+
+    _setProgress(2 / 3);
     await Future.delayed(_interval);
     var response = await _client.postUri<dynamic>(
       Uri.https('gakujo.shizuoka.ac.jp',
@@ -942,13 +995,15 @@ class Api {
     }
 
     quiz.toDetail(document);
-    navigatorKey.currentContext
+    App.navigatorKey.currentContext
         ?.read<QuizRepository>()
         .add(quiz, overwrite: true);
+    _setProgress(3 / 3);
     return quiz;
   }
 
   Future<void> fetchSharedFiles() async {
+    _setProgress(0 / 2);
     var response = await _client.postUri<dynamic>(
       Uri.https(
         'gakujo.shizuoka.ac.jp',
@@ -963,6 +1018,7 @@ class Api {
     );
     _updateToken(response.data, required: true);
 
+    _setProgress(1 / 2);
     await Future.delayed(_interval);
     response = await _client.postUri<dynamic>(
       Uri.https(
@@ -986,15 +1042,17 @@ class Api {
     );
     _updateToken(response.data, required: true);
 
-    navigatorKey.currentContext?.read<SharedFileRepository>().addAll(
+    App.navigatorKey.currentContext?.read<SharedFileRepository>().addAll(
         parse(response.data)
             .querySelectorAll('#tbl_classFile > tbody > tr')
             .map(SharedFile.fromElement)
             .toList());
+    _setProgress(2 / 2);
   }
 
   Future<SharedFile> fetchDetailSharedFile(SharedFile sharedFile,
       {bool bypass = false}) async {
+    _setProgress(0 / 3);
     var index = -1;
     if (!bypass) {
       var response = await _client.postUri<dynamic>(
@@ -1011,6 +1069,7 @@ class Api {
       );
       _updateToken(response.data, required: true);
 
+      _setProgress(1 / 3);
       await Future.delayed(_interval);
       response = await _client.postUri<dynamic>(
         Uri.https(
@@ -1044,6 +1103,7 @@ class Api {
       }
     }
 
+    _setProgress(2 / 3);
     await Future.delayed(_interval);
     var response = await _client.postUri<dynamic>(
       Uri.https(
@@ -1081,6 +1141,7 @@ class Api {
           }),
     );
     _updateToken(response.data, required: true);
+
     var document = parse(response.data);
     sharedFile.fileNames = [];
     var dir = await getApplicationDocumentsDirectory();
@@ -1111,13 +1172,15 @@ class Api {
     }
 
     sharedFile.toDetail(document);
-    navigatorKey.currentContext
+    App.navigatorKey.currentContext
         ?.read<SharedFileRepository>()
         .add(sharedFile, overwrite: true);
+    _setProgress(3 / 3);
     return sharedFile;
   }
 
   Future<void> fetchClassLinks() async {
+    _setProgress(0 / 2);
     var response = await _client.postUri<dynamic>(
       Uri.https(
         'gakujo.shizuoka.ac.jp',
@@ -1132,6 +1195,7 @@ class Api {
     );
     _updateToken(response.data, required: true);
 
+    _setProgress(1 / 2);
     await Future.delayed(_interval);
     response = await _client.postUri<dynamic>(
       Uri.https(
@@ -1154,15 +1218,17 @@ class Api {
     );
     _updateToken(response.data, required: true);
 
-    navigatorKey.currentContext?.read<ClassLinkRepository>().addAll(
+    App.navigatorKey.currentContext?.read<ClassLinkRepository>().addAll(
         parse(response.data)
             .querySelectorAll('#tbl_classLinkList > tbody > tr')
             .map(ClassLink.fromElement)
             .toList());
+    _setProgress(2 / 2);
   }
 
   Future<ClassLink> fetchDetailClassLink(ClassLink classLink,
       {bool bypass = false}) async {
+    _setProgress(0 / 3);
     if (!bypass) {
       var response = await _client.postUri<dynamic>(
         Uri.https(
@@ -1178,6 +1244,7 @@ class Api {
       );
       _updateToken(response.data, required: true);
 
+      _setProgress(1 / 3);
       await Future.delayed(_interval);
       response = await _client.postUri<dynamic>(
         Uri.https(
@@ -1208,6 +1275,8 @@ class Api {
         return classLink;
       }
     }
+
+    _setProgress(2 / 3);
     await Future.delayed(_interval);
     var response = await _client.postUri<dynamic>(
       Uri.https(
@@ -1231,13 +1300,15 @@ class Api {
     _updateToken(response.data, required: true);
     var document = parse(response.data);
     classLink.toDetail(document);
-    navigatorKey.currentContext
+    App.navigatorKey.currentContext
         ?.read<ClassLinkRepository>()
         .add(classLink, overwrite: true);
+    _setProgress(3 / 3);
     return classLink;
   }
 
   Future<bool> fetchAcademicSystem() async {
+    _setProgress(0 / 7);
     await _client.postUri<dynamic>(
       Uri.https(
         'gakujo.shizuoka.ac.jp',
@@ -1252,6 +1323,7 @@ class Api {
       ),
     );
 
+    _setProgress(1 / 7);
     await Future.delayed(_interval);
     var response = await _client.postUri<dynamic>(
       Uri.https(
@@ -1273,6 +1345,7 @@ class Api {
       ),
     );
 
+    _setProgress(2 / 7);
     await Future.delayed(_interval);
     response = await _client.postUri<dynamic>(
       Uri.https(
@@ -1291,6 +1364,7 @@ class Api {
     );
 
     if (response.statusCode == 302) {
+      _setProgress(3 / 7);
       await Future.delayed(_interval);
       response = await _client.get<dynamic>(
         response.headers.value('location')!,
@@ -1318,6 +1392,7 @@ class Api {
         print('RelayState: ${relayState.substring(0, 10)} ...');
       }
 
+      _setProgress(4 / 7);
       await Future.delayed(_interval);
       response = await _client.postUri<dynamic>(
         Uri.https(
@@ -1339,6 +1414,7 @@ class Api {
         ),
       );
 
+      _setProgress(5 / 7);
       await Future.delayed(_interval);
       response = await _client.get<dynamic>(response.headers.value('location')!,
           options: Options(
@@ -1346,17 +1422,20 @@ class Api {
           ));
 
       if (response.statusCode == 302) {
+        _setProgress(6 / 7);
         await Future.delayed(_interval);
         response =
             await _client.get<dynamic>(response.headers.value('location')!);
       }
     }
+    _setProgress(7 / 7);
     return true;
   }
 
   Future<void> fetchGrades() async {
     await fetchAcademicSystem();
 
+    _setProgress(0 / 5);
     await Future.delayed(_interval);
     var response = await _client.getUri<dynamic>(
       Uri.https(
@@ -1371,8 +1450,10 @@ class Api {
     var document = parse(response.data);
 
     if (document.querySelector('table.txt12') != null) {
-      await navigatorKey.currentContext?.read<GradeRepository>().deleteAll();
-      navigatorKey.currentContext?.read<GradeRepository>().addAll(document
+      await App.navigatorKey.currentContext
+          ?.read<GradeRepository>()
+          .deleteAll();
+      App.navigatorKey.currentContext?.read<GradeRepository>().addAll(document
           .querySelector('table.txt12')!
           .querySelectorAll('tr')
           .skip(1)
@@ -1380,9 +1461,11 @@ class Api {
           .toList());
     }
 
-    Gpa gpa = await navigatorKey.currentContext?.read<GpaRepository>().load() ??
-        Gpa.init();
+    Gpa gpa =
+        await App.navigatorKey.currentContext?.read<GpaRepository>().load() ??
+            Gpa.init();
 
+    _setProgress(1 / 5);
     await Future.delayed(_interval);
     response = await _client.getUri<dynamic>(
       Uri.https(
@@ -1401,6 +1484,7 @@ class Api {
           int.parse(e.children[1].text.trimWhiteSpace());
     });
 
+    _setProgress(2 / 5);
     await Future.delayed(_interval);
     response = await _client.getUri<dynamic>(
       Uri.https(
@@ -1422,6 +1506,7 @@ class Api {
           double.parse(e.children[1].text.trimWhiteSpace());
     });
 
+    _setProgress(3 / 5);
     await Future.delayed(_interval);
     response = await _client.getUri<dynamic>(
       Uri.https(
@@ -1469,6 +1554,7 @@ class Api {
         .split('中')[0]
         .replaceAll('人', ''));
 
+    _setProgress(4 / 5);
     await Future.delayed(_interval);
     response = await _client.getUri<dynamic>(
       Uri.https(
@@ -1488,7 +1574,8 @@ class Api {
           int.parse(e.children[1].text.trimWhiteSpace());
     });
 
-    await navigatorKey.currentContext?.read<GpaRepository>().save(gpa);
+    await App.navigatorKey.currentContext?.read<GpaRepository>().save(gpa);
+    _setProgress(5 / 5);
   }
 
   Future<void> fetchTimetables() async {
@@ -1507,7 +1594,9 @@ class Api {
     );
     var document = parse(response.data);
 
-    await navigatorKey.currentContext?.read<TimetableRepository>().deleteAll();
+    await App.navigatorKey.currentContext
+        ?.read<TimetableRepository>()
+        .deleteAll();
     var table = document
         .querySelectorAll('table.txt12')[1]
         .querySelector('tbody')!
@@ -1547,7 +1636,7 @@ class Api {
                 .trimWhiteSpace();
             Timetable timetable = await fetchDetailTimetable(
                 i, j - 1, kamokuCode, classCode, classRoom);
-            await navigatorKey.currentContext
+            await App.navigatorKey.currentContext
                 ?.read<TimetableRepository>()
                 .add(timetable);
           }
