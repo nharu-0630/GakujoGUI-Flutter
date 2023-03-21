@@ -27,9 +27,13 @@ import 'package:uuid/uuid.dart';
 import 'package:version/version.dart';
 
 class Api {
-  static final version = Version(1, 4, 0);
+  static final version = Version(1, 4, 1);
+  static const _interval = Duration(milliseconds: 250);
 
-  final _interval = const Duration(milliseconds: 500);
+  late Dio _client;
+  late PersistCookieJar _cookieJar;
+  String _token = '';
+  String get token => _token;
 
   Future<Settings>? get _settings =>
       navigatorKey.currentContext?.read<SettingsRepository>().load();
@@ -39,21 +43,11 @@ class Api {
   Future<int> get _year async => (await _settings)?.year ?? 2022;
   Future<int> get _semester async => (await _settings)?.semester ?? 3;
 
-  Dio _client = Dio();
-  CookieJar _cookieJar = CookieJar();
-
-  Api() {
-    loadSettings();
-  }
-
   Future<String> get _schoolYear async => (await _year).toString();
   Future<String> get _semesterCode async =>
       ((await _semester) < 2 ? 1 : 2).toString();
   Future<String> get _reportDateStart async =>
       '${await _schoolYear}/${(await _semester) < 2 ? '04' : '10'}/01';
-
-  String _token = '';
-  String get token => _token;
 
   bool _updateToken(dynamic data, {bool required = false}) {
     _token =
@@ -70,25 +64,10 @@ class Api {
     return _token.isNotEmpty;
   }
 
-  Future<void> loadSettings() async {
-    var settings = await _settings;
-    if (settings?.accessEnvironmentKey == null) return;
-    if (settings?.accessEnvironmentValue == null) return;
-    _cookieJar.saveFromResponse(
-      Uri.https('gakujo.shizuoka.ac.jp', '/portal'),
-      [
-        Cookie(
-          settings!.accessEnvironmentKey!,
-          settings.accessEnvironmentValue!,
-        )
-      ],
-    );
-  }
-
   Future<void> clearSettings() async =>
       await navigatorKey.currentContext?.watch<SettingsRepository>().delete();
 
-  void _initialize() {
+  Future<void> initialize() async {
     _client = Dio(BaseOptions(
       headers: {
         'User-Agent':
@@ -98,7 +77,11 @@ class Api {
       followRedirects: false,
     ));
     _token = '';
-    _cookieJar = CookieJar();
+    _cookieJar = PersistCookieJar(
+      ignoreExpires: true,
+      storage: FileStorage(
+          join((await getApplicationDocumentsDirectory()).path, '.cookies')),
+    );
     _client.interceptors.add(CookieManager(_cookieJar));
     _client.interceptors.add(LogInterceptor());
     _client.interceptors.add(RetryInterceptor(
@@ -110,9 +93,6 @@ class Api {
   }
 
   Future<void> fetchLogin() async {
-    _initialize();
-    await loadSettings();
-
     await Future.delayed(_interval);
     _client.getUri<dynamic>(
       Uri.https(
@@ -161,119 +141,6 @@ class Api {
           'Origin': 'https://gakujo.shizuoka.ac.jp',
           'Referer': 'https://gakujo.shizuoka.ac.jp/portal/',
         },
-        validateStatus: (status) => status == 302,
-      ),
-    );
-
-    await Future.delayed(_interval);
-    response = await _client.get<dynamic>(
-      response.headers.value('location')!,
-      options: Options(
-        headers: {
-          'Accept':
-              'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
-          'Referer': 'https://gakujo.shizuoka.ac.jp/portal/',
-        },
-        validateStatus: (status) => status == 302 || status == 200,
-      ),
-    );
-
-    if (response.statusCode == 302) {
-      await Future.delayed(_interval);
-      await _client.getUri<dynamic>(
-        Uri.https(
-          'idp.shizuoka.ac.jp',
-          '/idp/profile/SAML2/Redirect/SSO',
-          {'execution': 'e1s1'},
-        ),
-        options: Options(
-          headers: {
-            'Accept':
-                'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
-            'Referer': 'https://gakujo.shizuoka.ac.jp/',
-          },
-        ),
-      );
-
-      await Future.delayed(_interval);
-      response = await _client.postUri<dynamic>(
-        Uri.https(
-          'idp.shizuoka.ac.jp',
-          '/idp/profile/SAML2/Redirect/SSO',
-          {'execution': 'e1s1'},
-        ),
-        data: {
-          'j_username': await _username,
-          'j_password': await _password,
-          '_eventId_proceed': '',
-        },
-        options: Options(
-          headers: {
-            'Accept':
-                'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
-            'Origin': 'https://idp.shizuoka.ac.jp',
-            'Referer':
-                'https://idp.shizuoka.ac.jp/idp/profile/SAML2/Redirect/SSO?execution=e1s1',
-          },
-        ),
-      );
-    }
-
-    var samlResponse = Uri.decodeFull(
-      RegExp(r'(?<=SAMLResponse" value=").*(?=")')
-              .firstMatch(response.data.toString())
-              ?.group(0) ??
-          '',
-    );
-    var relayState = Uri.decodeFull(
-      RegExp(r'(?<=RelayState" value=").*(?=")')
-              .firstMatch(response.data.toString())
-              ?.group(0) ??
-          '',
-    ).replaceAll('&#x3a;', ':');
-
-    if (samlResponse.isEmpty || relayState.isEmpty) {
-      throw Exception('SAMLResponse or RelayState is empty.');
-    }
-
-    if (kDebugMode) {
-      print('SAMLResponse: ${samlResponse.substring(0, 10)} ...');
-      print('RelayState: ${relayState.substring(0, 10)} ...');
-    }
-
-    await Future.delayed(_interval);
-    await _client.postUri<dynamic>(
-      Uri.https(
-        'gakujo.shizuoka.ac.jp',
-        '/Shibboleth.sso/SAML2/POST',
-      ),
-      data: {
-        'RelayState': relayState,
-        'SAMLResponse': samlResponse,
-      },
-      options: Options(
-        headers: {
-          'Accept':
-              'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
-          'Origin': 'https://idp.shizuoka.ac.jp',
-          'Referer': 'https://idp.shizuoka.ac.jp/',
-        },
-        validateStatus: (status) => status == 302,
-      ),
-    );
-
-    await Future.delayed(_interval);
-    response = await _client.getUri<dynamic>(
-      Uri.https(
-        'gakujo.shizuoka.ac.jp',
-        '/portal/shibbolethlogin/shibbolethLogin/initLogin/sso',
-      ),
-      options: Options(
-        headers: {
-          'Accept':
-              'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
-          'Referer': 'https://idp.shizuoka.ac.jp/',
-        },
         validateStatus: (status) => status == 302 || status == 200,
       ),
     );
@@ -282,28 +149,79 @@ class Api {
       await Future.delayed(_interval);
       response = await _client.get<dynamic>(
         response.headers.value('location')!,
+        options: Options(
+          headers: {
+            'Accept':
+                'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
+            'Referer': 'https://gakujo.shizuoka.ac.jp/portal/',
+          },
+          validateStatus: (status) => status == 302 || status == 200,
+        ),
       );
-    }
 
-    _updateToken(response.data);
+      if (response.statusCode == 302) {
+        await Future.delayed(_interval);
+        await _client.getUri<dynamic>(
+          Uri.https(
+            'idp.shizuoka.ac.jp',
+            '/idp/profile/SAML2/Redirect/SSO',
+            {'execution': 'e1s1'},
+          ),
+          options: Options(
+            headers: {
+              'Accept':
+                  'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
+              'Referer': 'https://gakujo.shizuoka.ac.jp/',
+            },
+          ),
+        );
 
-    samlResponse = Uri.decodeFull(
-      RegExp(r'(?<=SAMLResponse" value=").*(?=")')
-              .firstMatch(response.data.toString())
-              ?.group(0) ??
-          '',
-    );
-    relayState = Uri.decodeFull(
-      RegExp(r'(?<=RelayState" value=").*(?=")')
-              .firstMatch(response.data.toString())
-              ?.group(0) ??
-          '',
-    ).replaceAll('&#x3a;', ':');
-    if (samlResponse.isNotEmpty && relayState.isNotEmpty) {
+        await Future.delayed(_interval);
+        response = await _client.postUri<dynamic>(
+          Uri.https(
+            'idp.shizuoka.ac.jp',
+            '/idp/profile/SAML2/Redirect/SSO',
+            {'execution': 'e1s1'},
+          ),
+          data: {
+            'j_username': await _username,
+            'j_password': await _password,
+            '_eventId_proceed': '',
+          },
+          options: Options(
+            headers: {
+              'Accept':
+                  'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
+              'Origin': 'https://idp.shizuoka.ac.jp',
+              'Referer':
+                  'https://idp.shizuoka.ac.jp/idp/profile/SAML2/Redirect/SSO?execution=e1s1',
+            },
+          ),
+        );
+      }
+
+      var samlResponse = Uri.decodeFull(
+        RegExp(r'(?<=SAMLResponse" value=").*(?=")')
+                .firstMatch(response.data.toString())
+                ?.group(0) ??
+            '',
+      );
+      var relayState = Uri.decodeFull(
+        RegExp(r'(?<=RelayState" value=").*(?=")')
+                .firstMatch(response.data.toString())
+                ?.group(0) ??
+            '',
+      ).replaceAll('&#x3a;', ':');
+
+      if (samlResponse.isEmpty || relayState.isEmpty) {
+        throw Exception('SAMLResponse or RelayState is empty.');
+      }
+
       if (kDebugMode) {
         print('SAMLResponse: ${samlResponse.substring(0, 10)} ...');
         print('RelayState: ${relayState.substring(0, 10)} ...');
       }
+
       await Future.delayed(_interval);
       await _client.postUri<dynamic>(
         Uri.https(
@@ -324,6 +242,7 @@ class Api {
           validateStatus: (status) => status == 302,
         ),
       );
+
       await Future.delayed(_interval);
       response = await _client.getUri<dynamic>(
         Uri.https(
@@ -334,15 +253,78 @@ class Api {
           headers: {
             'Accept':
                 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
+            'Referer': 'https://idp.shizuoka.ac.jp/',
           },
           validateStatus: (status) => status == 302 || status == 200,
         ),
       );
+
       if (response.statusCode == 302) {
         await Future.delayed(_interval);
         response = await _client.get<dynamic>(
           response.headers.value('location')!,
         );
+      }
+
+      _updateToken(response.data);
+
+      samlResponse = Uri.decodeFull(
+        RegExp(r'(?<=SAMLResponse" value=").*(?=")')
+                .firstMatch(response.data.toString())
+                ?.group(0) ??
+            '',
+      );
+      relayState = Uri.decodeFull(
+        RegExp(r'(?<=RelayState" value=").*(?=")')
+                .firstMatch(response.data.toString())
+                ?.group(0) ??
+            '',
+      ).replaceAll('&#x3a;', ':');
+      if (samlResponse.isNotEmpty && relayState.isNotEmpty) {
+        if (kDebugMode) {
+          print('SAMLResponse: ${samlResponse.substring(0, 10)} ...');
+          print('RelayState: ${relayState.substring(0, 10)} ...');
+        }
+        await Future.delayed(_interval);
+        await _client.postUri<dynamic>(
+          Uri.https(
+            'gakujo.shizuoka.ac.jp',
+            '/Shibboleth.sso/SAML2/POST',
+          ),
+          data: {
+            'RelayState': relayState,
+            'SAMLResponse': samlResponse,
+          },
+          options: Options(
+            headers: {
+              'Accept':
+                  'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
+              'Origin': 'https://idp.shizuoka.ac.jp',
+              'Referer': 'https://idp.shizuoka.ac.jp/',
+            },
+            validateStatus: (status) => status == 302,
+          ),
+        );
+        await Future.delayed(_interval);
+        response = await _client.getUri<dynamic>(
+          Uri.https(
+            'gakujo.shizuoka.ac.jp',
+            '/portal/shibbolethlogin/shibbolethLogin/initLogin/sso',
+          ),
+          options: Options(
+            headers: {
+              'Accept':
+                  'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
+            },
+            validateStatus: (status) => status == 302 || status == 200,
+          ),
+        );
+        if (response.statusCode == 302) {
+          await Future.delayed(_interval);
+          response = await _client.get<dynamic>(
+            response.headers.value('location')!,
+          );
+        }
       }
     }
 

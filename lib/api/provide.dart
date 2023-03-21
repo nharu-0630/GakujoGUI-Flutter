@@ -22,11 +22,7 @@ class ApiRepository extends ChangeNotifier {
   bool _isError = false;
 
   ApiRepository() {
-    loadSettings();
-  }
-
-  void loadSettings() {
-    _api.loadSettings().then((value) => notifyListeners());
+    _api.initialize();
   }
 
   void _onError(Object e) {
