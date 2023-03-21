@@ -582,13 +582,13 @@ class _SettingsWidgetState extends State<SettingsWidget> {
                                 child: FutureBuilder(
                                   future: PackageInfo.fromPlatform(),
                                   builder: (context,
-                                      AsyncSnapshot<PackageInfo> snapshot) {
-                                    return Text(
-                                      snapshot.hasData
-                                          ? 'Client Version: ${snapshot.data!.version}\nAPI Version: ${Api.version}'
-                                          : 'Client Version: \nAPI Version: ',
-                                    );
-                                  },
+                                          AsyncSnapshot<PackageInfo>
+                                              snapshot) =>
+                                      Text(
+                                    snapshot.hasData
+                                        ? 'Client Version: ${snapshot.data!.version}\nAPI Version: ${Api.version}\nToken: ${context.read<ApiRepository>().token}'
+                                        : '',
+                                  ),
                                 ),
                               ),
                             ),

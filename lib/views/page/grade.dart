@@ -1,4 +1,5 @@
 import 'dart:collection';
+import 'dart:io';
 
 import 'package:collection/collection.dart';
 import 'package:fl_chart/fl_chart.dart';
@@ -38,6 +39,14 @@ class _GradePageState extends State<GradePage> {
           _grades.sort(((a, b) => b.compareTo(a)));
           _gpa = snapshot.data![1];
           return Scaffold(
+            floatingActionButton:
+                (Platform.isLinux || Platform.isMacOS || Platform.isWindows)
+                    ? FloatingActionButton(
+                        onPressed: () async =>
+                            context.read<ApiRepository>().fetchGrades(),
+                        child: Icon(KIcons.update),
+                      )
+                    : null,
             body: DefaultTabController(
               length: 2,
               child: NestedScrollView(
