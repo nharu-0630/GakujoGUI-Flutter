@@ -4,6 +4,7 @@ import 'package:adaptive_dialog/adaptive_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:gakujo_gui/api/provide.dart';
+import 'package:gakujo_gui/constants/kcolors.dart';
 import 'package:gakujo_gui/constants/kicons.dart';
 import 'package:gakujo_gui/models/shared_file.dart';
 import 'package:gakujo_gui/views/common/widget.dart';
@@ -169,7 +170,7 @@ class _SharedFilePageState extends State<SharedFilePage> {
                 .setArchive(
                     sharedFile.hashCode.toString(), !sharedFile.isArchived)
                 .then((value) => setState(() {})),
-            backgroundColor: const Color(0xFF7BC043),
+            backgroundColor: KColors.archive,
             foregroundColor: Colors.white,
             icon: sharedFile.isArchived ? KIcons.unarchive : KIcons.archive,
             label: sharedFile.isArchived ? 'アーカイブ解除' : 'アーカイブ',
@@ -182,7 +183,7 @@ class _SharedFilePageState extends State<SharedFilePage> {
           SlidableAction(
             onPressed: (context) async =>
                 context.read<ApiRepository>().fetchDetailSharedFile(sharedFile),
-            backgroundColor: const Color(0xFF0392CF),
+            backgroundColor: KColors.update,
             foregroundColor: Colors.white,
             icon: KIcons.update,
             label: '更新',

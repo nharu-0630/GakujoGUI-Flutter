@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:gakujo_gui/api/parse.dart';
 import 'package:gakujo_gui/api/provide.dart';
+import 'package:gakujo_gui/constants/kcolors.dart';
 import 'package:gakujo_gui/constants/kicons.dart';
 import 'package:gakujo_gui/models/quiz.dart';
 import 'package:gakujo_gui/views/common/widget.dart';
@@ -174,7 +175,7 @@ class _QuizPageState extends State<QuizPage> {
                 .read<QuizRepository>()
                 .setArchive(quiz.id, !quiz.isArchived)
                 .then((value) => setState(() {})),
-            backgroundColor: const Color(0xFF7BC043),
+            backgroundColor: KColors.archive,
             foregroundColor: Colors.white,
             icon: quiz.isArchived ? KIcons.unarchive : KIcons.archive,
             label: quiz.isArchived ? 'アーカイブ解除' : 'アーカイブ',
@@ -187,7 +188,7 @@ class _QuizPageState extends State<QuizPage> {
           SlidableAction(
             onPressed: (context) async =>
                 context.read<ApiRepository>().fetchDetailQuiz(quiz),
-            backgroundColor: const Color(0xFF0392CF),
+            backgroundColor: KColors.update,
             foregroundColor: Colors.white,
             icon: KIcons.update,
             label: '更新',

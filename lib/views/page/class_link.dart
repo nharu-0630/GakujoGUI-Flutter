@@ -4,6 +4,7 @@ import 'package:adaptive_dialog/adaptive_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:gakujo_gui/api/provide.dart';
+import 'package:gakujo_gui/constants/kcolors.dart';
 import 'package:gakujo_gui/constants/kicons.dart';
 import 'package:gakujo_gui/models/class_link.dart';
 import 'package:gakujo_gui/models/shared_file.dart';
@@ -169,7 +170,7 @@ class _ClassLinkPageState extends State<ClassLinkPage> {
                 .read<SharedFileRepository>()
                 .setArchive(classLink.id, !classLink.isArchived)
                 .then((value) => setState(() {})),
-            backgroundColor: const Color(0xFF7BC043),
+            backgroundColor: KColors.archive,
             foregroundColor: Colors.white,
             icon: classLink.isArchived ? KIcons.unarchive : KIcons.archive,
             label: classLink.isArchived ? 'アーカイブ解除' : 'アーカイブ',
@@ -182,7 +183,7 @@ class _ClassLinkPageState extends State<ClassLinkPage> {
           SlidableAction(
             onPressed: (context) async =>
                 context.read<ApiRepository>().fetchDetailClassLink(classLink),
-            backgroundColor: const Color(0xFF0392CF),
+            backgroundColor: KColors.update,
             foregroundColor: Colors.white,
             icon: KIcons.update,
             label: '更新',

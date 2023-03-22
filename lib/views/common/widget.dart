@@ -111,7 +111,7 @@ Widget buildAutoLinkText(BuildContext context, String text) {
   return SelectableAutoLinkText(
     text,
     style: Theme.of(context).textTheme.bodyMedium,
-    linkStyle: const TextStyle(color: Colors.blueAccent),
+    linkStyle: TextStyle(color: Theme.of(context).colorScheme.primary),
     onTap: (url) => launchUrlString(url, mode: LaunchMode.inAppWebView),
     onLongPress: (url) => Share.share(url),
     linkRegExpPattern:
