@@ -4,7 +4,6 @@ import 'dart:io';
 import 'package:cookie_jar/cookie_jar.dart';
 import 'package:dio/dio.dart';
 import 'package:dio_cookie_manager/dio_cookie_manager.dart';
-import 'package:dio_smart_retry/dio_smart_retry.dart';
 import 'package:flutter/foundation.dart';
 import 'package:gakujo_gui/api/parse.dart';
 import 'package:gakujo_gui/api/provide.dart';
@@ -32,7 +31,7 @@ class Api {
   static const _interval = Duration(milliseconds: 250);
 
   late Dio _client;
-  late PersistCookieJar _cookieJar;
+  late CookieJar _cookieJar;
   String _token = '';
   String get token => _token;
 
@@ -75,28 +74,24 @@ class Api {
             'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/111.0.0.0 Safari/537.36 GakujoGUI/$version',
       },
       contentType: Headers.formUrlEncodedContentType,
+      responseType: ResponseType.plain,
       followRedirects: false,
     ));
     _token = '';
-    _cookieJar = PersistCookieJar(
-      ignoreExpires: true,
-      storage: FileStorage(
-          join((await getApplicationDocumentsDirectory()).path, '.cookies')),
-    );
+    _cookieJar = CookieJar();
+    // _cookieJar = PersistCookieJar(
+    //   ignoreExpires: true,
+    //   storage: FileStorage(
+    //       join((await getApplicationDocumentsDirectory()).path, '.cookies')),
+    // );
     _client.interceptors.add(CookieManager(_cookieJar));
     _client.interceptors.add(LogInterceptor());
-    _client.interceptors.add(RetryInterceptor(
-      dio: _client,
-      logPrint: print,
-      retries: 0,
-      retryDelays: const [],
-    ));
   }
 
   Future<void> fetchLogin() async {
     _setProgress(0 / 15);
     await Future.delayed(_interval);
-    _client.getUri<dynamic>(
+    await _client.getUri<dynamic>(
       Uri.https(
         'gakujo.shizuoka.ac.jp',
         '/portal/',
