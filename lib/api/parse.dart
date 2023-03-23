@@ -41,10 +41,10 @@ extension StringParsing on String {
 
   DateTime toDateTime() {
     try {
-      return DateFormat('y/M/d').parse(this);
+      return DateFormat('y/M/d HH:mm').parse(this);
     } on FormatException {
       try {
-        return DateFormat('y/M/d HH:mm').parse(this);
+        return DateFormat('y/M/d').parse(this);
       } on FormatException {
         try {
           return DateFormat('y年 MM月 dd日').parse(this);

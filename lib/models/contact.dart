@@ -51,11 +51,8 @@ class Contact implements Comparable<Contact> {
 
   factory Contact.fromElement(Element element) {
     return Contact(
-      subject: element
-          .querySelectorAll('td')[1]
-          .text
-          .trimWhiteSpace()
-          .replaceAll(RegExp(r'（.*）(前|後)期.*'), ''),
+      subject:
+          element.querySelectorAll('td')[1].text.trimWhiteSpace().trimSubject(),
       teacherName: element.querySelectorAll('td')[2].text.trim(),
       contactType: element.querySelectorAll('td')[4].text.trim(),
       title: element.querySelectorAll('td')[3].querySelector('a')!.text.trim(),
