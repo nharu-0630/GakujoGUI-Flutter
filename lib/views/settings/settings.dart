@@ -57,8 +57,13 @@ class _SettingsWidgetState extends State<SettingsWidget> {
     return Scaffold(
       appBar: _buildAppBar(context),
       body: FutureBuilder(
-        future: context.watch<SettingsRepository>().load(),
-        builder: (context, AsyncSnapshot<Settings> snapshot) {
+        future: Future.wait([
+          context.watch<SettingsRepository>().load(),
+          PackageInfo.fromPlatform()
+        ]),
+        builder: (context, AsyncSnapshot<List<dynamic>> snapshot) {
+          var settings = (snapshot.data?[0] as Settings?);
+          var packageInfo = (snapshot.data?[1] as PackageInfo?);
           return snapshot.hasData
               ? ListView(
                   physics: const AlwaysScrollableScrollPhysics(),
@@ -192,7 +197,7 @@ class _SettingsWidgetState extends State<SettingsWidget> {
                                 Expanded(
                                   flex: 1,
                                   child: Text(
-                                    snapshot.data!.year?.toString() ?? '-',
+                                    settings!.year?.toString() ?? '-',
                                     style:
                                         Theme.of(context).textTheme.titleMedium,
                                   ),
@@ -226,18 +231,16 @@ class _SettingsWidgetState extends State<SettingsWidget> {
                                                   lastDate: DateTime(
                                                       DateTime.now().year + 5,
                                                       1),
-                                                  initialDate: snapshot
-                                                              .data!.year ==
-                                                          null
-                                                      ? DateTime.now()
-                                                      : DateTime(
-                                                          snapshot.data!.year!),
-                                                  selectedDate: snapshot
-                                                              .data!.year ==
-                                                          null
-                                                      ? DateTime.now()
-                                                      : DateTime(
-                                                          snapshot.data!.year!),
+                                                  initialDate:
+                                                      settings.year == null
+                                                          ? DateTime.now()
+                                                          : DateTime(
+                                                              settings.year!),
+                                                  selectedDate:
+                                                      settings.year == null
+                                                          ? DateTime.now()
+                                                          : DateTime(
+                                                              settings.year!),
                                                   onChanged:
                                                       (DateTime dateTime) {
                                                     context
@@ -285,7 +288,7 @@ class _SettingsWidgetState extends State<SettingsWidget> {
                                   flex: 1,
                                   child: Text(
                                     (() {
-                                      switch (snapshot.data!.semester) {
+                                      switch (settings.semester) {
                                         case 0:
                                           return '前期前半';
                                         case 1:
@@ -579,16 +582,9 @@ class _SettingsWidgetState extends State<SettingsWidget> {
                               padding: const EdgeInsets.all(8.0),
                               child: Align(
                                 alignment: Alignment.topLeft,
-                                child: FutureBuilder(
-                                  future: PackageInfo.fromPlatform(),
-                                  builder: (context,
-                                          AsyncSnapshot<PackageInfo>
-                                              snapshot) =>
-                                      Text(
-                                    snapshot.hasData
-                                        ? 'Client Version: ${snapshot.data!.version}\nAPI Version: ${Api.version}\nToken: ${context.read<ApiRepository>().token}'
-                                        : '',
-                                  ),
+                                child: buildAutoLinkText(
+                                  context,
+                                  'Client Version: ${packageInfo!.version}\nAPI Version: ${Api.version}\nToken: ${context.read<ApiRepository>().token}\nAccessEnvironment Key: ${settings.accessEnvironmentKey}\nAccessEnvironment Value: ${settings.accessEnvironmentValue}',
                                 ),
                               ),
                             ),

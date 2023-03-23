@@ -16,6 +16,7 @@ import 'package:gakujo_gui/models/subject.dart';
 import 'package:gakujo_gui/models/timetable.dart';
 import 'package:hive_flutter/adapters.dart';
 import 'package:intl/date_symbol_data_local.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:window_size/window_size.dart';
 import 'package:windows_taskbar/windows_taskbar.dart';
@@ -30,7 +31,7 @@ void main() async {
     WindowsTaskbar.setProgressMode(TaskbarProgressMode.noProgress);
   }
   initializeDateFormatting('ja');
-  await Hive.initFlutter();
+  await Hive.initFlutter((await getApplicationSupportDirectory()).path);
   Hive.registerAdapter(ContactAdapter());
   Hive.registerAdapter(SubjectAdapter());
   Hive.registerAdapter(SettingsAdapter());

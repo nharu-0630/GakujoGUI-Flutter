@@ -71,18 +71,17 @@ class Api {
     _client = Dio(BaseOptions(
       headers: {
         'User-Agent':
-            'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/111.0.0.0 Safari/537.36 GakujoGUI/$version',
+            'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/111.0.0.0 Safari/537.36 GakujoAPI/$version',
       },
       contentType: Headers.formUrlEncodedContentType,
       followRedirects: false,
     ));
     _token = '';
-    _cookieJar = CookieJar();
-    // _cookieJar = PersistCookieJar(
-    //   ignoreExpires: true,
-    //   storage: FileStorage(
-    //       join((await getApplicationDocumentsDirectory()).path, '.cookies')),
-    // );
+    _cookieJar = PersistCookieJar(
+      ignoreExpires: true,
+      storage: FileStorage(
+          join((await getApplicationSupportDirectory()).path, 'cookies')),
+    );
     _client.interceptors.add(CookieManager(_cookieJar));
     _client.interceptors.add(LogInterceptor());
   }
@@ -159,6 +158,10 @@ class Api {
       );
 
       if (response.statusCode == 302) {
+        if (response.headers.value('set-cookie') == null) {
+          throw Exception('Failed to fetch login.');
+        }
+
         var idpSession = RegExp(r'(?<=JSESSIONID=).*?(?=;)')
             .firstMatch(response.headers.value('set-cookie')!)
             ?.group(0);
@@ -390,27 +393,47 @@ class Api {
         settings?.accessEnvironmentKey = cookies[0];
         settings?.accessEnvironmentValue = cookies[1];
       }
-    }
 
-    _setProgress(13 / 15);
-    await Future.delayed(_interval);
-    response = await _client.postUri<dynamic>(
-      Uri.https(
-        'gakujo.shizuoka.ac.jp',
-        '/portal/home/home/initialize',
-        {'EXCLUDE_SET': ''},
-      ),
-      data: {'EXCLUDE_SET': ''},
-      options: Options(
-        headers: {
-          'Accept':
-              'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
-          'Origin': 'https://gakujo.shizuoka.ac.jp',
-          'Referer':
-              'https://gakujo.shizuoka.ac.jp/portal/common/accessEnvironmentRegist/goHome/',
-        },
-      ),
-    );
+      _setProgress(13 / 15);
+      await Future.delayed(_interval);
+      response = await _client.postUri<dynamic>(
+        Uri.https(
+          'gakujo.shizuoka.ac.jp',
+          '/portal/home/home/initialize',
+          {'EXCLUDE_SET': ''},
+        ),
+        data: {'EXCLUDE_SET': ''},
+        options: Options(
+          headers: {
+            'Accept':
+                'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
+            'Origin': 'https://gakujo.shizuoka.ac.jp',
+            'Referer':
+                'https://gakujo.shizuoka.ac.jp/portal/common/accessEnvironmentRegist/goHome/',
+          },
+        ),
+      );
+    } else {
+      _setProgress(13 / 15);
+      await Future.delayed(_interval);
+      response = await _client.postUri<dynamic>(
+        Uri.https(
+          'gakujo.shizuoka.ac.jp',
+          '/portal/home/home/initialize',
+          {'EXCLUDE_SET': ''},
+        ),
+        data: {'EXCLUDE_SET': ''},
+        options: Options(
+          headers: {
+            'Accept':
+                'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
+            'Origin': 'https://gakujo.shizuoka.ac.jp',
+            'Referer':
+                'https://gakujo.shizuoka.ac.jp/portal/shibbolethlogin/shibbolethLogin/initLogin/sso',
+          },
+        ),
+      );
+    }
 
     _updateToken(response.data, required: true);
 
