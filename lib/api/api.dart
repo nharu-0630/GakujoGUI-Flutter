@@ -27,7 +27,7 @@ import 'package:uuid/uuid.dart';
 import 'package:version/version.dart';
 
 class Api {
-  static final version = Version(1, 4, 1);
+  static final version = Version(1, 5, 0);
   static const _interval = Duration(milliseconds: 250);
 
   late Dio _client;
