@@ -4,7 +4,6 @@ import 'dart:io';
 import 'package:cookie_jar/cookie_jar.dart';
 import 'package:dio/dio.dart';
 import 'package:dio_cookie_manager/dio_cookie_manager.dart';
-import 'package:dio_smart_retry/dio_smart_retry.dart';
 import 'package:flutter/foundation.dart';
 import 'package:gakujo_gui/api/parse.dart';
 import 'package:gakujo_gui/api/provide.dart';
@@ -28,11 +27,11 @@ import 'package:uuid/uuid.dart';
 import 'package:version/version.dart';
 
 class Api {
-  static final version = Version(1, 4, 1);
+  static final version = Version(1, 5, 0);
   static const _interval = Duration(milliseconds: 250);
 
   late Dio _client;
-  late PersistCookieJar _cookieJar;
+  late CookieJar _cookieJar;
   String _token = '';
   String get token => _token;
 
@@ -78,25 +77,20 @@ class Api {
       followRedirects: false,
     ));
     _token = '';
-    _cookieJar = PersistCookieJar(
-      ignoreExpires: true,
-      storage: FileStorage(
-          join((await getApplicationDocumentsDirectory()).path, '.cookies')),
-    );
+    _cookieJar = CookieJar();
+    // _cookieJar = PersistCookieJar(
+    //   ignoreExpires: true,
+    //   storage: FileStorage(
+    //       join((await getApplicationDocumentsDirectory()).path, '.cookies')),
+    // );
     _client.interceptors.add(CookieManager(_cookieJar));
     _client.interceptors.add(LogInterceptor());
-    _client.interceptors.add(RetryInterceptor(
-      dio: _client,
-      logPrint: print,
-      retries: 0,
-      retryDelays: const [],
-    ));
   }
 
   Future<void> fetchLogin() async {
     _setProgress(0 / 15);
     await Future.delayed(_interval);
-    _client.getUri<dynamic>(
+    await _client.getUri<dynamic>(
       Uri.https(
         'gakujo.shizuoka.ac.jp',
         '/portal/',
@@ -165,9 +159,13 @@ class Api {
       );
 
       if (response.statusCode == 302) {
+        var idpSession = RegExp(r'(?<=JSESSIONID=).*?(?=;)')
+            .firstMatch(response.headers.value('set-cookie')!)
+            ?.group(0);
+
         _setProgress(4 / 15);
         await Future.delayed(_interval);
-        await _client.getUri<dynamic>(
+        response = await _client.getUri<dynamic>(
           Uri.https(
             'idp.shizuoka.ac.jp',
             '/idp/profile/SAML2/Redirect/SSO',
@@ -178,6 +176,7 @@ class Api {
               'Accept':
                   'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
               'Referer': 'https://gakujo.shizuoka.ac.jp/',
+              'Cookie': 'JSESSIONID=$idpSession',
             },
           ),
         );
@@ -202,9 +201,15 @@ class Api {
               'Origin': 'https://idp.shizuoka.ac.jp',
               'Referer':
                   'https://idp.shizuoka.ac.jp/idp/profile/SAML2/Redirect/SSO?execution=e1s1',
+              'Cookie': 'JSESSIONID=$idpSession',
             },
+            validateStatus: (_) => true,
           ),
         );
+      }
+
+      if (response.statusCode != 200) {
+        throw Exception('Login failed.');
       }
 
       var samlResponse = Uri.decodeFull(
