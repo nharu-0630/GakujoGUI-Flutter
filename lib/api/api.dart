@@ -74,7 +74,6 @@ class Api {
             'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/111.0.0.0 Safari/537.36 GakujoGUI/$version',
       },
       contentType: Headers.formUrlEncodedContentType,
-      responseType: ResponseType.plain,
       followRedirects: false,
     ));
     _token = '';
@@ -160,9 +159,13 @@ class Api {
       );
 
       if (response.statusCode == 302) {
+        var idpSession = RegExp(r'(?<=JSESSIONID=).*?(?=;)')
+            .firstMatch(response.headers.value('set-cookie')!)
+            ?.group(0);
+
         _setProgress(4 / 15);
         await Future.delayed(_interval);
-        await _client.getUri<dynamic>(
+        response = await _client.getUri<dynamic>(
           Uri.https(
             'idp.shizuoka.ac.jp',
             '/idp/profile/SAML2/Redirect/SSO',
@@ -173,6 +176,7 @@ class Api {
               'Accept':
                   'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
               'Referer': 'https://gakujo.shizuoka.ac.jp/',
+              'Cookie': 'JSESSIONID=$idpSession',
             },
           ),
         );
@@ -197,6 +201,7 @@ class Api {
               'Origin': 'https://idp.shizuoka.ac.jp',
               'Referer':
                   'https://idp.shizuoka.ac.jp/idp/profile/SAML2/Redirect/SSO?execution=e1s1',
+              'Cookie': 'JSESSIONID=$idpSession',
             },
           ),
         );
