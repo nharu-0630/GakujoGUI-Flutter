@@ -1657,11 +1657,7 @@ class Api {
                 node.querySelector("a")!.attributes["onclick"]!.trimJsArgs(1);
             var classCode =
                 node.querySelector("a")!.attributes["onclick"]!.trimJsArgs(2);
-            var classRoom = node.innerHtml
-                .split('<br>')
-                .last
-                .trimNewLines()
-                .trimWhiteSpace();
+            var classRoom = node.innerHtml.split('<br>').last.trimNewLines();
             Timetable timetable = await fetchDetailTimetable(
                 i, j - 1, kamokuCode, classCode, classRoom);
             await App.navigatorKey.currentContext
