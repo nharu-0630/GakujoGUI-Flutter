@@ -203,8 +203,13 @@ class Api {
                   'https://idp.shizuoka.ac.jp/idp/profile/SAML2/Redirect/SSO?execution=e1s1',
               'Cookie': 'JSESSIONID=$idpSession',
             },
+            validateStatus: (_) => true,
           ),
         );
+      }
+
+      if (response.statusCode != 200) {
+        throw Exception('Login failed.');
       }
 
       var samlResponse = Uri.decodeFull(
