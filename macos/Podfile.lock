@@ -1,4 +1,6 @@
 PODS:
+  - dynamic_color (0.0.2):
+    - FlutterMacOS
   - file_saver (0.0.1):
     - FlutterMacOS
   - flutter_secure_storage_macos (6.1.1):
@@ -7,6 +9,8 @@ PODS:
   - FMDB (2.7.5):
     - FMDB/standard (= 2.7.5)
   - FMDB/standard (2.7.5)
+  - macos_ui (0.1.0):
+    - FlutterMacOS
   - package_info_plus (0.0.1):
     - FlutterMacOS
   - path_provider_foundation (0.0.1):
@@ -24,11 +28,15 @@ PODS:
     - FlutterMacOS
   - wakelock_macos (0.0.1):
     - FlutterMacOS
+  - window_size (0.0.2):
+    - FlutterMacOS
 
 DEPENDENCIES:
+  - dynamic_color (from `Flutter/ephemeral/.symlinks/plugins/dynamic_color/macos`)
   - file_saver (from `Flutter/ephemeral/.symlinks/plugins/file_saver/macos`)
   - flutter_secure_storage_macos (from `Flutter/ephemeral/.symlinks/plugins/flutter_secure_storage_macos/macos`)
   - FlutterMacOS (from `Flutter/ephemeral`)
+  - macos_ui (from `Flutter/ephemeral/.symlinks/plugins/macos_ui/macos`)
   - package_info_plus (from `Flutter/ephemeral/.symlinks/plugins/package_info_plus/macos`)
   - path_provider_foundation (from `Flutter/ephemeral/.symlinks/plugins/path_provider_foundation/macos`)
   - share_plus (from `Flutter/ephemeral/.symlinks/plugins/share_plus/macos`)
@@ -36,18 +44,23 @@ DEPENDENCIES:
   - sqflite (from `Flutter/ephemeral/.symlinks/plugins/sqflite/macos`)
   - url_launcher_macos (from `Flutter/ephemeral/.symlinks/plugins/url_launcher_macos/macos`)
   - wakelock_macos (from `Flutter/ephemeral/.symlinks/plugins/wakelock_macos/macos`)
+  - window_size (from `Flutter/ephemeral/.symlinks/plugins/window_size/macos`)
 
 SPEC REPOS:
   trunk:
     - FMDB
 
 EXTERNAL SOURCES:
+  dynamic_color:
+    :path: Flutter/ephemeral/.symlinks/plugins/dynamic_color/macos
   file_saver:
     :path: Flutter/ephemeral/.symlinks/plugins/file_saver/macos
   flutter_secure_storage_macos:
     :path: Flutter/ephemeral/.symlinks/plugins/flutter_secure_storage_macos/macos
   FlutterMacOS:
     :path: Flutter/ephemeral
+  macos_ui:
+    :path: Flutter/ephemeral/.symlinks/plugins/macos_ui/macos
   package_info_plus:
     :path: Flutter/ephemeral/.symlinks/plugins/package_info_plus/macos
   path_provider_foundation:
@@ -62,12 +75,16 @@ EXTERNAL SOURCES:
     :path: Flutter/ephemeral/.symlinks/plugins/url_launcher_macos/macos
   wakelock_macos:
     :path: Flutter/ephemeral/.symlinks/plugins/wakelock_macos/macos
+  window_size:
+    :path: Flutter/ephemeral/.symlinks/plugins/window_size/macos
 
 SPEC CHECKSUMS:
+  dynamic_color: 2eaa27267de1ca20d879fbd6e01259773fb1670f
   file_saver: 44e6fbf666677faf097302460e214e977fdd977b
   flutter_secure_storage_macos: 75c8cadfdba05ca007c0fa4ea0c16e5cf85e521b
   FlutterMacOS: 8f6f14fa908a6fb3fba0cd85dbd81ec4b251fb24
   FMDB: 2ce00b547f966261cd18927a3ddb07cb6f3db82a
+  macos_ui: 6229a8922cd97bafb7d9636c8eb8dfb0744183ca
   package_info_plus: 02d7a575e80f194102bef286361c6c326e4c29ce
   path_provider_foundation: c68054786f1b4f3343858c1e1d0caaded73f0be9
   share_plus: 76dd39142738f7a68dd57b05093b5e8193f220f7
@@ -75,6 +92,7 @@ SPEC CHECKSUMS:
   sqflite: a5789cceda41d54d23f31d6de539d65bb14100ea
   url_launcher_macos: 5335912b679c073563f29d89d33d10d459f95451
   wakelock_macos: bc3f2a9bd8d2e6c89fee1e1822e7ddac3bd004a9
+  window_size: 339dafa0b27a95a62a843042038fa6c3c48de195
 
 PODFILE CHECKSUM: 353c8bcc5d5b0994e508d035b5431cfe18c1dea7
 
