@@ -27,7 +27,7 @@ import 'package:uuid/uuid.dart';
 import 'package:version/version.dart';
 
 class Api {
-  static final version = Version(1, 5, 0);
+  static final version = Version(1, 5, 1);
   static final userAgent =
       'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/111.0.0.0 Safari/537.36 GakujoAPI/$version';
   static const _interval = Duration(milliseconds: 250);
@@ -78,12 +78,6 @@ class Api {
       followRedirects: false,
     ));
     _token = '';
-    // _cookieJar = PersistCookieJar(
-    //   persistSession: true,
-    //   ignoreExpires: true,
-    //   storage: FileStorage(
-    //       join((await getApplicationSupportDirectory()).path, 'cookies')),
-    // );
     _cookieJar = CookieJar();
     var settings = await _settings;
     if (settings!.accessEnvironmentKey != null &&
@@ -99,6 +93,12 @@ class Api {
 
   Future<void> clearCookies() async {
     await _cookieJar.deleteAll();
+    var settings = await _settings;
+    if (settings == null) return;
+    settings.accessEnvironmentKey = null;
+    settings.accessEnvironmentValue = null;
+    settings.accessEnvironmentName = null;
+    App.navigatorKey.currentContext?.read<SettingsRepository>().save(settings);
   }
 
   Future<void> fetchLogin() async {
@@ -373,11 +373,14 @@ class Api {
     }
 
     var settings = await _settings;
+    if (settings == null) {
+      throw Exception('Failed to get settings.');
+    }
     if (parse(response.data).querySelector('title')?.text == 'アクセス環境登録') {
       _updateToken(response.data, required: true);
       var accessEnvName =
           'GakujoGUI Flutter ${(const Uuid()).v4().substring(0, 8)}';
-      settings?.accessEnvironmentName = accessEnvName;
+      settings.accessEnvironmentName = accessEnvName;
 
       _setProgress(12 / 15);
       await Future.delayed(_interval);
@@ -405,8 +408,8 @@ class Api {
       if (response.headers.value('set-cookie') != null) {
         var cookies =
             response.headers.value('set-cookie')!.split(';')[0].split('=');
-        settings?.accessEnvironmentKey = cookies[0];
-        settings?.accessEnvironmentValue = cookies[1];
+        settings.accessEnvironmentKey = cookies[0];
+        settings.accessEnvironmentValue = cookies[1];
       }
 
       _setProgress(13 / 15);
@@ -455,10 +458,10 @@ class Api {
     var name = parse(response.data)
         .querySelector('#header-cog > li > a > span > span')
         ?.text;
-    settings?.fullName =
+    settings.fullName =
         name?.substring(0, name.indexOf('さん')).replaceAll('　', '');
 
-    if (settings?.profileImage == null) {
+    if (settings.profileImage == null) {
       _setProgress(14 / 15);
       await Future.delayed(_interval);
       response = await _client.getUri<dynamic>(
@@ -471,10 +474,10 @@ class Api {
         ),
         options: Options(responseType: ResponseType.bytes),
       );
-      settings?.profileImage = base64.encode(response.data);
+      settings.profileImage = base64.encode(response.data);
     }
-    settings?.lastLoginTime = DateTime.now();
-    App.navigatorKey.currentContext?.read<SettingsRepository>().save(settings!);
+    settings.lastLoginTime = DateTime.now();
+    App.navigatorKey.currentContext?.read<SettingsRepository>().save(settings);
     _setProgress(15 / 15);
   }
 
