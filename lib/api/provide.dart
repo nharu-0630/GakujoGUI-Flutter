@@ -23,7 +23,9 @@ class ApiRepository extends ChangeNotifier {
   double get progress => _progress;
   double _progress = -1;
 
-  ApiRepository() {
+  ApiRepository();
+
+  void initialize() {
     _api.initialize();
   }
 
@@ -77,6 +79,10 @@ class ApiRepository extends ChangeNotifier {
       }
     }
     notifyListeners();
+  }
+
+  void clearCookies() async {
+    await _api.clearCookies();
   }
 
   void fetchAll() async {

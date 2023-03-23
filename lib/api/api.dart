@@ -28,6 +28,8 @@ import 'package:version/version.dart';
 
 class Api {
   static final version = Version(1, 5, 0);
+  static final userAgent =
+      'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/111.0.0.0 Safari/537.36 GakujoAPI/$version';
   static const _interval = Duration(milliseconds: 250);
 
   late Dio _client;
@@ -70,20 +72,33 @@ class Api {
   Future<void> initialize() async {
     _client = Dio(BaseOptions(
       headers: {
-        'User-Agent':
-            'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/111.0.0.0 Safari/537.36 GakujoAPI/$version',
+        'User-Agent': userAgent,
       },
       contentType: Headers.formUrlEncodedContentType,
       followRedirects: false,
     ));
     _token = '';
-    _cookieJar = PersistCookieJar(
-      ignoreExpires: true,
-      storage: FileStorage(
-          join((await getApplicationSupportDirectory()).path, 'cookies')),
-    );
+    // _cookieJar = PersistCookieJar(
+    //   persistSession: true,
+    //   ignoreExpires: true,
+    //   storage: FileStorage(
+    //       join((await getApplicationSupportDirectory()).path, 'cookies')),
+    // );
+    _cookieJar = CookieJar();
+    var settings = await _settings;
+    if (settings!.accessEnvironmentKey != null &&
+        settings.accessEnvironmentValue != null) {
+      _cookieJar.saveFromResponse(
+          Uri.https('gakujo.shizuoka.ac.jp', '/portal'), [
+        Cookie(settings.accessEnvironmentKey!, settings.accessEnvironmentValue!)
+      ]);
+    }
     _client.interceptors.add(CookieManager(_cookieJar));
     _client.interceptors.add(LogInterceptor());
+  }
+
+  Future<void> clearCookies() async {
+    await _cookieJar.deleteAll();
   }
 
   Future<void> fetchLogin() async {

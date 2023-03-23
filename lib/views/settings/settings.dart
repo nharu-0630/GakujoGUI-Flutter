@@ -588,6 +588,54 @@ class _SettingsWidgetState extends State<SettingsWidget> {
                                 ),
                               ),
                             ),
+                            Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: ElevatedButton(
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor:
+                                      Theme.of(context).colorScheme.error,
+                                  foregroundColor:
+                                      Theme.of(context).colorScheme.onError,
+                                ),
+                                onPressed: () async {
+                                  var result = await showOkCancelAlertDialog(
+                                    isDestructiveAction: true,
+                                    context: context,
+                                    title: 'Cookiesを削除すると環境登録が解除されます。',
+                                    message: '削除しますか？',
+                                    okLabel: '削除',
+                                    cancelLabel: 'キャンセル',
+                                  );
+                                  if (result == OkCancelResult.ok) {
+                                    {
+                                      App.navigatorKey.currentContext
+                                          ?.read<ApiRepository>()
+                                          .clearCookies();
+                                    }
+                                  }
+                                },
+                                child: Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      const Icon(LineIcons.trash),
+                                      const SizedBox(width: 8.0),
+                                      Text(
+                                        'Cookiesを削除',
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .bodyLarge!
+                                            .copyWith(
+                                                color: Theme.of(context)
+                                                    .colorScheme
+                                                    .onError),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ),
                           ],
                         ),
                       ),

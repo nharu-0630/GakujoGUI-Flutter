@@ -32,9 +32,9 @@ void main() async {
   }
   initializeDateFormatting('ja');
   await Hive.initFlutter((await getApplicationSupportDirectory()).path);
+  Hive.registerAdapter(SettingsAdapter());
   Hive.registerAdapter(ContactAdapter());
   Hive.registerAdapter(SubjectAdapter());
-  Hive.registerAdapter(SettingsAdapter());
   Hive.registerAdapter(ReportAdapter());
   Hive.registerAdapter(QuizAdapter());
   Hive.registerAdapter(GradeAdapter());
@@ -64,11 +64,10 @@ class _MyAppState extends State<MyApp> {
         const SystemUiOverlayStyle(statusBarColor: Colors.transparent));
     return MultiProvider(
       providers: [
-        ChangeNotifierProvider(create: (_) => ApiRepository()),
-        ChangeNotifierProvider(create: (_) => ContactRepository(ContactBox())),
-        ChangeNotifierProvider(create: (_) => SubjectRepository(SubjectBox())),
         ChangeNotifierProvider(
             create: (_) => SettingsRepository(SettingsBox())),
+        ChangeNotifierProvider(create: (_) => ContactRepository(ContactBox())),
+        ChangeNotifierProvider(create: (_) => SubjectRepository(SubjectBox())),
         ChangeNotifierProvider(create: (_) => ReportRepository(ReportBox())),
         ChangeNotifierProvider(create: (_) => QuizRepository(QuizBox())),
         ChangeNotifierProvider(create: (_) => GradeRepository(GradeBox())),
@@ -79,6 +78,7 @@ class _MyAppState extends State<MyApp> {
         ChangeNotifierProvider(
             create: (_) => TimetableRepository(TimetableBox())),
         ChangeNotifierProvider(create: (_) => GpaRepository(GpaBox())),
+        ChangeNotifierProvider(create: (_) => ApiRepository()),
       ],
       child: const App(),
     );
