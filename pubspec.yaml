@@ -11,7 +11,6 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-
   intl: ^0.17.0
   sticky_headers: ^0.3.0
   package_info_plus: ^3.0.2
@@ -79,6 +78,5 @@ flutter_icons:
 
 flutter:
   uses-material-design: true
-
   assets:
     - assets/images/
