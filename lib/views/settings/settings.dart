@@ -65,7 +65,7 @@ class _SettingsPageState extends State<SettingsPage> {
         builder: (context, AsyncSnapshot<List<dynamic>> snapshot) {
           var settings = (snapshot.data?[0] as Settings?);
           var packageInfo = (snapshot.data?[1] as PackageInfo?);
-          return snapshot.hasData
+          return settings != null && packageInfo != null
               ? ListView(
                   physics: const AlwaysScrollableScrollPhysics(),
                   children: [
@@ -208,7 +208,7 @@ class _SettingsPageState extends State<SettingsPage> {
                                 Expanded(
                                   flex: 1,
                                   child: Text(
-                                    settings!.year?.toString() ?? '-',
+                                    settings.year?.toString() ?? '-',
                                     style:
                                         Theme.of(context).textTheme.titleMedium,
                                   ),
@@ -583,7 +583,7 @@ class _SettingsPageState extends State<SettingsPage> {
                                 alignment: Alignment.topLeft,
                                 child: buildAutoLinkText(
                                   context,
-                                  'Client Version: ${packageInfo!.version}\nAPI Version: ${Api.version}\nToken: ${context.read<ApiRepository>().token}\nAccessEnvironment Key: ${settings.accessEnvironmentKey}\nAccessEnvironment Value: ${settings.accessEnvironmentValue}',
+                                  'Client Version: ${packageInfo.version}\nAPI Version: ${Api.version}\nToken: ${context.read<ApiRepository>().token}\nAccessEnvironment Key: ${settings.accessEnvironmentKey}\nAccessEnvironment Value: ${settings.accessEnvironmentValue}',
                                 ),
                               ),
                             ),

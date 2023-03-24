@@ -81,27 +81,30 @@ Flash buildInfoFlashBar(
   );
 }
 
-ListView buildFileList(List<String>? fileNames,
+Widget buildFileList(List<String>? fileNames,
     {Axis scrollDirection = Axis.vertical}) {
-  return ListView.builder(
-    scrollDirection: scrollDirection,
-    padding: const EdgeInsets.all(0.0),
-    shrinkWrap: true,
-    physics: const NeverScrollableScrollPhysics(),
-    itemCount: fileNames?.length ?? 0,
-    itemBuilder: (context, index) {
-      return ListTile(
-        title: Row(
-          children: [
-            _buildExtIcon(p.extension(fileNames![index]).replaceFirst('.', '')),
-            const SizedBox(width: 8.0),
-            Text(p.basename(fileNames[index])),
-          ],
-        ),
-        onTap: () async => _openFile(fileNames[index]),
-      );
-    },
-  );
+  return fileNames?.isNotEmpty ?? false
+      ? ListView.builder(
+          scrollDirection: scrollDirection,
+          padding: const EdgeInsets.all(0.0),
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          itemCount: fileNames!.length,
+          itemBuilder: (context, index) {
+            return ListTile(
+              title: Row(
+                children: [
+                  _buildExtIcon(
+                      p.extension(fileNames[index]).replaceFirst('.', '')),
+                  const SizedBox(width: 8.0),
+                  Text(p.basename(fileNames[index])),
+                ],
+              ),
+              onTap: () async => _openFile(fileNames[index]),
+            );
+          },
+        )
+      : const SizedBox.shrink();
 }
 
 void _openFile(String filename) async {
@@ -174,6 +177,9 @@ Widget buildDrawer(BuildContext context) {
         context.watch<QuizRepository>().getAll()
       ]),
       builder: (context, AsyncSnapshot<List<dynamic>> snapshot) {
+        var settings = (snapshot.data?[0] as Settings?);
+        var reports = (snapshot.data?[1] as List<Report>?);
+        var quizzes = (snapshot.data?[2] as List<Quiz>?);
         return Drawer(
           child: ListView(
             children: [
@@ -186,7 +192,7 @@ Widget buildDrawer(BuildContext context) {
                         style: Theme.of(context).textTheme.titleLarge,
                       ),
                       const SizedBox(height: 16.0),
-                      snapshot.hasData
+                      settings != null
                           ? Column(
                               children: [
                                 Row(
@@ -194,8 +200,7 @@ Widget buildDrawer(BuildContext context) {
                                     const Icon(LineIcons.userClock),
                                     const SizedBox(width: 8.0),
                                     Text(
-                                      (snapshot.data![0] as Settings)
-                                          .lastLoginTime
+                                      settings.lastLoginTime
                                           .toLocal()
                                           .toDetailString(),
                                       style: Theme.of(context)
@@ -210,9 +215,7 @@ Widget buildDrawer(BuildContext context) {
                                     const Icon(LineIcons.identificationBadge),
                                     const SizedBox(width: 8.0),
                                     Text(
-                                      (snapshot.data![0] as Settings)
-                                              .username ??
-                                          '',
+                                      settings.username ?? '',
                                       style: Theme.of(context)
                                           .textTheme
                                           .titleMedium,
@@ -225,9 +228,7 @@ Widget buildDrawer(BuildContext context) {
                                     const Icon(LineIcons.userShield),
                                     const SizedBox(width: 8.0),
                                     Text(
-                                      (snapshot.data![0] as Settings)
-                                              .accessEnvironmentName ??
-                                          '',
+                                      settings.accessEnvironmentName ?? '',
                                       style: Theme.of(context)
                                           .textTheme
                                           .titleMedium,
@@ -254,9 +255,9 @@ Widget buildDrawer(BuildContext context) {
                       style: Theme.of(context).textTheme.titleMedium,
                     ),
                     const Expanded(child: SizedBox()),
-                    snapshot.hasData
+                    reports != null
                         ? Text(
-                            (snapshot.data![1] as List<Report>)
+                            reports
                                 .where((e) => !(e.isArchived ||
                                     !(!e.isSubmitted &&
                                         e.endDateTime.isAfter(DateTime.now()))))
@@ -286,9 +287,9 @@ Widget buildDrawer(BuildContext context) {
                       style: Theme.of(context).textTheme.titleMedium,
                     ),
                     const Expanded(child: SizedBox()),
-                    snapshot.hasData
+                    quizzes != null
                         ? Text(
-                            (snapshot.data![2] as List<Quiz>)
+                            quizzes
                                 .where((e) => !(e.isArchived ||
                                     !(!e.isSubmitted &&
                                         e.endDateTime.isAfter(DateTime.now()))))

@@ -61,7 +61,7 @@ class Api {
       print('Token: $_token');
     }
     if (required && _token.isEmpty) {
-      throw Exception('Failed to update token.');
+      throw Exception('Failed to update Struts TransactionToken.');
     }
     return _token.isNotEmpty;
   }
@@ -80,7 +80,8 @@ class Api {
     _token = '';
     _cookieJar = CookieJar();
     var settings = await _settings;
-    if (settings!.accessEnvironmentKey != null &&
+    if (settings == null) return;
+    if (settings.accessEnvironmentKey != null &&
         settings.accessEnvironmentValue != null) {
       _cookieJar.saveFromResponse(
           Uri.https('gakujo.shizuoka.ac.jp', '/portal'), [
@@ -158,6 +159,10 @@ class Api {
     );
 
     if (response.statusCode == 302) {
+      if (response.headers.value('location') == null) {
+        throw Exception('Failed to get location header.');
+      }
+
       _setProgress(3 / 15);
       await Future.delayed(_interval);
       response = await _client.get<dynamic>(
@@ -174,12 +179,16 @@ class Api {
 
       if (response.statusCode == 302) {
         if (response.headers.value('set-cookie') == null) {
-          throw Exception('Failed to fetch login.');
+          throw Exception('Failed to get set-cookie header.');
         }
 
         var idpSession = RegExp(r'(?<=JSESSIONID=).*?(?=;)')
             .firstMatch(response.headers.value('set-cookie')!)
             ?.group(0);
+
+        if (idpSession == null) {
+          throw Exception('Failed to get IdPSession.');
+        }
 
         _setProgress(4 / 15);
         await Future.delayed(_interval);
@@ -227,7 +236,7 @@ class Api {
       }
 
       if (response.statusCode != 200) {
-        throw Exception('Login failed.');
+        throw Exception('Failed to authenticate user.');
       }
 
       var samlResponse = Uri.decodeFull(
@@ -244,7 +253,7 @@ class Api {
       ).replaceAll('&#x3a;', ':');
 
       if (samlResponse.isEmpty || relayState.isEmpty) {
-        throw Exception('SAMLResponse or RelayState is empty.');
+        throw Exception('Failed to get SAMLResponse or RelayState.');
       }
 
       if (kDebugMode) {
@@ -294,6 +303,10 @@ class Api {
       );
 
       if (response.statusCode == 302) {
+        if (response.headers.value('location') == null) {
+          throw Exception('Failed to get location header.');
+        }
+
         App.navigatorKey.currentContext
             ?.read<ApiRepository>()
             .setProgress(8 / 15);
@@ -361,6 +374,10 @@ class Api {
           ),
         );
         if (response.statusCode == 302) {
+          if (response.headers.value('location') == null) {
+            throw Exception('Failed to get location header.');
+          }
+
           App.navigatorKey.currentContext
               ?.read<ApiRepository>()
               .setProgress(11 / 15);
@@ -1410,6 +1427,10 @@ class Api {
     );
 
     if (response.statusCode == 302) {
+      if (response.headers.value('location') == null) {
+        throw Exception('Failed to get location header.');
+      }
+
       _setProgress(3 / 7);
       await Future.delayed(_interval);
       response = await _client.get<dynamic>(
@@ -1430,7 +1451,7 @@ class Api {
       ).replaceAll('&#x3a;', ':');
 
       if (samlResponse.isEmpty || relayState.isEmpty) {
-        throw Exception('SAMLResponse or RelayState is empty.');
+        throw Exception('Failed to get SAMLResponse or RelayState.');
       }
 
       if (kDebugMode) {
@@ -1460,6 +1481,10 @@ class Api {
         ),
       );
 
+      if (response.headers.value('location') == null) {
+        throw Exception('Failed to get location header.');
+      }
+
       _setProgress(5 / 7);
       await Future.delayed(_interval);
       response = await _client.get<dynamic>(response.headers.value('location')!,
@@ -1468,6 +1493,10 @@ class Api {
           ));
 
       if (response.statusCode == 302) {
+        if (response.headers.value('location') == null) {
+          throw Exception('Failed to get location header.');
+        }
+
         _setProgress(6 / 7);
         await Future.delayed(_interval);
         response =
@@ -1661,16 +1690,16 @@ class Api {
           if (node.querySelector("a") != null) {
             if ((node.innerHtml
                         .contains("<font class=\"halfTime\">(前期前半)</font>") &&
-                    await _semesterCode != "0") ||
+                    await _semester != 0) ||
                 (node.innerHtml
                         .contains("<font class=\"halfTime\">(前期後半)</font>") &&
-                    await _semesterCode != "1") ||
+                    await _semester != 1) ||
                 ((node.innerHtml.contains(
                             "<font class=\"halfTime\">(後期前半)</font>") &&
-                        await _semesterCode != "2") ||
+                        await _semester != 2) ||
                     (node.innerHtml.contains(
                             "<font class=\"halfTime\">(後期後半)</font>") &&
-                        await _semesterCode != "3"))) continue;
+                        await _semester != 3))) continue;
             var kamokuCode =
                 node.querySelector("a")!.attributes["onclick"]!.trimJsArgs(1);
             var classCode =
