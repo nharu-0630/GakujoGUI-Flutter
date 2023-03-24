@@ -52,6 +52,7 @@ dependencies:
   multi_split_view: ^2.4.0
   side_sheet: ^1.0.4
   windows_taskbar: ^1.1.1
+  badges: ^3.0.2
 
 dev_dependencies:
   flutter_test:

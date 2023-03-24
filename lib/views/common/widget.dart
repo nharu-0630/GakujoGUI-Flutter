@@ -69,10 +69,12 @@ Flash buildInfoFlashBar(
         LineIcons.infoCircle,
         color: Theme.of(context).colorScheme.primary,
       ),
-      title: Text(
-        title ?? '情報',
-        style: Theme.of(context).textTheme.titleMedium,
-      ),
+      title: title != null
+          ? Text(
+              title,
+              style: Theme.of(context).textTheme.titleMedium,
+            )
+          : null,
       content: Text(
         content,
         style: Theme.of(context).textTheme.bodyMedium,
@@ -179,7 +181,17 @@ Widget buildDrawer(BuildContext context) {
       builder: (context, AsyncSnapshot<List<dynamic>> snapshot) {
         var settings = (snapshot.data?[0] as Settings?);
         var reports = (snapshot.data?[1] as List<Report>?);
+        var reportCount = reports
+                ?.where((e) => !(e.isArchived ||
+                    !(!e.isSubmitted && e.endDateTime.isAfter(DateTime.now()))))
+                .length ??
+            0;
         var quizzes = (snapshot.data?[2] as List<Quiz>?);
+        var quizCount = quizzes
+                ?.where((e) => !(e.isArchived ||
+                    !(!e.isSubmitted && e.endDateTime.isAfter(DateTime.now()))))
+                .length ??
+            0;
         return Drawer(
           child: ListView(
             children: [
@@ -245,27 +257,26 @@ Widget buildDrawer(BuildContext context) {
               ListTile(
                 title: Row(
                   children: [
-                    Icon(
-                      KIcons.report,
-                      color: Theme.of(context).iconTheme.color,
-                    ),
+                    reportCount > 0
+                        ? Badge(
+                            label: Text(reportCount.toString()),
+                            backgroundColor:
+                                Theme.of(context).colorScheme.onError,
+                            textColor: Theme.of(context).colorScheme.error,
+                            child: Icon(
+                              KIcons.report,
+                              color: Theme.of(context).iconTheme.color,
+                            ),
+                          )
+                        : Icon(
+                            KIcons.report,
+                            color: Theme.of(context).iconTheme.color,
+                          ),
                     const SizedBox(width: 8.0),
                     Text(
                       'レポート',
                       style: Theme.of(context).textTheme.titleMedium,
                     ),
-                    const Expanded(child: SizedBox()),
-                    reports != null
-                        ? Text(
-                            reports
-                                .where((e) => !(e.isArchived ||
-                                    !(!e.isSubmitted &&
-                                        e.endDateTime.isAfter(DateTime.now()))))
-                                .length
-                                .toString(),
-                            style: Theme.of(context).textTheme.titleMedium,
-                          )
-                        : const SizedBox.shrink(),
                   ],
                 ),
                 onTap: () {
@@ -277,27 +288,26 @@ Widget buildDrawer(BuildContext context) {
               ListTile(
                 title: Row(
                   children: [
-                    Icon(
-                      KIcons.quiz,
-                      color: Theme.of(context).iconTheme.color,
-                    ),
+                    quizCount > 0
+                        ? Badge(
+                            label: Text(quizCount.toString()),
+                            backgroundColor:
+                                Theme.of(context).colorScheme.onError,
+                            textColor: Theme.of(context).colorScheme.error,
+                            child: Icon(
+                              KIcons.quiz,
+                              color: Theme.of(context).iconTheme.color,
+                            ),
+                          )
+                        : Icon(
+                            KIcons.quiz,
+                            color: Theme.of(context).iconTheme.color,
+                          ),
                     const SizedBox(width: 8.0),
                     Text(
                       '小テスト',
                       style: Theme.of(context).textTheme.titleMedium,
                     ),
-                    const Expanded(child: SizedBox()),
-                    quizzes != null
-                        ? Text(
-                            quizzes
-                                .where((e) => !(e.isArchived ||
-                                    !(!e.isSubmitted &&
-                                        e.endDateTime.isAfter(DateTime.now()))))
-                                .length
-                                .toString(),
-                            style: Theme.of(context).textTheme.titleMedium,
-                          )
-                        : const SizedBox.shrink()
                   ],
                 ),
                 onTap: () {
