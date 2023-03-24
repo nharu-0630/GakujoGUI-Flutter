@@ -1,8 +1,8 @@
 import 'dart:io';
 
-import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
 import 'package:better_open_file/better_open_file.dart';
 import 'package:cached_memory_image/provider/cached_memory_image_provider.dart';
+import 'package:flash/flash.dart';
 import 'package:flutter/material.dart';
 import 'package:gakujo_gui/api/parse.dart';
 import 'package:gakujo_gui/api/provide.dart';
@@ -24,6 +24,62 @@ import 'package:provider/provider.dart';
 import 'package:selectable_autolink_text/selectable_autolink_text.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher_string.dart';
+
+Flash buildErrorFlashBar(
+    BuildContext context, FlashController<Object?> controller, Object? e) {
+  return Flash(
+    controller: controller,
+    behavior: FlashBehavior.floating,
+    position: FlashPosition.bottom,
+    backgroundColor: Theme.of(context).colorScheme.onError,
+    child: FlashBar(
+      icon: Icon(
+        LineIcons.exclamationTriangle,
+        color: Theme.of(context).colorScheme.error,
+      ),
+      primaryAction: IconButton(
+        onPressed: () => controller.dismiss(),
+        icon: Icon(
+          KIcons.close,
+          color: Theme.of(context).iconTheme.color,
+        ),
+      ),
+      title: Text(
+        'エラー',
+        style: Theme.of(context).textTheme.titleMedium,
+      ),
+      content: Text(
+        e.toString(),
+        style: Theme.of(context).textTheme.bodyMedium,
+      ),
+    ),
+  );
+}
+
+Flash buildInfoFlashBar(
+    BuildContext context, FlashController<Object?> controller,
+    {String? title, required String content}) {
+  return Flash(
+    controller: controller,
+    behavior: FlashBehavior.floating,
+    position: FlashPosition.bottom,
+    backgroundColor: Theme.of(context).colorScheme.onSecondary,
+    child: FlashBar(
+      icon: Icon(
+        LineIcons.infoCircle,
+        color: Theme.of(context).colorScheme.primary,
+      ),
+      title: Text(
+        title ?? '情報',
+        style: Theme.of(context).textTheme.titleMedium,
+      ),
+      content: Text(
+        content,
+        style: Theme.of(context).textTheme.bodyMedium,
+      ),
+    ),
+  );
+}
 
 ListView buildFileList(List<String>? fileNames,
     {Axis scrollDirection = Axis.vertical}) {
@@ -53,21 +109,12 @@ void _openFile(String filename) async {
   if (File(path).existsSync()) {
     OpenFile.open(path);
   } else {
-    App.scaffoldMessengerKey.currentState!
-      ..hideCurrentSnackBar()
-      ..showSnackBar(
-        SnackBar(
-          elevation: 0,
-          behavior: SnackBarBehavior.floating,
-          backgroundColor: Colors.transparent,
-          content: AwesomeSnackbarContent(
-            title: 'Error',
-            message: 'Not exist file.',
-            contentType: ContentType.failure,
-            inMaterialBanner: true,
-          ),
-        ),
-      );
+    showFlash(
+      context: App.navigatorKey.currentState!.overlay!.context,
+      builder: (context, controller) {
+        return buildErrorFlashBar(context, controller, 'ファイルが存在しません');
+      },
+    );
   }
 }
 

@@ -1,8 +1,7 @@
 import 'dart:io';
 
-import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
+import 'package:flash/flash.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
 import 'package:gakujo_gui/api/api.dart';
 import 'package:gakujo_gui/app.dart';
 import 'package:gakujo_gui/models/class_link.dart';
@@ -10,6 +9,7 @@ import 'package:gakujo_gui/models/contact.dart';
 import 'package:gakujo_gui/models/quiz.dart';
 import 'package:gakujo_gui/models/report.dart';
 import 'package:gakujo_gui/models/shared_file.dart';
+import 'package:gakujo_gui/views/common/widget.dart';
 import 'package:windows_taskbar/windows_taskbar.dart';
 
 class ApiRepository extends ChangeNotifier {
@@ -34,6 +34,17 @@ class ApiRepository extends ChangeNotifier {
     notifyListeners();
   }
 
+  void _onSuccess(String content) {
+    showFlash(
+      context: App.navigatorKey.currentState!.overlay!.context,
+      duration: const Duration(seconds: 3),
+      builder: (context, controller) {
+        return buildInfoFlashBar(context, controller,
+            content: '$contentに成功しました');
+      },
+    );
+  }
+
   void _onError(Object e) {
     _isError = true;
     if (Platform.isWindows) {
@@ -51,21 +62,13 @@ class ApiRepository extends ChangeNotifier {
       }
       _toggleLoading();
     });
-    App.scaffoldMessengerKey.currentState!
-      ..hideCurrentSnackBar()
-      ..showSnackBar(
-        SnackBar(
-          elevation: 0,
-          behavior: SnackBarBehavior.floating,
-          backgroundColor: Colors.transparent,
-          content: AwesomeSnackbarContent(
-            title: 'Error',
-            message: e.toString(),
-            contentType: ContentType.failure,
-            inMaterialBanner: true,
-          ),
-        ),
-      );
+
+    showFlash(
+      context: App.navigatorKey.currentState!.overlay!.context,
+      builder: (context, controller) {
+        return buildErrorFlashBar(context, controller, e);
+      },
+    );
   }
 
   void _toggleLoading() {
@@ -85,37 +88,15 @@ class ApiRepository extends ChangeNotifier {
     await _api.clearCookies();
   }
 
-  void fetchAll() async {
+  void fetchLogin() async {
     if (isLoading) return;
     _toggleLoading();
     try {
       await _api.fetchLogin();
-      await _api.fetchSubjects();
-      await _api.fetchContacts();
-      await _api.fetchReports();
-      await _api.fetchQuizzes();
-      await _api.fetchSharedFiles();
-      await _api.fetchClassLinks();
-      await _api.fetchGrades();
       _toggleLoading();
+      _onSuccess('ログイン');
     } catch (e) {
       _onError(e);
-    }
-  }
-
-  void fetchLogin() async {
-    if (isLoading) return;
-    _toggleLoading();
-    if (kDebugMode) {
-      await _api.fetchLogin();
-      _toggleLoading();
-    } else {
-      try {
-        await _api.fetchLogin();
-        _toggleLoading();
-      } catch (e) {
-        _onError(e);
-      }
     }
   }
 
@@ -125,6 +106,7 @@ class ApiRepository extends ChangeNotifier {
     try {
       await _api.fetchSubjects();
       _toggleLoading();
+      _onSuccess('授業科目一覧の取得');
     } catch (e) {
       _onError(e);
     }
@@ -136,6 +118,7 @@ class ApiRepository extends ChangeNotifier {
     try {
       await _api.fetchContacts();
       _toggleLoading();
+      _onSuccess('授業連絡一覧の取得');
     } catch (e) {
       _onError(e);
     }
@@ -147,6 +130,7 @@ class ApiRepository extends ChangeNotifier {
     try {
       await _api.fetchDetailContact(contact);
       _toggleLoading();
+      _onSuccess('授業連絡詳細の取得');
     } catch (e) {
       _onError(e);
     }
@@ -158,6 +142,7 @@ class ApiRepository extends ChangeNotifier {
     try {
       await _api.fetchReports();
       _toggleLoading();
+      _onSuccess('レポート一覧の取得');
     } catch (e) {
       _onError(e);
     }
@@ -169,6 +154,7 @@ class ApiRepository extends ChangeNotifier {
     try {
       await _api.fetchDetailReport(report);
       _toggleLoading();
+      _onSuccess('レポート詳細の取得');
     } catch (e) {
       _onError(e);
     }
@@ -180,6 +166,7 @@ class ApiRepository extends ChangeNotifier {
     try {
       await _api.fetchQuizzes();
       _toggleLoading();
+      _onSuccess('小テスト一覧の取得');
     } catch (e) {
       _onError(e);
     }
@@ -191,6 +178,7 @@ class ApiRepository extends ChangeNotifier {
     try {
       await _api.fetchDetailQuiz(quiz);
       _toggleLoading();
+      _onSuccess('小テスト詳細の取得');
     } catch (e) {
       _onError(e);
     }
@@ -202,6 +190,7 @@ class ApiRepository extends ChangeNotifier {
     try {
       await _api.fetchSharedFiles();
       _toggleLoading();
+      _onSuccess('授業共有ファイル一覧の取得');
     } catch (e) {
       _onError(e);
     }
@@ -213,6 +202,7 @@ class ApiRepository extends ChangeNotifier {
     try {
       await _api.fetchDetailSharedFile(sharedFile);
       _toggleLoading();
+      _onSuccess('授業共有ファイル詳細の取得');
     } catch (e) {
       _onError(e);
     }
@@ -224,6 +214,7 @@ class ApiRepository extends ChangeNotifier {
     try {
       await _api.fetchClassLinks();
       _toggleLoading();
+      _onSuccess('授業リンク一覧の取得');
     } catch (e) {
       _onError(e);
     }
@@ -235,6 +226,7 @@ class ApiRepository extends ChangeNotifier {
     try {
       await _api.fetchDetailClassLink(classLink);
       _toggleLoading();
+      _onSuccess('授業リンク詳細の取得');
     } catch (e) {
       _onError(e);
     }
@@ -246,6 +238,7 @@ class ApiRepository extends ChangeNotifier {
     try {
       await _api.fetchGrades();
       _toggleLoading();
+      _onSuccess('成績情報の取得');
     } catch (e) {
       _onError(e);
     }
@@ -257,6 +250,7 @@ class ApiRepository extends ChangeNotifier {
     try {
       await _api.fetchTimetables();
       _toggleLoading();
+      _onSuccess('個人時間割の取得');
     } catch (e) {
       _onError(e);
     }

@@ -1,4 +1,5 @@
 import 'package:adaptive_dialog/adaptive_dialog.dart';
+import 'package:flash/flash.dart';
 import 'package:flutter/material.dart';
 import 'package:gakujo_gui/api/api.dart';
 import 'package:gakujo_gui/api/provide.dart';
@@ -156,6 +157,16 @@ class _SettingsPageState extends State<SettingsPage> {
                                   context
                                       .read<SettingsRepository>()
                                       .setPassword(_passwordController.text);
+                                  showFlash(
+                                    context: App.navigatorKey.currentState!
+                                        .overlay!.context,
+                                    duration: const Duration(seconds: 3),
+                                    builder: (context, controller) {
+                                      return buildInfoFlashBar(
+                                          context, controller,
+                                          content: 'ログイン情報を保存しました');
+                                    },
+                                  );
                                 },
                                 child: Padding(
                                   padding: const EdgeInsets.all(8.0),
@@ -543,19 +554,7 @@ class _SettingsPageState extends State<SettingsPage> {
                                   foregroundColor:
                                       Theme.of(context).colorScheme.onError,
                                 ),
-                                onPressed: () async {
-                                  await showOkCancelAlertDialog(
-                                            context: context,
-                                            message: '取得しますか？',
-                                            okLabel: '取得',
-                                            cancelLabel: 'キャンセル',
-                                          ) ==
-                                          OkCancelResult.ok
-                                      ? context
-                                          .read<ApiRepository>()
-                                          .fetchTimetables()
-                                      : null;
-                                },
+                                onPressed: () async {},
                                 child: Padding(
                                   padding: const EdgeInsets.all(8.0),
                                   child: Row(
