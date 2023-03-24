@@ -1,7 +1,7 @@
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:gakujo_gui/api/parse.dart';
-import 'package:gakujo_gui/constants/KIcons.dart';
+import 'package:gakujo_gui/constants/kicons.dart';
 import 'package:gakujo_gui/models/contact.dart';
 import 'package:gakujo_gui/models/subject.dart';
 import 'package:gakujo_gui/views/page/contact.dart';

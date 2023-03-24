@@ -2,7 +2,7 @@ import 'package:adaptive_dialog/adaptive_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:gakujo_gui/api/parse.dart';
 import 'package:gakujo_gui/api/provide.dart';
-import 'package:gakujo_gui/constants/KIcons.dart';
+import 'package:gakujo_gui/constants/kicons.dart';
 import 'package:gakujo_gui/models/quiz.dart';
 import 'package:gakujo_gui/models/report.dart';
 import 'package:gakujo_gui/views/page/quiz.dart';

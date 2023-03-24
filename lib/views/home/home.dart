@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:gakujo_gui/constants/KIcons.dart';
+import 'package:gakujo_gui/constants/kicons.dart';
 import 'package:gakujo_gui/views/home/widgets/contact.dart';
 import 'package:gakujo_gui/views/home/widgets/task.dart';
 import 'package:multi_split_view/multi_split_view.dart';
