@@ -194,210 +194,155 @@ class _SettingsPageState extends State<SettingsPage> {
                               padding: EdgeInsets.all(4.0),
                               child: Divider(thickness: 2.0),
                             ),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Expanded(
-                                  flex: 1,
-                                  child: Text(
-                                    '取得年度',
-                                    style:
-                                        Theme.of(context).textTheme.titleMedium,
+                            Padding(
+                              padding:
+                                  const EdgeInsets.symmetric(vertical: 8.0),
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Expanded(
+                                    flex: 1,
+                                    child: Text(
+                                      '取得年度',
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .titleMedium,
+                                    ),
                                   ),
-                                ),
-                                Expanded(
-                                  flex: 1,
-                                  child: Text(
-                                    settings.year?.toString() ?? '-',
-                                    style:
-                                        Theme.of(context).textTheme.titleMedium,
-                                  ),
-                                ),
-                                Expanded(
-                                  flex: 1,
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(8.0),
-                                    child: ElevatedButton(
-                                      style: ElevatedButton.styleFrom(
-                                        backgroundColor: Theme.of(context)
-                                            .colorScheme
-                                            .primary,
-                                        foregroundColor: Theme.of(context)
-                                            .colorScheme
-                                            .onPrimary,
+                                  Expanded(
+                                    flex: 3,
+                                    child: TextButton(
+                                      child: Text(
+                                        settings.year?.toString() ?? '-',
                                       ),
-                                      onPressed: () async {
-                                        showDialog(
-                                          context: context,
-                                          builder: (BuildContext context) {
-                                            return AlertDialog(
-                                              title: const Text("取得年度"),
-                                              content: SizedBox(
-                                                width: 360,
-                                                height: 360,
-                                                child: YearPicker(
-                                                  firstDate: DateTime(
-                                                      DateTime.now().year - 5,
-                                                      1),
-                                                  lastDate: DateTime(
-                                                      DateTime.now().year + 5,
-                                                      1),
-                                                  initialDate:
-                                                      settings.year == null
-                                                          ? DateTime.now()
-                                                          : DateTime(
-                                                              settings.year!),
-                                                  selectedDate:
-                                                      settings.year == null
-                                                          ? DateTime.now()
-                                                          : DateTime(
-                                                              settings.year!),
-                                                  onChanged:
-                                                      (DateTime dateTime) {
-                                                    context
-                                                        .read<
-                                                            SettingsRepository>()
-                                                        .setYear(dateTime.year);
-                                                    Navigator.pop(context);
-                                                  },
-                                                ),
+                                      onPressed: () async => showDialog(
+                                        context: context,
+                                        builder: (BuildContext context) {
+                                          return AlertDialog(
+                                            title: const Text('取得年度'),
+                                            content: SizedBox(
+                                              width: 360,
+                                              height: 360,
+                                              child: YearPicker(
+                                                firstDate: DateTime(
+                                                    DateTime.now().year - 5, 1),
+                                                lastDate: DateTime(
+                                                    DateTime.now().year + 5, 1),
+                                                initialDate: settings.year ==
+                                                        null
+                                                    ? DateTime.now()
+                                                    : DateTime(settings.year!),
+                                                selectedDate: settings.year ==
+                                                        null
+                                                    ? DateTime.now()
+                                                    : DateTime(settings.year!),
+                                                onChanged: (DateTime dateTime) {
+                                                  context
+                                                      .read<
+                                                          SettingsRepository>()
+                                                      .setYear(dateTime.year);
+                                                  Navigator.pop(context);
+                                                },
                                               ),
-                                            );
-                                          },
-                                        );
-                                      },
-                                      child: Padding(
-                                        padding: const EdgeInsets.all(8.0),
-                                        child: Text(
-                                          '選択',
-                                          style: Theme.of(context)
-                                              .textTheme
-                                              .bodyLarge!
-                                              .copyWith(
-                                                  color: Theme.of(context)
-                                                      .colorScheme
-                                                      .onPrimary),
-                                        ),
+                                            ),
+                                          );
+                                        },
                                       ),
                                     ),
                                   ),
-                                )
-                              ],
+                                ],
+                              ),
                             ),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Expanded(
-                                  flex: 1,
-                                  child: Text(
-                                    '取得学期',
-                                    style:
-                                        Theme.of(context).textTheme.titleMedium,
+                            Padding(
+                              padding:
+                                  const EdgeInsets.symmetric(vertical: 8.0),
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Expanded(
+                                    flex: 1,
+                                    child: Text(
+                                      '取得学期',
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .titleMedium,
+                                    ),
                                   ),
-                                ),
-                                Expanded(
-                                  flex: 1,
-                                  child: Text(
-                                    (() {
-                                      switch (settings.semester) {
-                                        case 0:
-                                          return '前期前半';
-                                        case 1:
-                                          return '前期後半';
-                                        case 2:
-                                          return '後期前半';
-                                        case 3:
-                                          return '後期後半';
-                                        default:
-                                          return '-';
-                                      }
-                                    })(),
-                                    style:
-                                        Theme.of(context).textTheme.titleMedium,
-                                  ),
-                                ),
-                                Expanded(
-                                  flex: 1,
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(8.0),
-                                    child: ElevatedButton(
-                                      style: ElevatedButton.styleFrom(
-                                        backgroundColor: Theme.of(context)
-                                            .colorScheme
-                                            .primary,
-                                        foregroundColor: Theme.of(context)
-                                            .colorScheme
-                                            .onPrimary,
+                                  Expanded(
+                                    flex: 3,
+                                    child: TextButton(
+                                      child: Text(
+                                        (() {
+                                          switch (settings.semester) {
+                                            case 0:
+                                              return '前期前半';
+                                            case 1:
+                                              return '前期後半';
+                                            case 2:
+                                              return '後期前半';
+                                            case 3:
+                                              return '後期後半';
+                                            default:
+                                              return '-';
+                                          }
+                                        })(),
                                       ),
-                                      onPressed: () async {
-                                        showDialog(
-                                          context: context,
-                                          builder: (context) {
-                                            return SimpleDialog(
-                                              title: const Text('取得学期'),
-                                              children: [
-                                                SimpleDialogOption(
-                                                  onPressed: () async {
-                                                    context
-                                                        .read<
-                                                            SettingsRepository>()
-                                                        .setSemester(0);
-                                                    Navigator.pop(context);
-                                                  },
-                                                  child: const Text('前期前半'),
-                                                ),
-                                                SimpleDialogOption(
-                                                  onPressed: () async {
-                                                    context
-                                                        .read<
-                                                            SettingsRepository>()
-                                                        .setSemester(1);
-                                                    Navigator.pop(context);
-                                                  },
-                                                  child: const Text('前期後半'),
-                                                ),
-                                                SimpleDialogOption(
-                                                  onPressed: () async {
-                                                    context
-                                                        .read<
-                                                            SettingsRepository>()
-                                                        .setSemester(2);
-                                                    Navigator.pop(context);
-                                                  },
-                                                  child: const Text('後期前半'),
-                                                ),
-                                                SimpleDialogOption(
-                                                  onPressed: () async {
-                                                    context
-                                                        .read<
-                                                            SettingsRepository>()
-                                                        .setSemester(3);
-                                                    Navigator.pop(context);
-                                                  },
-                                                  child: const Text('後期後半'),
-                                                ),
-                                              ],
-                                            );
-                                          },
-                                        );
-                                      },
-                                      child: Padding(
-                                        padding: const EdgeInsets.all(8.0),
-                                        child: Text(
-                                          '選択',
-                                          style: Theme.of(context)
-                                              .textTheme
-                                              .bodyLarge!
-                                              .copyWith(
-                                                  color: Theme.of(context)
-                                                      .colorScheme
-                                                      .onPrimary),
-                                        ),
+                                      onPressed: () async => showDialog(
+                                        context: context,
+                                        builder: (context) {
+                                          return SimpleDialog(
+                                            title: const Text('取得学期'),
+                                            children: [
+                                              SimpleDialogOption(
+                                                onPressed: () async {
+                                                  context
+                                                      .read<
+                                                          SettingsRepository>()
+                                                      .setSemester(0);
+                                                  Navigator.pop(context);
+                                                },
+                                                child: const Text('前期前半'),
+                                              ),
+                                              SimpleDialogOption(
+                                                onPressed: () async {
+                                                  context
+                                                      .read<
+                                                          SettingsRepository>()
+                                                      .setSemester(1);
+                                                  Navigator.pop(context);
+                                                },
+                                                child: const Text('前期後半'),
+                                              ),
+                                              SimpleDialogOption(
+                                                onPressed: () async {
+                                                  context
+                                                      .read<
+                                                          SettingsRepository>()
+                                                      .setSemester(2);
+                                                  Navigator.pop(context);
+                                                },
+                                                child: const Text('後期前半'),
+                                              ),
+                                              SimpleDialogOption(
+                                                onPressed: () async {
+                                                  context
+                                                      .read<
+                                                          SettingsRepository>()
+                                                      .setSemester(3);
+                                                  Navigator.pop(context);
+                                                },
+                                                child: const Text('後期後半'),
+                                              ),
+                                            ],
+                                          );
+                                        },
                                       ),
                                     ),
                                   ),
-                                )
-                              ],
+                                ],
+                              ),
                             ),
                             const Padding(
                               padding: EdgeInsets.all(4.0),

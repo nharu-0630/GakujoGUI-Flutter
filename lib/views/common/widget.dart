@@ -15,8 +15,9 @@ import 'package:gakujo_gui/views/page/class_link.dart';
 import 'package:gakujo_gui/views/page/grade.dart';
 import 'package:gakujo_gui/views/page/quiz.dart';
 import 'package:gakujo_gui/views/page/report.dart';
+import 'package:gakujo_gui/views/page/settings.dart';
 import 'package:gakujo_gui/views/page/shared_file.dart';
-import 'package:gakujo_gui/views/settings/settings.dart';
+import 'package:gakujo_gui/views/page/syllabus.dart';
 import 'package:line_icons/line_icons.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
@@ -374,6 +375,26 @@ Widget buildDrawer(BuildContext context) {
                   Navigator.of(context).pop();
                   Navigator.of(context).push(MaterialPageRoute(
                       builder: (context) => const GradePage()));
+                },
+              ),
+              ListTile(
+                title: Row(
+                  children: [
+                    Icon(
+                      KIcons.syllabus,
+                      color: Theme.of(context).iconTheme.color,
+                    ),
+                    const SizedBox(width: 8.0),
+                    Text(
+                      'シラバス',
+                      style: Theme.of(context).textTheme.titleMedium,
+                    ),
+                  ],
+                ),
+                onTap: () {
+                  Navigator.of(context).pop();
+                  Navigator.of(context).push(MaterialPageRoute(
+                      builder: (context) => const SyllabusPage()));
                 },
               ),
               ListTile(

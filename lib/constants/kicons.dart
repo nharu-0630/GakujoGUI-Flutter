@@ -7,6 +7,7 @@ class KIcons {
   static IconData sharedFile = LineIcons.alternateCloudDownload;
   static IconData classLink = LineIcons.link;
   static IconData grade = LineIcons.graduationCap;
+  static IconData syllabus = LineIcons.chalkboardTeacher;
   static IconData settings = LineIcons.cog;
   static IconData task = LineIcons.tasks;
   static IconData contact = LineIcons.sms;

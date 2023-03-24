@@ -9,6 +9,7 @@ import 'package:gakujo_gui/models/contact.dart';
 import 'package:gakujo_gui/models/quiz.dart';
 import 'package:gakujo_gui/models/report.dart';
 import 'package:gakujo_gui/models/shared_file.dart';
+import 'package:gakujo_gui/models/syllabus_search.dart';
 import 'package:gakujo_gui/views/common/widget.dart';
 import 'package:windows_taskbar/windows_taskbar.dart';
 
@@ -254,5 +255,17 @@ class ApiRepository extends ChangeNotifier {
     } catch (e) {
       _onError(e);
     }
+  }
+
+  Future<SyllabusSearch?> fetchSyllabusSearch(String syllabusTitleID) async {
+    try {
+      var result = await _api.fetchSyllabusSearch(
+          syllabusTitleID: syllabusTitleID.isEmpty ? null : syllabusTitleID);
+      _onSuccess('シラバス検索の取得');
+      return result;
+    } catch (e) {
+      _onError(e);
+    }
+    return null;
   }
 }

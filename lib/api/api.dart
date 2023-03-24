@@ -17,6 +17,7 @@ import 'package:gakujo_gui/models/report.dart';
 import 'package:gakujo_gui/models/settings.dart';
 import 'package:gakujo_gui/models/shared_file.dart';
 import 'package:gakujo_gui/models/subject.dart';
+import 'package:gakujo_gui/models/syllabus_search.dart';
 import 'package:gakujo_gui/models/timetable.dart';
 import 'package:html/dom.dart';
 import 'package:html/parser.dart' show parse;
@@ -1838,5 +1839,89 @@ class Api {
     var index = cells.indexWhere(
         (e) => e.querySelector('font')?.text.contains(key) ?? false);
     return cells[index + 1].text.trimWhiteSpace();
+  }
+
+  Future<SyllabusSearch> fetchSyllabusSearch({String? syllabusTitleID}) async {
+    var client = Dio(BaseOptions(
+      headers: {
+        'User-Agent': userAgent,
+      },
+      contentType: Headers.formUrlEncodedContentType,
+      followRedirects: false,
+    ));
+    client.interceptors.add(LogInterceptor());
+
+    var response = await client.getUri<dynamic>(
+      Uri.https('syllabus.shizuoka.ac.jp',
+          '/ext_syllabus/syllabusSearchDirect.do', {'nologin': 'on'}),
+    );
+
+    if (syllabusTitleID != null) {
+      var idpSession = RegExp(r'(?<=JSESSIONID=).*?(?=;)')
+          .firstMatch(response.headers.value('set-cookie')!)
+          ?.group(0);
+
+      if (idpSession == null) {
+        throw Exception('Failed to get IdPSession.');
+      }
+
+      response = await client.postUri<dynamic>(
+        Uri.https('syllabus.shizuoka.ac.jp', '/ext_syllabus/syllabusSearch.do'),
+        data: {
+          'academicYear': '',
+          'syllabusTitleID': syllabusTitleID,
+          'indexID': '',
+          'subFolderFlag': 'on',
+          'targetGrade': '',
+          'semester': '',
+          'week': '',
+          'hour': '',
+          'kamokuName': '',
+          'editorName': '',
+          'numberingAtrib': '',
+          'numberingLevel': '',
+          'numberingSubjectType': '',
+          'numberingAcademic': '',
+          'freeWord': '',
+          'actionStatus': 'titleID',
+          'subFolderFlag2': 'on',
+          'bottonType': 'titleID',
+        },
+        options: Options(
+          headers: {
+            'Cookie': 'JSESSIONID=$idpSession',
+          },
+        ),
+      );
+    }
+
+    var document = parse(response.data);
+    var academicYearMap = <int, String>{};
+    academicYearMap.addEntries(document
+        .querySelector('table.txt12')!
+        .querySelectorAll('tr')[0]
+        .querySelectorAll('option')
+        .skip(1)
+        .map((e) => MapEntry<int, String>(
+            int.parse(e.attributes['value'] ?? '-1'), e.text)));
+    var syllabusTitleIDMap = <String, String>{};
+    syllabusTitleIDMap.addEntries(document
+        .querySelector('table.txt12')!
+        .querySelectorAll('tr')[1]
+        .querySelectorAll('option')
+        .skip(1)
+        .map((e) => MapEntry(e.attributes['value'] ?? '-', e.text)));
+    var indexIDMap = <String, String>{};
+    indexIDMap.addEntries(document
+        .querySelector('table.txt12')!
+        .querySelectorAll('tr')[2]
+        .querySelectorAll('option')
+        .skip(1)
+        .map((e) => MapEntry(e.attributes['value'] ?? '-', e.text)));
+
+    return SyllabusSearch(
+        academicYearMap: academicYearMap,
+        syllabusTitleIDMap: syllabusTitleIDMap,
+        indexIDMap: syllabusTitleID != null ? indexIDMap : null);
   }
 }
