@@ -1,5 +1,6 @@
 <br />
 <div align="center">	
+	<img src="https://raw.githubusercontent.com/xyzyxJP/GakujoGUI-Flutter/main/assets/images/android/res/mipmap-xxxhdpi/ic_launcher.png" width="128">
 	<h2 style="font-weight: 600">GakujoGUI</h2>
 	<p align="center">
 	  Flutter Version<br>
