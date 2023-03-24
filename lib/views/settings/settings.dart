@@ -18,14 +18,14 @@ import 'package:package_info_plus/package_info_plus.dart';
 import 'package:provider/provider.dart';
 import 'package:sticky_headers/sticky_headers.dart';
 
-class SettingsWidget extends StatefulWidget {
-  const SettingsWidget({Key? key}) : super(key: key);
+class SettingsPage extends StatefulWidget {
+  const SettingsPage({Key? key}) : super(key: key);
 
   @override
-  State<SettingsWidget> createState() => _SettingsWidgetState();
+  State<SettingsPage> createState() => _SettingsPageState();
 }
 
-class _SettingsWidgetState extends State<SettingsWidget> {
+class _SettingsPageState extends State<SettingsPage> {
   TextEditingController _usernameController = TextEditingController();
   TextEditingController _passwordController = TextEditingController();
 

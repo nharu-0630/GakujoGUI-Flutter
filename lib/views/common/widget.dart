@@ -335,7 +335,7 @@ Widget buildDrawer(BuildContext context) {
                 onTap: () {
                   Navigator.of(context).pop();
                   Navigator.of(context).push(MaterialPageRoute(
-                      builder: (context) => const SettingsWidget()));
+                      builder: (context) => const SettingsPage()));
                 },
               ),
             ],
