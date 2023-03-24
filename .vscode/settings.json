@@ -23,6 +23,7 @@
     "KHTML",
     "kicons",
     "kyoumu",
+    "mipmap",
     "nbsp",
     "nenbetu",
     "onclick",
@@ -41,6 +42,7 @@
     "wakelock",
     "webp",
     "webspace",
+    "xxxhdpi",
     "xyzyx"
   ],
   "files.associations": {

@@ -57,10 +57,24 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   test: any
-
   flutter_lints: ^2.0.0
   hive_generator: ^2.0.0
   build_runner: ^2.3.3
+  flutter_launcher_icons: ^0.12.0
+
+flutter_icons:
+  android: true
+  ios: true
+  image_path: "assets/images/android/play_store_512.png"
+  adaptive_icon_background: "assets/images/android/res/mipmap-xxxhdpi/ic_launcher_background.png"
+  adaptive_icon_foreground: "assets/images/android/res/mipmap-xxxhdpi/ic_launcher_foreground.png"
+  windows:
+    generate: true
+    image_path: "assets/images/android/play_store_512.png"
+    icon_size: 256
+  macos:
+    generate: true
+    image_path: "assets/images/android/play_store_512.png"
 
 flutter:
   uses-material-design: true
