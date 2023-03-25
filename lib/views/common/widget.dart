@@ -17,7 +17,7 @@ import 'package:gakujo_gui/views/page/quiz.dart';
 import 'package:gakujo_gui/views/page/report.dart';
 import 'package:gakujo_gui/views/page/settings.dart';
 import 'package:gakujo_gui/views/page/shared_file.dart';
-import 'package:gakujo_gui/views/page/syllabus.dart';
+import 'package:gakujo_gui/views/page/syllabus_search.dart';
 import 'package:line_icons/line_icons.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
@@ -394,7 +394,7 @@ Widget buildDrawer(BuildContext context) {
                 onTap: () {
                   Navigator.of(context).pop();
                   Navigator.of(context).push(MaterialPageRoute(
-                      builder: (context) => const SyllabusPage()));
+                      builder: (context) => const SyllabusSearchPage()));
                 },
               ),
               ListTile(

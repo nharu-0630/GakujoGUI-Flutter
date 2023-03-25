@@ -5,16 +5,17 @@ import 'package:gakujo_gui/api/provide.dart';
 import 'package:gakujo_gui/constants/kicons.dart';
 import 'package:gakujo_gui/models/syllabus_search.dart';
 import 'package:gakujo_gui/views/common/widget.dart';
+import 'package:gakujo_gui/views/page/syllabus_result.dart';
 import 'package:provider/provider.dart';
 
-class SyllabusPage extends StatefulWidget {
-  const SyllabusPage({Key? key}) : super(key: key);
+class SyllabusSearchPage extends StatefulWidget {
+  const SyllabusSearchPage({Key? key}) : super(key: key);
 
   @override
-  State<SyllabusPage> createState() => _SyllabusPageState();
+  State<SyllabusSearchPage> createState() => _SyllabusSearchPageState();
 }
 
-class _SyllabusPageState extends State<SyllabusPage> {
+class _SyllabusSearchPageState extends State<SyllabusSearchPage> {
   SyllabusSearch? syllabusSearch;
 
   var academicYear = -1;
@@ -434,9 +435,9 @@ class _SyllabusPageState extends State<SyllabusPage> {
                             Theme.of(context).colorScheme.onPrimary,
                       ),
                       onPressed: () async {
-                        var _ = await context
-                            .read<ApiRepository>()
-                            .fetchSyllabusResult(
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (context) => SyllabusResultPage(
                               academicYear: academicYear,
                               syllabusTitleID: syllabusTitleID,
                               indexID: indexID,
@@ -447,7 +448,9 @@ class _SyllabusPageState extends State<SyllabusPage> {
                               kamokuName: kamokuName,
                               editorName: editorName,
                               freeWord: freeWord,
-                            );
+                            ),
+                          ),
+                        );
                       },
                       child: Padding(
                         padding: const EdgeInsets.all(8.0),
