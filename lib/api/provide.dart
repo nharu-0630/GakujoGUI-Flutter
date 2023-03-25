@@ -9,6 +9,7 @@ import 'package:gakujo_gui/models/contact.dart';
 import 'package:gakujo_gui/models/quiz.dart';
 import 'package:gakujo_gui/models/report.dart';
 import 'package:gakujo_gui/models/shared_file.dart';
+import 'package:gakujo_gui/models/syllabus_result.dart';
 import 'package:gakujo_gui/models/syllabus_search.dart';
 import 'package:gakujo_gui/views/common/widget.dart';
 import 'package:windows_taskbar/windows_taskbar.dart';
@@ -259,13 +260,46 @@ class ApiRepository extends ChangeNotifier {
 
   Future<SyllabusSearch?> fetchSyllabusSearch(String syllabusTitleID) async {
     try {
-      var result = await _api.fetchSyllabusSearch(
-          syllabusTitleID: syllabusTitleID.isEmpty ? null : syllabusTitleID);
-      _onSuccess('シラバス検索の取得');
+      var result =
+          await _api.fetchSyllabusSearch(syllabusTitleID: syllabusTitleID);
+      _onSuccess('シラバス検索条件の取得');
       return result;
     } catch (e) {
       _onError(e);
     }
     return null;
+  }
+
+  Future<List<SyllabusResult>> fetchSyllabusResult({
+    required int academicYear,
+    required String syllabusTitleID,
+    required String indexID,
+    required String targetGrade,
+    required String semester,
+    required String week,
+    required String hour,
+    required String kamokuName,
+    required String editorName,
+    required String freeWord,
+  }) async {
+    try {
+      var result = await _api.fetchSyllabusResult(
+        academicYear: academicYear,
+        syllabusTitleID: syllabusTitleID,
+        indexID: indexID,
+        targetGrade: targetGrade,
+        semester: semester,
+        week: week,
+        hour: hour,
+        kamokuName: kamokuName,
+        editorName: editorName,
+        freeWord: freeWord,
+      );
+      _onSuccess('シラバス検索結果の取得');
+      return result;
+    } catch (e) {
+      _onError(e);
+    }
+    return [];
   }
 }

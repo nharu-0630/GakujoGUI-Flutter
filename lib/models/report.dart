@@ -95,7 +95,7 @@ class Report implements Comparable<Report> {
       endDateTime: element.querySelectorAll('td')[3].text.toSpanDateTime(1),
       implementationFormat: element.querySelectorAll('td')[5].text.trim(),
       operation: element.querySelectorAll('td')[6].text.trim(),
-      submittedDateTime: element.querySelectorAll('td')[4].text != ''
+      submittedDateTime: element.querySelectorAll('td')[4].text.isNotEmpty
           ? element.querySelectorAll('td')[4].text.trim().toDateTime()
           : DateTime.fromMicrosecondsSinceEpoch(0),
       evaluationMethod: '',

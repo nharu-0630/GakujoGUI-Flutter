@@ -17,6 +17,7 @@ import 'package:gakujo_gui/models/report.dart';
 import 'package:gakujo_gui/models/settings.dart';
 import 'package:gakujo_gui/models/shared_file.dart';
 import 'package:gakujo_gui/models/subject.dart';
+import 'package:gakujo_gui/models/syllabus_result.dart';
 import 'package:gakujo_gui/models/syllabus_search.dart';
 import 'package:gakujo_gui/models/timetable.dart';
 import 'package:html/dom.dart';
@@ -1841,7 +1842,8 @@ class Api {
     return cells[index + 1].text.trimWhiteSpace();
   }
 
-  Future<SyllabusSearch> fetchSyllabusSearch({String? syllabusTitleID}) async {
+  Future<SyllabusSearch> fetchSyllabusSearch(
+      {required String syllabusTitleID}) async {
     var client = Dio(BaseOptions(
       headers: {
         'User-Agent': userAgent,
@@ -1856,7 +1858,7 @@ class Api {
           '/ext_syllabus/syllabusSearchDirect.do', {'nologin': 'on'}),
     );
 
-    if (syllabusTitleID != null) {
+    if (syllabusTitleID.isNotEmpty) {
       var idpSession = RegExp(r'(?<=JSESSIONID=).*?(?=;)')
           .firstMatch(response.headers.value('set-cookie')!)
           ?.group(0);
@@ -1865,6 +1867,7 @@ class Api {
         throw Exception('Failed to get IdPSession.');
       }
 
+      await Future.delayed(_interval);
       response = await client.postUri<dynamic>(
         Uri.https('syllabus.shizuoka.ac.jp', '/ext_syllabus/syllabusSearch.do'),
         data: {
@@ -1900,6 +1903,7 @@ class Api {
     academicYearMap.addEntries(document
         .querySelector('table.txt12')!
         .querySelectorAll('tr')[0]
+        .querySelector('select')!
         .querySelectorAll('option')
         .skip(1)
         .map((e) => MapEntry<int, String>(
@@ -1908,6 +1912,7 @@ class Api {
     syllabusTitleIDMap.addEntries(document
         .querySelector('table.txt12')!
         .querySelectorAll('tr')[1]
+        .querySelector('select')!
         .querySelectorAll('option')
         .skip(1)
         .map((e) => MapEntry(e.attributes['value'] ?? '-', e.text)));
@@ -1915,13 +1920,161 @@ class Api {
     indexIDMap.addEntries(document
         .querySelector('table.txt12')!
         .querySelectorAll('tr')[2]
+        .querySelector('select')!
+        .querySelectorAll('option')
+        .skip(1)
+        .map((e) => MapEntry(e.attributes['value'] ?? '-', e.text)));
+    var targetGradeMap = <String, String>{};
+    targetGradeMap.addEntries(document
+        .querySelector('table.txt12')!
+        .querySelectorAll('tr')[3]
+        .querySelector('select')!
+        .querySelectorAll('option')
+        .skip(1)
+        .map((e) => MapEntry(e.attributes['value'] ?? '-', e.text)));
+    var semesterMap = <String, String>{};
+    semesterMap.addEntries(document
+        .querySelector('table.txt12')!
+        .querySelectorAll('tr')[4]
+        .querySelector('select')!
+        .querySelectorAll('option')
+        .skip(1)
+        .map((e) => MapEntry(e.attributes['value'] ?? '-', e.text)));
+    var weekMap = <String, String>{};
+    weekMap.addEntries(document
+        .querySelector('table.txt12')!
+        .querySelectorAll('tr')[5]
+        .querySelectorAll('select')[0]
+        .querySelectorAll('option')
+        .skip(1)
+        .map((e) => MapEntry(e.attributes['value'] ?? '-', e.text)));
+    var hourMap = <String, String>{};
+    hourMap.addEntries(document
+        .querySelector('table.txt12')!
+        .querySelectorAll('tr')[5]
+        .querySelectorAll('select')[1]
         .querySelectorAll('option')
         .skip(1)
         .map((e) => MapEntry(e.attributes['value'] ?? '-', e.text)));
 
     return SyllabusSearch(
-        academicYearMap: academicYearMap,
-        syllabusTitleIDMap: syllabusTitleIDMap,
-        indexIDMap: syllabusTitleID != null ? indexIDMap : null);
+      academicYearMap: academicYearMap,
+      syllabusTitleIDMap: syllabusTitleIDMap,
+      indexIDMap: syllabusTitleID.isNotEmpty ? indexIDMap : null,
+      targetGradeMap: targetGradeMap,
+      semesterMap: semesterMap,
+      weekMap: weekMap,
+      hourMap: hourMap,
+    );
+  }
+
+  Future<List<SyllabusResult>> fetchSyllabusResult({
+    required int academicYear,
+    required String syllabusTitleID,
+    required String indexID,
+    required String targetGrade,
+    required String semester,
+    required String week,
+    required String hour,
+    required String kamokuName,
+    required String editorName,
+    required String freeWord,
+  }) async {
+    var client = Dio(BaseOptions(
+      headers: {
+        'User-Agent': userAgent,
+      },
+      contentType: Headers.formUrlEncodedContentType,
+      followRedirects: false,
+    ));
+    client.interceptors.add(LogInterceptor());
+
+    var response = await client.getUri<dynamic>(
+      Uri.https('syllabus.shizuoka.ac.jp',
+          '/ext_syllabus/syllabusSearchDirect.do', {'nologin': 'on'}),
+    );
+
+    var idpSession = RegExp(r'(?<=JSESSIONID=).*?(?=;)')
+        .firstMatch(response.headers.value('set-cookie')!)
+        ?.group(0);
+
+    if (idpSession == null) {
+      throw Exception('Failed to get IdPSession.');
+    }
+
+    if (syllabusTitleID.isNotEmpty) {
+      await Future.delayed(_interval);
+      response = await client.postUri<dynamic>(
+        Uri.https('syllabus.shizuoka.ac.jp', '/ext_syllabus/syllabusSearch.do'),
+        data: {
+          'academicYear': '',
+          'syllabusTitleID': syllabusTitleID,
+          'indexID': '',
+          'subFolderFlag': 'on',
+          'targetGrade': '',
+          'semester': '',
+          'week': '',
+          'hour': '',
+          'kamokuName': '',
+          'editorName': '',
+          'numberingAtrib': '',
+          'numberingLevel': '',
+          'numberingSubjectType': '',
+          'numberingAcademic': '',
+          'freeWord': '',
+          'actionStatus': 'titleID',
+          'subFolderFlag2': 'on',
+          'bottonType': 'titleID',
+        },
+        options: Options(
+          headers: {
+            'Cookie': 'JSESSIONID=$idpSession',
+          },
+        ),
+      );
+    }
+
+    await Future.delayed(_interval);
+    response = await client.postUri<dynamic>(
+      Uri.https('syllabus.shizuoka.ac.jp', '/ext_syllabus/syllabusSearch.do'),
+      data: {
+        'academicYear': academicYear,
+        'syllabusTitleID': syllabusTitleID,
+        'indexID': indexID,
+        'subFolderFlag': 'on',
+        'targetGrade': targetGrade,
+        'semester': semester,
+        'halfTimeInfo': '',
+        'week': week,
+        'hour': hour,
+        'kamokuName': kamokuName,
+        'editorName': editorName,
+        'numberingAtrib': '',
+        'numberingLevel': '',
+        'numberingSubjectType': '',
+        'numberingAcademic': '',
+        'freeWord': freeWord,
+        'actionStatus': 'search',
+        'subFolderFlag2': 'on',
+        'bottonType': 'search',
+      },
+      options: Options(
+        headers: {
+          'Cookie': 'JSESSIONID=$idpSession',
+        },
+      ),
+    );
+
+    if (response.data.contains('検索条件に合致する科目が見つかりません。')) {
+      return [];
+    }
+
+    var document = parse(response.data);
+    return document
+        .querySelector('table.txt12')!
+        .querySelectorAll('tr')
+        .skip(1)
+        .map((e) => SyllabusResult.fromElement(e))
+        .toList();
   }
 }
