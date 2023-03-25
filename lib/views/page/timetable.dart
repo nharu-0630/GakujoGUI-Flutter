@@ -106,6 +106,8 @@ class _TimetablePageState extends State<TimetablePage> {
       child: SizedBox(
         height: max(MediaQuery.of(context).size.height * .8 / 5, 120.0),
         child: Card(
+          color: Color.lerp(
+              timetable.subject.toColor(), Theme.of(context).cardColor, 0.7),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12.0),
           ),
@@ -131,42 +133,46 @@ class _TimetablePageState extends State<TimetablePage> {
                     ),
                     context: context,
                   ),
-            child: ClipPath(
-              clipper: ShapeBorderClipper(
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12.0))),
-              child: Container(
-                decoration: BoxDecoration(
-                  border: Border(
-                      left: BorderSide(
-                    color: timetable.subject.toColor(),
-                    width: 6.0,
-                  )),
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.all(4.0),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        timetable.subject,
-                        style: Theme.of(context)
-                            .textTheme
-                            .titleSmall
-                            ?.copyWith(fontWeight: FontWeight.bold),
-                        overflow: TextOverflow.visible,
-                      ),
-                      Flexible(
-                        child: Text(
-                          '${timetable.className}\n${timetable.classRoom}\n${timetable.teacher}',
-                          style: Theme.of(context).textTheme.bodySmall,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
-                    ],
+            child: Padding(
+              padding: const EdgeInsets.all(2.0),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Text(
+                    timetable.subject,
+                    style: Theme.of(context)
+                        .textTheme
+                        .titleSmall
+                        ?.copyWith(fontWeight: FontWeight.bold),
+                    overflow: TextOverflow.visible,
+                    textAlign: TextAlign.center,
                   ),
-                ),
+                  Flexible(
+                    child: Text(
+                      timetable.className,
+                      style: Theme.of(context).textTheme.bodySmall,
+                      overflow: TextOverflow.ellipsis,
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                  Flexible(
+                    child: Text(
+                      timetable.classRoom,
+                      style: Theme.of(context).textTheme.bodySmall,
+                      overflow: TextOverflow.ellipsis,
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                  Flexible(
+                    child: Text(
+                      timetable.teacher,
+                      style: Theme.of(context).textTheme.bodySmall,
+                      overflow: TextOverflow.ellipsis,
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                ],
               ),
             ),
           ),
