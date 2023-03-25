@@ -1,4 +1,4 @@
-class Syllabus {
+class SyllabusDetail {
   String subject;
   String teacher;
   String affiliation;
@@ -31,7 +31,7 @@ class Syllabus {
   String homeClassStyle;
   String homeClassStyleDetail;
 
-  Syllabus({
+  SyllabusDetail({
     required this.subject,
     required this.teacher,
     required this.affiliation,

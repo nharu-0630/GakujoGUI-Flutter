@@ -10,9 +10,9 @@ import 'package:gakujo_gui/models/contact.dart';
 import 'package:gakujo_gui/models/quiz.dart';
 import 'package:gakujo_gui/models/report.dart';
 import 'package:gakujo_gui/models/shared_file.dart';
-import 'package:gakujo_gui/models/syllabus.dart';
+import 'package:gakujo_gui/models/syllabus_detail.dart';
+import 'package:gakujo_gui/models/syllabus_parameters.dart';
 import 'package:gakujo_gui/models/syllabus_result.dart';
-import 'package:gakujo_gui/models/syllabus_search.dart';
 import 'package:gakujo_gui/views/common/widget.dart';
 import 'package:windows_taskbar/windows_taskbar.dart';
 
@@ -262,9 +262,10 @@ class ApiRepository extends ChangeNotifier {
     }
   }
 
-  Future<SyllabusSearch?> fetchSyllabusSearch(String syllabusTitleID) async {
+  Future<SyllabusParameters?> fetchSyllabusParameters(
+      String syllabusTitleID) async {
     try {
-      var result = await _syllabusApi.fetchSyllabusSearch(syllabusTitleID);
+      var result = await _syllabusApi.fetchSyllabusParameters(syllabusTitleID);
       _onSuccess('シラバス検索条件の取得');
       return result;
     } catch (e) {
@@ -306,9 +307,9 @@ class ApiRepository extends ChangeNotifier {
     return [];
   }
 
-  Future<Syllabus?> fetchSyllabusDetail(String subjectId) async {
+  Future<SyllabusDetail?> fetchSyllabusDetail(SyllabusResult query) async {
     try {
-      var result = await _syllabusApi.fetchSyllabus(subjectId);
+      var result = await _syllabusApi.fetchSyllabusDetail(query);
       _onSuccess('シラバス詳細の取得');
       return result;
     } catch (e) {

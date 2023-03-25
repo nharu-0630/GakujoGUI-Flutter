@@ -2,9 +2,9 @@ import 'package:cookie_jar/cookie_jar.dart';
 import 'package:dio/dio.dart';
 import 'package:dio_cookie_manager/dio_cookie_manager.dart';
 import 'package:gakujo_gui/api/parse.dart';
-import 'package:gakujo_gui/models/syllabus.dart';
+import 'package:gakujo_gui/models/syllabus_detail.dart';
+import 'package:gakujo_gui/models/syllabus_parameters.dart';
 import 'package:gakujo_gui/models/syllabus_result.dart';
-import 'package:gakujo_gui/models/syllabus_search.dart';
 import 'package:html/dom.dart';
 import 'package:html/parser.dart';
 import 'package:version/version.dart';
@@ -33,7 +33,8 @@ class SyllabusApi {
     _client.interceptors.add(LogInterceptor());
   }
 
-  Future<SyllabusSearch> fetchSyllabusSearch(String syllabusTitleID) async {
+  Future<SyllabusParameters> fetchSyllabusParameters(
+      String syllabusTitleID) async {
     dynamic response;
     if (syllabusTitleID.isEmpty) {
       await _initialize();
@@ -145,7 +146,7 @@ class SyllabusApi {
         .skip(1)
         .map((e) => MapEntry(e.attributes['value'] ?? '-', e.text)));
 
-    return SyllabusSearch(
+    return SyllabusParameters(
       academicYearMap: academicYearMap,
       syllabusTitleIDMap: syllabusTitleIDMap,
       indexIDMap: syllabusTitleID.isNotEmpty ? indexIDMap : null,
@@ -211,13 +212,15 @@ class SyllabusApi {
         .toList();
   }
 
-  Future<Syllabus> fetchSyllabus(String subjectId) async {
+  Future<SyllabusDetail> fetchSyllabusDetail(SyllabusResult query) async {
     var response = await _client.postUri<dynamic>(
       Uri.https('syllabus.shizuoka.ac.jp',
           '/ext_syllabus/syllabusReferenceContentsInit.do'),
       data: {
-        'subjectId': subjectId,
-        'formatCode': '1',
+        'subjectId': query.subjectId,
+        'formatCode': query.formatCode,
+        'rowIndex': query.rowIndex,
+        'jikanwariSchoolYear': query.jikanwariSchoolYear,
       },
       options: Options(
         headers: {
@@ -227,8 +230,8 @@ class SyllabusApi {
     );
 
     var document = parse(response.data);
-    var syllabus = Syllabus(
-      subject: trimSyllabusValue(document, '授業科目名'),
+    var syllabus = SyllabusDetail(
+      subject: trimSyllabusValue(document, '授業科目名', offset: 2),
       teacher: trimSyllabusValue(document, '担当教員名'),
       affiliation: trimSyllabusValue(document, '所属等'),
       researchRoom: trimSyllabusValue(document, '研究室'),
@@ -264,10 +267,10 @@ class SyllabusApi {
     return syllabus;
   }
 
-  String trimSyllabusValue(Document document, String key) {
+  String trimSyllabusValue(Document document, String key, {int offset = 1}) {
     var cells = document.querySelectorAll('td');
     var index = cells.indexWhere(
         (e) => e.querySelector('font')?.text.contains(key) ?? false);
-    return cells[index + 1].text.trimWhiteSpace();
+    return cells[index + offset].text.trimWhiteSpace();
   }
 }

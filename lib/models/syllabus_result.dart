@@ -3,6 +3,9 @@ import 'package:html/dom.dart';
 
 class SyllabusResult {
   String subjectId;
+  String formatCode;
+  String rowIndex;
+  String jikanwariSchoolYear;
   String titleName;
   String indexName;
   String subjectCode;
@@ -16,6 +19,9 @@ class SyllabusResult {
 
   SyllabusResult({
     required this.subjectId,
+    required this.formatCode,
+    required this.rowIndex,
+    required this.jikanwariSchoolYear,
     required this.titleName,
     required this.indexName,
     required this.subjectCode,
@@ -31,6 +37,12 @@ class SyllabusResult {
   factory SyllabusResult.fromElement(Element element) {
     return SyllabusResult(
       subjectId: RegExp(r'(?<=subjectId=)\d*').firstMatch(
+          element.querySelectorAll('td')[0].attributes['onclick']!)![0]!,
+      formatCode: RegExp(r'(?<=formatCode=)\d*').firstMatch(
+          element.querySelectorAll('td')[0].attributes['onclick']!)![0]!,
+      rowIndex: RegExp(r'(?<=rowIndex=)\d*').firstMatch(
+          element.querySelectorAll('td')[0].attributes['onclick']!)![0]!,
+      jikanwariSchoolYear: RegExp(r'(?<=jikanwariSchoolYear=)\d*').firstMatch(
           element.querySelectorAll('td')[0].attributes['onclick']!)![0]!,
       titleName: element.querySelectorAll('td')[0].text.trimWhiteSpace(),
       indexName: element.querySelectorAll('td')[1].text.trimWhiteSpace(),

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:gakujo_gui/api/provide.dart';
 import 'package:gakujo_gui/constants/kicons.dart';
-import 'package:gakujo_gui/models/syllabus.dart';
+import 'package:gakujo_gui/models/syllabus_detail.dart';
 import 'package:gakujo_gui/models/syllabus_result.dart';
 import 'package:gakujo_gui/views/common/widget.dart';
 import 'package:line_icons/line_icons.dart';
@@ -115,14 +115,13 @@ class _SyllabusResultPageState extends State<SyllabusResultPage> {
                       borderRadius:
                           BorderRadius.vertical(top: Radius.circular(0.0))),
                   context: context,
-                  builder: (context) =>
-                      buildSyllabusModal(context, syllabus.subjectId),
+                  builder: (context) => buildSyllabusModal(context, syllabus),
                 )
               : SideSheet.right(
                   sheetColor: Theme.of(context).colorScheme.surface,
                   body: SizedBox(
                     width: MediaQuery.of(context).size.width * .6,
-                    child: buildSyllabusModal(context, syllabus.subjectId),
+                    child: buildSyllabusModal(context, syllabus),
                   ),
                   context: context,
                 ),
@@ -207,10 +206,10 @@ List<Widget> _buildLongItem(BuildContext context, String title, String body) =>
       const SizedBox(height: 8.0)
     ];
 
-Widget buildSyllabusModal(BuildContext context, String subjectId) {
+Widget buildSyllabusModal(BuildContext context, SyllabusResult query) {
   return FutureBuilder(
-    future: context.read<ApiRepository>().fetchSyllabusDetail(subjectId),
-    builder: (context, AsyncSnapshot<Syllabus?> snapshot) {
+    future: context.read<ApiRepository>().fetchSyllabusDetail(query),
+    builder: (context, AsyncSnapshot<SyllabusDetail?> snapshot) {
       var syllabus = snapshot.data;
       return syllabus != null
           ? ListView(

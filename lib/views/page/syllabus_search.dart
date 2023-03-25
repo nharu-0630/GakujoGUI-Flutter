@@ -3,7 +3,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:gakujo_gui/api/provide.dart';
 import 'package:gakujo_gui/constants/kicons.dart';
-import 'package:gakujo_gui/models/syllabus_search.dart';
+import 'package:gakujo_gui/models/syllabus_parameters.dart';
 import 'package:gakujo_gui/views/common/widget.dart';
 import 'package:gakujo_gui/views/page/syllabus_result.dart';
 import 'package:provider/provider.dart';
@@ -16,7 +16,7 @@ class SyllabusSearchPage extends StatefulWidget {
 }
 
 class _SyllabusSearchPageState extends State<SyllabusSearchPage> {
-  SyllabusSearch? syllabusSearch;
+  SyllabusParameters? parameters;
 
   var academicYear = -1;
   var syllabusTitleID = '';
@@ -33,15 +33,15 @@ class _SyllabusSearchPageState extends State<SyllabusSearchPage> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      syllabusSearch =
-          await context.read<ApiRepository>().fetchSyllabusSearch('');
+      parameters =
+          await context.read<ApiRepository>().fetchSyllabusParameters('');
       setState(() {});
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    return syllabusSearch != null
+    return parameters != null
         ? Scaffold(
             body: NestedScrollView(
               headerSliverBuilder: (context, innerBoxScrolled) =>
@@ -78,12 +78,12 @@ class _SyllabusSearchPageState extends State<SyllabusSearchPage> {
                                     height: 360,
                                     child: YearPicker(
                                       firstDate: DateTime(
-                                          syllabusSearch!.academicYearMap.keys
+                                          parameters!.academicYearMap.keys
                                               .toList()
                                               .reduce(min),
                                           1),
                                       lastDate: DateTime(
-                                          syllabusSearch!.academicYearMap.keys
+                                          parameters!.academicYearMap.keys
                                               .toList()
                                               .reduce(max),
                                           1),
@@ -130,7 +130,7 @@ class _SyllabusSearchPageState extends State<SyllabusSearchPage> {
                           child: TextButton(
                             child: Text(
                               syllabusTitleID.isNotEmpty
-                                  ? syllabusSearch!.syllabusTitleIDMap[
+                                  ? parameters!.syllabusTitleIDMap[
                                           syllabusTitleID] ??
                                       '-'
                                   : '-',
@@ -139,23 +139,22 @@ class _SyllabusSearchPageState extends State<SyllabusSearchPage> {
                               context: context,
                               builder: (context) => SimpleDialog(
                                 title: const Text('タイトル'),
-                                children:
-                                    syllabusSearch!.syllabusTitleIDMap.entries
-                                        .map(
-                                          (e) => SimpleDialogOption(
-                                            onPressed: () async {
-                                              syllabusTitleID = e.key;
-                                              Navigator.pop(context);
-                                              syllabusSearch = await context
-                                                  .read<ApiRepository>()
-                                                  .fetchSyllabusSearch(
-                                                      syllabusTitleID);
-                                              setState(() {});
-                                            },
-                                            child: Text(e.value),
-                                          ),
-                                        )
-                                        .toList(),
+                                children: parameters!.syllabusTitleIDMap.entries
+                                    .map(
+                                      (e) => SimpleDialogOption(
+                                        onPressed: () async {
+                                          syllabusTitleID = e.key;
+                                          Navigator.pop(context);
+                                          parameters = await context
+                                              .read<ApiRepository>()
+                                              .fetchSyllabusParameters(
+                                                  syllabusTitleID);
+                                          setState(() {});
+                                        },
+                                        child: Text(e.value),
+                                      ),
+                                    )
+                                    .toList(),
                               ),
                             ),
                           ),
@@ -164,9 +163,9 @@ class _SyllabusSearchPageState extends State<SyllabusSearchPage> {
                           icon: Icon(KIcons.close),
                           onPressed: () async {
                             syllabusTitleID = '';
-                            syllabusSearch = await context
+                            parameters = await context
                                 .read<ApiRepository>()
-                                .fetchSyllabusSearch(syllabusTitleID);
+                                .fetchSyllabusParameters(syllabusTitleID);
                             setState(() {});
                           },
                         ),
@@ -190,15 +189,15 @@ class _SyllabusSearchPageState extends State<SyllabusSearchPage> {
                           child: TextButton(
                             child: Text(
                               indexID.isNotEmpty &&
-                                      syllabusSearch!.indexIDMap != null
-                                  ? syllabusSearch!.indexIDMap![indexID] ?? '-'
+                                      parameters!.indexIDMap != null
+                                  ? parameters!.indexIDMap![indexID] ?? '-'
                                   : '-',
                             ),
                             onPressed: () async => showDialog(
                               context: context,
                               builder: (context) => SimpleDialog(
                                 title: const Text('フォルダ'),
-                                children: syllabusSearch!.indexIDMap?.entries
+                                children: parameters!.indexIDMap?.entries
                                         .map(
                                           (e) => SimpleDialogOption(
                                             onPressed: () async {
@@ -240,8 +239,7 @@ class _SyllabusSearchPageState extends State<SyllabusSearchPage> {
                           child: TextButton(
                             child: Text(
                               targetGrade.isNotEmpty
-                                  ? syllabusSearch!
-                                          .targetGradeMap[targetGrade] ??
+                                  ? parameters!.targetGradeMap[targetGrade] ??
                                       '-'
                                   : '-',
                             ),
@@ -249,7 +247,7 @@ class _SyllabusSearchPageState extends State<SyllabusSearchPage> {
                               context: context,
                               builder: (context) => SimpleDialog(
                                 title: const Text('対象学年'),
-                                children: syllabusSearch!.targetGradeMap.entries
+                                children: parameters!.targetGradeMap.entries
                                     .map(
                                       (e) => SimpleDialogOption(
                                         onPressed: () async {
@@ -290,14 +288,14 @@ class _SyllabusSearchPageState extends State<SyllabusSearchPage> {
                           child: TextButton(
                             child: Text(
                               week.isNotEmpty
-                                  ? syllabusSearch!.weekMap[week] ?? '-'
+                                  ? parameters!.weekMap[week] ?? '-'
                                   : '-',
                             ),
                             onPressed: () async => showDialog(
                               context: context,
                               builder: (context) => SimpleDialog(
                                 title: const Text('曜日'),
-                                children: syllabusSearch!.weekMap.entries
+                                children: parameters!.weekMap.entries
                                     .map(
                                       (e) => SimpleDialogOption(
                                         onPressed: () async {
@@ -338,14 +336,14 @@ class _SyllabusSearchPageState extends State<SyllabusSearchPage> {
                           child: TextButton(
                             child: Text(
                               hour.isNotEmpty
-                                  ? syllabusSearch!.hourMap[hour] ?? '-'
+                                  ? parameters!.hourMap[hour] ?? '-'
                                   : '-',
                             ),
                             onPressed: () async => showDialog(
                               context: context,
                               builder: (context) => SimpleDialog(
                                 title: const Text('時限'),
-                                children: syllabusSearch!.hourMap.entries
+                                children: parameters!.hourMap.entries
                                     .map(
                                       (e) => SimpleDialogOption(
                                         onPressed: () async {

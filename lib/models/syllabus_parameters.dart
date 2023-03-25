@@ -1,4 +1,4 @@
-class SyllabusSearch {
+class SyllabusParameters {
   Map<int, String> academicYearMap;
   Map<String, String> syllabusTitleIDMap;
   Map<String, String>? indexIDMap;
@@ -7,7 +7,7 @@ class SyllabusSearch {
   Map<String, String> weekMap;
   Map<String, String> hourMap;
 
-  SyllabusSearch({
+  SyllabusParameters({
     required this.academicYearMap,
     required this.syllabusTitleIDMap,
     this.indexIDMap,

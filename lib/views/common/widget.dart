@@ -536,19 +536,22 @@ AppBar buildAppBar(BuildContext context, GlobalKey<ScaffoldState> scaffoldKey) {
 PreferredSize buildAppBarBottom(BuildContext context) {
   return PreferredSize(
     preferredSize: const Size.fromHeight(6.0),
-    child: Visibility(
-      visible: context.watch<ApiRepository>().isLoading,
-      child: LinearProgressIndicator(
-        minHeight: 3.0,
-        valueColor: context.watch<ApiRepository>().isError
-            ? AlwaysStoppedAnimation<Color>(Theme.of(context).colorScheme.error)
-            : AlwaysStoppedAnimation<Color>(
-                Theme.of(context).colorScheme.primary,
-              ),
-        value: context.watch<ApiRepository>().progress != -1
-            ? context.watch<ApiRepository>().progress
-            : null,
-      ),
-    ),
+    child: Builder(builder: (context) {
+      return Visibility(
+        visible: context.watch<ApiRepository>().isLoading,
+        child: LinearProgressIndicator(
+          minHeight: 3.0,
+          valueColor: context.watch<ApiRepository>().isError
+              ? AlwaysStoppedAnimation<Color>(
+                  Theme.of(context).colorScheme.error)
+              : AlwaysStoppedAnimation<Color>(
+                  Theme.of(context).colorScheme.primary,
+                ),
+          value: context.watch<ApiRepository>().progress != -1
+              ? context.watch<ApiRepository>().progress
+              : null,
+        ),
+      );
+    }),
   );
 }
