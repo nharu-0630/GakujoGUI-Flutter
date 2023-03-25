@@ -2,21 +2,25 @@ import 'dart:io';
 
 import 'package:flash/flash.dart';
 import 'package:flutter/foundation.dart';
-import 'package:gakujo_gui/api/api.dart';
+import 'package:gakujo_gui/api/gakujo_api.dart';
+import 'package:gakujo_gui/api/syllabus_api.dart';
 import 'package:gakujo_gui/app.dart';
 import 'package:gakujo_gui/models/class_link.dart';
 import 'package:gakujo_gui/models/contact.dart';
 import 'package:gakujo_gui/models/quiz.dart';
 import 'package:gakujo_gui/models/report.dart';
 import 'package:gakujo_gui/models/shared_file.dart';
+import 'package:gakujo_gui/models/syllabus.dart';
 import 'package:gakujo_gui/models/syllabus_result.dart';
 import 'package:gakujo_gui/models/syllabus_search.dart';
 import 'package:gakujo_gui/views/common/widget.dart';
 import 'package:windows_taskbar/windows_taskbar.dart';
 
 class ApiRepository extends ChangeNotifier {
-  final _api = Api();
-  String get token => _api.token;
+  final _gakujoApi = GakujoApi();
+  String get token => _gakujoApi.token;
+
+  final _syllabusApi = SyllabusApi();
 
   bool get isLoading => _isLoading;
   bool _isLoading = false;
@@ -28,7 +32,7 @@ class ApiRepository extends ChangeNotifier {
   ApiRepository();
 
   void initialize() {
-    _api.initialize();
+    _gakujoApi.initialize();
   }
 
   void setProgress(double value) {
@@ -87,14 +91,14 @@ class ApiRepository extends ChangeNotifier {
   }
 
   void clearCookies() async {
-    await _api.clearCookies();
+    await _gakujoApi.clearCookies();
   }
 
   void fetchLogin() async {
     if (isLoading) return;
     _toggleLoading();
     try {
-      await _api.fetchLogin();
+      await _gakujoApi.fetchLogin();
       _toggleLoading();
       _onSuccess('ログイン');
     } catch (e) {
@@ -106,7 +110,7 @@ class ApiRepository extends ChangeNotifier {
     if (isLoading) return;
     _toggleLoading();
     try {
-      await _api.fetchSubjects();
+      await _gakujoApi.fetchSubjects();
       _toggleLoading();
       _onSuccess('授業科目一覧の取得');
     } catch (e) {
@@ -118,7 +122,7 @@ class ApiRepository extends ChangeNotifier {
     if (isLoading) return;
     _toggleLoading();
     try {
-      await _api.fetchContacts();
+      await _gakujoApi.fetchContacts();
       _toggleLoading();
       _onSuccess('授業連絡一覧の取得');
     } catch (e) {
@@ -130,7 +134,7 @@ class ApiRepository extends ChangeNotifier {
     if (isLoading) return;
     _toggleLoading();
     try {
-      await _api.fetchDetailContact(contact);
+      await _gakujoApi.fetchDetailContact(contact);
       _toggleLoading();
       _onSuccess('授業連絡詳細の取得');
     } catch (e) {
@@ -142,7 +146,7 @@ class ApiRepository extends ChangeNotifier {
     if (isLoading) return;
     _toggleLoading();
     try {
-      await _api.fetchReports();
+      await _gakujoApi.fetchReports();
       _toggleLoading();
       _onSuccess('レポート一覧の取得');
     } catch (e) {
@@ -154,7 +158,7 @@ class ApiRepository extends ChangeNotifier {
     if (isLoading) return;
     _toggleLoading();
     try {
-      await _api.fetchDetailReport(report);
+      await _gakujoApi.fetchDetailReport(report);
       _toggleLoading();
       _onSuccess('レポート詳細の取得');
     } catch (e) {
@@ -166,7 +170,7 @@ class ApiRepository extends ChangeNotifier {
     if (isLoading) return;
     _toggleLoading();
     try {
-      await _api.fetchQuizzes();
+      await _gakujoApi.fetchQuizzes();
       _toggleLoading();
       _onSuccess('小テスト一覧の取得');
     } catch (e) {
@@ -178,7 +182,7 @@ class ApiRepository extends ChangeNotifier {
     if (isLoading) return;
     _toggleLoading();
     try {
-      await _api.fetchDetailQuiz(quiz);
+      await _gakujoApi.fetchDetailQuiz(quiz);
       _toggleLoading();
       _onSuccess('小テスト詳細の取得');
     } catch (e) {
@@ -190,7 +194,7 @@ class ApiRepository extends ChangeNotifier {
     if (isLoading) return;
     _toggleLoading();
     try {
-      await _api.fetchSharedFiles();
+      await _gakujoApi.fetchSharedFiles();
       _toggleLoading();
       _onSuccess('授業共有ファイル一覧の取得');
     } catch (e) {
@@ -202,7 +206,7 @@ class ApiRepository extends ChangeNotifier {
     if (isLoading) return;
     _toggleLoading();
     try {
-      await _api.fetchDetailSharedFile(sharedFile);
+      await _gakujoApi.fetchDetailSharedFile(sharedFile);
       _toggleLoading();
       _onSuccess('授業共有ファイル詳細の取得');
     } catch (e) {
@@ -214,7 +218,7 @@ class ApiRepository extends ChangeNotifier {
     if (isLoading) return;
     _toggleLoading();
     try {
-      await _api.fetchClassLinks();
+      await _gakujoApi.fetchClassLinks();
       _toggleLoading();
       _onSuccess('授業リンク一覧の取得');
     } catch (e) {
@@ -226,7 +230,7 @@ class ApiRepository extends ChangeNotifier {
     if (isLoading) return;
     _toggleLoading();
     try {
-      await _api.fetchDetailClassLink(classLink);
+      await _gakujoApi.fetchDetailClassLink(classLink);
       _toggleLoading();
       _onSuccess('授業リンク詳細の取得');
     } catch (e) {
@@ -238,7 +242,7 @@ class ApiRepository extends ChangeNotifier {
     if (isLoading) return;
     _toggleLoading();
     try {
-      await _api.fetchGrades();
+      await _gakujoApi.fetchGrades();
       _toggleLoading();
       _onSuccess('成績情報の取得');
     } catch (e) {
@@ -250,7 +254,7 @@ class ApiRepository extends ChangeNotifier {
     if (isLoading) return;
     _toggleLoading();
     try {
-      await _api.fetchTimetables();
+      await _gakujoApi.fetchTimetables();
       _toggleLoading();
       _onSuccess('個人時間割の取得');
     } catch (e) {
@@ -260,8 +264,7 @@ class ApiRepository extends ChangeNotifier {
 
   Future<SyllabusSearch?> fetchSyllabusSearch(String syllabusTitleID) async {
     try {
-      var result =
-          await _api.fetchSyllabusSearch(syllabusTitleID: syllabusTitleID);
+      var result = await _syllabusApi.fetchSyllabusSearch(syllabusTitleID);
       _onSuccess('シラバス検索条件の取得');
       return result;
     } catch (e) {
@@ -283,8 +286,8 @@ class ApiRepository extends ChangeNotifier {
     required String freeWord,
   }) async {
     try {
-      var result = await _api.fetchSyllabusResult(
-        academicYear: academicYear,
+      var result = await _syllabusApi.fetchSyllabusResult(
+        academicYear: academicYear != -1 ? academicYear.toString() : '',
         syllabusTitleID: syllabusTitleID,
         indexID: indexID,
         targetGrade: targetGrade,
@@ -301,5 +304,16 @@ class ApiRepository extends ChangeNotifier {
       _onError(e);
     }
     return [];
+  }
+
+  Future<Syllabus?> fetchSyllabusDetail(String subjectId) async {
+    try {
+      var result = await _syllabusApi.fetchSyllabus(subjectId);
+      _onSuccess('シラバス詳細の取得');
+      return result;
+    } catch (e) {
+      _onError(e);
+    }
+    return null;
   }
 }

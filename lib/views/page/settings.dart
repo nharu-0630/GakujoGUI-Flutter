@@ -1,8 +1,9 @@
 import 'package:adaptive_dialog/adaptive_dialog.dart';
 import 'package:flash/flash.dart';
 import 'package:flutter/material.dart';
-import 'package:gakujo_gui/api/api.dart';
+import 'package:gakujo_gui/api/gakujo_api.dart';
 import 'package:gakujo_gui/api/provide.dart';
+import 'package:gakujo_gui/api/syllabus_api.dart';
 import 'package:gakujo_gui/app.dart';
 import 'package:gakujo_gui/constants/kicons.dart';
 import 'package:gakujo_gui/models/class_link.dart';
@@ -528,7 +529,7 @@ class _SettingsPageState extends State<SettingsPage> {
                                 alignment: Alignment.topLeft,
                                 child: buildAutoLinkText(
                                   context,
-                                  'Client Version: ${packageInfo.version}\nAPI Version: ${Api.version}\nToken: ${context.read<ApiRepository>().token}\nAccessEnvironment Key: ${settings.accessEnvironmentKey}\nAccessEnvironment Value: ${settings.accessEnvironmentValue}',
+                                  'Client Version: ${packageInfo.version}\nGakujoAPI Version: ${GakujoApi.version}\nSyllabusAPI Version: ${SyllabusApi.version}\nToken: ${context.read<ApiRepository>().token}\nAccessEnvironment Key: ${settings.accessEnvironmentKey}\nAccessEnvironment Value: ${settings.accessEnvironmentValue}',
                                 ),
                               ),
                             ),

@@ -2,6 +2,7 @@ import 'package:gakujo_gui/api/parse.dart';
 import 'package:html/dom.dart';
 
 class SyllabusResult {
+  String subjectId;
   String titleName;
   String indexName;
   String subjectCode;
@@ -14,6 +15,7 @@ class SyllabusResult {
   String youbiJigen;
 
   SyllabusResult({
+    required this.subjectId,
     required this.titleName,
     required this.indexName,
     required this.subjectCode,
@@ -28,6 +30,8 @@ class SyllabusResult {
 
   factory SyllabusResult.fromElement(Element element) {
     return SyllabusResult(
+      subjectId: RegExp(r'(?<=subjectId=)\d*').firstMatch(
+          element.querySelectorAll('td')[0].attributes['onclick']!)![0]!,
       titleName: element.querySelectorAll('td')[0].text.trimWhiteSpace(),
       indexName: element.querySelectorAll('td')[1].text.trimWhiteSpace(),
       subjectCode: element.querySelectorAll('td')[2].text.trimWhiteSpace(),
