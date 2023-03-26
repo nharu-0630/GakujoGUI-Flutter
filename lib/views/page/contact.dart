@@ -159,8 +159,7 @@ class _ContactPageState extends State<ContactPage> {
                     backgroundColor: Theme.of(context).colorScheme.surface,
                     isScrollControlled: false,
                     shape: const RoundedRectangleBorder(
-                        borderRadius:
-                            BorderRadius.vertical(top: Radius.circular(0.0))),
+                        borderRadius: BorderRadius.vertical(top: Radius.zero)),
                     context: context,
                     builder: (context) => buildContact(context, contact),
                   )

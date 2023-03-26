@@ -200,6 +200,9 @@ Widget buildDrawer(BuildContext context) {
                 .length ??
             0;
         return Drawer(
+          shape: const RoundedRectangleBorder(
+            borderRadius: BorderRadius.all(Radius.zero),
+          ),
           child: ListView(
             children: [
               SizedBox(
