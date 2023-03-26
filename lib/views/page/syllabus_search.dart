@@ -70,39 +70,37 @@ class _SyllabusSearchPageState extends State<SyllabusSearchPage> {
                             ),
                             onPressed: () async => showDialog(
                               context: context,
-                              builder: (BuildContext context) {
-                                return AlertDialog(
-                                  title: const Text('開講年度'),
-                                  content: SizedBox(
-                                    width: 360,
-                                    height: 360,
-                                    child: YearPicker(
-                                      firstDate: DateTime(
-                                          parameters!.academicYearMap.keys
-                                              .toList()
-                                              .reduce(min),
-                                          1),
-                                      lastDate: DateTime(
-                                          parameters!.academicYearMap.keys
-                                              .toList()
-                                              .reduce(max),
-                                          1),
-                                      initialDate: academicYear != -1
-                                          ? DateTime(academicYear)
-                                          : DateTime.now(),
-                                      selectedDate: academicYear != -1
-                                          ? DateTime(academicYear)
-                                          : DateTime.now(),
-                                      onChanged: (DateTime dateTime) {
-                                        setState(() {
-                                          academicYear = dateTime.year;
-                                          Navigator.pop(context);
-                                        });
-                                      },
-                                    ),
+                              builder: (BuildContext context) => AlertDialog(
+                                title: const Text('開講年度'),
+                                content: SizedBox(
+                                  width: 360,
+                                  height: 360,
+                                  child: YearPicker(
+                                    firstDate: DateTime(
+                                        parameters!.academicYearMap.keys
+                                            .toList()
+                                            .reduce(min),
+                                        1),
+                                    lastDate: DateTime(
+                                        parameters!.academicYearMap.keys
+                                            .toList()
+                                            .reduce(max),
+                                        1),
+                                    initialDate: academicYear != -1
+                                        ? DateTime(academicYear)
+                                        : DateTime.now(),
+                                    selectedDate: academicYear != -1
+                                        ? DateTime(academicYear)
+                                        : DateTime.now(),
+                                    onChanged: (DateTime dateTime) {
+                                      setState(() {
+                                        academicYear = dateTime.year;
+                                        Navigator.pop(context);
+                                      });
+                                    },
                                   ),
-                                );
-                              },
+                                ),
+                              ),
                             ),
                           ),
                         ),

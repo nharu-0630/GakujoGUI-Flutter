@@ -91,7 +91,7 @@ class _SettingsPageState extends State<SettingsPage> {
                           ],
                         ),
                       ),
-                      content: Container(
+                      content: Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 16.0),
                         child: Column(
                           children: [
@@ -162,11 +162,9 @@ class _SettingsPageState extends State<SettingsPage> {
                                     context: App.navigatorKey.currentState!
                                         .overlay!.context,
                                     duration: const Duration(seconds: 3),
-                                    builder: (context, controller) {
-                                      return buildInfoFlashBar(
-                                          context, controller,
-                                          content: 'ログイン情報を保存しました');
-                                    },
+                                    builder: (context, controller) =>
+                                        buildInfoFlashBar(context, controller,
+                                            content: 'ログイン情報を保存しました'),
                                   );
                                 },
                                 child: Padding(
@@ -219,36 +217,33 @@ class _SettingsPageState extends State<SettingsPage> {
                                       ),
                                       onPressed: () async => showDialog(
                                         context: context,
-                                        builder: (BuildContext context) {
-                                          return AlertDialog(
-                                            title: const Text('取得年度'),
-                                            content: SizedBox(
-                                              width: 360,
-                                              height: 360,
-                                              child: YearPicker(
-                                                firstDate: DateTime(
-                                                    DateTime.now().year - 5, 1),
-                                                lastDate: DateTime(
-                                                    DateTime.now().year + 5, 1),
-                                                initialDate: settings.year ==
-                                                        null
-                                                    ? DateTime.now()
-                                                    : DateTime(settings.year!),
-                                                selectedDate: settings.year ==
-                                                        null
-                                                    ? DateTime.now()
-                                                    : DateTime(settings.year!),
-                                                onChanged: (DateTime dateTime) {
-                                                  context
-                                                      .read<
-                                                          SettingsRepository>()
-                                                      .setYear(dateTime.year);
-                                                  Navigator.pop(context);
-                                                },
-                                              ),
+                                        builder: (BuildContext context) =>
+                                            AlertDialog(
+                                          title: const Text('取得年度'),
+                                          content: SizedBox(
+                                            width: 360,
+                                            height: 360,
+                                            child: YearPicker(
+                                              firstDate: DateTime(
+                                                  DateTime.now().year - 5, 1),
+                                              lastDate: DateTime(
+                                                  DateTime.now().year + 5, 1),
+                                              initialDate: settings.year == null
+                                                  ? DateTime.now()
+                                                  : DateTime(settings.year!),
+                                              selectedDate: settings.year ==
+                                                      null
+                                                  ? DateTime.now()
+                                                  : DateTime(settings.year!),
+                                              onChanged: (DateTime dateTime) {
+                                                context
+                                                    .read<SettingsRepository>()
+                                                    .setYear(dateTime.year);
+                                                Navigator.pop(context);
+                                              },
                                             ),
-                                          );
-                                        },
+                                          ),
+                                        ),
                                       ),
                                     ),
                                   ),
@@ -292,53 +287,47 @@ class _SettingsPageState extends State<SettingsPage> {
                                       ),
                                       onPressed: () async => showDialog(
                                         context: context,
-                                        builder: (context) {
-                                          return SimpleDialog(
-                                            title: const Text('取得学期'),
-                                            children: [
-                                              SimpleDialogOption(
-                                                onPressed: () async {
-                                                  context
-                                                      .read<
-                                                          SettingsRepository>()
-                                                      .setSemester(0);
-                                                  Navigator.pop(context);
-                                                },
-                                                child: const Text('前期前半'),
-                                              ),
-                                              SimpleDialogOption(
-                                                onPressed: () async {
-                                                  context
-                                                      .read<
-                                                          SettingsRepository>()
-                                                      .setSemester(1);
-                                                  Navigator.pop(context);
-                                                },
-                                                child: const Text('前期後半'),
-                                              ),
-                                              SimpleDialogOption(
-                                                onPressed: () async {
-                                                  context
-                                                      .read<
-                                                          SettingsRepository>()
-                                                      .setSemester(2);
-                                                  Navigator.pop(context);
-                                                },
-                                                child: const Text('後期前半'),
-                                              ),
-                                              SimpleDialogOption(
-                                                onPressed: () async {
-                                                  context
-                                                      .read<
-                                                          SettingsRepository>()
-                                                      .setSemester(3);
-                                                  Navigator.pop(context);
-                                                },
-                                                child: const Text('後期後半'),
-                                              ),
-                                            ],
-                                          );
-                                        },
+                                        builder: (context) => SimpleDialog(
+                                          title: const Text('取得学期'),
+                                          children: [
+                                            SimpleDialogOption(
+                                              onPressed: () async {
+                                                context
+                                                    .read<SettingsRepository>()
+                                                    .setSemester(0);
+                                                Navigator.pop(context);
+                                              },
+                                              child: const Text('前期前半'),
+                                            ),
+                                            SimpleDialogOption(
+                                              onPressed: () async {
+                                                context
+                                                    .read<SettingsRepository>()
+                                                    .setSemester(1);
+                                                Navigator.pop(context);
+                                              },
+                                              child: const Text('前期後半'),
+                                            ),
+                                            SimpleDialogOption(
+                                              onPressed: () async {
+                                                context
+                                                    .read<SettingsRepository>()
+                                                    .setSemester(2);
+                                                Navigator.pop(context);
+                                              },
+                                              child: const Text('後期前半'),
+                                            ),
+                                            SimpleDialogOption(
+                                              onPressed: () async {
+                                                context
+                                                    .read<SettingsRepository>()
+                                                    .setSemester(3);
+                                                Navigator.pop(context);
+                                              },
+                                              child: const Text('後期後半'),
+                                            ),
+                                          ],
+                                        ),
                                       ),
                                     ),
                                   ),
@@ -487,7 +476,7 @@ class _SettingsPageState extends State<SettingsPage> {
                           ],
                         ),
                       ),
-                      content: Container(
+                      content: Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 16.0),
                         child: Column(
                           children: [

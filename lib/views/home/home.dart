@@ -15,11 +15,12 @@ class HomeWidget extends StatefulWidget {
 class _HomeWidgetState extends State<HomeWidget> {
   @override
   Widget build(BuildContext context) {
-    return Scaffold(body: OrientationBuilder(builder: (context, orientation) {
-      return orientation == Orientation.portrait
-          ? _buildVertical(context)
-          : _buildHorizontal(context);
-    }));
+    return Scaffold(
+        body: OrientationBuilder(
+            builder: (context, orientation) =>
+                orientation == Orientation.portrait
+                    ? _buildVertical(context)
+                    : _buildHorizontal(context)));
   }
 
   Widget _buildHeader(BuildContext context, IconData icon, String title) {

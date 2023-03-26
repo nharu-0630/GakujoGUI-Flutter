@@ -34,7 +34,7 @@ class TaskWidget extends StatelessWidget {
               .toList();
           List<dynamic> tasks = [...reports, ...quizzes];
           tasks.sort((a, b) => b.endDateTime.compareTo(a.endDateTime));
-          return Container(
+          return Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16.0),
             child: tasks.isEmpty
                 ? Center(
@@ -66,10 +66,11 @@ class TaskWidget extends StatelessWidget {
           );
         } else {
           return const Center(
-              child: Padding(
-            padding: EdgeInsets.all(8.0),
-            child: CircularProgressIndicator(),
-          ));
+            child: Padding(
+              padding: EdgeInsets.all(8.0),
+              child: CircularProgressIndicator(),
+            ),
+          );
         }
       },
     );

@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:adaptive_dialog/adaptive_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
@@ -43,14 +41,10 @@ class _QuizPageState extends State<QuizPage> {
                   : true)
               .toList();
           return Scaffold(
-            floatingActionButton:
-                (Platform.isLinux || Platform.isMacOS || Platform.isWindows)
-                    ? FloatingActionButton(
-                        onPressed: () async =>
-                            context.read<ApiRepository>().fetchQuizzes(),
-                        child: Icon(KIcons.update),
-                      )
-                    : null,
+            floatingActionButton: buildFloatingActionButton(
+              onPressed: context.read<ApiRepository>().fetchQuizzes,
+              iconData: KIcons.update,
+            ),
             body: NestedScrollView(
               headerSliverBuilder: (context, innerBoxScrolled) =>
                   [_buildAppBar(context)],
@@ -412,7 +406,7 @@ Widget buildQuizModal(BuildContext context, Quiz quiz) {
       Row(
         children: [
           Expanded(
-            child: Container(
+            child: Padding(
               padding: const EdgeInsets.all(4.0),
               child: ElevatedButton(
                 onPressed: () {
@@ -427,7 +421,7 @@ Widget buildQuizModal(BuildContext context, Quiz quiz) {
             ),
           ),
           Expanded(
-            child: Container(
+            child: Padding(
               padding: const EdgeInsets.all(4.0),
               child: ElevatedButton(
                 onPressed: () async =>
@@ -437,7 +431,7 @@ Widget buildQuizModal(BuildContext context, Quiz quiz) {
             ),
           ),
           Expanded(
-            child: Container(
+            child: Padding(
               padding: const EdgeInsets.all(4.0),
               child: ElevatedButton(
                 onPressed: () => Share.share(

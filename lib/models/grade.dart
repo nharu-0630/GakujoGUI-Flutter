@@ -62,9 +62,7 @@ class Grade implements Comparable<Grade> {
 
   @override
   bool operator ==(Object other) {
-    if (identical(this, other)) {
-      return true;
-    }
+    if (identical(this, other)) return true;
     if (other is Grade) {
       return subject == other.subject &&
           acquisitionYear == other.acquisitionYear;
@@ -78,13 +76,9 @@ class Grade implements Comparable<Grade> {
   @override
   int compareTo(Grade other) {
     var compare1 = reportDateTime.compareTo(other.reportDateTime);
-    if (compare1 != 0) {
-      return compare1;
-    }
+    if (compare1 != 0) return compare1;
     var compare2 = acquisitionYear.compareTo(other.acquisitionYear);
-    if (compare2 != 0) {
-      return compare2;
-    }
+    if (compare2 != 0) return compare2;
     var compare3 = subject.compareTo(other.subject);
     return compare3;
   }

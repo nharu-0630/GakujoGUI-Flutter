@@ -197,9 +197,7 @@ class Timetable implements Comparable<Timetable> {
 
   @override
   bool operator ==(Object other) {
-    if (identical(this, other)) {
-      return true;
-    }
+    if (identical(this, other)) return true;
     if (other is Timetable) {
       return kamokuCode == other.kamokuCode && classCode == other.classCode;
     }
@@ -212,9 +210,7 @@ class Timetable implements Comparable<Timetable> {
   @override
   int compareTo(Timetable other) {
     var compare1 = kamokuCode.compareTo(other.kamokuCode);
-    if (compare1 != 0) {
-      return compare1;
-    }
+    if (compare1 != 0) return compare1;
     var compare2 = classCode.compareTo(other.classCode);
     return compare2;
   }

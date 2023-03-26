@@ -24,33 +24,53 @@ class _TimetablePageState extends State<TimetablePage> {
         children: [
           FutureBuilder(
               future: context.watch<TimetableRepository>().getAll(),
-              builder: (context, AsyncSnapshot<List<Timetable>> snapshot) {
-                return snapshot.hasData
-                    ? Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 4.0),
-                        child: Table(
-                          columnWidths: const {
-                            0: IntrinsicColumnWidth(),
-                            1: FlexColumnWidth(1.0),
-                            2: FlexColumnWidth(1.0),
-                            3: FlexColumnWidth(1.0),
-                            4: FlexColumnWidth(1.0),
-                            5: FlexColumnWidth(1.0),
-                          },
-                          defaultVerticalAlignment:
-                              TableCellVerticalAlignment.middle,
-                          children: [
-                            TableRow(
-                              children: [
-                                const TableCell(child: SizedBox()),
-                                for (var i = 0; i < 5; i++)
-                                  TableCell(
-                                    child: Padding(
-                                      padding: const EdgeInsets.all(8.0),
-                                      child: Align(
-                                        alignment: Alignment.center,
+              builder: (context, AsyncSnapshot<List<Timetable>> snapshot) =>
+                  snapshot.hasData
+                      ? Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 4.0),
+                          child: Table(
+                            columnWidths: const {
+                              0: IntrinsicColumnWidth(),
+                              1: FlexColumnWidth(1.0),
+                              2: FlexColumnWidth(1.0),
+                              3: FlexColumnWidth(1.0),
+                              4: FlexColumnWidth(1.0),
+                              5: FlexColumnWidth(1.0),
+                            },
+                            defaultVerticalAlignment:
+                                TableCellVerticalAlignment.middle,
+                            children: [
+                              TableRow(
+                                children: [
+                                  const TableCell(child: SizedBox()),
+                                  for (var i = 0; i < 5; i++)
+                                    TableCell(
+                                      child: Padding(
+                                        padding: const EdgeInsets.all(8.0),
+                                        child: Align(
+                                          alignment: Alignment.center,
+                                          child: Text(
+                                            '月火水木金'[i],
+                                            style: Theme.of(context)
+                                                .textTheme
+                                                .titleMedium
+                                                ?.copyWith(
+                                                    fontWeight:
+                                                        FontWeight.bold),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                ],
+                              ),
+                              for (var i = 0; i < 5; i++)
+                                TableRow(
+                                  children: [
+                                    TableCell(
+                                      child: Padding(
+                                        padding: const EdgeInsets.all(8.0),
                                         child: Text(
-                                          '月火水木金'[i],
+                                          '${i + 1}',
                                           style: Theme.of(context)
                                               .textTheme
                                               .titleMedium
@@ -59,43 +79,23 @@ class _TimetablePageState extends State<TimetablePage> {
                                         ),
                                       ),
                                     ),
-                                  ),
-                              ],
-                            ),
-                            for (var i = 0; i < 5; i++)
-                              TableRow(
-                                children: [
-                                  TableCell(
-                                    child: Padding(
-                                      padding: const EdgeInsets.all(8.0),
-                                      child: Text(
-                                        '${i + 1}',
-                                        style: Theme.of(context)
-                                            .textTheme
-                                            .titleMedium
-                                            ?.copyWith(
-                                                fontWeight: FontWeight.bold),
-                                      ),
-                                    ),
-                                  ),
-                                  for (var j = 0; j < 5; j++)
-                                    snapshot.data!.any((e) =>
-                                            e.weekday == j && e.period == i)
-                                        ? _buildCell(
-                                            context,
-                                            snapshot.data!.firstWhere((e) =>
-                                                e.weekday == j &&
-                                                e.period == i))
-                                        : const TableCell(child: SizedBox()),
-                                ],
-                              ),
-                          ],
-                        ),
-                      )
-                    : const Center(
-                        child: CircularProgressIndicator(),
-                      );
-              }),
+                                    for (var j = 0; j < 5; j++)
+                                      snapshot.data!.any((e) =>
+                                              e.weekday == j && e.period == i)
+                                          ? _buildCell(
+                                              context,
+                                              snapshot.data!.firstWhere((e) =>
+                                                  e.weekday == j &&
+                                                  e.period == i))
+                                          : const TableCell(child: SizedBox()),
+                                  ],
+                                ),
+                            ],
+                          ),
+                        )
+                      : const Center(
+                          child: CircularProgressIndicator(),
+                        )),
         ],
       ),
     );

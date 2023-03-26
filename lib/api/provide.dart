@@ -44,10 +44,8 @@ class ApiRepository extends ChangeNotifier {
     showFlash(
       context: App.navigatorKey.currentState!.overlay!.context,
       duration: const Duration(seconds: 3),
-      builder: (context, controller) {
-        return buildInfoFlashBar(context, controller,
-            content: '$contentに成功しました');
-      },
+      builder: (context, controller) =>
+          buildInfoFlashBar(context, controller, content: '$contentに成功しました'),
     );
   }
 
@@ -66,9 +64,8 @@ class ApiRepository extends ChangeNotifier {
       if (Platform.isWindows) {
         WindowsTaskbar.setProgressMode(TaskbarProgressMode.noProgress);
       }
-      _toggleLoading();
+      _setStatus(false);
     });
-
     showFlash(
       context: App.navigatorKey.currentState!.overlay!.context,
       builder: (context, controller) {
@@ -77,8 +74,8 @@ class ApiRepository extends ChangeNotifier {
     );
   }
 
-  void _toggleLoading() {
-    _isLoading = !isLoading;
+  void _setStatus(bool value) {
+    _isLoading = value;
     _progress = -1;
     if (Platform.isWindows) {
       if (isLoading) {
@@ -96,10 +93,10 @@ class ApiRepository extends ChangeNotifier {
 
   void fetchLogin() async {
     if (isLoading) return;
-    _toggleLoading();
+    _setStatus(true);
     try {
       await _gakujoApi.fetchLogin();
-      _toggleLoading();
+      _setStatus(false);
       _onSuccess('ログイン');
     } catch (e) {
       _onError(e);
@@ -108,10 +105,10 @@ class ApiRepository extends ChangeNotifier {
 
   void fetchSubjects() async {
     if (isLoading) return;
-    _toggleLoading();
+    _setStatus(true);
     try {
       await _gakujoApi.fetchSubjects();
-      _toggleLoading();
+      _setStatus(false);
       _onSuccess('授業科目一覧の取得');
     } catch (e) {
       _onError(e);
@@ -120,10 +117,10 @@ class ApiRepository extends ChangeNotifier {
 
   void fetchContacts() async {
     if (isLoading) return;
-    _toggleLoading();
+    _setStatus(true);
     try {
       await _gakujoApi.fetchContacts();
-      _toggleLoading();
+      _setStatus(false);
       _onSuccess('授業連絡一覧の取得');
     } catch (e) {
       _onError(e);
@@ -132,10 +129,10 @@ class ApiRepository extends ChangeNotifier {
 
   void fetchDetailContact(Contact contact) async {
     if (isLoading) return;
-    _toggleLoading();
+    _setStatus(true);
     try {
       await _gakujoApi.fetchDetailContact(contact);
-      _toggleLoading();
+      _setStatus(false);
       _onSuccess('授業連絡詳細の取得');
     } catch (e) {
       _onError(e);
@@ -144,10 +141,10 @@ class ApiRepository extends ChangeNotifier {
 
   void fetchReports() async {
     if (isLoading) return;
-    _toggleLoading();
+    _setStatus(true);
     try {
       await _gakujoApi.fetchReports();
-      _toggleLoading();
+      _setStatus(false);
       _onSuccess('レポート一覧の取得');
     } catch (e) {
       _onError(e);
@@ -156,10 +153,10 @@ class ApiRepository extends ChangeNotifier {
 
   void fetchDetailReport(Report report) async {
     if (isLoading) return;
-    _toggleLoading();
+    _setStatus(true);
     try {
       await _gakujoApi.fetchDetailReport(report);
-      _toggleLoading();
+      _setStatus(false);
       _onSuccess('レポート詳細の取得');
     } catch (e) {
       _onError(e);
@@ -168,10 +165,10 @@ class ApiRepository extends ChangeNotifier {
 
   void fetchQuizzes() async {
     if (isLoading) return;
-    _toggleLoading();
+    _setStatus(true);
     try {
       await _gakujoApi.fetchQuizzes();
-      _toggleLoading();
+      _setStatus(false);
       _onSuccess('小テスト一覧の取得');
     } catch (e) {
       _onError(e);
@@ -180,10 +177,10 @@ class ApiRepository extends ChangeNotifier {
 
   void fetchDetailQuiz(Quiz quiz) async {
     if (isLoading) return;
-    _toggleLoading();
+    _setStatus(true);
     try {
       await _gakujoApi.fetchDetailQuiz(quiz);
-      _toggleLoading();
+      _setStatus(false);
       _onSuccess('小テスト詳細の取得');
     } catch (e) {
       _onError(e);
@@ -192,10 +189,10 @@ class ApiRepository extends ChangeNotifier {
 
   void fetchSharedFiles() async {
     if (isLoading) return;
-    _toggleLoading();
+    _setStatus(true);
     try {
       await _gakujoApi.fetchSharedFiles();
-      _toggleLoading();
+      _setStatus(false);
       _onSuccess('授業共有ファイル一覧の取得');
     } catch (e) {
       _onError(e);
@@ -204,10 +201,10 @@ class ApiRepository extends ChangeNotifier {
 
   void fetchDetailSharedFile(SharedFile sharedFile) async {
     if (isLoading) return;
-    _toggleLoading();
+    _setStatus(true);
     try {
       await _gakujoApi.fetchDetailSharedFile(sharedFile);
-      _toggleLoading();
+      _setStatus(false);
       _onSuccess('授業共有ファイル詳細の取得');
     } catch (e) {
       _onError(e);
@@ -216,10 +213,10 @@ class ApiRepository extends ChangeNotifier {
 
   void fetchClassLinks() async {
     if (isLoading) return;
-    _toggleLoading();
+    _setStatus(true);
     try {
       await _gakujoApi.fetchClassLinks();
-      _toggleLoading();
+      _setStatus(false);
       _onSuccess('授業リンク一覧の取得');
     } catch (e) {
       _onError(e);
@@ -228,10 +225,10 @@ class ApiRepository extends ChangeNotifier {
 
   void fetchDetailClassLink(ClassLink classLink) async {
     if (isLoading) return;
-    _toggleLoading();
+    _setStatus(true);
     try {
       await _gakujoApi.fetchDetailClassLink(classLink);
-      _toggleLoading();
+      _setStatus(false);
       _onSuccess('授業リンク詳細の取得');
     } catch (e) {
       _onError(e);
@@ -240,10 +237,10 @@ class ApiRepository extends ChangeNotifier {
 
   void fetchGrades() async {
     if (isLoading) return;
-    _toggleLoading();
+    _setStatus(true);
     try {
       await _gakujoApi.fetchGrades();
-      _toggleLoading();
+      _setStatus(false);
       _onSuccess('成績情報の取得');
     } catch (e) {
       _onError(e);
@@ -252,10 +249,10 @@ class ApiRepository extends ChangeNotifier {
 
   void fetchTimetables() async {
     if (isLoading) return;
-    _toggleLoading();
+    _setStatus(true);
     try {
       await _gakujoApi.fetchTimetables();
-      _toggleLoading();
+      _setStatus(false);
       _onSuccess('個人時間割の取得');
     } catch (e) {
       _onError(e);

@@ -1,5 +1,4 @@
 import 'dart:collection';
-import 'dart:io';
 
 import 'package:collection/collection.dart';
 import 'package:fl_chart/fl_chart.dart';
@@ -39,14 +38,10 @@ class _GradePageState extends State<GradePage> {
           _grades.sort(((a, b) => b.compareTo(a)));
           _gpa = snapshot.data![1];
           return Scaffold(
-            floatingActionButton:
-                (Platform.isLinux || Platform.isMacOS || Platform.isWindows)
-                    ? FloatingActionButton(
-                        onPressed: () async =>
-                            context.read<ApiRepository>().fetchGrades(),
-                        child: Icon(KIcons.update),
-                      )
-                    : null,
+            floatingActionButton: buildFloatingActionButton(
+              onPressed: context.read<ApiRepository>().fetchGrades,
+              iconData: KIcons.update,
+            ),
             body: DefaultTabController(
               length: 2,
               child: NestedScrollView(
@@ -162,15 +157,11 @@ class _GradePageState extends State<GradePage> {
       int yearB = int.parse(
           b.replaceAll('GPA値', '').split('　')[0].replaceAll('年度', ''));
       int compare1 = yearA.compareTo(yearB);
-      if (compare1 != 0) {
-        return compare1;
-      }
+      if (compare1 != 0) return compare1;
       int termA = a.replaceAll('GPA値', '').split('　')[1] == '前期' ? 1 : 2;
       int termB = b.replaceAll('GPA値', '').split('　')[1] == '前期' ? 1 : 2;
       int compare2 = termA.compareTo(termB);
-      if (compare2 != 0) {
-        return compare2;
-      }
+      if (compare2 != 0) return compare2;
       return 1;
     });
     return gpas.isNotEmpty

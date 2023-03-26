@@ -33,9 +33,7 @@ class Subject implements Comparable<Subject> {
 
   @override
   bool operator ==(Object other) {
-    if (identical(this, other)) {
-      return true;
-    }
+    if (identical(this, other)) return true;
     if (other is Subject) {
       return subject == other.subject &&
           teacher == other.teacher &&
@@ -50,13 +48,9 @@ class Subject implements Comparable<Subject> {
   @override
   int compareTo(Subject other) {
     var compare1 = subject.compareTo(other.subject);
-    if (compare1 != 0) {
-      return compare1;
-    }
+    if (compare1 != 0) return compare1;
     var compare2 = teacher.compareTo(other.teacher);
-    if (compare2 != 0) {
-      return compare2;
-    }
+    if (compare2 != 0) return compare2;
     var compare3 = className.compareTo(other.className);
     return compare3;
   }

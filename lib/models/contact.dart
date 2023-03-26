@@ -115,9 +115,7 @@ class Contact implements Comparable<Contact> {
 
   @override
   bool operator ==(Object other) {
-    if (identical(this, other)) {
-      return true;
-    }
+    if (identical(this, other)) return true;
     if (other is Contact) {
       return subject == other.subject &&
           title == other.title &&
@@ -133,13 +131,9 @@ class Contact implements Comparable<Contact> {
   @override
   int compareTo(Contact other) {
     var compare1 = contactDateTime.compareTo(other.contactDateTime);
-    if (compare1 != 0) {
-      return compare1;
-    }
+    if (compare1 != 0) return compare1;
     var compare2 = subject.compareTo(other.subject);
-    if (compare2 != 0) {
-      return compare2;
-    }
+    if (compare2 != 0) return compare2;
     var compare3 = title.compareTo(other.title);
     return compare3;
   }

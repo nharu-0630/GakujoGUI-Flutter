@@ -147,9 +147,7 @@ class Report implements Comparable<Report> {
 
   @override
   bool operator ==(Object other) {
-    if (identical(this, other)) {
-      return true;
-    }
+    if (identical(this, other)) return true;
     if (other is Report) {
       return subjectCode == other.subjectCode &&
           classCode == other.classCode &&
@@ -164,17 +162,11 @@ class Report implements Comparable<Report> {
   @override
   int compareTo(Report other) {
     var compare1 = endDateTime.compareTo(other.endDateTime);
-    if (compare1 != 0) {
-      return compare1;
-    }
+    if (compare1 != 0) return compare1;
     var compare2 = startDateTime.compareTo(other.startDateTime);
-    if (compare2 != 0) {
-      return compare2;
-    }
+    if (compare2 != 0) return compare2;
     var compare3 = subjectCode.compareTo(other.subjectCode);
-    if (compare3 != 0) {
-      return compare3;
-    }
+    if (compare3 != 0) return compare3;
     var compare4 = id.compareTo(other.id);
     return compare4;
   }

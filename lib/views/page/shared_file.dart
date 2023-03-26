@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:adaptive_dialog/adaptive_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
@@ -37,14 +35,10 @@ class _SharedFilePageState extends State<SharedFilePage> {
               .where((e) => _filterStatus ? !e.isArchived : true)
               .toList();
           return Scaffold(
-            floatingActionButton:
-                (Platform.isLinux || Platform.isMacOS || Platform.isWindows)
-                    ? FloatingActionButton(
-                        onPressed: () async =>
-                            context.read<ApiRepository>().fetchSharedFiles(),
-                        child: Icon(KIcons.update),
-                      )
-                    : null,
+            floatingActionButton: buildFloatingActionButton(
+              onPressed: context.read<ApiRepository>().fetchSharedFiles,
+              iconData: KIcons.update,
+            ),
             body: NestedScrollView(
               headerSliverBuilder: (context, innerBoxScrolled) =>
                   [_buildAppBar(context)],
@@ -367,7 +361,7 @@ Widget buildSharedFileModal(BuildContext context, SharedFile sharedFile) {
       Row(
         children: [
           Expanded(
-            child: Container(
+            child: Padding(
               padding: const EdgeInsets.all(4.0),
               child: ElevatedButton(
                 onPressed: () {
@@ -381,7 +375,7 @@ Widget buildSharedFileModal(BuildContext context, SharedFile sharedFile) {
             ),
           ),
           Expanded(
-            child: Container(
+            child: Padding(
               padding: const EdgeInsets.all(4.0),
               child: ElevatedButton(
                 onPressed: () async => context
@@ -392,7 +386,7 @@ Widget buildSharedFileModal(BuildContext context, SharedFile sharedFile) {
             ),
           ),
           Expanded(
-            child: Container(
+            child: Padding(
               padding: const EdgeInsets.all(4.0),
               child: ElevatedButton(
                 onPressed: () => Share.share(sharedFile.description,

@@ -145,7 +145,6 @@ class SyllabusApi {
         .querySelectorAll('option')
         .skip(1)
         .map((e) => MapEntry(e.attributes['value'] ?? '-', e.text)));
-
     return SyllabusParameters(
       academicYearMap: academicYearMap,
       syllabusTitleIDMap: syllabusTitleIDMap,
@@ -199,9 +198,7 @@ class SyllabusApi {
       ),
     );
 
-    if (response.data.contains('検索条件に合致する科目が見つかりません。')) {
-      return [];
-    }
+    if (response.data.contains('検索条件に合致する科目が見つかりません。')) return [];
 
     var document = parse(response.data);
     return document

@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:adaptive_dialog/adaptive_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
@@ -43,14 +41,10 @@ class _ReportPageState extends State<ReportPage> {
                   : true)
               .toList();
           return Scaffold(
-            floatingActionButton:
-                (Platform.isLinux || Platform.isMacOS || Platform.isWindows)
-                    ? FloatingActionButton(
-                        onPressed: () async =>
-                            context.read<ApiRepository>().fetchReports(),
-                        child: Icon(KIcons.update),
-                      )
-                    : null,
+            floatingActionButton: buildFloatingActionButton(
+              onPressed: context.read<ApiRepository>().fetchReports,
+              iconData: KIcons.update,
+            ),
             body: NestedScrollView(
               headerSliverBuilder: (context, innerBoxScrolled) =>
                   [_buildAppBar(context)],
@@ -414,7 +408,7 @@ Widget buildReportModal(BuildContext context, Report report) {
       Row(
         children: [
           Expanded(
-            child: Container(
+            child: Padding(
               padding: const EdgeInsets.all(4.0),
               child: ElevatedButton(
                 onPressed: () {
@@ -429,7 +423,7 @@ Widget buildReportModal(BuildContext context, Report report) {
             ),
           ),
           Expanded(
-            child: Container(
+            child: Padding(
               padding: const EdgeInsets.all(4.0),
               child: ElevatedButton(
                 onPressed: () async =>
@@ -439,7 +433,7 @@ Widget buildReportModal(BuildContext context, Report report) {
             ),
           ),
           Expanded(
-            child: Container(
+            child: Padding(
               padding: const EdgeInsets.all(4.0),
               child: ElevatedButton(
                 onPressed: () => Share.share(

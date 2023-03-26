@@ -57,9 +57,7 @@ class GakujoApi {
                 .firstMatch(data.toString())
                 ?.group(0) ??
             '';
-    if (kDebugMode) {
-      print('Token: $_token');
-    }
+    if (kDebugMode) print('Token: $_token');
     if (required && _token.isEmpty) {
       throw Exception('Failed to update Struts TransactionToken.');
     }
@@ -596,9 +594,7 @@ class GakujoApi {
           .map(Contact.fromElement)
           .toList()
           .indexOf(contact);
-      if (index == -1) {
-        return contact;
-      }
+      if (index == -1) return contact;
     }
 
     _setProgress(2 / 3);
@@ -823,9 +819,7 @@ class GakujoApi {
           .querySelectorAll('#searchList > tbody > tr')
           .map(Report.fromElement)
           .where((e) => e == report)
-          .isEmpty) {
-        return report;
-      }
+          .isEmpty) return report;
     }
 
     _setProgress(2 / 3);
@@ -996,9 +990,7 @@ class GakujoApi {
           .querySelectorAll('#searchList > tbody > tr')
           .map(Quiz.fromElement)
           .where((e) => e == quiz)
-          .isEmpty) {
-        return quiz;
-      }
+          .isEmpty) return quiz;
     }
 
     _setProgress(2 / 3);
@@ -1161,9 +1153,7 @@ class GakujoApi {
           .map(SharedFile.fromElement)
           .toList()
           .indexOf(sharedFile);
-      if (index == -1) {
-        return sharedFile;
-      }
+      if (index == -1) return sharedFile;
     }
 
     _setProgress(2 / 3);
@@ -1334,9 +1324,7 @@ class GakujoApi {
           .querySelectorAll('#tbl_classLinkList > tbody > tr')
           .map(ClassLink.fromElement)
           .where((e) => e == classLink)
-          .isEmpty) {
-        return classLink;
-      }
+          .isEmpty) return classLink;
     }
 
     _setProgress(2 / 3);
@@ -1766,9 +1754,7 @@ class GakujoApi {
       var subjectId =
           RegExp(r'(?<=subjectID=)\d*').firstMatch(response.data)?[0];
       var formatCd = RegExp(r'(?<=formatCD=)\d*').firstMatch(response.data)?[0];
-      if (subjectId == null || formatCd == null) {
-        return timetable;
-      }
+      if (subjectId == null || formatCd == null) return timetable;
 
       await Future.delayed(_interval);
       response = await _client.getUri<dynamic>(

@@ -81,9 +81,7 @@ class SyllabusResult implements Comparable<SyllabusResult> {
 
   @override
   bool operator ==(Object other) {
-    if (identical(this, other)) {
-      return true;
-    }
+    if (identical(this, other)) return true;
     if (other is SyllabusResult) {
       return subjectId == other.subjectId &&
           formatCode == other.formatCode &&
@@ -101,9 +99,7 @@ class SyllabusResult implements Comparable<SyllabusResult> {
       jikanwariSchoolYear.hashCode;
 
   @override
-  int compareTo(SyllabusResult other) {
-    return subjectId.compareTo(other.subjectId);
-  }
+  int compareTo(SyllabusResult other) => subjectId.compareTo(other.subjectId);
 }
 
 class SyllabusResultBox {

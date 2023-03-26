@@ -68,9 +68,7 @@ class ClassLink implements Comparable<ClassLink> {
 
   @override
   bool operator ==(Object other) {
-    if (identical(this, other)) {
-      return true;
-    }
+    if (identical(this, other)) return true;
     if (other is ClassLink) {
       return subject == other.subject && title == other.title;
     }
@@ -83,13 +81,9 @@ class ClassLink implements Comparable<ClassLink> {
   @override
   int compareTo(ClassLink other) {
     var compare1 = subject.compareTo(other.subject);
-    if (compare1 != 0) {
-      return compare1;
-    }
+    if (compare1 != 0) return compare1;
     var compare2 = title.compareTo(other.title);
-    if (compare2 != 0) {
-      return compare2;
-    }
+    if (compare2 != 0) return compare2;
     var compare3 = id.compareTo(other.id);
     return compare3;
   }

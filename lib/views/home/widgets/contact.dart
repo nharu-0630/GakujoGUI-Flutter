@@ -29,7 +29,7 @@ class ContactWidget extends StatelessWidget {
             if (aContact == null || bContact == null) return 0;
             return bContact.contactDateTime.compareTo(aContact.contactDateTime);
           });
-          return Container(
+          return Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16.0),
             child: subjects.isEmpty
                 ? Center(
@@ -66,10 +66,11 @@ class ContactWidget extends StatelessWidget {
           );
         } else {
           return const Center(
-              child: Padding(
-            padding: EdgeInsets.all(8.0),
-            child: CircularProgressIndicator(),
-          ));
+            child: Padding(
+              padding: EdgeInsets.all(8.0),
+              child: CircularProgressIndicator(),
+            ),
+          );
         }
       },
     );
@@ -78,10 +79,8 @@ class ContactWidget extends StatelessWidget {
   Widget _buildTile(
       BuildContext context, Subject subject, List<Contact> contacts) {
     return ListTile(
-      onTap: () {
-        Navigator.of(context).push(
-            MaterialPageRoute(builder: (context) => ContactPage(subject)));
-      },
+      onTap: () => Navigator.of(context)
+          .push(MaterialPageRoute(builder: (context) => ContactPage(subject))),
       title: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [

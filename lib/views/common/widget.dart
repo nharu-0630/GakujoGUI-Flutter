@@ -26,6 +26,15 @@ import 'package:selectable_autolink_text/selectable_autolink_text.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
+Widget? buildFloatingActionButton(
+        {required Function() onPressed, required IconData iconData}) =>
+    (Platform.isLinux || Platform.isMacOS || Platform.isWindows)
+        ? FloatingActionButton(
+            onPressed: () async => onPressed(),
+            child: Icon(iconData),
+          )
+        : null;
+
 Flash buildErrorFlashBar(
     BuildContext context, FlashController<Object?> controller, Object? e) {
   return Flash(
@@ -93,19 +102,17 @@ Widget buildFileList(List<String>? fileNames,
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
           itemCount: fileNames!.length,
-          itemBuilder: (context, index) {
-            return ListTile(
-              title: Row(
-                children: [
-                  _buildExtIcon(
-                      p.extension(fileNames[index]).replaceFirst('.', '')),
-                  const SizedBox(width: 8.0),
-                  Text(p.basename(fileNames[index])),
-                ],
-              ),
-              onTap: () async => _openFile(fileNames[index]),
-            );
-          },
+          itemBuilder: (context, index) => ListTile(
+            title: Row(
+              children: [
+                _buildExtIcon(
+                    p.extension(fileNames[index]).replaceFirst('.', '')),
+                const SizedBox(width: 8.0),
+                Text(p.basename(fileNames[index])),
+              ],
+            ),
+            onTap: () async => _openFile(fileNames[index]),
+          ),
         )
       : const SizedBox.shrink();
 }
@@ -117,9 +124,8 @@ void _openFile(String filename) async {
   } else {
     showFlash(
       context: App.navigatorKey.currentState!.overlay!.context,
-      builder: (context, controller) {
-        return buildErrorFlashBar(context, controller, 'ファイルが存在しません');
-      },
+      builder: (context, controller) =>
+          buildErrorFlashBar(context, controller, 'ファイルが存在しません'),
     );
   }
 }
@@ -428,30 +434,28 @@ AppBar buildAppBar(BuildContext context, GlobalKey<ScaffoldState> scaffoldKey) {
     elevation: 0,
     leading: FutureBuilder(
       future: context.watch<SettingsRepository>().load(),
-      builder: (context, AsyncSnapshot<Settings> snapshot) {
-        return snapshot.hasData
-            ? Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: snapshot.data?.profileImage != null
-                    ? MouseRegion(
-                        cursor: SystemMouseCursors.click,
-                        child: GestureDetector(
-                          onTap: () => scaffoldKey.currentState?.openDrawer(),
-                          child: CircleAvatar(
-                            backgroundImage: CachedMemoryImageProvider(
-                              'ProfileImage',
-                              base64: snapshot.data?.profileImage,
-                            ),
+      builder: (context, AsyncSnapshot<Settings> snapshot) => snapshot.hasData
+          ? Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: snapshot.data?.profileImage != null
+                  ? MouseRegion(
+                      cursor: SystemMouseCursors.click,
+                      child: GestureDetector(
+                        onTap: () => scaffoldKey.currentState?.openDrawer(),
+                        child: CircleAvatar(
+                          backgroundImage: CachedMemoryImageProvider(
+                            'ProfileImage',
+                            base64: snapshot.data?.profileImage,
                           ),
                         ),
-                      )
-                    : IconButton(
-                        onPressed: () => scaffoldKey.currentState?.openDrawer(),
-                        icon: const Icon(LineIcons.user),
                       ),
-              )
-            : const SizedBox.shrink();
-      },
+                    )
+                  : IconButton(
+                      onPressed: () => scaffoldKey.currentState?.openDrawer(),
+                      icon: const Icon(LineIcons.user),
+                    ),
+            )
+          : const SizedBox.shrink(),
     ),
     centerTitle: false,
     title: FutureBuilder(
@@ -478,53 +482,51 @@ AppBar buildAppBar(BuildContext context, GlobalKey<ScaffoldState> scaffoldKey) {
           icon: Icon(KIcons.update),
           onPressed: () async => showDialog(
             context: App.navigatorKey.currentState!.overlay!.context,
-            builder: (context) {
-              return SimpleDialog(
-                title: const Text('更新'),
-                children: [
-                  SimpleDialogOption(
-                    onPressed: () async =>
-                        context.read<ApiRepository>().fetchSubjects(),
-                    child: const Text('授業科目'),
-                  ),
-                  SimpleDialogOption(
-                    onPressed: () async =>
-                        context.read<ApiRepository>().fetchContacts(),
-                    child: const Text('授業連絡'),
-                  ),
-                  SimpleDialogOption(
-                    onPressed: () async =>
-                        context.read<ApiRepository>().fetchReports(),
-                    child: const Text('レポート'),
-                  ),
-                  SimpleDialogOption(
-                    onPressed: () async =>
-                        context.read<ApiRepository>().fetchQuizzes(),
-                    child: const Text('小テスト'),
-                  ),
-                  SimpleDialogOption(
-                    onPressed: () async =>
-                        context.read<ApiRepository>().fetchSharedFiles(),
-                    child: const Text('授業共有ファイル'),
-                  ),
-                  SimpleDialogOption(
-                    onPressed: () async =>
-                        context.read<ApiRepository>().fetchClassLinks(),
-                    child: const Text('授業リンク'),
-                  ),
-                  SimpleDialogOption(
-                    onPressed: () async =>
-                        context.read<ApiRepository>().fetchGrades(),
-                    child: const Text('成績情報'),
-                  ),
-                  SimpleDialogOption(
-                    onPressed: () async =>
-                        context.read<ApiRepository>().fetchTimetables(),
-                    child: const Text('個人時間割'),
-                  ),
-                ],
-              );
-            },
+            builder: (context) => SimpleDialog(
+              title: const Text('更新'),
+              children: [
+                SimpleDialogOption(
+                  onPressed: () async =>
+                      context.read<ApiRepository>().fetchSubjects(),
+                  child: const Text('授業科目'),
+                ),
+                SimpleDialogOption(
+                  onPressed: () async =>
+                      context.read<ApiRepository>().fetchContacts(),
+                  child: const Text('授業連絡'),
+                ),
+                SimpleDialogOption(
+                  onPressed: () async =>
+                      context.read<ApiRepository>().fetchReports(),
+                  child: const Text('レポート'),
+                ),
+                SimpleDialogOption(
+                  onPressed: () async =>
+                      context.read<ApiRepository>().fetchQuizzes(),
+                  child: const Text('小テスト'),
+                ),
+                SimpleDialogOption(
+                  onPressed: () async =>
+                      context.read<ApiRepository>().fetchSharedFiles(),
+                  child: const Text('授業共有ファイル'),
+                ),
+                SimpleDialogOption(
+                  onPressed: () async =>
+                      context.read<ApiRepository>().fetchClassLinks(),
+                  child: const Text('授業リンク'),
+                ),
+                SimpleDialogOption(
+                  onPressed: () async =>
+                      context.read<ApiRepository>().fetchGrades(),
+                  child: const Text('成績情報'),
+                ),
+                SimpleDialogOption(
+                  onPressed: () async =>
+                      context.read<ApiRepository>().fetchTimetables(),
+                  child: const Text('個人時間割'),
+                ),
+              ],
+            ),
           ),
         ),
       ),
@@ -536,22 +538,21 @@ AppBar buildAppBar(BuildContext context, GlobalKey<ScaffoldState> scaffoldKey) {
 PreferredSize buildAppBarBottom(BuildContext context) {
   return PreferredSize(
     preferredSize: const Size.fromHeight(6.0),
-    child: Builder(builder: (context) {
-      return Visibility(
-        visible: context.watch<ApiRepository>().isLoading,
-        child: LinearProgressIndicator(
-          minHeight: 3.0,
-          valueColor: context.watch<ApiRepository>().isError
-              ? AlwaysStoppedAnimation<Color>(
-                  Theme.of(context).colorScheme.error)
-              : AlwaysStoppedAnimation<Color>(
-                  Theme.of(context).colorScheme.primary,
-                ),
-          value: context.watch<ApiRepository>().progress != -1
-              ? context.watch<ApiRepository>().progress
-              : null,
-        ),
-      );
-    }),
+    child: Builder(
+        builder: (context) => Visibility(
+              visible: context.watch<ApiRepository>().isLoading,
+              child: LinearProgressIndicator(
+                minHeight: 3.0,
+                valueColor: context.watch<ApiRepository>().isError
+                    ? AlwaysStoppedAnimation<Color>(
+                        Theme.of(context).colorScheme.error)
+                    : AlwaysStoppedAnimation<Color>(
+                        Theme.of(context).colorScheme.primary,
+                      ),
+                value: context.watch<ApiRepository>().progress != -1
+                    ? context.watch<ApiRepository>().progress
+                    : null,
+              ),
+            )),
   );
 }

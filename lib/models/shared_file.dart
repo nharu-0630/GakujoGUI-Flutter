@@ -80,9 +80,7 @@ class SharedFile implements Comparable<SharedFile> {
 
   @override
   bool operator ==(Object other) {
-    if (identical(this, other)) {
-      return true;
-    }
+    if (identical(this, other)) return true;
     if (other is SharedFile) {
       return subject == other.subject && title == other.title;
     }
@@ -95,13 +93,9 @@ class SharedFile implements Comparable<SharedFile> {
   @override
   int compareTo(SharedFile other) {
     var compare1 = updateDateTime.compareTo(other.updateDateTime);
-    if (compare1 != 0) {
-      return compare1;
-    }
+    if (compare1 != 0) return compare1;
     var compare2 = subject.compareTo(other.subject);
-    if (compare2 != 0) {
-      return compare2;
-    }
+    if (compare2 != 0) return compare2;
     var compare3 = title.compareTo(other.title);
     return compare3;
   }

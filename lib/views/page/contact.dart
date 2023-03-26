@@ -313,7 +313,7 @@ class _ContactPageState extends State<ContactPage> {
         Row(
           children: [
             Expanded(
-              child: Container(
+              child: Padding(
                 padding: const EdgeInsets.all(4.0),
                 child: ElevatedButton(
                   onPressed: () async =>
@@ -323,7 +323,7 @@ class _ContactPageState extends State<ContactPage> {
               ),
             ),
             Expanded(
-              child: Container(
+              child: Padding(
                 padding: const EdgeInsets.all(4.0),
                 child: ElevatedButton(
                   onPressed: () =>
