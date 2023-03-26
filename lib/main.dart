@@ -13,6 +13,7 @@ import 'package:gakujo_gui/models/report.dart';
 import 'package:gakujo_gui/models/settings.dart';
 import 'package:gakujo_gui/models/shared_file.dart';
 import 'package:gakujo_gui/models/subject.dart';
+import 'package:gakujo_gui/models/syllabus_result.dart';
 import 'package:gakujo_gui/models/timetable.dart';
 import 'package:hive_flutter/adapters.dart';
 import 'package:intl/date_symbol_data_local.dart';
@@ -42,6 +43,7 @@ void main() async {
   Hive.registerAdapter(ClassLinkAdapter());
   Hive.registerAdapter(TimetableAdapter());
   Hive.registerAdapter(GpaAdapter());
+  Hive.registerAdapter(SyllabusResultAdapter());
   runApp(const MyApp());
 }
 
@@ -78,6 +80,8 @@ class _MyAppState extends State<MyApp> {
         ChangeNotifierProvider(
             create: (_) => TimetableRepository(TimetableBox())),
         ChangeNotifierProvider(create: (_) => GpaRepository(GpaBox())),
+        ChangeNotifierProvider(
+            create: (_) => SyllabusResultRepository(SyllabusResultBox())),
         ChangeNotifierProvider(create: (_) => ApiRepository()),
       ],
       child: const App(),

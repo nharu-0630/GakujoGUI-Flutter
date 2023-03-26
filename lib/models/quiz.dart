@@ -199,14 +199,14 @@ class QuizBox {
 }
 
 class QuizRepository extends ChangeNotifier {
-  late QuizBox _quizBox;
+  late QuizBox _box;
 
-  QuizRepository(QuizBox quizBox) {
-    _quizBox = quizBox;
+  QuizRepository(QuizBox box) {
+    _box = box;
   }
 
   Future<void> add(Quiz quiz, {bool overwrite = false}) async {
-    var box = await _quizBox.box;
+    var box = await _box.box;
     if (!overwrite && box.containsKey(quiz.id)) {
       Quiz oldQuiz = box.get(quiz.id)!;
       oldQuiz.toRefresh(quiz);
@@ -224,30 +224,30 @@ class QuizRepository extends ChangeNotifier {
   }
 
   Future<void> delete(Quiz quiz) async {
-    var box = await _quizBox.box;
+    var box = await _box.box;
     await box.delete(quiz.id);
     notifyListeners();
   }
 
   Future<void> deleteAll() async {
-    var box = await _quizBox.box;
+    var box = await _box.box;
     await box.deleteFromDisk();
-    await _quizBox.open();
+    await _box.open();
     notifyListeners();
   }
 
   Future<Quiz?> get(String id) async {
-    var box = await _quizBox.box;
+    var box = await _box.box;
     return box.get(id);
   }
 
   Future<List<Quiz>> getAll() async {
-    var box = await _quizBox.box;
+    var box = await _box.box;
     return box.values.toList().cast<Quiz>();
   }
 
   Future<void> setArchive(String id, bool value) async {
-    var box = await _quizBox.box;
+    var box = await _box.box;
     box.get(id).isArchived = value;
     notifyListeners();
   }

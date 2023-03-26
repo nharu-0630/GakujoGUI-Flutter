@@ -107,14 +107,14 @@ class ClassLinkBox {
 }
 
 class ClassLinkRepository extends ChangeNotifier {
-  late ClassLinkBox _classLinkBox;
+  late ClassLinkBox _box;
 
-  ClassLinkRepository(ClassLinkBox classLinkBox) {
-    _classLinkBox = classLinkBox;
+  ClassLinkRepository(ClassLinkBox box) {
+    _box = box;
   }
 
   Future<void> add(ClassLink classLink, {bool overwrite = false}) async {
-    var box = await _classLinkBox.box;
+    var box = await _box.box;
     if (!overwrite && box.containsKey(classLink.id)) return;
     await box.put(classLink.id, classLink);
     notifyListeners();
@@ -129,30 +129,30 @@ class ClassLinkRepository extends ChangeNotifier {
   }
 
   Future<void> delete(ClassLink classLink) async {
-    var box = await _classLinkBox.box;
+    var box = await _box.box;
     await box.delete(classLink.id);
     notifyListeners();
   }
 
   Future<void> deleteAll() async {
-    var box = await _classLinkBox.box;
+    var box = await _box.box;
     await box.deleteFromDisk();
-    await _classLinkBox.open();
+    await _box.open();
     notifyListeners();
   }
 
   Future<ClassLink?> get(int key) async {
-    var box = await _classLinkBox.box;
+    var box = await _box.box;
     return box.get(key);
   }
 
   Future<List<ClassLink>> getAll() async {
-    var box = await _classLinkBox.box;
+    var box = await _box.box;
     return box.values.toList().cast<ClassLink>();
   }
 
   Future<void> setArchive(String id, bool value) async {
-    var box = await _classLinkBox.box;
+    var box = await _box.box;
     box.get(id).isArchived = value;
     notifyListeners();
   }

@@ -192,14 +192,14 @@ class ReportBox {
 }
 
 class ReportRepository extends ChangeNotifier {
-  late ReportBox _reportBox;
+  late ReportBox _box;
 
-  ReportRepository(ReportBox reportBox) {
-    _reportBox = reportBox;
+  ReportRepository(ReportBox box) {
+    _box = box;
   }
 
   Future<void> add(Report report, {bool overwrite = false}) async {
-    var box = await _reportBox.box;
+    var box = await _box.box;
     if (!overwrite && box.containsKey(report.id)) {
       Report oldReport = box.get(report.id)!;
       oldReport.toRefresh(report);
@@ -217,30 +217,30 @@ class ReportRepository extends ChangeNotifier {
   }
 
   Future<void> delete(Report report) async {
-    var box = await _reportBox.box;
+    var box = await _box.box;
     await box.delete(report.id);
     notifyListeners();
   }
 
   Future<void> deleteAll() async {
-    var box = await _reportBox.box;
+    var box = await _box.box;
     await box.deleteFromDisk();
-    await _reportBox.open();
+    await _box.open();
     notifyListeners();
   }
 
   Future<Report?> get(String id) async {
-    var box = await _reportBox.box;
+    var box = await _box.box;
     return box.get(id);
   }
 
   Future<List<Report>> getAll() async {
-    var box = await _reportBox.box;
+    var box = await _box.box;
     return box.values.toList().cast<Report>();
   }
 
   Future<void> setArchive(String id, bool value) async {
-    var box = await _reportBox.box;
+    var box = await _box.box;
     box.get(id).isArchived = value;
     notifyListeners();
   }

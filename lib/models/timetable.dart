@@ -232,14 +232,14 @@ class TimetableBox {
 }
 
 class TimetableRepository extends ChangeNotifier {
-  late TimetableBox _timetableBox;
+  late TimetableBox _box;
 
-  TimetableRepository(TimetableBox timetableBox) {
-    _timetableBox = timetableBox;
+  TimetableRepository(TimetableBox box) {
+    _box = box;
   }
 
   Future<void> add(Timetable timetable, {bool overwrite = false}) async {
-    var box = await _timetableBox.box;
+    var box = await _box.box;
     if (!overwrite && box.containsKey(timetable.hashCode.toString())) return;
     await box.put(timetable.hashCode.toString(), timetable);
     notifyListeners();
@@ -254,25 +254,25 @@ class TimetableRepository extends ChangeNotifier {
   }
 
   Future<void> delete(Timetable timetable) async {
-    var box = await _timetableBox.box;
+    var box = await _box.box;
     await box.delete(timetable.hashCode.toString());
     notifyListeners();
   }
 
   Future<void> deleteAll() async {
-    var box = await _timetableBox.box;
+    var box = await _box.box;
     await box.deleteFromDisk();
-    await _timetableBox.open();
+    await _box.open();
     notifyListeners();
   }
 
   Future<Timetable?> get(int key) async {
-    var box = await _timetableBox.box;
+    var box = await _box.box;
     return box.get(key);
   }
 
   Future<List<Timetable>> getAll() async {
-    var box = await _timetableBox.box;
+    var box = await _box.box;
     return box.values.toList().cast<Timetable>();
   }
 }

@@ -66,35 +66,35 @@ class SettingsBox {
 }
 
 class SettingsRepository extends ChangeNotifier {
-  late SettingsBox _settingsBox;
+  late SettingsBox _box;
 
-  SettingsRepository(SettingsBox settingsBox) {
-    _settingsBox = settingsBox;
+  SettingsRepository(SettingsBox box) {
+    _box = box;
   }
 
   Future<void> save(Settings settings) async {
-    await _settingsBox.open();
-    Box b = await _settingsBox.box;
+    await _box.open();
+    Box b = await _box.box;
     await b.put('settings', settings);
     notifyListeners();
   }
 
   Future<Settings> load() async {
-    await _settingsBox.open();
-    Box b = await _settingsBox.box;
+    await _box.open();
+    Box b = await _box.box;
     return b.get('settings') ?? Settings.init();
   }
 
   Future<void> delete() async {
-    await _settingsBox.open();
-    Box b = await _settingsBox.box;
+    await _box.open();
+    Box b = await _box.box;
     await b.put('settings', Settings.init());
     notifyListeners();
   }
 
   Future<void> setUsername(String username) async {
-    await _settingsBox.open();
-    Box b = await _settingsBox.box;
+    await _box.open();
+    Box b = await _box.box;
     Settings settings = b.get('settings') ?? Settings.init();
     settings.username = username;
     await b.put('settings', settings);
@@ -102,8 +102,8 @@ class SettingsRepository extends ChangeNotifier {
   }
 
   Future<void> setPassword(String password) async {
-    await _settingsBox.open();
-    Box b = await _settingsBox.box;
+    await _box.open();
+    Box b = await _box.box;
     Settings settings = b.get('settings') ?? Settings.init();
     settings.password = password;
     await b.put('settings', settings);
@@ -111,8 +111,8 @@ class SettingsRepository extends ChangeNotifier {
   }
 
   Future<void> setYear(int year) async {
-    await _settingsBox.open();
-    Box b = await _settingsBox.box;
+    await _box.open();
+    Box b = await _box.box;
     Settings settings = b.get('settings') ?? Settings.init();
     settings.year = year;
     await b.put('settings', settings);
@@ -120,8 +120,8 @@ class SettingsRepository extends ChangeNotifier {
   }
 
   Future<void> setSemester(int semester) async {
-    await _settingsBox.open();
-    Box b = await _settingsBox.box;
+    await _box.open();
+    Box b = await _box.box;
     Settings settings = b.get('settings') ?? Settings.init();
     settings.semester = semester;
     await b.put('settings', settings);

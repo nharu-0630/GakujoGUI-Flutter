@@ -119,14 +119,14 @@ class SharedFileBox {
 }
 
 class SharedFileRepository extends ChangeNotifier {
-  late SharedFileBox _sharedFileBox;
+  late SharedFileBox _box;
 
-  SharedFileRepository(SharedFileBox sharedFileBox) {
-    _sharedFileBox = sharedFileBox;
+  SharedFileRepository(SharedFileBox box) {
+    _box = box;
   }
 
   Future<void> add(SharedFile sharedFile, {bool overwrite = false}) async {
-    var box = await _sharedFileBox.box;
+    var box = await _box.box;
     if (!overwrite && box.containsKey(sharedFile.hashCode)) {
       SharedFile oldSharedFile = box.get(sharedFile.hashCode)!;
       oldSharedFile.toRefresh(sharedFile);
@@ -145,30 +145,30 @@ class SharedFileRepository extends ChangeNotifier {
   }
 
   Future<void> delete(SharedFile sharedFile) async {
-    var box = await _sharedFileBox.box;
+    var box = await _box.box;
     await box.delete(sharedFile.hashCode);
     notifyListeners();
   }
 
   Future<void> deleteAll() async {
-    var box = await _sharedFileBox.box;
+    var box = await _box.box;
     await box.deleteFromDisk();
-    await _sharedFileBox.open();
+    await _box.open();
     notifyListeners();
   }
 
   Future<SharedFile?> get(int key) async {
-    var box = await _sharedFileBox.box;
+    var box = await _box.box;
     return box.get(key);
   }
 
   Future<List<SharedFile>> getAll() async {
-    var box = await _sharedFileBox.box;
+    var box = await _box.box;
     return box.values.toList().cast<SharedFile>();
   }
 
   Future<void> setArchive(String id, bool value) async {
-    var box = await _sharedFileBox.box;
+    var box = await _box.box;
     box.get(id).isArchived = value;
     notifyListeners();
   }

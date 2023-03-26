@@ -157,14 +157,14 @@ class ContactBox {
 }
 
 class ContactRepository extends ChangeNotifier {
-  late ContactBox _contactBox;
+  late ContactBox _box;
 
-  ContactRepository(ContactBox contactBox) {
-    _contactBox = contactBox;
+  ContactRepository(ContactBox box) {
+    _box = box;
   }
 
   Future<void> add(Contact contact, {bool overwrite = false}) async {
-    var box = await _contactBox.box;
+    var box = await _box.box;
     if (!overwrite && box.containsKey(contact.hashCode)) return;
     await box.put(contact.hashCode, contact);
     notifyListeners();
@@ -178,30 +178,30 @@ class ContactRepository extends ChangeNotifier {
   }
 
   Future<void> delete(Contact contact) async {
-    var box = await _contactBox.box;
+    var box = await _box.box;
     await box.delete(contact.hashCode);
     notifyListeners();
   }
 
   Future<void> deleteAll() async {
-    var box = await _contactBox.box;
+    var box = await _box.box;
     await box.deleteFromDisk();
-    await _contactBox.open();
+    await _box.open();
     notifyListeners();
   }
 
   Future<Contact?> get(int key) async {
-    var box = await _contactBox.box;
+    var box = await _box.box;
     return box.get(key);
   }
 
   Future<List<Contact>> getAll() async {
-    var box = await _contactBox.box;
+    var box = await _box.box;
     return box.values.toList().cast<Contact>();
   }
 
   Future<List<Contact>> getSubjects(String subject) async {
-    var box = await _contactBox.box;
+    var box = await _box.box;
     return box.values
         .where((contact) => contact.subject == subject)
         .toList()

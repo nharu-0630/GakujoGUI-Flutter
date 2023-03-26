@@ -102,21 +102,21 @@ class GradeBox {
 }
 
 class GradeRepository extends ChangeNotifier {
-  late GradeBox _gradeBox;
+  late GradeBox _box;
 
-  GradeRepository(GradeBox gradeBox) {
-    _gradeBox = gradeBox;
+  GradeRepository(GradeBox box) {
+    _box = box;
   }
 
   Future<void> add(Grade grade, {bool overwrite = false}) async {
-    var box = await _gradeBox.box;
+    var box = await _box.box;
     if (!overwrite && box.containsKey(grade.hashCode)) return;
     await box.put(grade.hashCode, grade);
     notifyListeners();
   }
 
   Future<void> addAll(List<Grade> grades) async {
-    var box = await _gradeBox.box;
+    var box = await _box.box;
     for (var grade in grades) {
       await box.put(grade.hashCode, grade);
     }
@@ -124,20 +124,20 @@ class GradeRepository extends ChangeNotifier {
   }
 
   Future<void> delete(Grade grade) async {
-    var box = await _gradeBox.box;
+    var box = await _box.box;
     await box.delete(grade.hashCode);
     notifyListeners();
   }
 
   Future<void> deleteAll() async {
-    var box = await _gradeBox.box;
+    var box = await _box.box;
     await box.deleteFromDisk();
-    await _gradeBox.open();
+    await _box.open();
     notifyListeners();
   }
 
   Future<List<Grade>> getAll() async {
-    var box = await _gradeBox.box;
+    var box = await _box.box;
     return box.values.toList().cast<Grade>();
   }
 }

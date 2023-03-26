@@ -74,14 +74,14 @@ class SubjectBox {
 }
 
 class SubjectRepository extends ChangeNotifier {
-  late SubjectBox _subjectBox;
+  late SubjectBox _box;
 
-  SubjectRepository(SubjectBox subjectBox) {
-    _subjectBox = subjectBox;
+  SubjectRepository(SubjectBox box) {
+    _box = box;
   }
 
   Future<void> add(Subject subject, {bool overwrite = false}) async {
-    var box = await _subjectBox.box;
+    var box = await _box.box;
     if (!overwrite && box.containsKey(subject.hashCode)) return;
     await box.put(subject.hashCode, subject);
     notifyListeners();
@@ -95,20 +95,20 @@ class SubjectRepository extends ChangeNotifier {
   }
 
   Future<void> delete(Subject subjects) async {
-    var box = await _subjectBox.box;
+    var box = await _box.box;
     await box.delete(subjects.hashCode);
     notifyListeners();
   }
 
   Future<void> deleteAll() async {
-    var box = await _subjectBox.box;
+    var box = await _box.box;
     await box.deleteFromDisk();
-    await _subjectBox.open();
+    await _box.open();
     notifyListeners();
   }
 
   Future<List<Subject>> getAll() async {
-    var box = await _subjectBox.box;
+    var box = await _box.box;
     return box.values.toList().cast<Subject>();
   }
 }

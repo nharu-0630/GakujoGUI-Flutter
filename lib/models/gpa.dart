@@ -90,28 +90,28 @@ class GpaBox {
 }
 
 class GpaRepository extends ChangeNotifier {
-  late GpaBox _gpaBox;
+  late GpaBox _box;
 
-  GpaRepository(GpaBox gpaBox) {
-    _gpaBox = gpaBox;
+  GpaRepository(GpaBox box) {
+    _box = box;
   }
 
   Future<void> save(Gpa gpa) async {
-    await _gpaBox.open();
-    Box b = await _gpaBox.box;
+    await _box.open();
+    Box b = await _box.box;
     await b.put('gpa', gpa);
     notifyListeners();
   }
 
   Future<Gpa> load() async {
-    await _gpaBox.open();
-    Box b = await _gpaBox.box;
+    await _box.open();
+    Box b = await _box.box;
     return b.get('gpa') ?? Gpa.init();
   }
 
   Future<void> delete() async {
-    await _gpaBox.open();
-    Box b = await _gpaBox.box;
+    await _box.open();
+    Box b = await _box.box;
     await b.put('gpa', Gpa.init());
     notifyListeners();
   }
