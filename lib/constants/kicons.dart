@@ -21,7 +21,7 @@ class KIcons {
   static IconData search = LineIcons.search;
   static IconData update = LineIcons.syncIcon;
   static IconData share = LineIcons.share;
-  static IconData important = LineIcons.tag;
+  static IconData important = LineIcons.exclamationCircle;
   static IconData checkedAfter = LineIcons.checkSquare;
   static IconData uncheckedAfter = LineIcons.square;
   static IconData checkedBefore = LineIcons.checkCircle;

@@ -10,7 +10,6 @@ import 'package:gakujo_gui/views/common/widget.dart';
 import 'package:line_icons/line_icons.dart';
 import 'package:provider/provider.dart';
 import 'package:share_plus/share_plus.dart';
-import 'package:side_sheet/side_sheet.dart';
 
 class ReportPage extends StatefulWidget {
   const ReportPage({Key? key}) : super(key: key);
@@ -29,7 +28,7 @@ class _ReportPageState extends State<ReportPage> {
   Widget build(BuildContext context) {
     return FutureBuilder(
       future: context.watch<ReportRepository>().getAll(),
-      builder: (context, AsyncSnapshot<List<Report>> snapshot) {
+      builder: (_, AsyncSnapshot<List<Report>> snapshot) {
         if (snapshot.hasData) {
           _reports = snapshot.data!;
           _reports.sort(((a, b) => b.compareTo(a)));
@@ -46,15 +45,13 @@ class _ReportPageState extends State<ReportPage> {
               iconData: KIcons.update,
             ),
             body: NestedScrollView(
-              headerSliverBuilder: (context, innerBoxScrolled) =>
-                  [_buildAppBar(context)],
+              headerSliverBuilder: (_, __) => [_buildAppBar()],
               body: RefreshIndicator(
                 onRefresh: () async =>
                     context.read<ApiRepository>().fetchReports(),
                 child: filteredReports.isEmpty
                     ? LayoutBuilder(
-                        builder: (context, constraints) =>
-                            SingleChildScrollView(
+                        builder: (_, constraints) => SingleChildScrollView(
                           physics: const AlwaysScrollableScrollPhysics(),
                           child: ConstrainedBox(
                             constraints: BoxConstraints(
@@ -86,9 +83,9 @@ class _ReportPageState extends State<ReportPage> {
                         itemCount: _searchStatus
                             ? _suggestReports.length
                             : filteredReports.length,
-                        itemBuilder: (context, index) => _searchStatus
-                            ? _buildCard(context, _suggestReports[index])
-                            : _buildCard(context, filteredReports[index]),
+                        itemBuilder: (_, index) => _searchStatus
+                            ? _buildCard(_suggestReports[index])
+                            : _buildCard(filteredReports[index]),
                       ),
               ),
             ),
@@ -104,347 +101,299 @@ class _ReportPageState extends State<ReportPage> {
     );
   }
 
-  Widget _buildAppBar(BuildContext context) {
-    return SliverAppBar(
-      centerTitle: true,
-      floating: true,
-      leading: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: IconButton(
-          onPressed: () => Navigator.of(context).pop(),
-          icon: Icon(KIcons.back),
+  Widget _buildAppBar() {
+    return Builder(builder: (context) {
+      return SliverAppBar(
+        centerTitle: true,
+        floating: true,
+        leading: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: IconButton(
+            onPressed: () => Navigator.of(context).pop(),
+            icon: Icon(KIcons.back),
+          ),
         ),
-      ),
-      title: _searchStatus
-          ? TextField(
-              onChanged: (value) => setState(() => _suggestReports =
-                  _reports.where((e) => e.contains(value)).toList()),
-              autofocus: true,
-              textInputAction: TextInputAction.search,
-            )
-          : const Text('レポート'),
-      actions: _searchStatus
-          ? [
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: IconButton(
-                  onPressed: (() => setState(() => _searchStatus = false)),
-                  icon: Icon(KIcons.close),
+        title: _searchStatus
+            ? TextField(
+                onChanged: (value) => setState(() => _suggestReports =
+                    _reports.where((e) => e.contains(value)).toList()),
+                autofocus: true,
+                textInputAction: TextInputAction.search,
+              )
+            : const Text('レポート'),
+        actions: _searchStatus
+            ? [
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: IconButton(
+                    onPressed: (() => setState(() => _searchStatus = false)),
+                    icon: Icon(KIcons.close),
+                  ),
                 ),
-              ),
-            ]
-          : [
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: IconButton(
-                  onPressed: (() =>
-                      setState(() => _filterStatus = !_filterStatus)),
-                  icon:
-                      Icon(_filterStatus ? KIcons.filterOn : KIcons.filterOff),
+              ]
+            : [
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: IconButton(
+                    onPressed: (() =>
+                        setState(() => _filterStatus = !_filterStatus)),
+                    icon: Icon(
+                        _filterStatus ? KIcons.filterOn : KIcons.filterOff),
+                  ),
                 ),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: IconButton(
-                  onPressed: (() => setState(() {
-                        _searchStatus = true;
-                        _suggestReports = [];
-                      })),
-                  icon: Icon(KIcons.search),
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: IconButton(
+                    onPressed: (() => setState(() {
+                          _searchStatus = true;
+                          _suggestReports = [];
+                        })),
+                    icon: Icon(KIcons.search),
+                  ),
                 ),
-              ),
-            ],
-      bottom: buildAppBarBottom(context),
-    );
+              ],
+        bottom: buildAppBarBottom(),
+      );
+    });
   }
 
-  Widget _buildCard(BuildContext context, Report report) {
-    return Slidable(
-      key: Key(report.id),
-      startActionPane: ActionPane(
-        motion: const DrawerMotion(),
-        children: [
-          SlidableAction(
-            onPressed: (context) => context
-                .read<ReportRepository>()
-                .setArchive(report.id, !report.isArchived)
-                .then((value) => setState(() {})),
-            backgroundColor: KColors.archive,
-            foregroundColor: Colors.white,
-            icon: report.isArchived ? KIcons.unarchive : KIcons.archive,
-            label: report.isArchived ? 'アーカイブ解除' : 'アーカイブ',
-          ),
-        ],
-      ),
-      endActionPane: ActionPane(
-        motion: const DrawerMotion(),
-        children: [
-          SlidableAction(
-            onPressed: (context) async =>
-                context.read<ApiRepository>().fetchDetailReport(report),
-            backgroundColor: KColors.update,
-            foregroundColor: Colors.white,
-            icon: KIcons.update,
-            label: '更新',
-          ),
-        ],
-      ),
-      child: ListTile(
-        onTap: () async {
-          if (report.isAcquired) {
-            MediaQuery.of(context).orientation == Orientation.portrait
-                ? showModalBottomSheet(
-                    backgroundColor: Theme.of(context).colorScheme.surface,
-                    isScrollControlled: false,
-                    shape: const RoundedRectangleBorder(
-                        borderRadius: BorderRadius.vertical(top: Radius.zero)),
-                    context: context,
-                    builder: (context) => buildReportModal(context, report),
-                  )
-                : SideSheet.right(
-                    sheetColor: Theme.of(context).colorScheme.surface,
-                    body: SizedBox(
-                      width: MediaQuery.of(context).size.width * .6,
-                      child: buildReportModal(context, report),
-                    ),
-                    context: context,
-                  );
-          } else {
-            await showOkCancelAlertDialog(
-                      context: context,
-                      title: '未取得のレポートです。',
-                      message: '取得しますか？',
-                      okLabel: '取得',
-                      cancelLabel: 'キャンセル',
-                    ) ==
-                    OkCancelResult.ok
-                ? context.read<ApiRepository>().fetchDetailReport(report)
-                : null;
-          }
-        },
-        leading: Icon(
-          (() {
-            if (report.isSubmitted) {
-              if (report.endDateTime.isAfter(DateTime.now())) {
-                return KIcons.checkedAfter;
-              } else {
-                return KIcons.checkedBefore;
-              }
+  Widget _buildCard(Report report) {
+    return Builder(builder: (context) {
+      return Slidable(
+        key: Key(report.id),
+        startActionPane: ActionPane(
+          motion: const DrawerMotion(),
+          children: [
+            SlidableAction(
+              onPressed: (context) => context
+                  .read<ReportRepository>()
+                  .setArchive(report.id, !report.isArchived)
+                  .then((value) => setState(() {})),
+              backgroundColor: KColors.archive,
+              foregroundColor: Colors.white,
+              icon: report.isArchived ? KIcons.unarchive : KIcons.archive,
+              label: report.isArchived ? 'アーカイブ解除' : 'アーカイブ',
+            ),
+          ],
+        ),
+        endActionPane: ActionPane(
+          motion: const DrawerMotion(),
+          children: [
+            SlidableAction(
+              onPressed: (context) async =>
+                  context.read<ApiRepository>().fetchDetailReport(report),
+              backgroundColor: KColors.update,
+              foregroundColor: Colors.white,
+              icon: KIcons.update,
+              label: '更新',
+            ),
+          ],
+        ),
+        child: ListTile(
+          onTap: () async {
+            if (report.isAcquired) {
+              showModalOnTap(context, buildReportModal(report));
             } else {
-              if (report.endDateTime.isAfter(DateTime.now())) {
-                return KIcons.uncheckedAfter;
-              } else {
-                return KIcons.uncheckedBefore;
-              }
+              await showOkCancelAlertDialog(
+                        context: context,
+                        title: '未取得のレポートです。',
+                        message: '取得しますか？',
+                        okLabel: '取得',
+                        cancelLabel: 'キャンセル',
+                      ) ==
+                      OkCancelResult.ok
+                  ? context.read<ApiRepository>().fetchDetailReport(report)
+                  : null;
             }
-          })(),
-        ),
-        title: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Expanded(
-              child: Text(
-                report.subject,
-                style: Theme.of(context).textTheme.bodyMedium,
-                overflow: TextOverflow.ellipsis,
+          },
+          leading: Icon(
+            (() {
+              if (report.isSubmitted) {
+                if (report.endDateTime.isAfter(DateTime.now())) {
+                  return KIcons.checkedAfter;
+                } else {
+                  return KIcons.checkedBefore;
+                }
+              } else {
+                if (report.endDateTime.isAfter(DateTime.now())) {
+                  return KIcons.uncheckedAfter;
+                } else {
+                  return KIcons.uncheckedBefore;
+                }
+              }
+            })(),
+          ),
+          title: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Expanded(
+                child: Text(
+                  report.subject,
+                  style: Theme.of(context).textTheme.bodyMedium,
+                  overflow: TextOverflow.ellipsis,
+                ),
               ),
-            ),
-            Text(
-              report.endDateTime.toLocal().toDetailString(),
-              style: Theme.of(context).textTheme.bodyMedium,
-            ),
-          ],
-        ),
-        subtitle: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Expanded(
-              child: Text(
-                report.title,
-                style: Theme.of(context)
-                    .textTheme
-                    .titleMedium
-                    ?.copyWith(fontWeight: FontWeight.bold),
-                overflow: TextOverflow.ellipsis,
-              ),
-            ),
-            Visibility(
-              visible: report.fileNames?.isNotEmpty ?? false,
-              child: Text(
-                '${report.fileNames?.length ?? ''}',
+              Text(
+                report.endDateTime.toLocal().toDetailString(),
                 style: Theme.of(context).textTheme.bodyMedium,
               ),
-            ),
-            Visibility(
-              visible: report.fileNames?.isNotEmpty ?? false,
-              child: Icon(KIcons.attachment),
-            ),
-            Visibility(
-              visible: report.isArchived,
-              child: Icon(KIcons.archive),
-            )
-          ],
+            ],
+          ),
+          subtitle: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Expanded(
+                child: Text(
+                  report.title,
+                  style: Theme.of(context)
+                      .textTheme
+                      .titleMedium
+                      ?.copyWith(fontWeight: FontWeight.bold),
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+              Visibility(
+                visible: report.fileNames?.isNotEmpty ?? false,
+                child: Text(
+                  '${report.fileNames?.length ?? ''}',
+                  style: Theme.of(context).textTheme.bodyMedium,
+                ),
+              ),
+              Visibility(
+                visible: report.fileNames?.isNotEmpty ?? false,
+                child: Icon(KIcons.attachment),
+              ),
+              Visibility(
+                visible: report.isArchived,
+                child: Icon(KIcons.archive),
+              )
+            ],
+          ),
         ),
-      ),
-    );
+      );
+    });
   }
 }
 
-Widget buildReportModal(BuildContext context, Report report) {
-  return ListView(
-    padding: const EdgeInsets.all(16.0),
-    children: [
-      Padding(
-        padding: const EdgeInsets.all(4.0),
-        child: Align(
-          alignment: Alignment.centerLeft,
-          child: Text(
-            report.title,
-            style: Theme.of(context).textTheme.titleLarge,
+Widget buildReportModal(Report report) {
+  return Builder(builder: (context) {
+    return ListView(
+      padding: const EdgeInsets.all(16.0),
+      children: [
+        Padding(
+          padding: const EdgeInsets.all(4.0),
+          child: Align(
+            alignment: Alignment.centerLeft,
+            child: Text(
+              report.title,
+              style: Theme.of(context).textTheme.titleLarge,
+            ),
           ),
         ),
-      ),
-      Padding(
-        padding: const EdgeInsets.all(4.0),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: [
-            Text(
-              report.startDateTime.toLocal().toDetailString(),
-              style: Theme.of(context).textTheme.bodyLarge,
-            ),
-            const Icon(LineIcons.arrowRight),
-            Text(
-              report.endDateTime.toLocal().toDetailString(),
-              style: Theme.of(context).textTheme.bodyLarge,
-            ),
-          ],
-        ),
-      ),
-      Padding(
-        padding: const EdgeInsets.all(4.0),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.end,
-          children: [
-            Container(
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(8.0),
-                border: Border.all(
-                  color: Theme.of(context).colorScheme.primary,
-                  width: 2,
-                ),
-              ),
-              padding: const EdgeInsets.symmetric(
-                vertical: 2.0,
-                horizontal: 4.0,
-              ),
-              child: Text(
-                report.status,
+        Padding(
+          padding: const EdgeInsets.all(4.0),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              Text(
+                report.startDateTime.toLocal().toDetailString(),
                 style: Theme.of(context).textTheme.bodyLarge,
               ),
-            ),
-            Container(
-              margin: const EdgeInsets.only(left: 8.0),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(8.0),
-                border: Border.all(
-                  color: Theme.of(context).colorScheme.primary,
-                  width: 2,
-                ),
-              ),
-              padding: const EdgeInsets.symmetric(
-                vertical: 2.0,
-                horizontal: 4.0,
-              ),
-              child: Text(
-                report.isSubmitted
-                    ? '提出済 ${report.submittedDateTime.toLocal().toDetailString()}'
-                    : '未提出',
+              const Icon(LineIcons.arrowRight),
+              Text(
+                report.endDateTime.toLocal().toDetailString(),
                 style: Theme.of(context).textTheme.bodyLarge,
               ),
-            ),
-            Visibility(
-              visible: report.isArchived,
-              child: Icon(KIcons.archive),
-            )
-          ],
+            ],
+          ),
         ),
-      ),
-      const SizedBox(height: 8.0),
-      Padding(
-        padding: const EdgeInsets.all(4.0),
-        child: buildAutoLinkText(
-          context,
-          report.isAcquired ? report.description : '未取得',
+        Padding(
+          padding: const EdgeInsets.all(4.0),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              buildRadiusBadge(report.status),
+              buildRadiusBadge(report.isSubmitted
+                  ? '提出済 ${report.submittedDateTime.toLocal().toDetailString()}'
+                  : '未提出'),
+              Visibility(
+                visible: report.isArchived,
+                child: Icon(KIcons.archive),
+              )
+            ],
+          ),
         ),
-      ),
-      const Padding(
-        padding: EdgeInsets.all(4.0),
-        child: Divider(thickness: 2.0),
-      ),
-      Padding(
-        padding: const EdgeInsets.all(4.0),
-        child: buildAutoLinkText(
-          context,
-          report.isAcquired ? report.message : '未取得',
+        const SizedBox(height: 8.0),
+        Padding(
+          padding: const EdgeInsets.all(4.0),
+          child:
+              buildAutoLinkText(report.isAcquired ? report.description : '未取得'),
         ),
-      ),
-      Visibility(
-        visible: report.fileNames?.isNotEmpty ?? false,
-        child: const Padding(
+        const Padding(
           padding: EdgeInsets.all(4.0),
           child: Divider(thickness: 2.0),
         ),
-      ),
-      Visibility(
-        visible: report.fileNames?.isNotEmpty ?? false,
-        child: Padding(
+        Padding(
           padding: const EdgeInsets.all(4.0),
-          child: buildFileList(report.fileNames),
+          child: buildAutoLinkText(report.isAcquired ? report.message : '未取得'),
         ),
-      ),
-      const SizedBox(height: 8.0),
-      Row(
-        children: [
-          Expanded(
-            child: Padding(
-              padding: const EdgeInsets.all(4.0),
-              child: ElevatedButton(
-                onPressed: () {
-                  context
-                      .read<ReportRepository>()
-                      .setArchive(report.id, !report.isArchived);
-                  Navigator.of(context).pop();
-                },
-                child:
-                    Icon(report.isArchived ? KIcons.unarchive : KIcons.archive),
+        Visibility(
+          visible: report.fileNames?.isNotEmpty ?? false,
+          child: const Padding(
+            padding: EdgeInsets.all(4.0),
+            child: Divider(thickness: 2.0),
+          ),
+        ),
+        Visibility(
+          visible: report.fileNames?.isNotEmpty ?? false,
+          child: Padding(
+            padding: const EdgeInsets.all(4.0),
+            child: buildFileList(report.fileNames),
+          ),
+        ),
+        const SizedBox(height: 8.0),
+        Row(
+          children: [
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.all(4.0),
+                child: ElevatedButton(
+                  onPressed: () {
+                    context
+                        .read<ReportRepository>()
+                        .setArchive(report.id, !report.isArchived);
+                    Navigator.of(context).pop();
+                  },
+                  child: Icon(
+                      report.isArchived ? KIcons.unarchive : KIcons.archive),
+                ),
               ),
             ),
-          ),
-          Expanded(
-            child: Padding(
-              padding: const EdgeInsets.all(4.0),
-              child: ElevatedButton(
-                onPressed: () async =>
-                    context.read<ApiRepository>().fetchDetailReport(report),
-                child: Icon(KIcons.update),
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.all(4.0),
+                child: ElevatedButton(
+                  onPressed: () async =>
+                      context.read<ApiRepository>().fetchDetailReport(report),
+                  child: Icon(KIcons.update),
+                ),
               ),
             ),
-          ),
-          Expanded(
-            child: Padding(
-              padding: const EdgeInsets.all(4.0),
-              child: ElevatedButton(
-                onPressed: () => Share.share(
-                    '${report.description}\n\n${report.message}',
-                    subject: report.title),
-                child: Icon(KIcons.share),
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.all(4.0),
+                child: ElevatedButton(
+                  onPressed: () => Share.share(
+                      '${report.description}\n\n${report.message}',
+                      subject: report.title),
+                  child: Icon(KIcons.share),
+                ),
               ),
             ),
-          ),
-        ],
-      ),
-      const SizedBox(height: 8.0),
-    ],
-  );
+          ],
+        ),
+        const SizedBox(height: 8.0),
+      ],
+    );
+  });
 }

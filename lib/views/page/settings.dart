@@ -63,7 +63,7 @@ class _SettingsPageState extends State<SettingsPage> {
           context.watch<SettingsRepository>().load(),
           PackageInfo.fromPlatform()
         ]),
-        builder: (context, AsyncSnapshot<List<dynamic>> snapshot) {
+        builder: (_, AsyncSnapshot<List<dynamic>> snapshot) {
           var settings = (snapshot.data?[0] as Settings?);
           var packageInfo = (snapshot.data?[1] as PackageInfo?);
           return settings != null && packageInfo != null
@@ -517,9 +517,7 @@ class _SettingsPageState extends State<SettingsPage> {
                               child: Align(
                                 alignment: Alignment.topLeft,
                                 child: buildAutoLinkText(
-                                  context,
-                                  'Client Version: ${packageInfo.version}\nGakujoAPI Version: ${GakujoApi.version}\nSyllabusAPI Version: ${SyllabusApi.version}\nToken: ${context.read<ApiRepository>().token}\nAccessEnvironment Key: ${settings.accessEnvironmentKey}\nAccessEnvironment Value: ${settings.accessEnvironmentValue}',
-                                ),
+                                    'Client Version: ${packageInfo.version}\nGakujoAPI Version: ${GakujoApi.version}\nSyllabusAPI Version: ${SyllabusApi.version}\nToken: ${context.read<ApiRepository>().token}\nAccessEnvironment Key: ${settings.accessEnvironmentKey}\nAccessEnvironment Value: ${settings.accessEnvironmentValue}'),
                               ),
                             ),
                             Padding(
@@ -594,7 +592,7 @@ class _SettingsPageState extends State<SettingsPage> {
         ),
       ),
       title: const Text('設定'),
-      bottom: buildAppBarBottom(context),
+      bottom: buildAppBarBottom(),
     );
   }
 }

@@ -17,7 +17,7 @@ class ContactWidget extends StatelessWidget {
         context.watch<SubjectRepository>().getAll(),
         context.watch<ContactRepository>().getAll()
       ]),
-      builder: (context, AsyncSnapshot<List<dynamic>> snapshot) {
+      builder: (_, AsyncSnapshot<List<dynamic>> snapshot) {
         if (snapshot.hasData) {
           var subjects = snapshot.data![0] as List<Subject>;
           var contacts = snapshot.data![1] as List<Contact>;
@@ -54,8 +54,7 @@ class ContactWidget extends StatelessWidget {
                     shrinkWrap: true,
                     physics: const NeverScrollableScrollPhysics(),
                     itemCount: subjects.length,
-                    itemBuilder: ((context, index) => _buildTile(
-                          context,
+                    itemBuilder: ((_, index) => _buildTile(
                           subjects[index],
                           contacts
                               .where(
@@ -76,42 +75,43 @@ class ContactWidget extends StatelessWidget {
     );
   }
 
-  Widget _buildTile(
-      BuildContext context, Subject subject, List<Contact> contacts) {
-    return ListTile(
-      onTap: () => Navigator.of(context)
-          .push(MaterialPageRoute(builder: (context) => ContactPage(subject))),
-      title: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Expanded(
-            child: Text(
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              subject.subject,
-              style: Theme.of(context)
-                  .textTheme
-                  .titleMedium
-                  ?.copyWith(fontWeight: FontWeight.bold),
+  Widget _buildTile(Subject subject, List<Contact> contacts) {
+    return Builder(builder: (context) {
+      return ListTile(
+        onTap: () => Navigator.of(context).push(
+            MaterialPageRoute(builder: (context) => ContactPage(subject))),
+        title: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Expanded(
+              child: Text(
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                subject.subject,
+                style: Theme.of(context)
+                    .textTheme
+                    .titleMedium
+                    ?.copyWith(fontWeight: FontWeight.bold),
+              ),
             ),
-          ),
-          Text(
-            contacts.isNotEmpty
-                ? contacts.first.contactDateTime.toLocal().toDetailString()
-                : '',
-            style: Theme.of(context).textTheme.bodyMedium,
-          )
-        ],
-      ),
-      subtitle: Text(
-        contacts.isNotEmpty
-            ? contacts.first.isAcquired
-                ? contacts.first.content.replaceAll('\n', ' ')
-                : '未取得'
-            : 'メッセージなし',
-        maxLines: 1,
-        overflow: TextOverflow.ellipsis,
-      ),
-    );
+            Text(
+              contacts.isNotEmpty
+                  ? contacts.first.contactDateTime.toLocal().toDetailString()
+                  : '',
+              style: Theme.of(context).textTheme.bodyMedium,
+            )
+          ],
+        ),
+        subtitle: Text(
+          contacts.isNotEmpty
+              ? contacts.first.isAcquired
+                  ? contacts.first.content.replaceAll('\n', ' ')
+                  : '未取得'
+              : 'メッセージなし',
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+        ),
+      );
+    });
   }
 }

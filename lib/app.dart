@@ -47,7 +47,7 @@ class _AppState extends State<App> {
       title: 'GakujoGUI',
       home: Scaffold(
         key: App.scaffoldKey,
-        drawer: buildDrawer(context),
+        drawer: buildDrawer(),
         appBar: buildAppBar(context, App.scaffoldKey),
         body: const [
           HomeWidget(),

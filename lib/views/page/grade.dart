@@ -32,7 +32,7 @@ class _GradePageState extends State<GradePage> {
         context.watch<GradeRepository>().getAll(),
         context.watch<GpaRepository>().load()
       ]),
-      builder: (context, AsyncSnapshot<List<dynamic>> snapshot) {
+      builder: (_, AsyncSnapshot<List<dynamic>> snapshot) {
         if (snapshot.hasData) {
           _grades = snapshot.data![0];
           _grades.sort(((a, b) => b.compareTo(a)));
@@ -45,10 +45,9 @@ class _GradePageState extends State<GradePage> {
             body: DefaultTabController(
               length: 2,
               child: NestedScrollView(
-                headerSliverBuilder: (context, innerBoxScrolled) =>
-                    [_buildAppBar(context)],
+                headerSliverBuilder: (_, __) => [_buildAppBar()],
                 body: TabBarView(
-                  children: [_buildGrade(context), _buildGpas(context)],
+                  children: [_buildGrade(), _buildGpas()],
                 ),
               ),
             ),
@@ -64,90 +63,85 @@ class _GradePageState extends State<GradePage> {
     );
   }
 
-  Widget _buildGrade(BuildContext context) {
-    return RefreshIndicator(
-      onRefresh: () async => context.read<ApiRepository>().fetchGrades(),
-      child: _grades.isEmpty
-          ? LayoutBuilder(
-              builder: (context, constraints) => SingleChildScrollView(
-                physics: const AlwaysScrollableScrollPhysics(),
-                child: ConstrainedBox(
-                  constraints: BoxConstraints(minHeight: constraints.maxHeight),
-                  child: Center(
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Icon(
-                            KIcons.grade,
-                            size: 48.0,
+  Widget _buildGrade() {
+    return Builder(builder: (context) {
+      return RefreshIndicator(
+        onRefresh: () async => context.read<ApiRepository>().fetchGrades(),
+        child: _grades.isEmpty
+            ? LayoutBuilder(
+                builder: (_, constraints) => SingleChildScrollView(
+                  physics: const AlwaysScrollableScrollPhysics(),
+                  child: ConstrainedBox(
+                    constraints:
+                        BoxConstraints(minHeight: constraints.maxHeight),
+                    child: Center(
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Icon(
+                              KIcons.grade,
+                              size: 48.0,
+                            ),
                           ),
-                        ),
-                        Text(
-                          '成績情報はありません',
-                          style: Theme.of(context).textTheme.titleMedium,
-                        ),
-                      ],
+                          Text(
+                            '成績情報はありません',
+                            style: Theme.of(context).textTheme.titleMedium,
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ),
+              )
+            : ListView.builder(
+                padding: const EdgeInsets.only(top: 8),
+                itemCount:
+                    _searchStatus ? _suggestGrades.length : _grades.length,
+                itemBuilder: (_, index) => _searchStatus
+                    ? _buildCard(_suggestGrades[index])
+                    : _buildCard(_grades[index]),
               ),
-            )
-          : ListView.builder(
-              padding: const EdgeInsets.only(top: 8),
-              itemCount: _searchStatus ? _suggestGrades.length : _grades.length,
-              itemBuilder: (context, index) => _searchStatus
-                  ? _buildCard(context, _suggestGrades[index])
-                  : _buildCard(context, _grades[index]),
-            ),
-    );
+      );
+    });
   }
 
-  Widget _buildShortItem(BuildContext context, String title, String body) =>
-      Column(
-        children: [
-          Text(
-            title,
-            style: Theme.of(context).textTheme.titleMedium,
-          ),
-          Text(body),
-        ],
+  Widget _buildGpas() {
+    return Builder(builder: (context) {
+      return RefreshIndicator(
+        onRefresh: () async => context.read<ApiRepository>().fetchGrades(),
+        child: ListView(
+          padding: const EdgeInsets.all(16.0),
+          physics: const AlwaysScrollableScrollPhysics(),
+          children: [
+            _buildGpaChart(_gpa.departmentGpas),
+            const SizedBox(height: 16.0),
+            const Padding(
+              padding: EdgeInsets.all(4.0),
+              child: Divider(thickness: 2.0),
+            ),
+            Wrap(
+              alignment: WrapAlignment.spaceAround,
+              direction: Axis.horizontal,
+              spacing: 32.0,
+              runSpacing: 8.0,
+              children: [
+                buildShortItem('学年', _gpa.facultyGrade),
+                buildShortItem('累積GPA', _gpa.facultyGpa.toString()),
+                buildShortItem('学科内順位',
+                    '${_gpa.departmentRankNumber} / ${_gpa.departmentRankDenom}'),
+                buildShortItem('コース内順位',
+                    '${_gpa.courseRankNumber} / ${_gpa.courseRankDenom}'),
+                buildShortItem('算出日',
+                    _gpa.facultyCalculationDate.toLocal().toDateString()),
+              ],
+            ),
+            const SizedBox(height: 8.0),
+          ],
+        ),
       );
-
-  Widget _buildGpas(BuildContext context) {
-    return RefreshIndicator(
-      onRefresh: () async => context.read<ApiRepository>().fetchGrades(),
-      child: ListView(
-        padding: const EdgeInsets.all(16.0),
-        physics: const AlwaysScrollableScrollPhysics(),
-        children: [
-          _buildGpaChart(_gpa.departmentGpas),
-          const SizedBox(height: 16.0),
-          const Padding(
-            padding: EdgeInsets.all(4.0),
-            child: Divider(thickness: 2.0),
-          ),
-          Wrap(
-            alignment: WrapAlignment.spaceAround,
-            direction: Axis.horizontal,
-            spacing: 32.0,
-            runSpacing: 8.0,
-            children: [
-              _buildShortItem(context, '学年', _gpa.facultyGrade),
-              _buildShortItem(context, '累積GPA', _gpa.facultyGpa.toString()),
-              _buildShortItem(context, '学科内順位',
-                  '${_gpa.departmentRankNumber} / ${_gpa.departmentRankDenom}'),
-              _buildShortItem(context, 'コース内順位',
-                  '${_gpa.courseRankNumber} / ${_gpa.courseRankDenom}'),
-              _buildShortItem(context, '算出日',
-                  _gpa.facultyCalculationDate.toLocal().toDateString()),
-            ],
-          ),
-          const SizedBox(height: 8.0),
-        ],
-      ),
-    );
+    });
   }
 
   Widget _buildGpaChart(Map<String, double> gpas) {
@@ -255,123 +249,127 @@ class _GradePageState extends State<GradePage> {
         : const SizedBox();
   }
 
-  Widget _buildAppBar(BuildContext context) {
-    return SliverAppBar(
-      centerTitle: true,
-      floating: true,
-      leading: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: IconButton(
-          onPressed: () => Navigator.of(context).pop(),
-          icon: Icon(KIcons.back),
+  Widget _buildAppBar() {
+    return Builder(builder: (context) {
+      return SliverAppBar(
+        centerTitle: true,
+        floating: true,
+        leading: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: IconButton(
+            onPressed: () => Navigator.of(context).pop(),
+            icon: Icon(KIcons.back),
+          ),
         ),
-      ),
-      title: _searchStatus
-          ? TextField(
-              onChanged: (value) => setState(() => _suggestGrades = _grades
-                  .where((e) =>
-                      e.subject.toLowerCase().contains(value.toLowerCase()))
-                  .toList()),
-              autofocus: true,
-              textInputAction: TextInputAction.search,
-            )
-          : const Text('成績情報'),
-      actions: _searchStatus
-          ? [
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: IconButton(
-                  onPressed: (() => setState(() => _searchStatus = false)),
-                  icon: Icon(KIcons.close),
+        title: _searchStatus
+            ? TextField(
+                onChanged: (value) => setState(() => _suggestGrades = _grades
+                    .where((e) =>
+                        e.subject.toLowerCase().contains(value.toLowerCase()))
+                    .toList()),
+                autofocus: true,
+                textInputAction: TextInputAction.search,
+              )
+            : const Text('成績情報'),
+        actions: _searchStatus
+            ? [
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: IconButton(
+                    onPressed: (() => setState(() => _searchStatus = false)),
+                    icon: Icon(KIcons.close),
+                  ),
                 ),
-              ),
-            ]
-          : [
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: IconButton(
-                  onPressed: (() => setState(() {
-                        _searchStatus = true;
-                        _suggestGrades = [];
-                      })),
-                  icon: Icon(KIcons.search),
+              ]
+            : [
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: IconButton(
+                    onPressed: (() => setState(() {
+                          _searchStatus = true;
+                          _suggestGrades = [];
+                        })),
+                    icon: Icon(KIcons.search),
+                  ),
                 ),
-              ),
-            ],
-      bottom: PreferredSize(
-        preferredSize: const Size.fromHeight(48.0),
-        child: Column(
-          children: [
-            const TabBar(
-              tabs: [
-                Tab(icon: Icon(LineIcons.bars)),
-                Tab(icon: Icon(LineIcons.barChart)),
               ],
-            ),
-            buildAppBarBottom(context),
-          ],
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(48.0),
+          child: Column(
+            children: [
+              const TabBar(
+                tabs: [
+                  Tab(icon: Icon(LineIcons.bars)),
+                  Tab(icon: Icon(LineIcons.barChart)),
+                ],
+              ),
+              buildAppBarBottom(),
+            ],
+          ),
         ),
-      ),
-    );
+      );
+    });
   }
 
-  Widget _buildCard(BuildContext context, Grade grade) {
-    return ListTile(
-      title: Row(
-        children: [
-          Expanded(
-            child: Text(
-              grade.subject,
+  Widget _buildCard(Grade grade) {
+    return Builder(builder: (context) {
+      return ListTile(
+        title: Row(
+          children: [
+            Expanded(
+              child: Text(
+                grade.subject,
+                style: Theme.of(context).textTheme.titleMedium,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+            Text(
+              grade.evaluation,
               style: Theme.of(context).textTheme.titleMedium,
-              overflow: TextOverflow.ellipsis,
             ),
-          ),
-          Text(
-            grade.evaluation,
-            style: Theme.of(context).textTheme.titleMedium,
-          ),
-          Visibility(
-            visible: grade.score != null,
-            child: Padding(
-              padding: const EdgeInsets.only(left: 8.0),
-              child: Text(
-                grade.score.toString(),
-                style: Theme.of(context).textTheme.titleMedium,
+            Visibility(
+              visible: grade.score != null,
+              child: Padding(
+                padding: const EdgeInsets.only(left: 8.0),
+                child: Text(
+                  grade.score.toString(),
+                  style: Theme.of(context).textTheme.titleMedium,
+                ),
               ),
             ),
-          ),
-          Visibility(
-            visible: grade.gp != null,
-            child: Padding(
-              padding: const EdgeInsets.only(left: 8.0),
-              child: Text(
-                grade.gp.toString(),
-                style: Theme.of(context).textTheme.titleMedium,
+            Visibility(
+              visible: grade.gp != null,
+              child: Padding(
+                padding: const EdgeInsets.only(left: 8.0),
+                child: Text(
+                  grade.gp.toString(),
+                  style: Theme.of(context).textTheme.titleMedium,
+                ),
               ),
             ),
-          ),
-        ],
-      ),
-      subtitle: Row(
-        children: [
-          Text(
-            grade.teacher.toString(),
-            style: Theme.of(context).textTheme.bodyMedium,
-          ),
-          Padding(
-            padding: const EdgeInsets.only(left: 8.0),
-            child: Text(
-              grade.selectionSection.toString(),
+          ],
+        ),
+        subtitle: Row(
+          children: [
+            Text(
+              grade.teacher.toString(),
               style: Theme.of(context).textTheme.bodyMedium,
             ),
-          ),
-          const Expanded(child: SizedBox()),
-          Text(
-            grade.reportDateTime.toLocal().toDateString(),
-            style: Theme.of(context).textTheme.bodyMedium,
-          ),
-        ],
-      ),
-    );
+            Padding(
+              padding: const EdgeInsets.only(left: 8.0),
+              child: Text(
+                grade.selectionSection.toString(),
+                style: Theme.of(context).textTheme.bodyMedium,
+              ),
+            ),
+            const Expanded(child: SizedBox()),
+            Text(
+              grade.reportDateTime.toLocal().toDateString(),
+              style: Theme.of(context).textTheme.bodyMedium,
+            ),
+          ],
+        ),
+      );
+    });
   }
 }

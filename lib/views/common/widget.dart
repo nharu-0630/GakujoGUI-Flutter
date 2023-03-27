@@ -24,6 +24,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:selectable_autolink_text/selectable_autolink_text.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:side_sheet/side_sheet.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
 Widget? buildFloatingActionButton(
@@ -34,6 +35,93 @@ Widget? buildFloatingActionButton(
             child: Icon(iconData),
           )
         : null;
+
+void showModalOnTap(BuildContext context, Widget widget) {
+  MediaQuery.of(context).orientation == Orientation.portrait
+      ? showModalBottomSheet(
+          backgroundColor: Theme.of(context).colorScheme.surface,
+          isScrollControlled: false,
+          shape: const RoundedRectangleBorder(
+              borderRadius: BorderRadius.vertical(top: Radius.zero)),
+          context: context,
+          builder: (_) => widget,
+        )
+      : SideSheet.right(
+          sheetColor: Theme.of(context).colorScheme.surface,
+          body: SizedBox(
+            width: MediaQuery.of(context).size.width * .6,
+            child: widget,
+          ),
+          context: context,
+        );
+}
+
+Widget buildIconItem(IconData icon, String text) => Builder(builder: (context) {
+      return Column(
+        children: [
+          Icon(icon),
+          const SizedBox(width: 8.0),
+          Text(
+            text,
+            style: Theme.of(context).textTheme.bodyLarge,
+          ),
+        ],
+      );
+    });
+
+Widget buildShortItem(String title, String body) => Builder(builder: (context) {
+      return Column(
+        children: [
+          Text(
+            title,
+            style: Theme.of(context).textTheme.titleMedium,
+          ),
+          Text(body),
+        ],
+      );
+    });
+
+List<Widget> buildLongItem(String title, String body) => [
+      Builder(builder: (context) {
+        return Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 8.0),
+          child: Text(
+            title,
+            style: Theme.of(context).textTheme.titleMedium,
+          ),
+        );
+      }),
+      Builder(builder: (context) {
+        return Padding(
+          padding: const EdgeInsets.all(4.0),
+          child: buildAutoLinkText(body),
+        );
+      }),
+      const SizedBox(height: 8.0)
+    ];
+
+Widget buildRadiusBadge(String text) => Builder(builder: (context) {
+      return Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 4.0),
+        child: Container(
+          padding: const EdgeInsets.symmetric(
+            vertical: 2.0,
+            horizontal: 4.0,
+          ),
+          decoration: BoxDecoration(
+            border: Border.all(
+              color: Theme.of(context).colorScheme.primary,
+              width: 2,
+            ),
+            borderRadius: BorderRadius.circular(8.0),
+          ),
+          child: Text(
+            text,
+            style: Theme.of(context).textTheme.bodyLarge,
+          ),
+        ),
+      );
+    });
 
 Flash buildErrorFlashBar(
     BuildContext context, FlashController<Object?> controller, Object? e) {
@@ -77,7 +165,7 @@ Flash buildInfoFlashBar(
     child: FlashBar(
       icon: Icon(
         LineIcons.infoCircle,
-        color: Theme.of(context).colorScheme.primary,
+        color: Theme.of(context).colorScheme.secondary,
       ),
       title: title != null
           ? Text(
@@ -102,7 +190,7 @@ Widget buildFileList(List<String>? fileNames,
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
           itemCount: fileNames!.length,
-          itemBuilder: (context, index) => ListTile(
+          itemBuilder: (_, index) => ListTile(
             title: Row(
               children: [
                 _buildExtIcon(
@@ -166,270 +254,278 @@ Icon _buildExtIcon(String ext) {
   }
 }
 
-Widget buildAutoLinkText(BuildContext context, String text) {
-  return SelectableAutoLinkText(
-    text,
-    style: Theme.of(context).textTheme.bodyMedium,
-    linkStyle: TextStyle(color: Theme.of(context).colorScheme.primary),
-    onTap: (url) => launchUrlString(url, mode: LaunchMode.inAppWebView),
-    onLongPress: (url) => Share.share(url),
-    linkRegExpPattern:
-        r'https?:\/\/(?:www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b(?:[-a-zA-Z0-9()@:%_\+.~#?&\/=]*)',
-  );
+Widget buildAutoLinkText(String text) {
+  return Builder(builder: (context) {
+    return SelectableAutoLinkText(
+      text,
+      style: Theme.of(context).textTheme.bodyMedium,
+      linkStyle: TextStyle(color: Theme.of(context).colorScheme.primary),
+      onTap: (url) => launchUrlString(url, mode: LaunchMode.inAppWebView),
+      onLongPress: (url) => Share.share(url),
+      linkRegExpPattern:
+          r'https?:\/\/(?:www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b(?:[-a-zA-Z0-9()@:%_\+.~#?&\/=]*)',
+    );
+  });
 }
 
-Widget buildDrawer(BuildContext context) {
-  return FutureBuilder(
-      future: Future.wait([
-        context.watch<SettingsRepository>().load(),
-        context.watch<ReportRepository>().getAll(),
-        context.watch<QuizRepository>().getAll()
-      ]),
-      builder: (context, AsyncSnapshot<List<dynamic>> snapshot) {
-        var settings = (snapshot.data?[0] as Settings?);
-        var reports = (snapshot.data?[1] as List<Report>?);
-        var reportCount = reports
-                ?.where((e) => !(e.isArchived ||
-                    !(!e.isSubmitted && e.endDateTime.isAfter(DateTime.now()))))
-                .length ??
-            0;
-        var quizzes = (snapshot.data?[2] as List<Quiz>?);
-        var quizCount = quizzes
-                ?.where((e) => !(e.isArchived ||
-                    !(!e.isSubmitted && e.endDateTime.isAfter(DateTime.now()))))
-                .length ??
-            0;
-        return Drawer(
-          shape: const RoundedRectangleBorder(
-            borderRadius: BorderRadius.all(Radius.zero),
-          ),
-          child: ListView(
-            children: [
-              SizedBox(
-                child: DrawerHeader(
-                  child: Column(
-                    children: [
-                      Text(
-                        'GakujoGUI',
-                        style: Theme.of(context).textTheme.titleLarge,
-                      ),
-                      const SizedBox(height: 16.0),
-                      settings != null
-                          ? Column(
-                              children: [
-                                Row(
-                                  children: [
-                                    const Icon(LineIcons.userClock),
-                                    const SizedBox(width: 8.0),
-                                    Text(
-                                      settings.lastLoginTime
-                                          .toLocal()
-                                          .toDetailString(),
-                                      style: Theme.of(context)
-                                          .textTheme
-                                          .titleMedium,
-                                    ),
-                                  ],
-                                ),
-                                const SizedBox(height: 4.0),
-                                Row(
-                                  children: [
-                                    const Icon(LineIcons.identificationBadge),
-                                    const SizedBox(width: 8.0),
-                                    Text(
-                                      settings.username ?? '',
-                                      style: Theme.of(context)
-                                          .textTheme
-                                          .titleMedium,
-                                    ),
-                                  ],
-                                ),
-                                const SizedBox(height: 4.0),
-                                Row(
-                                  children: [
-                                    const Icon(LineIcons.userShield),
-                                    const SizedBox(width: 8.0),
-                                    Text(
-                                      settings.accessEnvironmentName ?? '',
-                                      style: Theme.of(context)
-                                          .textTheme
-                                          .titleMedium,
-                                    ),
-                                  ],
-                                ),
-                              ],
-                            )
-                          : const SizedBox.shrink(),
-                    ],
+Widget buildDrawer() {
+  return Builder(builder: (context) {
+    return FutureBuilder(
+        future: Future.wait([
+          context.watch<SettingsRepository>().load(),
+          context.watch<ReportRepository>().getAll(),
+          context.watch<QuizRepository>().getAll()
+        ]),
+        builder: (_, AsyncSnapshot<List<dynamic>> snapshot) {
+          var settings = (snapshot.data?[0] as Settings?);
+          var reports = (snapshot.data?[1] as List<Report>?);
+          var reportCount = reports
+                  ?.where((e) => !(e.isArchived ||
+                      !(!e.isSubmitted &&
+                          e.endDateTime.isAfter(DateTime.now()))))
+                  .length ??
+              0;
+          var quizzes = (snapshot.data?[2] as List<Quiz>?);
+          var quizCount = quizzes
+                  ?.where((e) => !(e.isArchived ||
+                      !(!e.isSubmitted &&
+                          e.endDateTime.isAfter(DateTime.now()))))
+                  .length ??
+              0;
+          return Drawer(
+            shape: const RoundedRectangleBorder(
+              borderRadius: BorderRadius.all(Radius.zero),
+            ),
+            child: ListView(
+              children: [
+                SizedBox(
+                  child: DrawerHeader(
+                    child: Column(
+                      children: [
+                        Text(
+                          'GakujoGUI',
+                          style: Theme.of(context).textTheme.titleLarge,
+                        ),
+                        const SizedBox(height: 16.0),
+                        settings != null
+                            ? Column(
+                                children: [
+                                  Row(
+                                    children: [
+                                      const Icon(LineIcons.userClock),
+                                      const SizedBox(width: 8.0),
+                                      Text(
+                                        settings.lastLoginTime
+                                            .toLocal()
+                                            .toDetailString(),
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .titleMedium,
+                                      ),
+                                    ],
+                                  ),
+                                  const SizedBox(height: 4.0),
+                                  Row(
+                                    children: [
+                                      const Icon(LineIcons.identificationBadge),
+                                      const SizedBox(width: 8.0),
+                                      Text(
+                                        settings.username ?? '',
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .titleMedium,
+                                      ),
+                                    ],
+                                  ),
+                                  const SizedBox(height: 4.0),
+                                  Row(
+                                    children: [
+                                      const Icon(LineIcons.userShield),
+                                      const SizedBox(width: 8.0),
+                                      Text(
+                                        settings.accessEnvironmentName ?? '',
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .titleMedium,
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              )
+                            : const SizedBox.shrink(),
+                      ],
+                    ),
                   ),
                 ),
-              ),
-              ListTile(
-                title: Row(
-                  children: [
-                    reportCount > 0
-                        ? Badge(
-                            label: Text(reportCount.toString()),
-                            backgroundColor:
-                                Theme.of(context).colorScheme.onError,
-                            textColor: Theme.of(context).colorScheme.error,
-                            child: Icon(
+                ListTile(
+                  title: Row(
+                    children: [
+                      reportCount > 0
+                          ? Badge(
+                              label: Text(reportCount.toString()),
+                              backgroundColor:
+                                  Theme.of(context).colorScheme.primary,
+                              textColor:
+                                  Theme.of(context).colorScheme.onPrimary,
+                              child: Icon(
+                                KIcons.report,
+                                color: Theme.of(context).iconTheme.color,
+                              ),
+                            )
+                          : Icon(
                               KIcons.report,
                               color: Theme.of(context).iconTheme.color,
                             ),
-                          )
-                        : Icon(
-                            KIcons.report,
-                            color: Theme.of(context).iconTheme.color,
-                          ),
-                    const SizedBox(width: 8.0),
-                    Text(
-                      'レポート',
-                      style: Theme.of(context).textTheme.titleMedium,
-                    ),
-                  ],
+                      const SizedBox(width: 8.0),
+                      Text(
+                        'レポート',
+                        style: Theme.of(context).textTheme.titleMedium,
+                      ),
+                    ],
+                  ),
+                  onTap: () {
+                    Navigator.of(context).pop();
+                    Navigator.of(context).push(MaterialPageRoute(
+                        builder: (context) => const ReportPage()));
+                  },
                 ),
-                onTap: () {
-                  Navigator.of(context).pop();
-                  Navigator.of(context).push(MaterialPageRoute(
-                      builder: (context) => const ReportPage()));
-                },
-              ),
-              ListTile(
-                title: Row(
-                  children: [
-                    quizCount > 0
-                        ? Badge(
-                            label: Text(quizCount.toString()),
-                            backgroundColor:
-                                Theme.of(context).colorScheme.onError,
-                            textColor: Theme.of(context).colorScheme.error,
-                            child: Icon(
+                ListTile(
+                  title: Row(
+                    children: [
+                      quizCount > 0
+                          ? Badge(
+                              label: Text(quizCount.toString()),
+                              backgroundColor:
+                                  Theme.of(context).colorScheme.primary,
+                              textColor:
+                                  Theme.of(context).colorScheme.onPrimary,
+                              child: Icon(
+                                KIcons.quiz,
+                                color: Theme.of(context).iconTheme.color,
+                              ),
+                            )
+                          : Icon(
                               KIcons.quiz,
                               color: Theme.of(context).iconTheme.color,
                             ),
-                          )
-                        : Icon(
-                            KIcons.quiz,
-                            color: Theme.of(context).iconTheme.color,
-                          ),
-                    const SizedBox(width: 8.0),
-                    Text(
-                      '小テスト',
-                      style: Theme.of(context).textTheme.titleMedium,
-                    ),
-                  ],
+                      const SizedBox(width: 8.0),
+                      Text(
+                        '小テスト',
+                        style: Theme.of(context).textTheme.titleMedium,
+                      ),
+                    ],
+                  ),
+                  onTap: () {
+                    Navigator.of(context).pop();
+                    Navigator.of(context).push(MaterialPageRoute(
+                        builder: (context) => const QuizPage()));
+                  },
                 ),
-                onTap: () {
-                  Navigator.of(context).pop();
-                  Navigator.of(context).push(MaterialPageRoute(
-                      builder: (context) => const QuizPage()));
-                },
-              ),
-              ListTile(
-                title: Row(
-                  children: [
-                    Icon(
-                      KIcons.sharedFile,
-                      color: Theme.of(context).iconTheme.color,
-                    ),
-                    const SizedBox(width: 8.0),
-                    Text(
-                      '授業共有ファイル',
-                      style: Theme.of(context).textTheme.titleMedium,
-                    ),
-                  ],
+                ListTile(
+                  title: Row(
+                    children: [
+                      Icon(
+                        KIcons.sharedFile,
+                        color: Theme.of(context).iconTheme.color,
+                      ),
+                      const SizedBox(width: 8.0),
+                      Text(
+                        '授業共有ファイル',
+                        style: Theme.of(context).textTheme.titleMedium,
+                      ),
+                    ],
+                  ),
+                  onTap: () {
+                    Navigator.of(context).pop();
+                    Navigator.of(context).push(MaterialPageRoute(
+                        builder: (context) => const SharedFilePage()));
+                  },
                 ),
-                onTap: () {
-                  Navigator.of(context).pop();
-                  Navigator.of(context).push(MaterialPageRoute(
-                      builder: (context) => const SharedFilePage()));
-                },
-              ),
-              ListTile(
-                title: Row(
-                  children: [
-                    Icon(
-                      KIcons.classLink,
-                      color: Theme.of(context).iconTheme.color,
-                    ),
-                    const SizedBox(width: 8.0),
-                    Text(
-                      '授業リンク',
-                      style: Theme.of(context).textTheme.titleMedium,
-                    ),
-                  ],
+                ListTile(
+                  title: Row(
+                    children: [
+                      Icon(
+                        KIcons.classLink,
+                        color: Theme.of(context).iconTheme.color,
+                      ),
+                      const SizedBox(width: 8.0),
+                      Text(
+                        '授業リンク',
+                        style: Theme.of(context).textTheme.titleMedium,
+                      ),
+                    ],
+                  ),
+                  onTap: () {
+                    Navigator.of(context).pop();
+                    Navigator.of(context).push(MaterialPageRoute(
+                        builder: (context) => const ClassLinkPage()));
+                  },
                 ),
-                onTap: () {
-                  Navigator.of(context).pop();
-                  Navigator.of(context).push(MaterialPageRoute(
-                      builder: (context) => const ClassLinkPage()));
-                },
-              ),
-              ListTile(
-                title: Row(
-                  children: [
-                    Icon(
-                      KIcons.grade,
-                      color: Theme.of(context).iconTheme.color,
-                    ),
-                    const SizedBox(width: 8.0),
-                    Text(
-                      '成績情報',
-                      style: Theme.of(context).textTheme.titleMedium,
-                    ),
-                  ],
+                ListTile(
+                  title: Row(
+                    children: [
+                      Icon(
+                        KIcons.grade,
+                        color: Theme.of(context).iconTheme.color,
+                      ),
+                      const SizedBox(width: 8.0),
+                      Text(
+                        '成績情報',
+                        style: Theme.of(context).textTheme.titleMedium,
+                      ),
+                    ],
+                  ),
+                  onTap: () {
+                    Navigator.of(context).pop();
+                    Navigator.of(context).push(MaterialPageRoute(
+                        builder: (context) => const GradePage()));
+                  },
                 ),
-                onTap: () {
-                  Navigator.of(context).pop();
-                  Navigator.of(context).push(MaterialPageRoute(
-                      builder: (context) => const GradePage()));
-                },
-              ),
-              ListTile(
-                title: Row(
-                  children: [
-                    Icon(
-                      KIcons.syllabus,
-                      color: Theme.of(context).iconTheme.color,
-                    ),
-                    const SizedBox(width: 8.0),
-                    Text(
-                      'シラバス',
-                      style: Theme.of(context).textTheme.titleMedium,
-                    ),
-                  ],
+                ListTile(
+                  title: Row(
+                    children: [
+                      Icon(
+                        KIcons.syllabus,
+                        color: Theme.of(context).iconTheme.color,
+                      ),
+                      const SizedBox(width: 8.0),
+                      Text(
+                        'シラバス',
+                        style: Theme.of(context).textTheme.titleMedium,
+                      ),
+                    ],
+                  ),
+                  onTap: () {
+                    Navigator.of(context).pop();
+                    Navigator.of(context).push(MaterialPageRoute(
+                        builder: (context) => const SyllabusSearchPage()));
+                  },
                 ),
-                onTap: () {
-                  Navigator.of(context).pop();
-                  Navigator.of(context).push(MaterialPageRoute(
-                      builder: (context) => const SyllabusSearchPage()));
-                },
-              ),
-              ListTile(
-                title: Row(
-                  children: [
-                    Icon(
-                      KIcons.settings,
-                      color: Theme.of(context).iconTheme.color,
-                    ),
-                    const SizedBox(width: 8.0),
-                    Text(
-                      '設定',
-                      style: Theme.of(context).textTheme.titleMedium,
-                    ),
-                  ],
+                ListTile(
+                  title: Row(
+                    children: [
+                      Icon(
+                        KIcons.settings,
+                        color: Theme.of(context).iconTheme.color,
+                      ),
+                      const SizedBox(width: 8.0),
+                      Text(
+                        '設定',
+                        style: Theme.of(context).textTheme.titleMedium,
+                      ),
+                    ],
+                  ),
+                  onTap: () {
+                    Navigator.of(context).pop();
+                    Navigator.of(context).push(MaterialPageRoute(
+                        builder: (context) => const SettingsPage()));
+                  },
                 ),
-                onTap: () {
-                  Navigator.of(context).pop();
-                  Navigator.of(context).push(MaterialPageRoute(
-                      builder: (context) => const SettingsPage()));
-                },
-              ),
-            ],
-          ),
-        );
-      });
+              ],
+            ),
+          );
+        });
+  });
 }
 
 AppBar buildAppBar(BuildContext context, GlobalKey<ScaffoldState> scaffoldKey) {
@@ -437,7 +533,7 @@ AppBar buildAppBar(BuildContext context, GlobalKey<ScaffoldState> scaffoldKey) {
     elevation: 0,
     leading: FutureBuilder(
       future: context.watch<SettingsRepository>().load(),
-      builder: (context, AsyncSnapshot<Settings> snapshot) => snapshot.hasData
+      builder: (_, AsyncSnapshot<Settings> snapshot) => snapshot.hasData
           ? Padding(
               padding: const EdgeInsets.all(8.0),
               child: snapshot.data?.profileImage != null
@@ -463,7 +559,7 @@ AppBar buildAppBar(BuildContext context, GlobalKey<ScaffoldState> scaffoldKey) {
     centerTitle: false,
     title: FutureBuilder(
       future: context.watch<SettingsRepository>().load(),
-      builder: (context, AsyncSnapshot<Settings> snapshot) => Text(
+      builder: (_, AsyncSnapshot<Settings> snapshot) => Text(
         snapshot.hasData
             ? snapshot.data?.fullName == null
                 ? 'アカウント情報なし'
@@ -485,7 +581,7 @@ AppBar buildAppBar(BuildContext context, GlobalKey<ScaffoldState> scaffoldKey) {
           icon: Icon(KIcons.update),
           onPressed: () async => showDialog(
             context: App.navigatorKey.currentState!.overlay!.context,
-            builder: (context) => SimpleDialog(
+            builder: (_) => SimpleDialog(
               title: const Text('更新'),
               children: [
                 SimpleDialogOption(
@@ -534,11 +630,11 @@ AppBar buildAppBar(BuildContext context, GlobalKey<ScaffoldState> scaffoldKey) {
         ),
       ),
     ],
-    bottom: buildAppBarBottom(context),
+    bottom: buildAppBarBottom(),
   );
 }
 
-PreferredSize buildAppBarBottom(BuildContext context) {
+PreferredSize buildAppBarBottom() {
   return PreferredSize(
     preferredSize: const Size.fromHeight(6.0),
     child: Builder(

@@ -6,7 +6,6 @@ import 'package:gakujo_gui/models/syllabus_result.dart';
 import 'package:gakujo_gui/views/common/widget.dart';
 import 'package:line_icons/line_icons.dart';
 import 'package:provider/provider.dart';
-import 'package:side_sheet/side_sheet.dart';
 
 class SyllabusResultPage extends StatefulWidget {
   const SyllabusResultPage({
@@ -65,11 +64,10 @@ class _SyllabusResultPageState extends State<SyllabusResultPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: NestedScrollView(
-        headerSliverBuilder: (context, innerBoxScrolled) =>
-            [_buildAppBar(context)],
+        headerSliverBuilder: (_, __) => [_buildAppBar()],
         body: result == null
             ? LayoutBuilder(
-                builder: (context, constraints) => SingleChildScrollView(
+                builder: (_, constraints) => SingleChildScrollView(
                   physics: const AlwaysScrollableScrollPhysics(),
                   child: ConstrainedBox(
                     constraints:
@@ -81,219 +79,157 @@ class _SyllabusResultPageState extends State<SyllabusResultPage> {
             : ListView.builder(
                 padding: const EdgeInsets.only(top: 8),
                 itemCount: result!.length,
-                itemBuilder: (context, index) =>
-                    _buildCard(context, result![index]),
+                itemBuilder: (_, index) => _buildCard(result![index]),
               ),
       ),
     );
   }
 
-  Widget _buildAppBar(BuildContext context) {
-    return SliverAppBar(
-      centerTitle: true,
-      floating: true,
-      leading: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: IconButton(
-          onPressed: () => Navigator.of(context).pop(),
-          icon: Icon(KIcons.back),
+  Widget _buildAppBar() {
+    return Builder(builder: (context) {
+      return SliverAppBar(
+        centerTitle: true,
+        floating: true,
+        leading: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: IconButton(
+            onPressed: () => Navigator.of(context).pop(),
+            icon: Icon(KIcons.back),
+          ),
         ),
-      ),
-      title: const Text('シラバス'),
-      bottom: buildAppBarBottom(context),
-    );
+        title: const Text('シラバス'),
+        bottom: buildAppBarBottom(),
+      );
+    });
   }
 
-  Widget _buildCard(BuildContext context, SyllabusResult syllabus) {
-    return ListTile(
-      onTap: () async =>
-          MediaQuery.of(context).orientation == Orientation.portrait
-              ? showModalBottomSheet(
-                  backgroundColor: Theme.of(context).colorScheme.surface,
-                  isScrollControlled: false,
-                  shape: const RoundedRectangleBorder(
-                      borderRadius: BorderRadius.vertical(top: Radius.zero)),
-                  context: context,
-                  builder: (context) => buildSyllabusModal(context, syllabus),
-                )
-              : SideSheet.right(
-                  sheetColor: Theme.of(context).colorScheme.surface,
-                  body: SizedBox(
-                    width: MediaQuery.of(context).size.width * .6,
-                    child: buildSyllabusModal(context, syllabus),
-                  ),
-                  context: context,
-                ),
-      title: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Expanded(
-            child: Text(
-              syllabus.teacherName,
+  Widget _buildCard(SyllabusResult syllabus) {
+    return Builder(builder: (context) {
+      return ListTile(
+        onTap: () async =>
+            showModalOnTap(context, buildSyllabusModal(syllabus)),
+        title: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Expanded(
+              child: Text(
+                syllabus.teacherName,
+                style: Theme.of(context).textTheme.bodyMedium,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+            Text(
+              syllabus.titleName,
               style: Theme.of(context).textTheme.bodyMedium,
-              overflow: TextOverflow.ellipsis,
             ),
-          ),
-          Text(
-            syllabus.titleName,
-            style: Theme.of(context).textTheme.bodyMedium,
-          ),
-        ],
-      ),
-      subtitle: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Expanded(
-            child: Text(
-              syllabus.subjectName,
-              style: Theme.of(context)
-                  .textTheme
-                  .titleMedium
-                  ?.copyWith(fontWeight: FontWeight.bold),
-              overflow: TextOverflow.ellipsis,
+          ],
+        ),
+        subtitle: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Expanded(
+              child: Text(
+                syllabus.subjectName,
+                style: Theme.of(context)
+                    .textTheme
+                    .titleMedium
+                    ?.copyWith(fontWeight: FontWeight.bold),
+                overflow: TextOverflow.ellipsis,
+              ),
             ),
-          ),
-          Text(
-            syllabus.indexName,
-            style: Theme.of(context).textTheme.bodyMedium,
-          ),
-        ],
-      ),
-    );
+            Text(
+              syllabus.indexName,
+              style: Theme.of(context).textTheme.bodyMedium,
+            ),
+          ],
+        ),
+      );
+    });
   }
 }
 
-Widget _buildIconItem(BuildContext context, IconData icon, String text) =>
-    Column(
-      children: [
-        Icon(icon),
-        const SizedBox(width: 8.0),
-        Text(
-          text,
-          style: Theme.of(context).textTheme.bodyLarge,
-        ),
-      ],
-    );
-
-Widget _buildShortItem(BuildContext context, String title, String body) =>
-    Column(
-      children: [
-        Text(
-          title,
-          style: Theme.of(context).textTheme.titleMedium,
-        ),
-        Text(body),
-      ],
-    );
-
-List<Widget> _buildLongItem(BuildContext context, String title, String body) =>
-    [
-      Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 8.0),
-        child: Text(
-          title,
-          style: Theme.of(context).textTheme.titleMedium,
-        ),
-      ),
-      Padding(
-        padding: const EdgeInsets.all(4.0),
-        child: buildAutoLinkText(
-          context,
-          body,
-        ),
-      ),
-      const SizedBox(height: 8.0)
-    ];
-
-Widget buildSyllabusModal(BuildContext context, SyllabusResult query) {
-  return FutureBuilder(
-    future: context.read<ApiRepository>().fetchSyllabusDetail(query),
-    builder: (context, AsyncSnapshot<SyllabusDetail?> snapshot) {
-      var syllabus = snapshot.data;
-      return syllabus != null
-          ? ListView(
-              padding: const EdgeInsets.all(16.0),
-              children: [
-                Padding(
-                  padding: const EdgeInsets.all(4.0),
-                  child: Text(
-                    syllabus.subject,
-                    style: Theme.of(context).textTheme.titleLarge,
+Widget buildSyllabusModal(SyllabusResult query) {
+  return Builder(builder: (context) {
+    return FutureBuilder(
+      future: context.read<ApiRepository>().fetchSyllabusDetail(query),
+      builder: (_, AsyncSnapshot<SyllabusDetail?> snapshot) {
+        var syllabus = snapshot.data;
+        return syllabus != null
+            ? ListView(
+                padding: const EdgeInsets.all(16.0),
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.all(4.0),
+                    child: Text(
+                      syllabus.subject,
+                      style: Theme.of(context).textTheme.titleLarge,
+                    ),
                   ),
-                ),
-                const Padding(
-                  padding: EdgeInsets.all(4.0),
-                  child: Divider(thickness: 2.0),
-                ),
-                Wrap(
-                  alignment: WrapAlignment.spaceAround,
-                  direction: Axis.horizontal,
-                  children: [
-                    _buildIconItem(
-                        context, LineIcons.shapes, syllabus.className),
-                    _buildIconItem(
-                        context, LineIcons.mapPin, syllabus.classRoom),
-                    _buildIconItem(
-                        context, LineIcons.userGraduate, syllabus.teacher),
-                  ],
-                ),
-                const Padding(
-                  padding: EdgeInsets.all(4.0),
-                  child: Divider(thickness: 2.0),
-                ),
-                Wrap(
-                  alignment: WrapAlignment.spaceAround,
-                  direction: Axis.horizontal,
-                  spacing: 32.0,
-                  runSpacing: 8.0,
-                  children: [
-                    _buildShortItem(context, '担当教員名', syllabus.teacher),
-                    _buildShortItem(context, '所属等', syllabus.affiliation),
-                    _buildShortItem(context, '研究室', syllabus.researchRoom),
-                    _buildShortItem(context, '分担教員名', syllabus.sharingTeacher),
-                    _buildShortItem(context, 'クラス', syllabus.className),
-                    _buildShortItem(context, '学期', syllabus.semesterName),
-                    _buildShortItem(
-                        context, '必修選択区分', syllabus.selectionSection),
-                    _buildShortItem(context, '対象学年', syllabus.targetGrade),
-                    _buildShortItem(context, '単位数', syllabus.credit),
-                    _buildShortItem(context, '曜日・時限', syllabus.weekdayPeriod),
-                    _buildShortItem(context, '教室', syllabus.classRoom),
-                  ],
-                ),
-                const Padding(
-                  padding: EdgeInsets.all(4.0),
-                  child: Divider(thickness: 2.0),
-                ),
-                ..._buildLongItem(context, 'キーワード', syllabus.keyword),
-                ..._buildLongItem(context, '授業の目標', syllabus.classTarget),
-                ..._buildLongItem(context, '学習内容', syllabus.learningDetail),
-                ..._buildLongItem(context, '授業計画', syllabus.classPlan),
-                ..._buildLongItem(context, 'テキスト', syllabus.textbook),
-                ..._buildLongItem(context, '参考書', syllabus.referenceBook),
-                ..._buildLongItem(
-                    context, '予習・復習について', syllabus.preparationReview),
-                ..._buildLongItem(
-                    context, '成績評価の方法･基準', syllabus.evaluationMethod),
-                ..._buildLongItem(context, 'オフィスアワー', syllabus.officeHour),
-                ..._buildLongItem(context, '担当教員からのメッセージ', syllabus.message),
-                ..._buildLongItem(
-                    context, 'アクティブ・ラーニング', syllabus.activeLearning),
-                ..._buildLongItem(context, '実務経験のある教員の有無',
-                    syllabus.teacherPracticalExperience),
-                ..._buildLongItem(context, '実務経験のある教員の経歴と授業内容',
-                    syllabus.teacherCareerClassDetail),
-                ..._buildLongItem(
-                    context, '教職科目区分', syllabus.teachingProfessionSection),
-                ..._buildLongItem(
-                    context, '関連授業科目', syllabus.relatedClassSubjects),
-                ..._buildLongItem(context, 'その他', syllabus.other),
-                ..._buildLongItem(context, '在宅授業形態', syllabus.homeClassStyle),
-                ..._buildLongItem(
-                    context, '在宅授業形態（詳細）', syllabus.homeClassStyleDetail),
-              ],
-            )
-          : const Center(child: CircularProgressIndicator());
-    },
-  );
+                  const Padding(
+                    padding: EdgeInsets.all(4.0),
+                    child: Divider(thickness: 2.0),
+                  ),
+                  Wrap(
+                    alignment: WrapAlignment.spaceAround,
+                    direction: Axis.horizontal,
+                    children: [
+                      buildIconItem(LineIcons.shapes, syllabus.className),
+                      buildIconItem(LineIcons.mapPin, syllabus.classRoom),
+                      buildIconItem(LineIcons.userGraduate, syllabus.teacher),
+                    ],
+                  ),
+                  const Padding(
+                    padding: EdgeInsets.all(4.0),
+                    child: Divider(thickness: 2.0),
+                  ),
+                  Wrap(
+                    alignment: WrapAlignment.spaceAround,
+                    direction: Axis.horizontal,
+                    spacing: 32.0,
+                    runSpacing: 8.0,
+                    children: [
+                      buildShortItem('担当教員名', syllabus.teacher),
+                      buildShortItem('所属等', syllabus.affiliation),
+                      buildShortItem('研究室', syllabus.researchRoom),
+                      buildShortItem('分担教員名', syllabus.sharingTeacher),
+                      buildShortItem('クラス', syllabus.className),
+                      buildShortItem('学期', syllabus.semesterName),
+                      buildShortItem('必修選択区分', syllabus.selectionSection),
+                      buildShortItem('対象学年', syllabus.targetGrade),
+                      buildShortItem('単位数', syllabus.credit),
+                      buildShortItem('曜日・時限', syllabus.weekdayPeriod),
+                      buildShortItem('教室', syllabus.classRoom),
+                    ],
+                  ),
+                  const Padding(
+                    padding: EdgeInsets.all(4.0),
+                    child: Divider(thickness: 2.0),
+                  ),
+                  ...buildLongItem('キーワード', syllabus.keyword),
+                  ...buildLongItem('授業の目標', syllabus.classTarget),
+                  ...buildLongItem('学習内容', syllabus.learningDetail),
+                  ...buildLongItem('授業計画', syllabus.classPlan),
+                  ...buildLongItem('テキスト', syllabus.textbook),
+                  ...buildLongItem('参考書', syllabus.referenceBook),
+                  ...buildLongItem('予習・復習について', syllabus.preparationReview),
+                  ...buildLongItem('成績評価の方法･基準', syllabus.evaluationMethod),
+                  ...buildLongItem('オフィスアワー', syllabus.officeHour),
+                  ...buildLongItem('担当教員からのメッセージ', syllabus.message),
+                  ...buildLongItem('アクティブ・ラーニング', syllabus.activeLearning),
+                  ...buildLongItem(
+                      '実務経験のある教員の有無', syllabus.teacherPracticalExperience),
+                  ...buildLongItem(
+                      '実務経験のある教員の経歴と授業内容', syllabus.teacherCareerClassDetail),
+                  ...buildLongItem(
+                      '教職科目区分', syllabus.teachingProfessionSection),
+                  ...buildLongItem('関連授業科目', syllabus.relatedClassSubjects),
+                  ...buildLongItem('その他', syllabus.other),
+                  ...buildLongItem('在宅授業形態', syllabus.homeClassStyle),
+                  ...buildLongItem('在宅授業形態（詳細）', syllabus.homeClassStyleDetail),
+                ],
+              )
+            : const Center(child: CircularProgressIndicator());
+      },
+    );
+  });
 }

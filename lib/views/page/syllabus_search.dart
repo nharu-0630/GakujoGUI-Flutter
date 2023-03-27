@@ -44,8 +44,7 @@ class _SyllabusSearchPageState extends State<SyllabusSearchPage> {
     return parameters != null
         ? Scaffold(
             body: NestedScrollView(
-              headerSliverBuilder: (context, innerBoxScrolled) =>
-                  [_buildAppBar(context)],
+              headerSliverBuilder: (_, __) => [_buildAppBar()],
               body: ListView(
                 padding: const EdgeInsets.symmetric(horizontal: 16.0),
                 physics: const AlwaysScrollableScrollPhysics(),
@@ -70,7 +69,7 @@ class _SyllabusSearchPageState extends State<SyllabusSearchPage> {
                             ),
                             onPressed: () async => showDialog(
                               context: context,
-                              builder: (BuildContext context) => AlertDialog(
+                              builder: (context) => AlertDialog(
                                 title: const Text('開講年度'),
                                 content: SizedBox(
                                   width: 360,
@@ -481,19 +480,21 @@ class _SyllabusSearchPageState extends State<SyllabusSearchPage> {
           );
   }
 
-  Widget _buildAppBar(BuildContext context) {
-    return SliverAppBar(
-      centerTitle: true,
-      floating: true,
-      leading: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: IconButton(
-          onPressed: () => Navigator.of(context).pop(),
-          icon: Icon(KIcons.back),
+  Widget _buildAppBar() {
+    return Builder(builder: (context) {
+      return SliverAppBar(
+        centerTitle: true,
+        floating: true,
+        leading: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: IconButton(
+            onPressed: () => Navigator.of(context).pop(),
+            icon: Icon(KIcons.back),
+          ),
         ),
-      ),
-      title: const Text('シラバス'),
-      bottom: buildAppBarBottom(context),
-    );
+        title: const Text('シラバス'),
+        bottom: buildAppBarBottom(),
+      );
+    });
   }
 }
