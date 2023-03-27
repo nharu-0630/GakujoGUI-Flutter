@@ -476,21 +476,19 @@ class GakujoApi {
     settings.fullName =
         name?.substring(0, name.indexOf('さん')).replaceAll('　', '');
 
-    if (settings.profileImage == null) {
-      _setProgress(14 / 15);
-      await Future.delayed(_interval);
-      response = await _client.getUri<dynamic>(
-        Uri.https(
-          'gakujo.shizuoka.ac.jp',
-          '/portal/common/fileDownload/downloadFavoriteImage',
-          {
-            'org.apache.struts.taglib.html.TOKEN=': _token,
-          },
-        ),
-        options: Options(responseType: ResponseType.bytes),
-      );
-      settings.profileImage = base64.encode(response.data);
-    }
+    _setProgress(14 / 15);
+    await Future.delayed(_interval);
+    response = await _client.getUri<dynamic>(
+      Uri.https(
+        'gakujo.shizuoka.ac.jp',
+        '/portal/common/fileDownload/downloadFavoriteImage',
+        {
+          'org.apache.struts.taglib.html.TOKEN=': _token,
+        },
+      ),
+      options: Options(responseType: ResponseType.bytes),
+    );
+    settings.profileImage = base64.encode(response.data);
     settings.lastLoginTime = DateTime.now();
     App.navigatorKey.currentContext?.read<SettingsRepository>().save(settings);
     _setProgress(15 / 15);
@@ -1528,7 +1526,7 @@ class GakujoApi {
         await App.navigatorKey.currentContext?.read<GpaRepository>().load() ??
             Gpa.init();
 
-    _setProgress(1 / 5);
+    _setProgress(1 / 7);
     await Future.delayed(_interval);
     response = await _client.getUri<dynamic>(
       Uri.https(
@@ -1547,7 +1545,7 @@ class GakujoApi {
           int.parse(e.children[1].text.trimWhiteSpace());
     });
 
-    _setProgress(2 / 5);
+    _setProgress(2 / 7);
     await Future.delayed(_interval);
     response = await _client.getUri<dynamic>(
       Uri.https(
@@ -1556,20 +1554,30 @@ class GakujoApi {
       ),
     );
     document = parse(response.data);
-
     var rows =
         document.querySelectorAll('table.txt12').first.querySelectorAll('tr');
     gpa.facultyGrade = rows[0].children[1].text.trimWhiteSpace();
     gpa.facultyGpa = double.parse(rows[1].children[1].text.trimWhiteSpace());
-    gpa.facultyCalculationDate =
-        rows.last.children[1].text.trimWhiteSpace().toDateTime();
     gpa.facultyGpas = {};
     rows.skip(2).toList().reversed.skip(3).forEach((e) {
       gpa.facultyGpas[e.children[0].text.trimWhiteSpace()] =
           double.parse(e.children[1].text.trimWhiteSpace());
     });
+    gpa.facultyCalculationDate =
+        rows.last.children[1].text.trimWhiteSpace().toDateTime();
 
-    _setProgress(3 / 5);
+    _setProgress(3 / 7);
+    await Future.delayed(_interval);
+    response = await _client.getUri<dynamic>(
+      Uri.https(
+        'gakujo.shizuoka.ac.jp',
+        '/kyoumu/gpaImage.do',
+      ),
+      options: Options(responseType: ResponseType.bytes),
+    );
+    gpa.facultyImage = base64.encode(response.data);
+
+    _setProgress(4 / 7);
     await Future.delayed(_interval);
     response = await _client.getUri<dynamic>(
       Uri.https(
@@ -1617,7 +1625,18 @@ class GakujoApi {
         .split('中')[0]
         .replaceAll('人', ''));
 
-    _setProgress(4 / 5);
+    _setProgress(5 / 7);
+    await Future.delayed(_interval);
+    response = await _client.getUri<dynamic>(
+      Uri.https(
+        'gakujo.shizuoka.ac.jp',
+        '/kyoumu/departmentGpaImage.do',
+      ),
+      options: Options(responseType: ResponseType.bytes),
+    );
+    gpa.departmentImage = base64.encode(response.data);
+
+    _setProgress(6 / 7);
     await Future.delayed(_interval);
     response = await _client.getUri<dynamic>(
       Uri.https(
@@ -1638,7 +1657,7 @@ class GakujoApi {
     });
 
     await App.navigatorKey.currentContext?.read<GpaRepository>().save(gpa);
-    _setProgress(5 / 5);
+    _setProgress(7 / 7);
   }
 
   Future<void> fetchTimetables() async {

@@ -1,5 +1,6 @@
 import 'dart:collection';
 
+import 'package:cached_memory_image/provider/cached_memory_image_provider.dart';
 import 'package:collection/collection.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
@@ -79,6 +80,28 @@ class _GradePageState extends State<GradePage> {
     });
   }
 
+  Widget _buildImageItem(String title, String key, String? image) {
+    return Builder(builder: (context) {
+      return Column(
+        children: [
+          Text(
+            title,
+            style: Theme.of(context).textTheme.titleMedium,
+          ),
+          const SizedBox(height: 8.0),
+          image != null
+              ? Image(
+                  image: CachedMemoryImageProvider(
+                    key,
+                    base64: image,
+                  ),
+                )
+              : const SizedBox.shrink(),
+        ],
+      );
+    });
+  }
+
   Widget _buildGpas() {
     return Builder(builder: (context) {
       return RefreshIndicator(
@@ -109,7 +132,19 @@ class _GradePageState extends State<GradePage> {
                     _gpa.facultyCalculationDate.toLocal().toDateString()),
               ],
             ),
-            const SizedBox(height: 8.0),
+            const Padding(
+              padding: EdgeInsets.all(4.0),
+              child: Divider(thickness: 2.0),
+            ),
+            Wrap(
+              alignment: WrapAlignment.center,
+              spacing: 32.0,
+              runSpacing: 8.0,
+              children: [
+                _buildImageItem('学部', 'FacultyImage', _gpa.facultyImage),
+                _buildImageItem('学科', 'DepartmentImage', _gpa.departmentImage),
+              ],
+            )
           ],
         ),
       );
