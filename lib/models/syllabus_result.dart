@@ -77,9 +77,6 @@ class SyllabusResult implements Comparable<SyllabusResult> {
   }
 
   @override
-  String toString() => subjectName;
-
-  @override
   bool operator ==(Object other) {
     if (identical(this, other)) return true;
     if (other is SyllabusResult) {

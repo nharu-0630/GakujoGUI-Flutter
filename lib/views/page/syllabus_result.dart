@@ -76,11 +76,39 @@ class _SyllabusResultPageState extends State<SyllabusResultPage> {
                   ),
                 ),
               )
-            : ListView.builder(
-                padding: const EdgeInsets.only(top: 8),
-                itemCount: result!.length,
-                itemBuilder: (_, index) => _buildCard(result![index]),
-              ),
+            : result!.isNotEmpty
+                ? ListView.builder(
+                    padding: const EdgeInsets.only(top: 8),
+                    itemCount: result!.length,
+                    itemBuilder: (_, index) => _buildCard(result![index]),
+                  )
+                : LayoutBuilder(
+                    builder: (_, constraints) => SingleChildScrollView(
+                      physics: const AlwaysScrollableScrollPhysics(),
+                      child: ConstrainedBox(
+                        constraints:
+                            BoxConstraints(minHeight: constraints.maxHeight),
+                        child: Center(
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Icon(
+                                  KIcons.syllabus,
+                                  size: 48.0,
+                                ),
+                              ),
+                              Text(
+                                '検索条件に合致するシラバスはありません',
+                                style: Theme.of(context).textTheme.titleMedium,
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
       ),
     );
   }

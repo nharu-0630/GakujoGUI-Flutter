@@ -76,9 +76,6 @@ class SharedFile implements Comparable<SharedFile> {
       description.toLowerCase().contains(value.toLowerCase());
 
   @override
-  String toString() => '$subject $title';
-
-  @override
   bool operator ==(Object other) {
     if (identical(this, other)) return true;
     if (other is SharedFile) {

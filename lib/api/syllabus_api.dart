@@ -88,72 +88,8 @@ class SyllabusApi {
     }
 
     var document = parse(response.data);
-    var academicYearMap = <int, String>{};
-    academicYearMap.addEntries(document
-        .querySelector('table.txt12')!
-        .querySelectorAll('tr')[0]
-        .querySelector('select')!
-        .querySelectorAll('option')
-        .skip(1)
-        .map((e) => MapEntry<int, String>(
-            int.parse(e.attributes['value'] ?? '-1'), e.text)));
-    var syllabusTitleIDMap = <String, String>{};
-    syllabusTitleIDMap.addEntries(document
-        .querySelector('table.txt12')!
-        .querySelectorAll('tr')[1]
-        .querySelector('select')!
-        .querySelectorAll('option')
-        .skip(1)
-        .map((e) => MapEntry(e.attributes['value'] ?? '-', e.text)));
-    var indexIDMap = <String, String>{};
-    indexIDMap.addEntries(document
-        .querySelector('table.txt12')!
-        .querySelectorAll('tr')[2]
-        .querySelector('select')!
-        .querySelectorAll('option')
-        .skip(1)
-        .map((e) => MapEntry(e.attributes['value'] ?? '-', e.text)));
-    var targetGradeMap = <String, String>{};
-    targetGradeMap.addEntries(document
-        .querySelector('table.txt12')!
-        .querySelectorAll('tr')[3]
-        .querySelector('select')!
-        .querySelectorAll('option')
-        .skip(1)
-        .map((e) => MapEntry(e.attributes['value'] ?? '-', e.text)));
-    var semesterMap = <String, String>{};
-    semesterMap.addEntries(document
-        .querySelector('table.txt12')!
-        .querySelectorAll('tr')[4]
-        .querySelector('select')!
-        .querySelectorAll('option')
-        .skip(1)
-        .map((e) => MapEntry(e.attributes['value'] ?? '-', e.text)));
-    var weekMap = <String, String>{};
-    weekMap.addEntries(document
-        .querySelector('table.txt12')!
-        .querySelectorAll('tr')[5]
-        .querySelectorAll('select')[0]
-        .querySelectorAll('option')
-        .skip(1)
-        .map((e) => MapEntry(e.attributes['value'] ?? '-', e.text)));
-    var hourMap = <String, String>{};
-    hourMap.addEntries(document
-        .querySelector('table.txt12')!
-        .querySelectorAll('tr')[5]
-        .querySelectorAll('select')[1]
-        .querySelectorAll('option')
-        .skip(1)
-        .map((e) => MapEntry(e.attributes['value'] ?? '-', e.text)));
-    return SyllabusParameters(
-      academicYearMap: academicYearMap,
-      syllabusTitleIDMap: syllabusTitleIDMap,
-      indexIDMap: syllabusTitleID.isNotEmpty ? indexIDMap : null,
-      targetGradeMap: targetGradeMap,
-      semesterMap: semesterMap,
-      weekMap: weekMap,
-      hourMap: hourMap,
-    );
+    return SyllabusParameters.fromElement(
+        syllabusTitleID, document.querySelector('table.txt12')!);
   }
 
   Future<List<SyllabusResult>> fetchSyllabusResult({
@@ -199,7 +135,7 @@ class SyllabusApi {
     );
 
     if (response.data.contains('検索条件に合致する科目が見つかりません。')) return [];
-
+    if (response.data.contains('のいずれかを入力してください。')) return [];
     var document = parse(response.data);
     return document
         .querySelector('table.txt12')!

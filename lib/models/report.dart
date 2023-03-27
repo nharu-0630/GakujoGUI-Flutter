@@ -143,9 +143,6 @@ class Report implements Comparable<Report> {
       message.toLowerCase().contains(value.toLowerCase());
 
   @override
-  String toString() => '[$status] $subject $title -> $endDateTime';
-
-  @override
   bool operator ==(Object other) {
     if (identical(this, other)) return true;
     if (other is Report) {
