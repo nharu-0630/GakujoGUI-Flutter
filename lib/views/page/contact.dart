@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:gakujo_gui/api/parse.dart';
 import 'package:gakujo_gui/api/provide.dart';
-import 'package:gakujo_gui/constants/kcolors.dart';
 import 'package:gakujo_gui/constants/kicons.dart';
 import 'package:gakujo_gui/models/contact.dart';
 import 'package:gakujo_gui/models/subject.dart';
@@ -145,8 +144,8 @@ class _ContactPageState extends State<ContactPage> {
             SlidableAction(
               onPressed: (context) async =>
                   context.read<ApiRepository>().fetchDetailContact(contact),
-              backgroundColor: KColors.update,
-              foregroundColor: Colors.white,
+              backgroundColor: Theme.of(context).colorScheme.primary,
+              foregroundColor: Theme.of(context).colorScheme.onPrimary,
               icon: KIcons.update,
               label: '更新',
             ),

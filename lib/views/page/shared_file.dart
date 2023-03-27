@@ -2,7 +2,6 @@ import 'package:adaptive_dialog/adaptive_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:gakujo_gui/api/provide.dart';
-import 'package:gakujo_gui/constants/kcolors.dart';
 import 'package:gakujo_gui/constants/kicons.dart';
 import 'package:gakujo_gui/models/shared_file.dart';
 import 'package:gakujo_gui/views/common/widget.dart';
@@ -45,8 +44,7 @@ class _SharedFilePageState extends State<SharedFilePage> {
                     context.read<ApiRepository>().fetchSharedFiles(),
                 child: filteredSharedFiles.isEmpty
                     ? LayoutBuilder(
-                        builder: (_, constraints) =>
-                            SingleChildScrollView(
+                        builder: (_, constraints) => SingleChildScrollView(
                           physics: const AlwaysScrollableScrollPhysics(),
                           child: ConstrainedBox(
                             constraints: BoxConstraints(
@@ -165,8 +163,8 @@ class _SharedFilePageState extends State<SharedFilePage> {
                   .setArchive(
                       sharedFile.hashCode.toString(), !sharedFile.isArchived)
                   .then((value) => setState(() {})),
-              backgroundColor: KColors.archive,
-              foregroundColor: Colors.white,
+              backgroundColor: Theme.of(context).colorScheme.primary,
+              foregroundColor: Theme.of(context).colorScheme.onPrimary,
               icon: sharedFile.isArchived ? KIcons.unarchive : KIcons.archive,
               label: sharedFile.isArchived ? 'アーカイブ解除' : 'アーカイブ',
             ),
@@ -179,8 +177,8 @@ class _SharedFilePageState extends State<SharedFilePage> {
               onPressed: (context) async => context
                   .read<ApiRepository>()
                   .fetchDetailSharedFile(sharedFile),
-              backgroundColor: KColors.update,
-              foregroundColor: Colors.white,
+              backgroundColor: Theme.of(context).colorScheme.primary,
+              foregroundColor: Theme.of(context).colorScheme.onPrimary,
               icon: KIcons.update,
               label: '更新',
             ),

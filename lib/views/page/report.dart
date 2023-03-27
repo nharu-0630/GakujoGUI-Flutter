@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:gakujo_gui/api/parse.dart';
 import 'package:gakujo_gui/api/provide.dart';
-import 'package:gakujo_gui/constants/kcolors.dart';
 import 'package:gakujo_gui/constants/kicons.dart';
 import 'package:gakujo_gui/models/report.dart';
 import 'package:gakujo_gui/views/common/widget.dart';
@@ -169,8 +168,8 @@ class _ReportPageState extends State<ReportPage> {
                   .read<ReportRepository>()
                   .setArchive(report.id, !report.isArchived)
                   .then((value) => setState(() {})),
-              backgroundColor: KColors.archive,
-              foregroundColor: Colors.white,
+              backgroundColor: Theme.of(context).colorScheme.primary,
+              foregroundColor: Theme.of(context).colorScheme.onPrimary,
               icon: report.isArchived ? KIcons.unarchive : KIcons.archive,
               label: report.isArchived ? 'アーカイブ解除' : 'アーカイブ',
             ),
@@ -182,8 +181,8 @@ class _ReportPageState extends State<ReportPage> {
             SlidableAction(
               onPressed: (context) async =>
                   context.read<ApiRepository>().fetchDetailReport(report),
-              backgroundColor: KColors.update,
-              foregroundColor: Colors.white,
+              backgroundColor: Theme.of(context).colorScheme.primary,
+              foregroundColor: Theme.of(context).colorScheme.onPrimary,
               icon: KIcons.update,
               label: '更新',
             ),
