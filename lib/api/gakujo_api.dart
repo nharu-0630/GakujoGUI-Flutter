@@ -27,7 +27,7 @@ import 'package:uuid/uuid.dart';
 import 'package:version/version.dart';
 
 class GakujoApi {
-  static final version = Version(1, 5, 1);
+  static final version = Version(1, 6, 0);
   static final userAgent =
       'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/111.0.0.0 Safari/537.36 GakujoAPI/$version';
   static const _interval = Duration(milliseconds: 250);

@@ -123,20 +123,24 @@ class _TimetablePageState extends State<TimetablePage> {
 
   Widget _buildCell(Timetable timetable) {
     return Builder(builder: (context) {
-      return badges.Badge(
-        showBadge: (_reports
-                    .where((e) => e.subject == timetable.subject)
-                    .length +
-                _quizzes.where((e) => e.subject == timetable.subject).length) >
-            0,
-        ignorePointer: true,
-        badgeContent: Text(
-          (_reports.where((e) => e.subject == timetable.subject).length +
-                  _quizzes.where((e) => e.subject == timetable.subject).length)
-              .toString(),
-        ),
-        position: badges.BadgePosition.topEnd(top: 0, end: 0),
-        child: TableCell(
+      return TableCell(
+        child: badges.Badge(
+          showBadge:
+              (_reports.where((e) => e.subject == timetable.subject).length +
+                          _quizzes
+                              .where((e) => e.subject == timetable.subject)
+                              .length) >
+                      0 ||
+                  true,
+          ignorePointer: true,
+          position: badges.BadgePosition.topEnd(top: 0, end: 0),
+          badgeContent: Text(
+            (_reports.where((e) => e.subject == timetable.subject).length +
+                    _quizzes
+                        .where((e) => e.subject == timetable.subject)
+                        .length)
+                .toString(),
+          ),
           child: SizedBox(
             height: max(MediaQuery.of(context).size.height * .8 / 5, 120.0),
             width: double.infinity,
