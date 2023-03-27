@@ -482,38 +482,6 @@ class _SettingsPageState extends State<SettingsPage> {
                           children: [
                             Padding(
                               padding: const EdgeInsets.all(8.0),
-                              child: ElevatedButton(
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor:
-                                      Theme.of(context).colorScheme.error,
-                                  foregroundColor:
-                                      Theme.of(context).colorScheme.onError,
-                                ),
-                                onPressed: () async {},
-                                child: Padding(
-                                  padding: const EdgeInsets.all(8.0),
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      const Icon(LineIcons.rocket),
-                                      const SizedBox(width: 8.0),
-                                      Text(
-                                        'テスト',
-                                        style: Theme.of(context)
-                                            .textTheme
-                                            .bodyLarge!
-                                            .copyWith(
-                                                color: Theme.of(context)
-                                                    .colorScheme
-                                                    .onError),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.all(8.0),
                               child: Align(
                                 alignment: Alignment.topLeft,
                                 child: buildAutoLinkText(

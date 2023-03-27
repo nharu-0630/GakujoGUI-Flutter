@@ -12,6 +12,7 @@ import 'package:gakujo_gui/models/quiz.dart';
 import 'package:gakujo_gui/models/report.dart';
 import 'package:gakujo_gui/models/settings.dart';
 import 'package:gakujo_gui/views/page/class_link.dart';
+import 'package:gakujo_gui/views/page/contact.dart';
 import 'package:gakujo_gui/views/page/grade.dart';
 import 'package:gakujo_gui/views/page/quiz.dart';
 import 'package:gakujo_gui/views/page/report.dart';
@@ -360,6 +361,26 @@ Widget buildDrawer() {
                 ListTile(
                   title: Row(
                     children: [
+                      Icon(
+                        KIcons.contact,
+                        color: Theme.of(context).iconTheme.color,
+                      ),
+                      const SizedBox(width: 8.0),
+                      Text(
+                        '授業連絡',
+                        style: Theme.of(context).textTheme.titleMedium,
+                      ),
+                    ],
+                  ),
+                  onTap: () {
+                    Navigator.of(context).pop();
+                    Navigator.of(context).push(MaterialPageRoute(
+                        builder: (context) => const ContactPage(null)));
+                  },
+                ),
+                ListTile(
+                  title: Row(
+                    children: [
                       reportCount > 0
                           ? Badge(
                               label: Text(reportCount.toString()),
@@ -567,69 +588,6 @@ AppBar buildAppBar(BuildContext context, GlobalKey<ScaffoldState> scaffoldKey) {
             : 'アカウント情報なし',
       ),
     ),
-    actions: [
-      Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: IconButton(
-          icon: const Icon(LineIcons.alternateSignIn),
-          onPressed: () async => context.read<ApiRepository>().fetchLogin(),
-        ),
-      ),
-      Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: IconButton(
-          icon: Icon(KIcons.update),
-          onPressed: () async => showDialog(
-            context: App.navigatorKey.currentState!.overlay!.context,
-            builder: (_) => SimpleDialog(
-              title: const Text('更新'),
-              children: [
-                SimpleDialogOption(
-                  onPressed: () async =>
-                      context.read<ApiRepository>().fetchSubjects(),
-                  child: const Text('授業科目'),
-                ),
-                SimpleDialogOption(
-                  onPressed: () async =>
-                      context.read<ApiRepository>().fetchContacts(),
-                  child: const Text('授業連絡'),
-                ),
-                SimpleDialogOption(
-                  onPressed: () async =>
-                      context.read<ApiRepository>().fetchReports(),
-                  child: const Text('レポート'),
-                ),
-                SimpleDialogOption(
-                  onPressed: () async =>
-                      context.read<ApiRepository>().fetchQuizzes(),
-                  child: const Text('小テスト'),
-                ),
-                SimpleDialogOption(
-                  onPressed: () async =>
-                      context.read<ApiRepository>().fetchSharedFiles(),
-                  child: const Text('授業共有ファイル'),
-                ),
-                SimpleDialogOption(
-                  onPressed: () async =>
-                      context.read<ApiRepository>().fetchClassLinks(),
-                  child: const Text('授業リンク'),
-                ),
-                SimpleDialogOption(
-                  onPressed: () async =>
-                      context.read<ApiRepository>().fetchGrades(),
-                  child: const Text('成績情報'),
-                ),
-                SimpleDialogOption(
-                  onPressed: () async =>
-                      context.read<ApiRepository>().fetchTimetables(),
-                  child: const Text('個人時間割'),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    ],
     bottom: buildAppBarBottom(),
   );
 }
@@ -638,20 +596,21 @@ PreferredSize buildAppBarBottom() {
   return PreferredSize(
     preferredSize: const Size.fromHeight(6.0),
     child: Builder(
-        builder: (context) => Visibility(
-              visible: context.watch<ApiRepository>().isLoading,
-              child: LinearProgressIndicator(
-                minHeight: 3.0,
-                valueColor: context.watch<ApiRepository>().isError
-                    ? AlwaysStoppedAnimation<Color>(
-                        Theme.of(context).colorScheme.error)
-                    : AlwaysStoppedAnimation<Color>(
-                        Theme.of(context).colorScheme.primary,
-                      ),
-                value: context.watch<ApiRepository>().progress != -1
-                    ? context.watch<ApiRepository>().progress
-                    : null,
-              ),
-            )),
+      builder: (context) => Visibility(
+        visible: context.watch<ApiRepository>().isLoading,
+        child: LinearProgressIndicator(
+          minHeight: 3.0,
+          valueColor: context.watch<ApiRepository>().isError
+              ? AlwaysStoppedAnimation<Color>(
+                  Theme.of(context).colorScheme.error)
+              : AlwaysStoppedAnimation<Color>(
+                  Theme.of(context).colorScheme.primary,
+                ),
+          value: context.watch<ApiRepository>().progress != -1
+              ? context.watch<ApiRepository>().progress
+              : null,
+        ),
+      ),
+    ),
   );
 }

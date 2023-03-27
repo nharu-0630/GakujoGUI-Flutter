@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_speed_dial/flutter_speed_dial.dart';
+import 'package:gakujo_gui/constants/kicons.dart';
 import 'package:gakujo_gui/views/common/widget.dart';
 import 'package:gakujo_gui/views/home/home.dart';
 import 'package:gakujo_gui/views/page/timetable.dart';
@@ -46,6 +48,69 @@ class _AppState extends State<App> {
       debugShowCheckedModeBanner: false,
       title: 'GakujoGUI',
       home: Scaffold(
+        floatingActionButton: SpeedDial(
+          childMargin: const EdgeInsets.all(8.0),
+          animatedIcon: AnimatedIcons.menu_close,
+          children: [
+            SpeedDialChild(
+              child: const Icon(LineIcons.alternateSignIn),
+              label: 'ログイン',
+              onTap: () async => context.read<ApiRepository>().fetchLogin(),
+            ),
+            SpeedDialChild(
+              child: Icon(KIcons.update),
+              label: '更新',
+              onTap: () async => showDialog(
+                context: App.navigatorKey.currentState!.overlay!.context,
+                builder: (_) => SimpleDialog(
+                  title: const Text('更新'),
+                  children: [
+                    SimpleDialogOption(
+                      onPressed: () async =>
+                          context.read<ApiRepository>().fetchSubjects(),
+                      child: const Text('授業科目'),
+                    ),
+                    SimpleDialogOption(
+                      onPressed: () async =>
+                          context.read<ApiRepository>().fetchContacts(),
+                      child: const Text('授業連絡'),
+                    ),
+                    SimpleDialogOption(
+                      onPressed: () async =>
+                          context.read<ApiRepository>().fetchReports(),
+                      child: const Text('レポート'),
+                    ),
+                    SimpleDialogOption(
+                      onPressed: () async =>
+                          context.read<ApiRepository>().fetchQuizzes(),
+                      child: const Text('小テスト'),
+                    ),
+                    SimpleDialogOption(
+                      onPressed: () async =>
+                          context.read<ApiRepository>().fetchSharedFiles(),
+                      child: const Text('授業共有ファイル'),
+                    ),
+                    SimpleDialogOption(
+                      onPressed: () async =>
+                          context.read<ApiRepository>().fetchClassLinks(),
+                      child: const Text('授業リンク'),
+                    ),
+                    SimpleDialogOption(
+                      onPressed: () async =>
+                          context.read<ApiRepository>().fetchGrades(),
+                      child: const Text('成績情報'),
+                    ),
+                    SimpleDialogOption(
+                      onPressed: () async =>
+                          context.read<ApiRepository>().fetchTimetables(),
+                      child: const Text('個人時間割'),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
         key: App.scaffoldKey,
         drawer: buildDrawer(),
         appBar: buildAppBar(context, App.scaffoldKey),

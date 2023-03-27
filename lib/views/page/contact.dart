@@ -11,7 +11,7 @@ import 'package:provider/provider.dart';
 import 'package:share_plus/share_plus.dart';
 
 class ContactPage extends StatefulWidget {
-  final Subject subject;
+  final Subject? subject;
   const ContactPage(this.subject, {Key? key}) : super(key: key);
 
   @override
@@ -28,12 +28,16 @@ class _ContactPageState extends State<ContactPage> {
     return FutureBuilder(
       future: context
           .watch<ContactRepository>()
-          .getSubjects(widget.subject.subject),
+          .getSubjects(widget.subject?.subject),
       builder: (_, AsyncSnapshot<List<Contact>> snapshot) {
         if (snapshot.hasData) {
           _contacts = snapshot.data!;
           _contacts.sort(((a, b) => b.compareTo(a)));
           return Scaffold(
+            floatingActionButton: buildFloatingActionButton(
+              onPressed: context.read<ApiRepository>().fetchContacts,
+              iconData: KIcons.update,
+            ),
             body: CustomScrollView(
               slivers: [
                 _buildAppBar(),
@@ -106,7 +110,7 @@ class _ContactPageState extends State<ContactPage> {
                 autofocus: true,
                 textInputAction: TextInputAction.search,
               )
-            : Text(widget.subject.subject),
+            : Text(widget.subject?.subject ?? '授業連絡'),
         actions: _searchStatus
             ? [
                 Padding(
