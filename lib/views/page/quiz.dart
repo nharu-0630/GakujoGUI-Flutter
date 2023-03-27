@@ -49,34 +49,7 @@ class _QuizPageState extends State<QuizPage> {
                 onRefresh: () async =>
                     context.read<ApiRepository>().fetchQuizzes(),
                 child: filteredQuizzes.isEmpty
-                    ? LayoutBuilder(
-                        builder: (_, constraints) => SingleChildScrollView(
-                          physics: const AlwaysScrollableScrollPhysics(),
-                          child: ConstrainedBox(
-                            constraints: BoxConstraints(
-                                minHeight: constraints.maxHeight),
-                            child: Center(
-                              child: Column(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Padding(
-                                    padding: const EdgeInsets.all(8.0),
-                                    child: Icon(
-                                      KIcons.quiz,
-                                      size: 48.0,
-                                    ),
-                                  ),
-                                  Text(
-                                    '小テストはありません',
-                                    style:
-                                        Theme.of(context).textTheme.titleMedium,
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ),
-                      )
+                    ? buildCenterItemLayoutBuilder(KIcons.quiz, '小テストはありません')
                     : ListView.builder(
                         padding: const EdgeInsets.only(top: 8),
                         itemCount: _searchStatus
@@ -91,9 +64,7 @@ class _QuizPageState extends State<QuizPage> {
           );
         } else {
           return const Scaffold(
-            body: Center(
-              child: CircularProgressIndicator(),
-            ),
+            body: Center(child: CircularProgressIndicator()),
           );
         }
       },

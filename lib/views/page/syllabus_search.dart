@@ -474,9 +474,7 @@ class _SyllabusSearchPageState extends State<SyllabusSearchPage> {
             ),
           )
         : const Scaffold(
-            body: Center(
-              child: CircularProgressIndicator(),
-            ),
+            body: Center(child: CircularProgressIndicator()),
           );
   }
 

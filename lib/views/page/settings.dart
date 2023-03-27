@@ -543,7 +543,12 @@ class _SettingsPageState extends State<SettingsPage> {
                     const SizedBox(height: 16.0),
                   ],
                 )
-              : const Center(child: CircularProgressIndicator());
+              : const Center(
+                  child: Padding(
+                    padding: EdgeInsets.all(8.0),
+                    child: CircularProgressIndicator(),
+                  ),
+                );
         },
       ),
     );

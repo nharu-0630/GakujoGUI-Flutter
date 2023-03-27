@@ -43,34 +43,8 @@ class _SharedFilePageState extends State<SharedFilePage> {
                 onRefresh: () async =>
                     context.read<ApiRepository>().fetchSharedFiles(),
                 child: filteredSharedFiles.isEmpty
-                    ? LayoutBuilder(
-                        builder: (_, constraints) => SingleChildScrollView(
-                          physics: const AlwaysScrollableScrollPhysics(),
-                          child: ConstrainedBox(
-                            constraints: BoxConstraints(
-                                minHeight: constraints.maxHeight),
-                            child: Center(
-                              child: Column(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Padding(
-                                    padding: const EdgeInsets.all(8.0),
-                                    child: Icon(
-                                      KIcons.sharedFile,
-                                      size: 48.0,
-                                    ),
-                                  ),
-                                  Text(
-                                    '授業共有ファイルはありません',
-                                    style:
-                                        Theme.of(context).textTheme.titleMedium,
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ),
-                      )
+                    ? buildCenterItemLayoutBuilder(
+                        KIcons.sharedFile, '授業共有ファイルはありません')
                     : ListView.builder(
                         padding: const EdgeInsets.only(top: 8),
                         itemCount: _searchStatus
@@ -85,9 +59,7 @@ class _SharedFilePageState extends State<SharedFilePage> {
           );
         } else {
           return const Scaffold(
-            body: Center(
-              child: CircularProgressIndicator(),
-            ),
+            body: Center(child: CircularProgressIndicator()),
           );
         }
       },

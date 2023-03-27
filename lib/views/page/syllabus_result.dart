@@ -62,55 +62,25 @@ class _SyllabusResultPageState extends State<SyllabusResultPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: NestedScrollView(
-        headerSliverBuilder: (_, __) => [_buildAppBar()],
-        body: result == null
-            ? LayoutBuilder(
-                builder: (_, constraints) => SingleChildScrollView(
-                  physics: const AlwaysScrollableScrollPhysics(),
-                  child: ConstrainedBox(
-                    constraints:
-                        BoxConstraints(minHeight: constraints.maxHeight),
-                    child: const Center(child: CircularProgressIndicator()),
-                  ),
-                ),
-              )
-            : result!.isNotEmpty
-                ? ListView.builder(
-                    padding: const EdgeInsets.only(top: 8),
-                    itemCount: result!.length,
-                    itemBuilder: (_, index) => _buildCard(result![index]),
-                  )
-                : LayoutBuilder(
-                    builder: (_, constraints) => SingleChildScrollView(
-                      physics: const AlwaysScrollableScrollPhysics(),
-                      child: ConstrainedBox(
-                        constraints:
-                            BoxConstraints(minHeight: constraints.maxHeight),
-                        child: Center(
-                          child: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: Icon(
-                                  KIcons.syllabus,
-                                  size: 48.0,
-                                ),
-                              ),
-                              Text(
-                                '検索条件に合致するシラバスはありません',
-                                style: Theme.of(context).textTheme.titleMedium,
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-      ),
-    );
+    return result != null
+        ? Scaffold(
+            body: NestedScrollView(
+              headerSliverBuilder: (_, __) => [_buildAppBar()],
+              body: result!.isNotEmpty
+                  ? ListView.builder(
+                      padding: const EdgeInsets.only(top: 8),
+                      itemCount: result!.length,
+                      itemBuilder: (_, index) => _buildCard(result![index]),
+                    )
+                  : buildCenterItemLayoutBuilder(
+                      KIcons.syllabus, '検索条件に合致するシラバスはありません'),
+            ),
+          )
+        : const Scaffold(
+            body: Center(
+              child: CircularProgressIndicator(),
+            ),
+          );
   }
 
   Widget _buildAppBar() {
@@ -256,7 +226,12 @@ Widget buildSyllabusModal(SyllabusResult query) {
                   ...buildLongItem('在宅授業形態（詳細）', syllabus.homeClassStyleDetail),
                 ],
               )
-            : const Center(child: CircularProgressIndicator());
+            : const Center(
+                child: Padding(
+                  padding: EdgeInsets.all(8.0),
+                  child: CircularProgressIndicator(),
+                ),
+              );
       },
     );
   });

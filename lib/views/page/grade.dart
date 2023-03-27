@@ -54,9 +54,7 @@ class _GradePageState extends State<GradePage> {
           );
         } else {
           return const Scaffold(
-            body: Center(
-              child: CircularProgressIndicator(),
-            ),
+            body: Center(child: CircularProgressIndicator()),
           );
         }
       },
@@ -68,33 +66,7 @@ class _GradePageState extends State<GradePage> {
       return RefreshIndicator(
         onRefresh: () async => context.read<ApiRepository>().fetchGrades(),
         child: _grades.isEmpty
-            ? LayoutBuilder(
-                builder: (_, constraints) => SingleChildScrollView(
-                  physics: const AlwaysScrollableScrollPhysics(),
-                  child: ConstrainedBox(
-                    constraints:
-                        BoxConstraints(minHeight: constraints.maxHeight),
-                    child: Center(
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Icon(
-                              KIcons.grade,
-                              size: 48.0,
-                            ),
-                          ),
-                          Text(
-                            '成績情報はありません',
-                            style: Theme.of(context).textTheme.titleMedium,
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-              )
+            ? buildCenterItemLayoutBuilder(KIcons.grade, '成績情報はありません')
             : ListView.builder(
                 padding: const EdgeInsets.only(top: 8),
                 itemCount:

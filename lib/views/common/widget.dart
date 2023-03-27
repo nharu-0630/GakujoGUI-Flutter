@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:badges/badges.dart' as badges;
 import 'package:better_open_file/better_open_file.dart';
 import 'package:cached_memory_image/provider/cached_memory_image_provider.dart';
 import 'package:flash/flash.dart';
@@ -29,13 +30,14 @@ import 'package:side_sheet/side_sheet.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
 Widget? buildFloatingActionButton(
-        {required Function() onPressed, required IconData iconData}) =>
-    (Platform.isLinux || Platform.isMacOS || Platform.isWindows)
-        ? FloatingActionButton(
-            onPressed: () async => onPressed(),
-            child: Icon(iconData),
-          )
-        : null;
+    {required Function() onPressed, required IconData iconData}) {
+  return (Platform.isLinux || Platform.isMacOS || Platform.isWindows)
+      ? FloatingActionButton(
+          onPressed: () async => onPressed(),
+          child: Icon(iconData),
+        )
+      : null;
+}
 
 void showModalOnTap(BuildContext context, Widget widget) {
   MediaQuery.of(context).orientation == Orientation.portrait
@@ -57,72 +59,109 @@ void showModalOnTap(BuildContext context, Widget widget) {
         );
 }
 
-Widget buildIconItem(IconData icon, String text) => Builder(builder: (context) {
-      return Column(
-        children: [
-          Icon(icon),
-          const SizedBox(width: 8.0),
-          Text(
-            text,
-            style: Theme.of(context).textTheme.bodyLarge,
-          ),
-        ],
-      );
-    });
+Widget buildIconItem(IconData iconData, String text) {
+  return Builder(builder: (context) {
+    return Column(
+      children: [
+        Icon(iconData),
+        const SizedBox(width: 8.0),
+        Text(
+          text,
+          style: Theme.of(context).textTheme.bodyLarge,
+        ),
+      ],
+    );
+  });
+}
 
-Widget buildShortItem(String title, String body) => Builder(builder: (context) {
-      return Column(
-        children: [
-          Text(
-            title,
-            style: Theme.of(context).textTheme.titleMedium,
-          ),
-          Text(body),
-        ],
-      );
-    });
+Widget buildShortItem(String title, String body) {
+  return Builder(builder: (context) {
+    return Column(
+      children: [
+        Text(
+          title,
+          style: Theme.of(context).textTheme.titleMedium,
+        ),
+        Text(body),
+      ],
+    );
+  });
+}
 
-List<Widget> buildLongItem(String title, String body) => [
-      Builder(builder: (context) {
-        return Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 8.0),
-          child: Text(
-            title,
-            style: Theme.of(context).textTheme.titleMedium,
-          ),
-        );
-      }),
-      Builder(builder: (context) {
-        return Padding(
-          padding: const EdgeInsets.all(4.0),
-          child: buildAutoLinkText(body),
-        );
-      }),
-      const SizedBox(height: 8.0)
-    ];
-
-Widget buildRadiusBadge(String text) => Builder(builder: (context) {
+List<Widget> buildLongItem(String title, String body) {
+  return [
+    Builder(builder: (context) {
       return Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 4.0),
-        child: Container(
-          padding: const EdgeInsets.symmetric(
-            vertical: 2.0,
-            horizontal: 4.0,
-          ),
-          decoration: BoxDecoration(
-            border: Border.all(
-              color: Theme.of(context).colorScheme.primary,
-              width: 2,
-            ),
-            borderRadius: BorderRadius.circular(8.0),
-          ),
-          child: Text(
-            text,
-            style: Theme.of(context).textTheme.bodyLarge,
-          ),
+        padding: const EdgeInsets.symmetric(horizontal: 8.0),
+        child: Text(
+          title,
+          style: Theme.of(context).textTheme.titleMedium,
         ),
       );
-    });
+    }),
+    Builder(builder: (context) {
+      return Padding(
+        padding: const EdgeInsets.all(4.0),
+        child: buildAutoLinkText(body),
+      );
+    }),
+    const SizedBox(height: 8.0)
+  ];
+}
+
+Widget buildRadiusBadge(String text) {
+  return Builder(builder: (context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 4.0),
+      child: Container(
+        padding: const EdgeInsets.symmetric(
+          vertical: 2.0,
+          horizontal: 4.0,
+        ),
+        decoration: BoxDecoration(
+          border: Border.all(
+            color: Theme.of(context).colorScheme.primary,
+            width: 2,
+          ),
+          borderRadius: BorderRadius.circular(8.0),
+        ),
+        child: Text(
+          text,
+          style: Theme.of(context).textTheme.bodyLarge,
+        ),
+      ),
+    );
+  });
+}
+
+LayoutBuilder buildCenterItemLayoutBuilder(IconData iconData, String text) {
+  return LayoutBuilder(
+    builder: (context, constraints) => SingleChildScrollView(
+      physics: const AlwaysScrollableScrollPhysics(),
+      child: ConstrainedBox(
+        constraints: BoxConstraints(minHeight: constraints.maxHeight),
+        child: Center(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Icon(
+                  iconData,
+                  size: 48.0,
+                ),
+              ),
+              Text(
+                text,
+                style: Theme.of(context).textTheme.titleMedium,
+              ),
+            ],
+          ),
+        ),
+      ),
+    ),
+  );
+}
 
 Flash buildErrorFlashBar(
     BuildContext context, FlashController<Object?> controller, Object? e) {
@@ -278,15 +317,15 @@ Widget buildDrawer() {
           context.watch<QuizRepository>().getAll()
         ]),
         builder: (_, AsyncSnapshot<List<dynamic>> snapshot) {
-          var settings = (snapshot.data?[0] as Settings?);
-          var reports = (snapshot.data?[1] as List<Report>?);
+          var settings = snapshot.data?[0] as Settings?;
+          var reports = snapshot.data?[1] as List<Report>?;
           var reportCount = reports
                   ?.where((e) => !(e.isArchived ||
                       !(!e.isSubmitted &&
                           e.endDateTime.isAfter(DateTime.now()))))
                   .length ??
               0;
-          var quizzes = (snapshot.data?[2] as List<Quiz>?);
+          var quizzes = snapshot.data?[2] as List<Quiz>?;
           var quizCount = quizzes
                   ?.where((e) => !(e.isArchived ||
                       !(!e.isSubmitted &&
@@ -381,22 +420,16 @@ Widget buildDrawer() {
                 ListTile(
                   title: Row(
                     children: [
-                      reportCount > 0
-                          ? Badge(
-                              label: Text(reportCount.toString()),
-                              backgroundColor:
-                                  Theme.of(context).colorScheme.primary,
-                              textColor:
-                                  Theme.of(context).colorScheme.onPrimary,
-                              child: Icon(
-                                KIcons.report,
-                                color: Theme.of(context).iconTheme.color,
-                              ),
-                            )
-                          : Icon(
-                              KIcons.report,
-                              color: Theme.of(context).iconTheme.color,
-                            ),
+                      badges.Badge(
+                        showBadge: reportCount > 0,
+                        ignorePointer: true,
+                        badgeContent: Text(reportCount.toString()),
+                        position: badges.BadgePosition.bottomEnd(end: -6.0),
+                        child: Icon(
+                          KIcons.report,
+                          color: Theme.of(context).iconTheme.color,
+                        ),
+                      ),
                       const SizedBox(width: 8.0),
                       Text(
                         'レポート',
@@ -413,22 +446,16 @@ Widget buildDrawer() {
                 ListTile(
                   title: Row(
                     children: [
-                      quizCount > 0
-                          ? Badge(
-                              label: Text(quizCount.toString()),
-                              backgroundColor:
-                                  Theme.of(context).colorScheme.primary,
-                              textColor:
-                                  Theme.of(context).colorScheme.onPrimary,
-                              child: Icon(
-                                KIcons.quiz,
-                                color: Theme.of(context).iconTheme.color,
-                              ),
-                            )
-                          : Icon(
-                              KIcons.quiz,
-                              color: Theme.of(context).iconTheme.color,
-                            ),
+                      badges.Badge(
+                        showBadge: quizCount > 0,
+                        ignorePointer: true,
+                        badgeContent: Text(quizCount.toString()),
+                        position: badges.BadgePosition.bottomEnd(end: -6.0),
+                        child: Icon(
+                          KIcons.quiz,
+                          color: Theme.of(context).iconTheme.color,
+                        ),
+                      ),
                       const SizedBox(width: 8.0),
                       Text(
                         '小テスト',
