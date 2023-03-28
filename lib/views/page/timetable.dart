@@ -127,11 +127,10 @@ class _TimetablePageState extends State<TimetablePage> {
         child: badges.Badge(
           showBadge:
               (_reports.where((e) => e.subject == timetable.subject).length +
-                          _quizzes
-                              .where((e) => e.subject == timetable.subject)
-                              .length) >
-                      0 ||
-                  true,
+                      _quizzes
+                          .where((e) => e.subject == timetable.subject)
+                          .length) >
+                  0,
           ignorePointer: true,
           position: badges.BadgePosition.topEnd(top: 0, end: 0),
           badgeContent: Text(
