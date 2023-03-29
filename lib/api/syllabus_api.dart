@@ -5,7 +5,6 @@ import 'package:gakujo_gui/api/parse.dart';
 import 'package:gakujo_gui/models/syllabus_detail.dart';
 import 'package:gakujo_gui/models/syllabus_parameters.dart';
 import 'package:gakujo_gui/models/syllabus_result.dart';
-import 'package:html/dom.dart';
 import 'package:html/parser.dart';
 import 'package:version/version.dart';
 
@@ -164,46 +163,38 @@ class SyllabusApi {
 
     var document = parse(response.data);
     var syllabus = SyllabusDetail(
-      subject: trimSyllabusValue(document, '授業科目名', offset: 2),
-      teacher: trimSyllabusValue(document, '担当教員名'),
-      affiliation: trimSyllabusValue(document, '所属等'),
-      researchRoom: trimSyllabusValue(document, '研究室'),
-      sharingTeacher: trimSyllabusValue(document, '分担教員名'),
-      className: trimSyllabusValue(document, 'クラス'),
-      semesterName: trimSyllabusValue(document, '学期'),
-      selectionSection: trimSyllabusValue(document, '必修選択区分'),
-      targetGrade: trimSyllabusValue(document, '対象学年'),
-      credit: trimSyllabusValue(document, '単位数'),
-      weekdayPeriod: trimSyllabusValue(document, '曜日・時限'),
-      classRoom: trimSyllabusValue(document, '教室'),
-      keyword: trimSyllabusValue(document, 'キーワード'),
-      classTarget: trimSyllabusValue(document, '授業の目標'),
-      learningDetail: trimSyllabusValue(document, '学習内容'),
-      classPlan: trimSyllabusValue(document, '授業計画'),
-      classRequirement: trimSyllabusValue(document, '受講要件'),
-      textbook: trimSyllabusValue(document, 'テキスト'),
-      referenceBook: trimSyllabusValue(document, '参考書'),
-      preparationReview: trimSyllabusValue(document, '予習・復習について'),
-      evaluationMethod: trimSyllabusValue(document, '成績評価の方法･基準'),
-      officeHour: trimSyllabusValue(document, 'オフィスアワー'),
-      message: trimSyllabusValue(document, '担当教員からのメッセージ'),
-      activeLearning: trimSyllabusValue(document, 'アクティブ・ラーニング'),
-      teacherPracticalExperience: trimSyllabusValue(document, '実務経験のある教員の有無'),
-      teacherCareerClassDetail:
-          trimSyllabusValue(document, '実務経験のある教員の経歴と授業内容'),
-      teachingProfessionSection: trimSyllabusValue(document, '教職科目区分'),
-      relatedClassSubjects: trimSyllabusValue(document, '関連授業科目'),
-      other: trimSyllabusValue(document, 'その他'),
-      homeClassStyle: trimSyllabusValue(document, '在宅授業形態'),
-      homeClassStyleDetail: trimSyllabusValue(document, '在宅授業形態（詳細）'),
+      subject: document.trimSyllabusValue('授業科目名', offset: 2),
+      teacher: document.trimSyllabusValue('担当教員名'),
+      affiliation: document.trimSyllabusValue('所属等'),
+      researchRoom: document.trimSyllabusValue('研究室'),
+      sharingTeacher: document.trimSyllabusValue('分担教員名'),
+      className: document.trimSyllabusValue('クラス'),
+      semesterName: document.trimSyllabusValue('学期'),
+      selectionSection: document.trimSyllabusValue('必修選択区分'),
+      targetGrade: document.trimSyllabusValue('対象学年'),
+      credit: document.trimSyllabusValue('単位数'),
+      weekdayPeriod: document.trimSyllabusValue('曜日・時限'),
+      classRoom: document.trimSyllabusValue('教室'),
+      keyword: document.trimSyllabusValue('キーワード'),
+      classTarget: document.trimSyllabusValue('授業の目標'),
+      learningDetail: document.trimSyllabusValue('学習内容'),
+      classPlan: document.trimSyllabusValue('授業計画'),
+      classRequirement: document.trimSyllabusValue('受講要件'),
+      textbook: document.trimSyllabusValue('テキスト'),
+      referenceBook: document.trimSyllabusValue('参考書'),
+      preparationReview: document.trimSyllabusValue('予習・復習について'),
+      evaluationMethod: document.trimSyllabusValue('成績評価の方法･基準'),
+      officeHour: document.trimSyllabusValue('オフィスアワー'),
+      message: document.trimSyllabusValue('担当教員からのメッセージ'),
+      activeLearning: document.trimSyllabusValue('アクティブ・ラーニング'),
+      teacherPracticalExperience: document.trimSyllabusValue('実務経験のある教員の有無'),
+      teacherCareerClassDetail: document.trimSyllabusValue('実務経験のある教員の経歴と授業内容'),
+      teachingProfessionSection: document.trimSyllabusValue('教職科目区分'),
+      relatedClassSubjects: document.trimSyllabusValue('関連授業科目'),
+      other: document.trimSyllabusValue('その他'),
+      homeClassStyle: document.trimSyllabusValue('在宅授業形態'),
+      homeClassStyleDetail: document.trimSyllabusValue('在宅授業形態（詳細）'),
     );
     return syllabus;
-  }
-
-  String trimSyllabusValue(Document document, String key, {int offset = 1}) {
-    var cells = document.querySelectorAll('td');
-    var index = cells.indexWhere(
-        (e) => e.querySelector('font')?.text.contains(key) ?? false);
-    return cells[index + offset].text.trimWhiteSpace();
   }
 }

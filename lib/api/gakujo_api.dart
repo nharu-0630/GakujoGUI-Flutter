@@ -18,7 +18,6 @@ import 'package:gakujo_gui/models/settings.dart';
 import 'package:gakujo_gui/models/shared_file.dart';
 import 'package:gakujo_gui/models/subject.dart';
 import 'package:gakujo_gui/models/timetable.dart';
-import 'package:html/dom.dart';
 import 'package:html/parser.dart' show parse;
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
@@ -1746,14 +1745,14 @@ class GakujoApi {
     );
     var document = parse(response.data);
 
-    timetable.subject = trimTimetableValue(document, '科目名');
-    timetable.id = trimTimetableValue(document, '科目番号');
-    timetable.className = trimTimetableValue(document, 'クラス名');
-    timetable.teacher = trimTimetableValue(document, '担当教員');
-    timetable.subjectSection = trimTimetableValue(document, '科目区分');
-    timetable.selectionSection = trimTimetableValue(document, '必修選択区分');
+    timetable.subject = document.trimTimetableValue('科目名');
+    timetable.id = document.trimTimetableValue('科目番号');
+    timetable.className = document.trimTimetableValue('クラス名');
+    timetable.teacher = document.trimTimetableValue('担当教員');
+    timetable.subjectSection = document.trimTimetableValue('科目区分');
+    timetable.selectionSection = document.trimTimetableValue('必修選択区分');
     timetable.credit =
-        int.parse(trimTimetableValue(document, '単位数').replaceAll('単位', ''));
+        int.parse(document.trimTimetableValue('単位数').replaceAll('単位', ''));
 
     await Future.delayed(_interval);
     response = await _client.getUri<dynamic>(
@@ -1791,58 +1790,45 @@ class GakujoApi {
       document = parse(response.data);
     }
 
-    timetable.syllabusSubject = trimSyllabusValue(document, '授業科目名');
-    timetable.syllabusTeacher = trimSyllabusValue(document, '担当教員名');
-    timetable.syllabusAffiliation = trimSyllabusValue(document, '所属等');
-    timetable.syllabusResearchRoom = trimSyllabusValue(document, '研究室');
-    timetable.syllabusSharingTeacher = trimSyllabusValue(document, '分担教員名');
-    timetable.syllabusClassName = trimSyllabusValue(document, 'クラス');
-    timetable.syllabusSemesterName = trimSyllabusValue(document, '学期');
-    timetable.syllabusSelectionSection = trimSyllabusValue(document, '必修選択区分');
-    timetable.syllabusTargetGrade = trimSyllabusValue(document, '対象学年');
-    timetable.syllabusCredit = trimSyllabusValue(document, '単位数');
-    timetable.syllabusWeekdayPeriod = trimSyllabusValue(document, '曜日・時限');
-    timetable.syllabusClassRoom = trimSyllabusValue(document, '教室');
-    timetable.syllabusKeyword = trimSyllabusValue(document, 'キーワード');
-    timetable.syllabusClassTarget = trimSyllabusValue(document, '授業の目標');
-    timetable.syllabusLearningDetail = trimSyllabusValue(document, '学習内容');
-    timetable.syllabusClassPlan = trimSyllabusValue(document, '授業計画');
-    timetable.syllabusClassRequirement = trimSyllabusValue(document, '受講要件');
-    timetable.syllabusTextbook = trimSyllabusValue(document, 'テキスト');
-    timetable.syllabusReferenceBook = trimSyllabusValue(document, '参考書');
+    timetable.syllabusSubject = document.trimSyllabusValue('授業科目名');
+    timetable.syllabusTeacher = document.trimSyllabusValue('担当教員名');
+    timetable.syllabusAffiliation = document.trimSyllabusValue('所属等');
+    timetable.syllabusResearchRoom = document.trimSyllabusValue('研究室');
+    timetable.syllabusSharingTeacher = document.trimSyllabusValue('分担教員名');
+    timetable.syllabusClassName = document.trimSyllabusValue('クラス');
+    timetable.syllabusSemesterName = document.trimSyllabusValue('学期');
+    timetable.syllabusSelectionSection = document.trimSyllabusValue('必修選択区分');
+    timetable.syllabusTargetGrade = document.trimSyllabusValue('対象学年');
+    timetable.syllabusCredit = document.trimSyllabusValue('単位数');
+    timetable.syllabusWeekdayPeriod = document.trimSyllabusValue('曜日・時限');
+    timetable.syllabusClassRoom = document.trimSyllabusValue('教室');
+    timetable.syllabusKeyword = document.trimSyllabusValue('キーワード');
+    timetable.syllabusClassTarget = document.trimSyllabusValue('授業の目標');
+    timetable.syllabusLearningDetail = document.trimSyllabusValue('学習内容');
+    timetable.syllabusClassPlan = document.trimSyllabusValue('授業計画');
+    timetable.syllabusClassRequirement = document.trimSyllabusValue('受講要件');
+    timetable.syllabusTextbook = document.trimSyllabusValue('テキスト');
+    timetable.syllabusReferenceBook = document.trimSyllabusValue('参考書');
     timetable.syllabusPreparationReview =
-        trimSyllabusValue(document, '予習・復習について');
+        document.trimSyllabusValue('予習・復習について');
     timetable.syllabusEvaluationMethod =
-        trimSyllabusValue(document, '成績評価の方法･基準');
-    timetable.syllabusOfficeHour = trimSyllabusValue(document, 'オフィスアワー');
-    timetable.syllabusMessage = trimSyllabusValue(document, '担当教員からのメッセージ');
+        document.trimSyllabusValue('成績評価の方法･基準');
+    timetable.syllabusOfficeHour = document.trimSyllabusValue('オフィスアワー');
+    timetable.syllabusMessage = document.trimSyllabusValue('担当教員からのメッセージ');
     timetable.syllabusActiveLearning =
-        trimSyllabusValue(document, 'アクティブ・ラーニング');
+        document.trimSyllabusValue('アクティブ・ラーニング');
     timetable.syllabusTeacherPracticalExperience =
-        trimSyllabusValue(document, '実務経験のある教員の有無');
+        document.trimSyllabusValue('実務経験のある教員の有無');
     timetable.syllabusTeacherCareerClassDetail =
-        trimSyllabusValue(document, '実務経験のある教員の経歴と授業内容');
+        document.trimSyllabusValue('実務経験のある教員の経歴と授業内容');
     timetable.syllabusTeachingProfessionSection =
-        trimSyllabusValue(document, '教職科目区分');
+        document.trimSyllabusValue('教職科目区分');
     timetable.syllabusRelatedClassSubjects =
-        trimSyllabusValue(document, '関連授業科目');
-    timetable.syllabusOther = trimSyllabusValue(document, 'その他');
-    timetable.syllabusHomeClassStyle = trimSyllabusValue(document, '在宅授業形態');
+        document.trimSyllabusValue('関連授業科目');
+    timetable.syllabusOther = document.trimSyllabusValue('その他');
+    timetable.syllabusHomeClassStyle = document.trimSyllabusValue('在宅授業形態');
     timetable.syllabusHomeClassStyleDetail =
-        trimSyllabusValue(document, '在宅授業形態（詳細）');
+        document.trimSyllabusValue('在宅授業形態（詳細）');
     return timetable;
-  }
-
-  String trimTimetableValue(Document document, String key) {
-    var cells = document.querySelector('table.txt12')!.querySelectorAll('td');
-    var index = cells.indexWhere((e) => e.text.contains(key));
-    return cells[index + 1].text.trimWhiteSpace();
-  }
-
-  String trimSyllabusValue(Document document, String key) {
-    var cells = document.querySelectorAll('td');
-    var index = cells.indexWhere(
-        (e) => e.querySelector('font')?.text.contains(key) ?? false);
-    return cells[index + 1].text.trimWhiteSpace();
   }
 }

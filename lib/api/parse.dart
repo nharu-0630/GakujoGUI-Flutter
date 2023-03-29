@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:ui';
 
 import 'package:crypto/crypto.dart';
+import 'package:html/dom.dart';
 import 'package:html_unescape/html_unescape.dart';
 import 'package:intl/intl.dart';
 
@@ -9,6 +10,21 @@ extension DateTimeParsing on DateTime {
   String toDetailString() => DateFormat('yyyy/MM/dd HH:mm', 'ja').format(this);
 
   String toDateString() => DateFormat('yyyy/MM/dd', 'ja').format(this);
+}
+
+extension DocumentParsing on Document {
+  String trimSyllabusValue(String key, {int offset = 1}) {
+    var cells = querySelectorAll('td');
+    var index = cells.indexWhere(
+        (e) => e.querySelector('font')?.text.contains(key) ?? false);
+    return cells[index + offset].text.trimWhiteSpace();
+  }
+
+  String trimTimetableValue(String key) {
+    var cells = querySelector('table.txt12')!.querySelectorAll('td');
+    var index = cells.indexWhere((e) => e.text.contains(key));
+    return cells[index + 1].text.trimWhiteSpace();
+  }
 }
 
 extension StringParsing on String {
