@@ -17,21 +17,13 @@ class TaskWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return FutureBuilder(
       future: Future.wait([
-        context.watch<ReportRepository>().getAll(),
-        context.watch<QuizRepository>().getAll()
+        context.watch<ReportRepository>().getSubmittable(),
+        context.watch<QuizRepository>().getSubmittable()
       ]),
       builder: (_, AsyncSnapshot<List<dynamic>> snapshot) {
         if (snapshot.hasData) {
           var reports = snapshot.data![0] as List<Report>;
           var quizzes = snapshot.data![1] as List<Quiz>;
-          // reports = reports
-          //     .where((e) => !(e.isArchived ||
-          //         !(!e.isSubmitted && e.endDateTime.isAfter(DateTime.now()))))
-          //     .toList();
-          // quizzes = quizzes
-          //     .where((e) => !(e.isArchived ||
-          //         !(!e.isSubmitted && e.endDateTime.isAfter(DateTime.now()))))
-          //     .toList();
           List<dynamic> tasks = [...reports, ...quizzes];
           tasks.sort((a, b) => b.endDateTime.compareTo(a.endDateTime));
           return Padding(

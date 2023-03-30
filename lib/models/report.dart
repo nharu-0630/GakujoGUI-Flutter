@@ -228,6 +228,16 @@ class ReportRepository extends ChangeNotifier {
     return box.values.toList().cast<Report>();
   }
 
+  Future<List<Report>> getSubmittable() async {
+    var box = await _box.box;
+    return box.values
+        .toList()
+        .cast<Report>()
+        .where((e) => !(e.isArchived ||
+            !(!e.isSubmitted && e.endDateTime.isAfter(DateTime.now()))))
+        .toList();
+  }
+
   Future<void> setArchive(String id, bool value) async {
     var box = await _box.box;
     box.get(id).isArchived = value;

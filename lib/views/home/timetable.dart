@@ -30,22 +30,14 @@ class _TimetablePageState extends State<TimetablePage> {
           FutureBuilder(
             future: Future.wait([
               context.watch<TimetableRepository>().getAll(),
-              context.watch<ReportRepository>().getAll(),
-              context.watch<QuizRepository>().getAll()
+              context.watch<ReportRepository>().getSubmittable(),
+              context.watch<QuizRepository>().getSubmittable()
             ]),
             builder: (_, AsyncSnapshot<List<dynamic>> snapshot) {
               if (snapshot.hasData) {
                 var timetables = snapshot.data![0] as List<Timetable>;
-                _reports = (snapshot.data![1] as List<Report>)
-                    .where((e) => !(e.isArchived ||
-                        !(!e.isSubmitted &&
-                            e.endDateTime.isAfter(DateTime.now()))))
-                    .toList();
-                _quizzes = (snapshot.data![2] as List<Quiz>)
-                    .where((e) => !(e.isArchived ||
-                        !(!e.isSubmitted &&
-                            e.endDateTime.isAfter(DateTime.now()))))
-                    .toList();
+                _reports = snapshot.data![1] as List<Report>;
+                _quizzes = snapshot.data![2] as List<Quiz>;
                 return Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 4.0),
                   child: Table(

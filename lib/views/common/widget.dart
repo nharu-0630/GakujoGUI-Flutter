@@ -325,25 +325,13 @@ Widget buildDrawer() {
     return FutureBuilder(
         future: Future.wait([
           context.watch<SettingsRepository>().load(),
-          context.watch<ReportRepository>().getAll(),
-          context.watch<QuizRepository>().getAll()
+          context.watch<ReportRepository>().getSubmittable(),
+          context.watch<QuizRepository>().getSubmittable()
         ]),
         builder: (_, AsyncSnapshot<List<dynamic>> snapshot) {
           var settings = snapshot.data?[0] as Settings?;
-          var reports = snapshot.data?[1] as List<Report>?;
-          var reportCount = reports
-                  ?.where((e) => !(e.isArchived ||
-                      !(!e.isSubmitted &&
-                          e.endDateTime.isAfter(DateTime.now()))))
-                  .length ??
-              0;
-          var quizzes = snapshot.data?[2] as List<Quiz>?;
-          var quizCount = quizzes
-                  ?.where((e) => !(e.isArchived ||
-                      !(!e.isSubmitted &&
-                          e.endDateTime.isAfter(DateTime.now()))))
-                  .length ??
-              0;
+          var reportCount = (snapshot.data?[1] ?? []).length;
+          var quizCount = (snapshot.data?[2] ?? []).length;
           return Drawer(
             shape: const RoundedRectangleBorder(
               borderRadius: BorderRadius.all(Radius.zero),
