@@ -18,16 +18,16 @@ class SyllabusSearchPage extends StatefulWidget {
 class _SyllabusSearchPageState extends State<SyllabusSearchPage> {
   SyllabusParameters? parameters;
 
-  var academicYear = -1;
-  var syllabusTitleID = '';
-  var indexID = '';
-  var targetGrade = '';
-  var semester = '';
-  var week = '';
-  var hour = '';
-  var kamokuName = '';
-  var editorName = '';
-  var freeWord = '';
+  int academicYear = -1;
+  String syllabusTitleID = '';
+  String indexID = '';
+  String targetGrade = '';
+  String semester = '';
+  String week = '';
+  String hour = '';
+  String kamokuName = '';
+  String editorName = '';
+  String freeWord = '';
 
   @override
   void initState() {

@@ -29,8 +29,6 @@ class ApiRepository extends ChangeNotifier {
   double get progress => _progress;
   double _progress = -1;
 
-  ApiRepository();
-
   void initialize() {
     _gakujoApi.initialize();
   }

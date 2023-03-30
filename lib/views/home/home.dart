@@ -53,7 +53,6 @@ class _HomeWidgetState extends State<HomeWidget> {
           header: _buildHeader(KIcons.task, 'タスク'),
           content: const TaskWidget(),
         ),
-        const SizedBox(height: 24.0),
         StickyHeader(
           header: _buildHeader(KIcons.contact, 'メッセージ'),
           content: const ContactWidget(),

@@ -52,6 +52,7 @@ class TaskWidget extends StatelessWidget {
                           'タスクはありません',
                           style: Theme.of(context).textTheme.titleMedium,
                         ),
+                        const SizedBox(height: 16.0),
                       ],
                     ),
                   )
@@ -78,69 +79,74 @@ class TaskWidget extends StatelessWidget {
 
   Widget _buildQuizCard(Quiz quiz) {
     return Builder(builder: (context) {
-      return ListTile(
-        onTap: () async {
-          if (quiz.isAcquired) {
-            showModalOnTap(context, buildQuizModal(quiz));
-          } else {
-            await showOkCancelAlertDialog(
-                      context: context,
-                      title: '未取得の小テストです。',
-                      message: '取得しますか？',
-                      okLabel: '取得',
-                      cancelLabel: 'キャンセル',
-                    ) ==
-                    OkCancelResult.ok
-                ? context.read<ApiRepository>().fetchDetailQuiz(quiz)
-                : null;
-          }
-        },
-        leading: Icon(KIcons.quiz),
-        title: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Expanded(
-              child: Text(
-                quiz.subject,
-                style: Theme.of(context).textTheme.bodyMedium,
-                overflow: TextOverflow.ellipsis,
+      return Card(
+        child: ListTile(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12.0),
+          ),
+          onTap: () async {
+            if (quiz.isAcquired) {
+              showModalOnTap(context, buildQuizModal(quiz));
+            } else {
+              await showOkCancelAlertDialog(
+                        context: context,
+                        title: '未取得の小テストです。',
+                        message: '取得しますか？',
+                        okLabel: '取得',
+                        cancelLabel: 'キャンセル',
+                      ) ==
+                      OkCancelResult.ok
+                  ? context.read<ApiRepository>().fetchDetailQuiz(quiz)
+                  : null;
+            }
+          },
+          leading: Icon(KIcons.quiz),
+          title: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Expanded(
+                child: Text(
+                  quiz.subject,
+                  style: Theme.of(context).textTheme.bodyMedium,
+                  overflow: TextOverflow.ellipsis,
+                ),
               ),
-            ),
-            Text(
-              quiz.endDateTime.toLocal().toDetailString(),
-              style: Theme.of(context).textTheme.bodyMedium,
-            ),
-          ],
-        ),
-        subtitle: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Expanded(
-              child: Text(
-                quiz.title,
-                style: Theme.of(context)
-                    .textTheme
-                    .titleMedium
-                    ?.copyWith(fontWeight: FontWeight.bold),
-                overflow: TextOverflow.ellipsis,
-              ),
-            ),
-            Visibility(
-              visible: quiz.fileNames?.isNotEmpty ?? false,
-              child: Text(
-                '${quiz.fileNames?.length ?? ''}',
+              Text(
+                quiz.endDateTime.toLocal().toDetailString(),
                 style: Theme.of(context).textTheme.bodyMedium,
               ),
-            ),
-            Visibility(
-              visible: quiz.fileNames?.isNotEmpty ?? false,
-              child: Icon(KIcons.attachment),
-            ),
-            Visibility(
-              visible: quiz.isArchived,
-              child: Icon(KIcons.archive),
-            )
-          ],
+            ],
+          ),
+          subtitle: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Expanded(
+                child: Text(
+                  quiz.title,
+                  style: Theme.of(context)
+                      .textTheme
+                      .titleMedium
+                      ?.copyWith(fontWeight: FontWeight.bold),
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+              Visibility(
+                visible: quiz.fileNames?.isNotEmpty ?? false,
+                child: Text(
+                  '${quiz.fileNames?.length ?? ''}',
+                  style: Theme.of(context).textTheme.bodyMedium,
+                ),
+              ),
+              Visibility(
+                visible: quiz.fileNames?.isNotEmpty ?? false,
+                child: Icon(KIcons.attachment),
+              ),
+              Visibility(
+                visible: quiz.isArchived,
+                child: Icon(KIcons.archive),
+              )
+            ],
+          ),
         ),
       );
     });
@@ -148,69 +154,74 @@ class TaskWidget extends StatelessWidget {
 
   Widget _buildReportCard(Report report) {
     return Builder(builder: (context) {
-      return ListTile(
-        onTap: () async {
-          if (report.isAcquired) {
-            showModalOnTap(context, buildReportModal(report));
-          } else {
-            await showOkCancelAlertDialog(
-                      context: context,
-                      title: '未取得のレポートです。',
-                      message: '取得しますか？',
-                      okLabel: '取得',
-                      cancelLabel: 'キャンセル',
-                    ) ==
-                    OkCancelResult.ok
-                ? context.read<ApiRepository>().fetchDetailReport(report)
-                : null;
-          }
-        },
-        leading: Icon(KIcons.report),
-        title: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Expanded(
-              child: Text(
-                report.subject,
-                style: Theme.of(context).textTheme.bodyMedium,
-                overflow: TextOverflow.ellipsis,
+      return Card(
+        child: ListTile(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12.0),
+          ),
+          onTap: () async {
+            if (report.isAcquired) {
+              showModalOnTap(context, buildReportModal(report));
+            } else {
+              await showOkCancelAlertDialog(
+                        context: context,
+                        title: '未取得のレポートです。',
+                        message: '取得しますか？',
+                        okLabel: '取得',
+                        cancelLabel: 'キャンセル',
+                      ) ==
+                      OkCancelResult.ok
+                  ? context.read<ApiRepository>().fetchDetailReport(report)
+                  : null;
+            }
+          },
+          leading: Icon(KIcons.report),
+          title: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Expanded(
+                child: Text(
+                  report.subject,
+                  style: Theme.of(context).textTheme.bodyMedium,
+                  overflow: TextOverflow.ellipsis,
+                ),
               ),
-            ),
-            Text(
-              report.endDateTime.toLocal().toDetailString(),
-              style: Theme.of(context).textTheme.bodyMedium,
-            ),
-          ],
-        ),
-        subtitle: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Expanded(
-              child: Text(
-                report.title,
-                style: Theme.of(context)
-                    .textTheme
-                    .titleMedium
-                    ?.copyWith(fontWeight: FontWeight.bold),
-                overflow: TextOverflow.ellipsis,
-              ),
-            ),
-            Visibility(
-              visible: report.fileNames?.isNotEmpty ?? false,
-              child: Text(
-                '${report.fileNames?.length ?? ''}',
+              Text(
+                report.endDateTime.toLocal().toDetailString(),
                 style: Theme.of(context).textTheme.bodyMedium,
               ),
-            ),
-            Visibility(
-              visible: report.fileNames?.isNotEmpty ?? false,
-              child: Icon(KIcons.attachment),
-            ),
-            Visibility(
-              visible: report.isArchived,
-              child: Icon(KIcons.archive),
-            )
-          ],
+            ],
+          ),
+          subtitle: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Expanded(
+                child: Text(
+                  report.title,
+                  style: Theme.of(context)
+                      .textTheme
+                      .titleMedium
+                      ?.copyWith(fontWeight: FontWeight.bold),
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+              Visibility(
+                visible: report.fileNames?.isNotEmpty ?? false,
+                child: Text(
+                  '${report.fileNames?.length ?? ''}',
+                  style: Theme.of(context).textTheme.bodyMedium,
+                ),
+              ),
+              Visibility(
+                visible: report.fileNames?.isNotEmpty ?? false,
+                child: Icon(KIcons.attachment),
+              ),
+              Visibility(
+                visible: report.isArchived,
+                child: Icon(KIcons.archive),
+              )
+            ],
+          ),
         ),
       );
     });

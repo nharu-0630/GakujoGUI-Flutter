@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
+import 'package:gakujo_gui/api/provide.dart';
 import 'package:gakujo_gui/constants/kicons.dart';
 import 'package:gakujo_gui/views/common/widget.dart';
 import 'package:gakujo_gui/views/home/home.dart';
-import 'package:gakujo_gui/views/page/timetable.dart';
+import 'package:gakujo_gui/views/home/timetable.dart';
 import 'package:line_icons/line_icons.dart';
 import 'package:provider/provider.dart';
-
-import 'api/provide.dart';
 
 class App extends StatefulWidget {
   const App({Key? key}) : super(key: key);
@@ -21,7 +20,7 @@ class App extends StatefulWidget {
 }
 
 class _AppState extends State<App> {
-  var _index = 0;
+  int _index = 0;
 
   @override
   void initState() {
