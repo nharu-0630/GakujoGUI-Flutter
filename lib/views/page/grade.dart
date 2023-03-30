@@ -222,22 +222,26 @@ class _GradePageState extends State<GradePage> {
                           getTitlesWidget: (value, meta) => Padding(
                             padding: const EdgeInsets.only(top: 8.0),
                             child: Text(
-                                gpas.keys
-                                    .elementAt(value.toInt())
-                                    .replaceAll('GPA値', '')
-                                    .replaceAll('　', '\n'),
-                                textAlign: TextAlign.center,
-                                maxLines: 2,
-                                overflow: TextOverflow.visible),
+                              gpas.keys
+                                  .elementAt(value.toInt())
+                                  .replaceAll('GPA値', '')
+                                  .replaceAll('　', '\n'),
+                              textAlign: TextAlign.center,
+                              maxLines: 2,
+                              overflow: TextOverflow.visible,
+                              style: Theme.of(context).textTheme.bodySmall,
+                            ),
                           ),
                         ),
                       ),
                       leftTitles: AxisTitles(
                         sideTitles: SideTitles(
+                          reservedSize: 32.0,
                           showTitles: true,
                           interval: 1,
                           getTitlesWidget: (value, meta) => Text(
                             value.toString(),
+                            style: Theme.of(context).textTheme.bodySmall,
                           ),
                         ),
                       ),
@@ -340,7 +344,7 @@ class _GradePageState extends State<GradePage> {
                 padding: const EdgeInsets.only(left: 8.0),
                 child: Text(
                   grade.score.toString(),
-                  style: Theme.of(context).textTheme.titleMedium,
+                  style: Theme.of(context).textTheme.titleSmall,
                 ),
               ),
             ),
@@ -350,7 +354,7 @@ class _GradePageState extends State<GradePage> {
                 padding: const EdgeInsets.only(left: 8.0),
                 child: Text(
                   grade.gp.toString(),
-                  style: Theme.of(context).textTheme.titleMedium,
+                  style: Theme.of(context).textTheme.titleSmall,
                 ),
               ),
             ),
@@ -360,19 +364,19 @@ class _GradePageState extends State<GradePage> {
           children: [
             Text(
               grade.teacher.toString(),
-              style: Theme.of(context).textTheme.bodyMedium,
+              style: Theme.of(context).textTheme.bodySmall,
             ),
             Padding(
               padding: const EdgeInsets.only(left: 8.0),
               child: Text(
                 grade.selectionSection.toString(),
-                style: Theme.of(context).textTheme.bodyMedium,
+                style: Theme.of(context).textTheme.bodySmall,
               ),
             ),
             const Expanded(child: SizedBox()),
             Text(
               grade.reportDateTime.toLocal().toDateString(),
-              style: Theme.of(context).textTheme.bodyMedium,
+              style: Theme.of(context).textTheme.bodySmall,
             ),
           ],
         ),

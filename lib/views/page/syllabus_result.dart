@@ -111,14 +111,14 @@ class _SyllabusResultPageState extends State<SyllabusResultPage> {
           children: [
             Expanded(
               child: Text(
-                syllabus.teacherName,
-                style: Theme.of(context).textTheme.bodyMedium,
+                syllabus.subjectName,
+                style: Theme.of(context).textTheme.titleMedium,
                 overflow: TextOverflow.ellipsis,
               ),
             ),
             Text(
               syllabus.titleName,
-              style: Theme.of(context).textTheme.bodyMedium,
+              style: Theme.of(context).textTheme.bodySmall,
             ),
           ],
         ),
@@ -127,17 +127,22 @@ class _SyllabusResultPageState extends State<SyllabusResultPage> {
           children: [
             Expanded(
               child: Text(
-                syllabus.subjectName,
-                style: Theme.of(context)
-                    .textTheme
-                    .titleMedium
-                    ?.copyWith(fontWeight: FontWeight.bold),
+                syllabus.teacherName,
+                style: Theme.of(context).textTheme.bodySmall,
                 overflow: TextOverflow.ellipsis,
               ),
             ),
+            Expanded(
+              child: Text(
+                syllabus.className,
+                style: Theme.of(context).textTheme.bodySmall,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+            const Spacer(),
             Text(
               syllabus.indexName,
-              style: Theme.of(context).textTheme.bodyMedium,
+              style: Theme.of(context).textTheme.bodySmall,
             ),
           ],
         ),

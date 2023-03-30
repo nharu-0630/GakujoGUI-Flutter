@@ -80,12 +80,7 @@ class _SettingsPageState extends State<SettingsPage> {
                             const SizedBox(width: 8.0),
                             Text(
                               'アカウント',
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .headlineSmall
-                                  ?.copyWith(
-                                    fontWeight: FontWeight.bold,
-                                  ),
+                              style: Theme.of(context).textTheme.titleLarge,
                             ),
                           ],
                         ),
@@ -102,13 +97,16 @@ class _SettingsPageState extends State<SettingsPage> {
                                   child: Text(
                                     '静大ID',
                                     style:
-                                        Theme.of(context).textTheme.titleMedium,
+                                        Theme.of(context).textTheme.titleSmall,
                                   ),
                                 ),
                                 Expanded(
                                   flex: 3,
                                   child: TextField(
-                                      controller: _usernameController),
+                                    controller: _usernameController,
+                                    style:
+                                        Theme.of(context).textTheme.titleSmall,
+                                  ),
                                 ),
                               ],
                             ),
@@ -120,7 +118,7 @@ class _SettingsPageState extends State<SettingsPage> {
                                   child: Text(
                                     'パスワード',
                                     style:
-                                        Theme.of(context).textTheme.titleMedium,
+                                        Theme.of(context).textTheme.titleSmall,
                                   ),
                                 ),
                                 Expanded(
@@ -137,6 +135,8 @@ class _SettingsPageState extends State<SettingsPage> {
                                             () => _isObscure = !_isObscure),
                                       ),
                                     ),
+                                    style:
+                                        Theme.of(context).textTheme.titleSmall,
                                   ),
                                 ),
                               ],
@@ -205,7 +205,7 @@ class _SettingsPageState extends State<SettingsPage> {
                                       '取得年度',
                                       style: Theme.of(context)
                                           .textTheme
-                                          .titleMedium,
+                                          .titleSmall,
                                     ),
                                   ),
                                   Expanded(
@@ -262,7 +262,7 @@ class _SettingsPageState extends State<SettingsPage> {
                                       '取得学期',
                                       style: Theme.of(context)
                                           .textTheme
-                                          .titleMedium,
+                                          .titleSmall,
                                     ),
                                   ),
                                   Expanded(
@@ -465,12 +465,7 @@ class _SettingsPageState extends State<SettingsPage> {
                             const SizedBox(width: 8.0),
                             Text(
                               '開発者向け',
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .headlineSmall
-                                  ?.copyWith(
-                                    fontWeight: FontWeight.bold,
-                                  ),
+                              style: Theme.of(context).textTheme.titleLarge,
                             ),
                           ],
                         ),
@@ -479,14 +474,10 @@ class _SettingsPageState extends State<SettingsPage> {
                         padding: const EdgeInsets.symmetric(horizontal: 16.0),
                         child: Column(
                           children: [
-                            Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Align(
-                                alignment: Alignment.topLeft,
-                                child: buildAutoLinkText(
-                                    'Client Version: ${packageInfo.version}\nGakujoAPI Version: ${GakujoApi.version}\nSyllabusAPI Version: ${SyllabusApi.version}\nToken: ${context.read<ApiRepository>().token}\nAccessEnvironment Key: ${settings.accessEnvironmentKey}\nAccessEnvironment Value: ${settings.accessEnvironmentValue}'),
-                              ),
-                            ),
+                            ...buildLongItem('バージョン情報',
+                                'Client Version: ${packageInfo.version}\nGakujoAPI Version: ${GakujoApi.version}\nSyllabusAPI Version: ${SyllabusApi.version}'),
+                            ...buildLongItem('トークン情報',
+                                'Token: ${context.read<ApiRepository>().token}\nAccessEnvironment Key: ${settings.accessEnvironmentKey}\nAccessEnvironment Value: ${settings.accessEnvironmentValue}'),
                             Padding(
                               padding: const EdgeInsets.all(8.0),
                               child: ElevatedButton(

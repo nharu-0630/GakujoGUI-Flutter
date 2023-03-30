@@ -6,7 +6,6 @@ import 'package:gakujo_gui/api/provide.dart';
 import 'package:gakujo_gui/constants/kicons.dart';
 import 'package:gakujo_gui/models/report.dart';
 import 'package:gakujo_gui/views/common/widget.dart';
-import 'package:line_icons/line_icons.dart';
 import 'package:provider/provider.dart';
 import 'package:share_plus/share_plus.dart';
 
@@ -198,27 +197,8 @@ class _ReportPageState extends State<ReportPage> {
             children: [
               Expanded(
                 child: Text(
-                  report.subject,
-                  style: Theme.of(context).textTheme.bodyMedium,
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ),
-              Text(
-                report.endDateTime.toLocal().toDetailString(),
-                style: Theme.of(context).textTheme.bodyMedium,
-              ),
-            ],
-          ),
-          subtitle: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Expanded(
-                child: Text(
                   report.title,
-                  style: Theme.of(context)
-                      .textTheme
-                      .titleMedium
-                      ?.copyWith(fontWeight: FontWeight.bold),
+                  style: Theme.of(context).textTheme.titleMedium,
                   overflow: TextOverflow.ellipsis,
                 ),
               ),
@@ -237,6 +217,22 @@ class _ReportPageState extends State<ReportPage> {
                 visible: report.isArchived,
                 child: Icon(KIcons.archive),
               )
+            ],
+          ),
+          subtitle: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Expanded(
+                child: Text(
+                  report.subject,
+                  style: Theme.of(context).textTheme.bodySmall,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+              Text(
+                report.endDateTime.toLocal().toDetailString(),
+                style: Theme.of(context).textTheme.bodySmall,
+              ),
             ],
           ),
         ),
@@ -267,12 +263,15 @@ Widget buildReportModal(Report report) {
             children: [
               Text(
                 report.startDateTime.toLocal().toDetailString(),
-                style: Theme.of(context).textTheme.bodyLarge,
+                style: Theme.of(context).textTheme.bodySmall,
               ),
-              const Icon(LineIcons.arrowRight),
+              Text(
+                '-',
+                style: Theme.of(context).textTheme.bodySmall,
+              ),
               Text(
                 report.endDateTime.toLocal().toDetailString(),
-                style: Theme.of(context).textTheme.bodyLarge,
+                style: Theme.of(context).textTheme.bodySmall,
               ),
             ],
           ),

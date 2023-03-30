@@ -175,18 +175,7 @@ class _SharedFilePageState extends State<SharedFilePage> {
                   : null;
             }
           },
-          title: Row(
-            children: [
-              Expanded(
-                child: Text(
-                  sharedFile.subject,
-                  style: Theme.of(context).textTheme.bodyMedium,
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ),
-            ],
-          ),
-          subtitle: Column(
+          title: Column(
             children: [
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -194,10 +183,7 @@ class _SharedFilePageState extends State<SharedFilePage> {
                   Expanded(
                     child: Text(
                       sharedFile.title,
-                      style: Theme.of(context)
-                          .textTheme
-                          .titleMedium
-                          ?.copyWith(fontWeight: FontWeight.bold),
+                      style: Theme.of(context).textTheme.titleMedium,
                       overflow: TextOverflow.ellipsis,
                     ),
                   ),
@@ -217,6 +203,17 @@ class _SharedFilePageState extends State<SharedFilePage> {
                     child: Icon(KIcons.archive),
                   )
                 ],
+              ),
+            ],
+          ),
+          subtitle: Row(
+            children: [
+              Expanded(
+                child: Text(
+                  sharedFile.subject,
+                  style: Theme.of(context).textTheme.bodySmall,
+                  overflow: TextOverflow.ellipsis,
+                ),
               ),
             ],
           ),
@@ -247,7 +244,8 @@ Widget buildSharedFileModal(SharedFile sharedFile) {
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
               Visibility(
-                visible: sharedFile.publicPeriod.isNotEmpty,
+                visible: sharedFile.publicPeriod.isNotEmpty &&
+                    sharedFile.publicPeriod != '～',
                 child: buildRadiusBadge(sharedFile.publicPeriod),
               ),
               buildRadiusBadge(sharedFile.fileSize),

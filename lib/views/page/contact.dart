@@ -186,16 +186,13 @@ class _ContactPageState extends State<ContactPage> {
               Expanded(
                 child: Text(
                   contact.title,
-                  style: Theme.of(context)
-                      .textTheme
-                      .titleMedium
-                      ?.copyWith(fontWeight: FontWeight.bold),
+                  style: Theme.of(context).textTheme.titleMedium,
                   overflow: TextOverflow.ellipsis,
                 ),
               ),
               Text(
                 contact.contactDateTime.toLocal().toDetailString(),
-                style: Theme.of(context).textTheme.bodyMedium,
+                style: Theme.of(context).textTheme.bodySmall,
               ),
             ],
           ),
@@ -209,6 +206,7 @@ class _ContactPageState extends State<ContactPage> {
                       : '未取得',
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
+                  style: Theme.of(context).textTheme.bodySmall,
                 ),
               ),
               Visibility(
@@ -250,7 +248,7 @@ class _ContactPageState extends State<ContactPage> {
               alignment: Alignment.centerRight,
               child: Text(
                 contact.contactDateTime.toLocal().toDetailString(),
-                style: Theme.of(context).textTheme.bodyLarge,
+                style: Theme.of(context).textTheme.bodyMedium,
               ),
             ),
           ),

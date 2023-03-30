@@ -67,7 +67,7 @@ Widget buildIconItem(IconData iconData, String text) {
         const SizedBox(width: 8.0),
         Text(
           text,
-          style: Theme.of(context).textTheme.bodyLarge,
+          style: Theme.of(context).textTheme.bodyMedium,
         ),
       ],
     );
@@ -80,9 +80,12 @@ Widget buildShortItem(String title, String body) {
       children: [
         Text(
           title,
-          style: Theme.of(context).textTheme.titleMedium,
+          style: Theme.of(context).textTheme.bodySmall,
         ),
-        Text(body),
+        Text(
+          body,
+          style: Theme.of(context).textTheme.bodyMedium,
+        ),
       ],
     );
   });
@@ -91,18 +94,24 @@ Widget buildShortItem(String title, String body) {
 List<Widget> buildLongItem(String title, String body) {
   return [
     Builder(builder: (context) {
-      return Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 8.0),
-        child: Text(
-          title,
-          style: Theme.of(context).textTheme.titleMedium,
+      return Align(
+        alignment: Alignment.centerLeft,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 8.0),
+          child: Text(
+            title,
+            style: Theme.of(context).textTheme.titleMedium,
+          ),
         ),
       );
     }),
     Builder(builder: (context) {
-      return Padding(
-        padding: const EdgeInsets.all(4.0),
-        child: buildAutoLinkText(body),
+      return Align(
+        alignment: Alignment.centerLeft,
+        child: Padding(
+          padding: const EdgeInsets.all(4.0),
+          child: buildAutoLinkText(body),
+        ),
       );
     }),
     const SizedBox(height: 8.0)
@@ -127,7 +136,7 @@ Widget buildRadiusBadge(String text) {
         ),
         child: Text(
           text,
-          style: Theme.of(context).textTheme.bodyLarge,
+          style: Theme.of(context).textTheme.bodyMedium,
         ),
       ),
     );
@@ -184,11 +193,11 @@ Flash buildErrorFlashBar(
       ),
       title: Text(
         'エラー',
-        style: Theme.of(context).textTheme.titleMedium,
+        style: Theme.of(context).textTheme.bodyMedium,
       ),
       content: Text(
         e.toString(),
-        style: Theme.of(context).textTheme.bodyMedium,
+        style: Theme.of(context).textTheme.bodySmall,
       ),
     ),
   );
@@ -210,12 +219,12 @@ Flash buildInfoFlashBar(
       title: title != null
           ? Text(
               title,
-              style: Theme.of(context).textTheme.titleMedium,
+              style: Theme.of(context).textTheme.bodyMedium,
             )
           : null,
       content: Text(
         content,
-        style: Theme.of(context).textTheme.bodyMedium,
+        style: Theme.of(context).textTheme.bodySmall,
       ),
     ),
   );
@@ -230,16 +239,19 @@ Widget buildFileList(List<String>? fileNames,
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
           itemCount: fileNames!.length,
-          itemBuilder: (_, index) => ListTile(
-            title: Row(
-              children: [
-                _buildExtIcon(
-                    p.extension(fileNames[index]).replaceFirst('.', '')),
-                const SizedBox(width: 8.0),
-                Text(p.basename(fileNames[index])),
-              ],
+          itemBuilder: (context, index) => Card(
+            child: ListTile(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12.0),
+              ),
+              leading: _buildExtIcon(
+                  p.extension(fileNames[index]).replaceFirst('.', '')),
+              title: Text(
+                p.basename(fileNames[index]),
+                style: Theme.of(context).textTheme.bodyMedium,
+              ),
+              onTap: () async => _openFile(fileNames[index]),
             ),
-            onTap: () async => _openFile(fileNames[index]),
           ),
         )
       : const SizedBox.shrink();
@@ -360,7 +372,7 @@ Widget buildDrawer() {
                                             .toDetailString(),
                                         style: Theme.of(context)
                                             .textTheme
-                                            .titleMedium,
+                                            .bodySmall,
                                       ),
                                     ],
                                   ),
@@ -373,7 +385,7 @@ Widget buildDrawer() {
                                         settings.username ?? '',
                                         style: Theme.of(context)
                                             .textTheme
-                                            .titleMedium,
+                                            .bodySmall,
                                       ),
                                     ],
                                   ),
@@ -386,7 +398,7 @@ Widget buildDrawer() {
                                         settings.accessEnvironmentName ?? '',
                                         style: Theme.of(context)
                                             .textTheme
-                                            .titleMedium,
+                                            .bodySmall,
                                       ),
                                     ],
                                   ),

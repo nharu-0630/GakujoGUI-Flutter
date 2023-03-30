@@ -88,17 +88,14 @@ class ContactWidget extends StatelessWidget {
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
                 subject.subject,
-                style: Theme.of(context)
-                    .textTheme
-                    .titleMedium
-                    ?.copyWith(fontWeight: FontWeight.bold),
+                style: Theme.of(context).textTheme.titleMedium,
               ),
             ),
             Text(
               contacts.isNotEmpty
                   ? contacts.first.contactDateTime.toLocal().toDetailString()
                   : '',
-              style: Theme.of(context).textTheme.bodyMedium,
+              style: Theme.of(context).textTheme.bodySmall,
             )
           ],
         ),
@@ -110,6 +107,7 @@ class ContactWidget extends StatelessWidget {
               : 'メッセージなし',
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
+          style: Theme.of(context).textTheme.bodySmall,
         ),
       );
     });

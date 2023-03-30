@@ -11,6 +11,8 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  flutter_localizations:
+    sdk: flutter
   intl: ^0.17.0
   sticky_headers: ^0.3.0
   package_info_plus: ^3.0.2
@@ -53,6 +55,7 @@ dependencies:
   windows_taskbar: ^1.1.1
   badges: ^3.0.2
   flutter_speed_dial: ^6.2.0
+  google_fonts: ^4.0.3
 
 dev_dependencies:
   flutter_test:
@@ -79,5 +82,3 @@ flutter_icons:
 
 flutter:
   uses-material-design: true
-  assets:
-    - assets/images/

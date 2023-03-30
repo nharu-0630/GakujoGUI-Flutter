@@ -6,7 +6,6 @@ import 'package:gakujo_gui/api/provide.dart';
 import 'package:gakujo_gui/constants/kicons.dart';
 import 'package:gakujo_gui/models/quiz.dart';
 import 'package:gakujo_gui/views/common/widget.dart';
-import 'package:line_icons/line_icons.dart';
 import 'package:provider/provider.dart';
 import 'package:share_plus/share_plus.dart';
 
@@ -198,27 +197,8 @@ class _QuizPageState extends State<QuizPage> {
             children: [
               Expanded(
                 child: Text(
-                  quiz.subject,
-                  style: Theme.of(context).textTheme.bodyMedium,
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ),
-              Text(
-                quiz.endDateTime.toLocal().toDetailString(),
-                style: Theme.of(context).textTheme.bodyMedium,
-              ),
-            ],
-          ),
-          subtitle: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Expanded(
-                child: Text(
                   quiz.title,
-                  style: Theme.of(context)
-                      .textTheme
-                      .titleMedium
-                      ?.copyWith(fontWeight: FontWeight.bold),
+                  style: Theme.of(context).textTheme.titleMedium,
                   overflow: TextOverflow.ellipsis,
                 ),
               ),
@@ -237,6 +217,22 @@ class _QuizPageState extends State<QuizPage> {
                 visible: quiz.isArchived,
                 child: Icon(KIcons.archive),
               )
+            ],
+          ),
+          subtitle: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Expanded(
+                child: Text(
+                  quiz.subject,
+                  style: Theme.of(context).textTheme.bodySmall,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+              Text(
+                quiz.endDateTime.toLocal().toDetailString(),
+                style: Theme.of(context).textTheme.bodySmall,
+              ),
             ],
           ),
         ),
@@ -267,12 +263,15 @@ Widget buildQuizModal(Quiz quiz) {
             children: [
               Text(
                 quiz.startDateTime.toLocal().toDetailString(),
-                style: Theme.of(context).textTheme.bodyLarge,
+                style: Theme.of(context).textTheme.bodySmall,
               ),
-              const Icon(LineIcons.arrowRight),
+              Text(
+                '-',
+                style: Theme.of(context).textTheme.bodySmall,
+              ),
               Text(
                 quiz.endDateTime.toLocal().toDetailString(),
-                style: Theme.of(context).textTheme.bodyLarge,
+                style: Theme.of(context).textTheme.bodySmall,
               ),
             ],
           ),

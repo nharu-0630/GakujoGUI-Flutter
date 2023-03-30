@@ -5,6 +5,7 @@ import 'package:gakujo_gui/constants/kicons.dart';
 import 'package:gakujo_gui/views/common/widget.dart';
 import 'package:gakujo_gui/views/home/home.dart';
 import 'package:gakujo_gui/views/home/timetable.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:line_icons/line_icons.dart';
 import 'package:provider/provider.dart';
 
@@ -39,10 +40,16 @@ class _AppState extends State<App> {
       theme: ThemeData(
         useMaterial3: true,
         brightness: Brightness.light,
+        textTheme: GoogleFonts.bizUDPGothicTextTheme(
+          ThemeData(brightness: Brightness.light).textTheme,
+        ),
       ),
       darkTheme: ThemeData(
         useMaterial3: true,
         brightness: Brightness.dark,
+        textTheme: GoogleFonts.bizUDPGothicTextTheme(
+          ThemeData(brightness: Brightness.dark).textTheme,
+        ),
       ),
       debugShowCheckedModeBanner: false,
       title: 'GakujoGUI',

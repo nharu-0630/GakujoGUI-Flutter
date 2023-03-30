@@ -24,14 +24,14 @@ class TaskWidget extends StatelessWidget {
         if (snapshot.hasData) {
           var reports = snapshot.data![0] as List<Report>;
           var quizzes = snapshot.data![1] as List<Quiz>;
-          reports = reports
-              .where((e) => !(e.isArchived ||
-                  !(!e.isSubmitted && e.endDateTime.isAfter(DateTime.now()))))
-              .toList();
-          quizzes = quizzes
-              .where((e) => !(e.isArchived ||
-                  !(!e.isSubmitted && e.endDateTime.isAfter(DateTime.now()))))
-              .toList();
+          // reports = reports
+          //     .where((e) => !(e.isArchived ||
+          //         !(!e.isSubmitted && e.endDateTime.isAfter(DateTime.now()))))
+          //     .toList();
+          // quizzes = quizzes
+          //     .where((e) => !(e.isArchived ||
+          //         !(!e.isSubmitted && e.endDateTime.isAfter(DateTime.now()))))
+          //     .toList();
           List<dynamic> tasks = [...reports, ...quizzes];
           tasks.sort((a, b) => b.endDateTime.compareTo(a.endDateTime));
           return Padding(
@@ -106,27 +106,8 @@ class TaskWidget extends StatelessWidget {
             children: [
               Expanded(
                 child: Text(
-                  quiz.subject,
-                  style: Theme.of(context).textTheme.bodyMedium,
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ),
-              Text(
-                quiz.endDateTime.toLocal().toDetailString(),
-                style: Theme.of(context).textTheme.bodyMedium,
-              ),
-            ],
-          ),
-          subtitle: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Expanded(
-                child: Text(
                   quiz.title,
-                  style: Theme.of(context)
-                      .textTheme
-                      .titleMedium
-                      ?.copyWith(fontWeight: FontWeight.bold),
+                  style: Theme.of(context).textTheme.titleMedium,
                   overflow: TextOverflow.ellipsis,
                 ),
               ),
@@ -145,6 +126,22 @@ class TaskWidget extends StatelessWidget {
                 visible: quiz.isArchived,
                 child: Icon(KIcons.archive),
               )
+            ],
+          ),
+          subtitle: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Expanded(
+                child: Text(
+                  quiz.subject,
+                  style: Theme.of(context).textTheme.bodySmall,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+              Text(
+                quiz.endDateTime.toLocal().toDetailString(),
+                style: Theme.of(context).textTheme.bodySmall,
+              ),
             ],
           ),
         ),
@@ -181,27 +178,8 @@ class TaskWidget extends StatelessWidget {
             children: [
               Expanded(
                 child: Text(
-                  report.subject,
-                  style: Theme.of(context).textTheme.bodyMedium,
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ),
-              Text(
-                report.endDateTime.toLocal().toDetailString(),
-                style: Theme.of(context).textTheme.bodyMedium,
-              ),
-            ],
-          ),
-          subtitle: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Expanded(
-                child: Text(
                   report.title,
-                  style: Theme.of(context)
-                      .textTheme
-                      .titleMedium
-                      ?.copyWith(fontWeight: FontWeight.bold),
+                  style: Theme.of(context).textTheme.titleMedium,
                   overflow: TextOverflow.ellipsis,
                 ),
               ),
@@ -220,6 +198,22 @@ class TaskWidget extends StatelessWidget {
                 visible: report.isArchived,
                 child: Icon(KIcons.archive),
               )
+            ],
+          ),
+          subtitle: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Expanded(
+                child: Text(
+                  report.subject,
+                  style: Theme.of(context).textTheme.bodySmall,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+              Text(
+                report.endDateTime.toLocal().toDetailString(),
+                style: Theme.of(context).textTheme.bodySmall,
+              ),
             ],
           ),
         ),

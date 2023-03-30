@@ -58,7 +58,7 @@ class _SyllabusSearchPageState extends State<SyllabusSearchPage> {
                           flex: 1,
                           child: Text(
                             '開講年度',
-                            style: Theme.of(context).textTheme.titleMedium,
+                            style: Theme.of(context).textTheme.titleSmall,
                           ),
                         ),
                         Expanded(
@@ -119,7 +119,7 @@ class _SyllabusSearchPageState extends State<SyllabusSearchPage> {
                           flex: 1,
                           child: Text(
                             'タイトル',
-                            style: Theme.of(context).textTheme.titleMedium,
+                            style: Theme.of(context).textTheme.titleSmall,
                           ),
                         ),
                         Expanded(
@@ -178,7 +178,7 @@ class _SyllabusSearchPageState extends State<SyllabusSearchPage> {
                           flex: 1,
                           child: Text(
                             'フォルダ',
-                            style: Theme.of(context).textTheme.titleMedium,
+                            style: Theme.of(context).textTheme.titleSmall,
                           ),
                         ),
                         Expanded(
@@ -228,7 +228,7 @@ class _SyllabusSearchPageState extends State<SyllabusSearchPage> {
                           flex: 1,
                           child: Text(
                             '対象学年',
-                            style: Theme.of(context).textTheme.titleMedium,
+                            style: Theme.of(context).textTheme.titleSmall,
                           ),
                         ),
                         Expanded(
@@ -277,7 +277,7 @@ class _SyllabusSearchPageState extends State<SyllabusSearchPage> {
                           flex: 1,
                           child: Text(
                             '曜日',
-                            style: Theme.of(context).textTheme.titleMedium,
+                            style: Theme.of(context).textTheme.titleSmall,
                           ),
                         ),
                         Expanded(
@@ -325,7 +325,7 @@ class _SyllabusSearchPageState extends State<SyllabusSearchPage> {
                           flex: 1,
                           child: Text(
                             '時限',
-                            style: Theme.of(context).textTheme.titleMedium,
+                            style: Theme.of(context).textTheme.titleSmall,
                           ),
                         ),
                         Expanded(
@@ -371,7 +371,7 @@ class _SyllabusSearchPageState extends State<SyllabusSearchPage> {
                         flex: 1,
                         child: Text(
                           '授業科目名',
-                          style: Theme.of(context).textTheme.titleMedium,
+                          style: Theme.of(context).textTheme.titleSmall,
                         ),
                       ),
                       Expanded(
@@ -379,6 +379,7 @@ class _SyllabusSearchPageState extends State<SyllabusSearchPage> {
                         child: TextField(
                           onChanged: (value) =>
                               setState(() => kamokuName = value),
+                          style: Theme.of(context).textTheme.titleSmall,
                         ),
                       ),
                     ],
@@ -390,7 +391,7 @@ class _SyllabusSearchPageState extends State<SyllabusSearchPage> {
                         flex: 1,
                         child: Text(
                           '担当教員名',
-                          style: Theme.of(context).textTheme.titleMedium,
+                          style: Theme.of(context).textTheme.titleSmall,
                         ),
                       ),
                       Expanded(
@@ -398,6 +399,7 @@ class _SyllabusSearchPageState extends State<SyllabusSearchPage> {
                         child: TextField(
                           onChanged: (value) =>
                               setState(() => editorName = value),
+                          style: Theme.of(context).textTheme.titleSmall,
                         ),
                       ),
                     ],
@@ -409,7 +411,7 @@ class _SyllabusSearchPageState extends State<SyllabusSearchPage> {
                         flex: 1,
                         child: Text(
                           'フリーワード',
-                          style: Theme.of(context).textTheme.titleMedium,
+                          style: Theme.of(context).textTheme.titleSmall,
                         ),
                       ),
                       Expanded(
@@ -417,6 +419,7 @@ class _SyllabusSearchPageState extends State<SyllabusSearchPage> {
                         child: TextField(
                           onChanged: (value) =>
                               setState(() => freeWord = value),
+                          style: Theme.of(context).textTheme.titleSmall,
                         ),
                       ),
                     ],

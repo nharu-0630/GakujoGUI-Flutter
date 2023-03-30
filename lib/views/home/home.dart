@@ -34,9 +34,7 @@ class _HomeWidgetState extends State<HomeWidget> {
             const SizedBox(width: 8.0),
             Text(
               title,
-              style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
+              style: Theme.of(context).textTheme.titleLarge,
             ),
             const Spacer(),
           ],

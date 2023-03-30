@@ -174,18 +174,7 @@ class _ClassLinkPageState extends State<ClassLinkPage> {
                   : null;
             }
           },
-          title: Row(
-            children: [
-              Expanded(
-                child: Text(
-                  classLink.subject,
-                  style: Theme.of(context).textTheme.bodyMedium,
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ),
-            ],
-          ),
-          subtitle: Column(
+          title: Column(
             children: [
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -193,10 +182,7 @@ class _ClassLinkPageState extends State<ClassLinkPage> {
                   Expanded(
                     child: Text(
                       classLink.title,
-                      style: Theme.of(context)
-                          .textTheme
-                          .titleMedium
-                          ?.copyWith(fontWeight: FontWeight.bold),
+                      style: Theme.of(context).textTheme.titleMedium,
                       overflow: TextOverflow.ellipsis,
                     ),
                   ),
@@ -207,6 +193,11 @@ class _ClassLinkPageState extends State<ClassLinkPage> {
                 ],
               ),
             ],
+          ),
+          subtitle: Text(
+            classLink.subject,
+            style: Theme.of(context).textTheme.bodySmall,
+            overflow: TextOverflow.ellipsis,
           ),
         ),
       );
