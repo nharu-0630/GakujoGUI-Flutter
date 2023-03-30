@@ -57,6 +57,8 @@ class _AppState extends State<App> {
         floatingActionButton: SpeedDial(
           childMargin: const EdgeInsets.all(8.0),
           animatedIcon: AnimatedIcons.menu_close,
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(16.0)),
           children: [
             SpeedDialChild(
               child: const Icon(LineIcons.alternateSignIn),
