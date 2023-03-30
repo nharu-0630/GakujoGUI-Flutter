@@ -171,7 +171,7 @@ class _ClassLinkPageState extends State<ClassLinkPage> {
                   ? context
                       .read<ApiRepository>()
                       .fetchDetailClassLink(classLink)
-                  : null;
+                  : showModalOnTap(context, buildClassLinkModal(classLink));
             }
           },
           title: Column(
@@ -237,19 +237,13 @@ Widget buildClassLinkModal(ClassLink classLink) {
           padding: const EdgeInsets.all(4.0),
           child: buildAutoLinkText(classLink.comment),
         ),
-        Visibility(
-          visible: classLink.isAcquired,
-          child: const Padding(
-            padding: EdgeInsets.all(4.0),
-            child: Divider(thickness: 2.0),
-          ),
+        const Padding(
+          padding: EdgeInsets.all(4.0),
+          child: Divider(thickness: 2.0),
         ),
-        Visibility(
-          visible: classLink.isAcquired,
-          child: Padding(
-            padding: const EdgeInsets.all(4.0),
-            child: buildAutoLinkText(classLink.link),
-          ),
+        Padding(
+          padding: const EdgeInsets.all(4.0),
+          child: buildAutoLinkText(classLink.link),
         ),
         const SizedBox(height: 8.0),
         Row(

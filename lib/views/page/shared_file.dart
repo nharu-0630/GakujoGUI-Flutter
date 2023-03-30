@@ -1,6 +1,7 @@
 import 'package:adaptive_dialog/adaptive_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
+import 'package:gakujo_gui/api/parse.dart';
 import 'package:gakujo_gui/api/provide.dart';
 import 'package:gakujo_gui/constants/kicons.dart';
 import 'package:gakujo_gui/models/shared_file.dart';
@@ -172,7 +173,7 @@ class _SharedFilePageState extends State<SharedFilePage> {
                   ? context
                       .read<ApiRepository>()
                       .fetchDetailSharedFile(sharedFile)
-                  : null;
+                  : showModalOnTap(context, buildSharedFileModal(sharedFile));
             }
           },
           title: Column(
@@ -215,6 +216,11 @@ class _SharedFilePageState extends State<SharedFilePage> {
                   overflow: TextOverflow.ellipsis,
                 ),
               ),
+              Text(
+                sharedFile.updateDateTime.toLocal().toDetailString(),
+                style: Theme.of(context).textTheme.bodySmall,
+                overflow: TextOverflow.ellipsis,
+              ),
             ],
           ),
         ),
@@ -240,14 +246,23 @@ Widget buildSharedFileModal(SharedFile sharedFile) {
         ),
         Padding(
           padding: const EdgeInsets.all(4.0),
+          child: Align(
+            alignment: Alignment.centerRight,
+            child: Text(
+              sharedFile.publicPeriod != '～'
+                  ? sharedFile.publicPeriod.isNotEmpty
+                      ? sharedFile.publicPeriod
+                      : '未取得'
+                  : '無期限',
+              style: Theme.of(context).textTheme.bodySmall,
+            ),
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.all(4.0),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
-              Visibility(
-                visible: sharedFile.publicPeriod.isNotEmpty &&
-                    sharedFile.publicPeriod != '～',
-                child: buildRadiusBadge(sharedFile.publicPeriod),
-              ),
               buildRadiusBadge(sharedFile.fileSize),
               Visibility(
                 visible: sharedFile.isArchived,

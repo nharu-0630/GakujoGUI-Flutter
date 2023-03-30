@@ -325,6 +325,7 @@ class _GradePageState extends State<GradePage> {
   Widget _buildCard(Grade grade) {
     return Builder(builder: (context) {
       return ListTile(
+        onTap: () {},
         title: Row(
           children: [
             Expanded(

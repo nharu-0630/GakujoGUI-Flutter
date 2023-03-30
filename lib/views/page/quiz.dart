@@ -172,7 +172,7 @@ class _QuizPageState extends State<QuizPage> {
                       ) ==
                       OkCancelResult.ok
                   ? context.read<ApiRepository>().fetchDetailQuiz(quiz)
-                  : null;
+                  : showModalOnTap(context, buildQuizModal(quiz));
             }
           },
           leading: Icon(
@@ -231,7 +231,24 @@ class _QuizPageState extends State<QuizPage> {
               ),
               Text(
                 quiz.endDateTime.toLocal().toDetailString(),
-                style: Theme.of(context).textTheme.bodySmall,
+                style: Theme.of(context).textTheme.bodySmall!.copyWith(
+                  color: (() {
+                    if (!quiz.isSubmitted &&
+                        quiz.endDateTime.isBefore(
+                            DateTime.now().add(const Duration(days: 1)))) {
+                      return Theme.of(context).colorScheme.error;
+                    }
+                    return Theme.of(context).textTheme.bodySmall!.color;
+                  })(),
+                  fontWeight: (() {
+                    if (!quiz.isSubmitted &&
+                        quiz.endDateTime.isBefore(
+                            DateTime.now().add(const Duration(days: 1)))) {
+                      return FontWeight.bold;
+                    }
+                    return FontWeight.normal;
+                  })(),
+                ),
               ),
             ],
           ),

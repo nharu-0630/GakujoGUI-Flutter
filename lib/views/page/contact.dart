@@ -156,7 +156,7 @@ class _ContactPageState extends State<ContactPage> {
         child: ListTile(
           onTap: () async {
             if (contact.isAcquired) {
-              showModalOnTap(context, buildContact(contact));
+              showModalOnTap(context, buildContactModal(contact));
             } else {
               await showOkCancelAlertDialog(
                         context: context,
@@ -167,7 +167,7 @@ class _ContactPageState extends State<ContactPage> {
                       ) ==
                       OkCancelResult.ok
                   ? context.read<ApiRepository>().fetchDetailContact(contact)
-                  : null;
+                  : showModalOnTap(context, buildContactModal(contact));
             }
           },
           title: Row(
@@ -227,7 +227,7 @@ class _ContactPageState extends State<ContactPage> {
     });
   }
 
-  Widget buildContact(Contact contact) {
+  Widget buildContactModal(Contact contact) {
     return Builder(builder: (context) {
       return ListView(
         padding: const EdgeInsets.all(16.0),
@@ -248,18 +248,16 @@ class _ContactPageState extends State<ContactPage> {
               alignment: Alignment.centerRight,
               child: Text(
                 contact.contactDateTime.toLocal().toDetailString(),
-                style: Theme.of(context).textTheme.bodyMedium,
+                style: Theme.of(context).textTheme.bodySmall,
               ),
             ),
           ),
           Padding(
             padding: const EdgeInsets.all(4.0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [buildRadiusBadge(contact.contactType)],
-            ),
+            child: Align(
+                alignment: Alignment.centerRight,
+                child: buildRadiusBadge(contact.contactType)),
           ),
-          const SizedBox(height: 8.0),
           Padding(
             padding: const EdgeInsets.all(4.0),
             child:

@@ -89,7 +89,7 @@ class TaskWidget extends StatelessWidget {
                       ) ==
                       OkCancelResult.ok
                   ? context.read<ApiRepository>().fetchDetailQuiz(quiz)
-                  : null;
+                  : showModalOnTap(context, buildQuizModal(quiz));
             }
           },
           leading: Icon(KIcons.quiz),
@@ -161,7 +161,7 @@ class TaskWidget extends StatelessWidget {
                       ) ==
                       OkCancelResult.ok
                   ? context.read<ApiRepository>().fetchDetailReport(report)
-                  : null;
+                  : showModalOnTap(context, buildReportModal(report));
             }
           },
           leading: Icon(KIcons.report),

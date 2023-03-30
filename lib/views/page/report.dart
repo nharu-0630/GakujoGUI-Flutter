@@ -172,7 +172,7 @@ class _ReportPageState extends State<ReportPage> {
                       ) ==
                       OkCancelResult.ok
                   ? context.read<ApiRepository>().fetchDetailReport(report)
-                  : null;
+                  : showModalOnTap(context, buildReportModal(report));
             }
           },
           leading: Icon(
@@ -231,7 +231,24 @@ class _ReportPageState extends State<ReportPage> {
               ),
               Text(
                 report.endDateTime.toLocal().toDetailString(),
-                style: Theme.of(context).textTheme.bodySmall,
+                style: Theme.of(context).textTheme.bodySmall!.copyWith(
+                  color: (() {
+                    if (!report.isSubmitted &&
+                        report.endDateTime.isBefore(
+                            DateTime.now().add(const Duration(days: 1)))) {
+                      return Theme.of(context).colorScheme.error;
+                    }
+                    return Theme.of(context).textTheme.bodySmall!.color;
+                  })(),
+                  fontWeight: (() {
+                    if (!report.isSubmitted &&
+                        report.endDateTime.isBefore(
+                            DateTime.now().add(const Duration(days: 1)))) {
+                      return FontWeight.bold;
+                    }
+                    return FontWeight.normal;
+                  })(),
+                ),
               ),
             ],
           ),

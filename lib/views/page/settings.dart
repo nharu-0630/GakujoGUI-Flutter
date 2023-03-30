@@ -473,11 +473,44 @@ class _SettingsPageState extends State<SettingsPage> {
                       content: Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 16.0),
                         child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            ...buildLongItem('バージョン情報',
-                                'Client Version: ${packageInfo.version}\nGakujoAPI Version: ${GakujoApi.version}\nSyllabusAPI Version: ${SyllabusApi.version}'),
-                            ...buildLongItem('トークン情報',
-                                'Token: ${context.read<ApiRepository>().token}\nAccessEnvironment Key: ${settings.accessEnvironmentKey}\nAccessEnvironment Value: ${settings.accessEnvironmentValue}'),
+                            Padding(
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 8.0),
+                              child: Text(
+                                'バージョン情報',
+                                style: Theme.of(context).textTheme.titleMedium,
+                              ),
+                            ),
+                            Padding(
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 8.0),
+                              child: Text(
+                                'Client Version: ${packageInfo.version}\nGakujoAPI Version: ${GakujoApi.version}\nGakujoAPI User-Agent: ${GakujoApi.userAgent}\nSyllabusAPI Version: ${SyllabusApi.version}\nSyllabusAPI User-Agent: ${SyllabusApi.userAgent}',
+                                style: Theme.of(context).textTheme.bodySmall,
+                              ),
+                            ),
+                            const Padding(
+                              padding: EdgeInsets.all(4.0),
+                              child: Divider(thickness: 2.0),
+                            ),
+                            Padding(
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 8.0),
+                              child: Text(
+                                'トークン情報',
+                                style: Theme.of(context).textTheme.titleMedium,
+                              ),
+                            ),
+                            Padding(
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 8.0),
+                              child: Text(
+                                'Token: ${context.read<ApiRepository>().token}\nAccessEnvironment Name: ${settings.accessEnvironmentName}\nAccessEnvironment Key: ${settings.accessEnvironmentKey}\nAccessEnvironment Value: ${settings.accessEnvironmentValue}',
+                                style: Theme.of(context).textTheme.bodySmall,
+                              ),
+                            ),
                             Padding(
                               padding: const EdgeInsets.all(8.0),
                               child: ElevatedButton(
