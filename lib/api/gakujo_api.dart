@@ -5,6 +5,7 @@ import 'package:cookie_jar/cookie_jar.dart';
 import 'package:dio/dio.dart';
 import 'package:dio_cookie_manager/dio_cookie_manager.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'package:gakujo_gui/api/parse.dart';
 import 'package:gakujo_gui/api/provide.dart';
 import 'package:gakujo_gui/app.dart';
@@ -36,13 +37,16 @@ class GakujoApi {
   String _token = '';
   String get token => _token;
 
-  Future<Settings>? get _settings =>
-      App.navigatorKey.currentContext?.read<SettingsRepository>().load();
+  final BuildContext? _context = App.navigatorKey.currentContext;
 
-  Future<String?> get _username async => (await _settings)?.username;
-  Future<String?> get _password async => (await _settings)?.password;
-  Future<int> get _year async => (await _settings)?.year ?? 2022;
-  Future<int> get _semester async => (await _settings)?.semester ?? 3;
+  Future<Settings> get _settings =>
+      _context?.read<SettingsRepository>().load() ??
+      Future.value(Settings.init());
+
+  Future<String?> get _username async => (await _settings).username;
+  Future<String?> get _password async => (await _settings).password;
+  Future<int> get _year async => (await _settings).year ?? 2022;
+  Future<int> get _semester async => (await _settings).semester ?? 3;
 
   Future<String> get _schoolYear async => (await _year).toString();
   Future<String> get _semesterCode async =>
@@ -64,7 +68,7 @@ class GakujoApi {
   }
 
   void _setProgress(double value) =>
-      App.navigatorKey.currentContext?.read<ApiRepository>().setProgress(value);
+      _context?.read<ApiRepository>().setProgress(value);
 
   Future<void> initialize() async {
     _client = Dio(BaseOptions(
@@ -77,7 +81,6 @@ class GakujoApi {
     _token = '';
     _cookieJar = CookieJar();
     var settings = await _settings;
-    if (settings == null) return;
     if (settings.accessEnvironmentKey != null &&
         settings.accessEnvironmentValue != null) {
       _cookieJar.saveFromResponse(
@@ -92,11 +95,10 @@ class GakujoApi {
   Future<void> clearCookies() async {
     await _cookieJar.deleteAll();
     var settings = await _settings;
-    if (settings == null) return;
     settings.accessEnvironmentKey = null;
     settings.accessEnvironmentValue = null;
     settings.accessEnvironmentName = null;
-    App.navigatorKey.currentContext?.read<SettingsRepository>().save(settings);
+    _context?.read<SettingsRepository>().save(settings);
   }
 
   Future<void> fetchLogin() async {
@@ -280,9 +282,7 @@ class GakujoApi {
         ),
       );
 
-      App.navigatorKey.currentContext
-          ?.read<ApiRepository>()
-          .setProgress(7 / 15);
+      _setProgress(7 / 15);
       await Future.delayed(_interval);
       response = await _client.getUri<dynamic>(
         Uri.https(
@@ -304,9 +304,7 @@ class GakujoApi {
           throw Exception('Failed to get location header.');
         }
 
-        App.navigatorKey.currentContext
-            ?.read<ApiRepository>()
-            .setProgress(8 / 15);
+        _setProgress(8 / 15);
         await Future.delayed(_interval);
         response = await _client.get<dynamic>(
           response.headers.value('location')!,
@@ -375,9 +373,7 @@ class GakujoApi {
             throw Exception('Failed to get location header.');
           }
 
-          App.navigatorKey.currentContext
-              ?.read<ApiRepository>()
-              .setProgress(11 / 15);
+          _setProgress(11 / 15);
           await Future.delayed(_interval);
           response = await _client.get<dynamic>(
             response.headers.value('location')!,
@@ -387,9 +383,6 @@ class GakujoApi {
     }
 
     var settings = await _settings;
-    if (settings == null) {
-      throw Exception('Failed to get settings.');
-    }
     if (parse(response.data).querySelector('title')?.text == 'アクセス環境登録') {
       _updateToken(response.data, required: true);
       var accessEnvName =
@@ -489,7 +482,7 @@ class GakujoApi {
     );
     settings.profileImage = base64.encode(response.data);
     settings.lastLoginTime = DateTime.now();
-    App.navigatorKey.currentContext?.read<SettingsRepository>().save(settings);
+    _context?.read<SettingsRepository>().save(settings);
     _setProgress(15 / 15);
   }
 
@@ -534,11 +527,10 @@ class GakujoApi {
     );
     _updateToken(response.data, required: true);
 
-    App.navigatorKey.currentContext?.read<ContactRepository>().addAll(
-        parse(response.data)
-            .querySelectorAll('#tbl_A01_01 > tbody > tr')
-            .map(Contact.fromElement)
-            .toList());
+    _context?.read<ContactRepository>().addAll(parse(response.data)
+        .querySelectorAll('#tbl_A01_01 > tbody > tr')
+        .map(Contact.fromElement)
+        .toList());
     _setProgress(2 / 2);
   }
 
@@ -664,9 +656,7 @@ class GakujoApi {
     }
 
     contact.toDetail(document);
-    App.navigatorKey.currentContext
-        ?.read<ContactRepository>()
-        .add(contact, overwrite: true);
+    _context?.read<ContactRepository>().add(contact, overwrite: true);
     _setProgress(3 / 3);
     return contact;
   }
@@ -701,17 +691,14 @@ class GakujoApi {
     );
     _updateToken(response.data, required: true);
 
-    await App.navigatorKey.currentContext
-        ?.read<SubjectRepository>()
-        .deleteAll();
-    App.navigatorKey.currentContext?.read<SubjectRepository>().addAll(
-        parse(response.data)
-            .querySelector('#st1')!
-            .querySelectorAll('ul')
-            .where((element) => element.querySelectorAll('li').length > 2)
-            .map(Subject.fromElement)
-            .toSet()
-            .toList());
+    await _context?.read<SubjectRepository>().deleteAll();
+    _context?.read<SubjectRepository>().addAll(parse(response.data)
+        .querySelector('#st1')!
+        .querySelectorAll('ul')
+        .where((element) => element.querySelectorAll('li').length > 2)
+        .map(Subject.fromElement)
+        .toSet()
+        .toList());
     _setProgress(2 / 2);
   }
 
@@ -759,11 +746,10 @@ class GakujoApi {
     );
     _updateToken(response.data, required: true);
 
-    App.navigatorKey.currentContext?.read<ReportRepository>().addAll(
-        parse(response.data)
-            .querySelectorAll('#searchList > tbody > tr')
-            .map(Report.fromElement)
-            .toList());
+    _context?.read<ReportRepository>().addAll(parse(response.data)
+        .querySelectorAll('#searchList > tbody > tr')
+        .map(Report.fromElement)
+        .toList());
     _setProgress(2 / 2);
   }
 
@@ -879,9 +865,7 @@ class GakujoApi {
     }
 
     report.toDetail(document);
-    App.navigatorKey.currentContext
-        ?.read<ReportRepository>()
-        .add(report, overwrite: true);
+    _context?.read<ReportRepository>().add(report, overwrite: true);
     _setProgress(3 / 3);
     return report;
   }
@@ -930,11 +914,10 @@ class GakujoApi {
     );
     _updateToken(response.data, required: true);
 
-    App.navigatorKey.currentContext?.read<QuizRepository>().addAll(
-        parse(response.data)
-            .querySelectorAll('#searchList > tbody > tr')
-            .map(Quiz.fromElement)
-            .toList());
+    _context?.read<QuizRepository>().addAll(parse(response.data)
+        .querySelectorAll('#searchList > tbody > tr')
+        .map(Quiz.fromElement)
+        .toList());
     _setProgress(2 / 2);
   }
 
@@ -1047,9 +1030,7 @@ class GakujoApi {
     }
 
     quiz.toDetail(document);
-    App.navigatorKey.currentContext
-        ?.read<QuizRepository>()
-        .add(quiz, overwrite: true);
+    _context?.read<QuizRepository>().add(quiz, overwrite: true);
     _setProgress(3 / 3);
     return quiz;
   }
@@ -1094,11 +1075,10 @@ class GakujoApi {
     );
     _updateToken(response.data, required: true);
 
-    App.navigatorKey.currentContext?.read<SharedFileRepository>().addAll(
-        parse(response.data)
-            .querySelectorAll('#tbl_classFile > tbody > tr')
-            .map(SharedFile.fromElement)
-            .toList());
+    _context?.read<SharedFileRepository>().addAll(parse(response.data)
+        .querySelectorAll('#tbl_classFile > tbody > tr')
+        .map(SharedFile.fromElement)
+        .toList());
     _setProgress(2 / 2);
   }
 
@@ -1222,9 +1202,7 @@ class GakujoApi {
     }
 
     sharedFile.toDetail(document);
-    App.navigatorKey.currentContext
-        ?.read<SharedFileRepository>()
-        .add(sharedFile, overwrite: true);
+    _context?.read<SharedFileRepository>().add(sharedFile, overwrite: true);
     _setProgress(3 / 3);
     return sharedFile;
   }
@@ -1268,11 +1246,10 @@ class GakujoApi {
     );
     _updateToken(response.data, required: true);
 
-    App.navigatorKey.currentContext?.read<ClassLinkRepository>().addAll(
-        parse(response.data)
-            .querySelectorAll('#tbl_classLinkList > tbody > tr')
-            .map(ClassLink.fromElement)
-            .toList());
+    _context?.read<ClassLinkRepository>().addAll(parse(response.data)
+        .querySelectorAll('#tbl_classLinkList > tbody > tr')
+        .map(ClassLink.fromElement)
+        .toList());
     _setProgress(2 / 2);
   }
 
@@ -1348,9 +1325,7 @@ class GakujoApi {
     _updateToken(response.data, required: true);
     var document = parse(response.data);
     classLink.toDetail(document);
-    App.navigatorKey.currentContext
-        ?.read<ClassLinkRepository>()
-        .add(classLink, overwrite: true);
+    _context?.read<ClassLinkRepository>().add(classLink, overwrite: true);
     _setProgress(3 / 3);
     return classLink;
   }
@@ -1510,10 +1485,8 @@ class GakujoApi {
     var document = parse(response.data);
 
     if (document.querySelector('table.txt12') != null) {
-      await App.navigatorKey.currentContext
-          ?.read<GradeRepository>()
-          .deleteAll();
-      App.navigatorKey.currentContext?.read<GradeRepository>().addAll(document
+      await _context?.read<GradeRepository>().deleteAll();
+      _context?.read<GradeRepository>().addAll(document
           .querySelector('table.txt12')!
           .querySelectorAll('tr')
           .skip(1)
@@ -1521,9 +1494,7 @@ class GakujoApi {
           .toList());
     }
 
-    Gpa gpa =
-        await App.navigatorKey.currentContext?.read<GpaRepository>().load() ??
-            Gpa.init();
+    Gpa gpa = await _context?.read<GpaRepository>().load() ?? Gpa.init();
 
     _setProgress(1 / 7);
     await Future.delayed(_interval);
@@ -1655,7 +1626,7 @@ class GakujoApi {
           int.parse(e.children[1].text.trimWhiteSpace());
     });
 
-    await App.navigatorKey.currentContext?.read<GpaRepository>().save(gpa);
+    await _context?.read<GpaRepository>().save(gpa);
     _setProgress(7 / 7);
   }
 
@@ -1675,9 +1646,7 @@ class GakujoApi {
     );
     var document = parse(response.data);
 
-    await App.navigatorKey.currentContext
-        ?.read<TimetableRepository>()
-        .deleteAll();
+    await _context?.read<TimetableRepository>().deleteAll();
     var table = document
         .querySelectorAll('table.txt12')[1]
         .querySelector('tbody')!
@@ -1713,9 +1682,7 @@ class GakujoApi {
             var classRoom = node.innerHtml.split('<br>').last.trimNewLines();
             Timetable timetable = await fetchDetailTimetable(
                 i, j - 1, kamokuCode, classCode, classRoom);
-            await App.navigatorKey.currentContext
-                ?.read<TimetableRepository>()
-                .add(timetable);
+            await _context?.read<TimetableRepository>().add(timetable);
           }
         }
       }

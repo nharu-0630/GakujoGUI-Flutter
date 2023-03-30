@@ -30,8 +30,7 @@ class SettingsPage extends StatefulWidget {
 class _SettingsPageState extends State<SettingsPage> {
   TextEditingController _usernameController = TextEditingController();
   TextEditingController _passwordController = TextEditingController();
-
-  var _isObscure = true;
+  bool _isObscure = true;
 
   @override
   void initState() {
