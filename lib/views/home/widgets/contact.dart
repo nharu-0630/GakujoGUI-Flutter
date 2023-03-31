@@ -44,7 +44,7 @@ class ContactWidget extends StatelessWidget {
                           ),
                         ),
                         Text(
-                          'メッセージはありません',
+                          '授業連絡はありません',
                           style: Theme.of(context).textTheme.titleMedium,
                         ),
                       ],
@@ -104,7 +104,7 @@ class ContactWidget extends StatelessWidget {
               ? contacts.first.isAcquired
                   ? contacts.first.content.replaceAll('\n', ' ')
                   : '未取得'
-              : 'メッセージなし',
+              : '授業連絡なし',
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
           style: Theme.of(context).textTheme.bodySmall,

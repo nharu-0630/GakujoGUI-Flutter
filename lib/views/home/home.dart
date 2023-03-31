@@ -76,7 +76,7 @@ class _HomeWidgetState extends State<HomeWidget> {
           physics: const AlwaysScrollableScrollPhysics(),
           children: [
             StickyHeader(
-              header: _buildHeader(KIcons.contact, 'メッセージ'),
+              header: _buildHeader(KIcons.contact, '授業連絡'),
               content: const ContactWidget(),
             ),
           ],

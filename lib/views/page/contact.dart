@@ -55,7 +55,7 @@ class _ContactPageState extends State<ContactPage> {
                                 ),
                               ),
                               Text(
-                                'メッセージはありません',
+                                '授業連絡はありません',
                                 style: Theme.of(context).textTheme.titleMedium,
                               ),
                             ],

@@ -44,7 +44,6 @@ class TaskWidget extends StatelessWidget {
                           'タスクはありません',
                           style: Theme.of(context).textTheme.titleMedium,
                         ),
-                        const SizedBox(height: 16.0),
                       ],
                     ),
                   )
