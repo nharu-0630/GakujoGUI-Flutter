@@ -357,7 +357,7 @@ Widget buildDrawer() {
                                       Text(
                                         settings.lastLoginTime
                                             .toLocal()
-                                            .toDetailString(),
+                                            .toDateTimeString(),
                                         style: Theme.of(context)
                                             .textTheme
                                             .bodySmall,

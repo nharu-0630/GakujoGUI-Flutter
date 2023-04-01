@@ -19,6 +19,7 @@ import 'package:hive_flutter/adapters.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
+import 'package:timeago/timeago.dart' as timeago;
 import 'package:window_size/window_size.dart';
 import 'package:windows_taskbar/windows_taskbar.dart';
 
@@ -32,6 +33,7 @@ void main() async {
     WindowsTaskbar.setProgressMode(TaskbarProgressMode.noProgress);
   }
   initializeDateFormatting('ja');
+  timeago.setLocaleMessages('ja', timeago.JaMessages());
   await Hive.initFlutter((await getApplicationSupportDirectory()).path);
   Hive.registerAdapter(SettingsAdapter());
   Hive.registerAdapter(ContactAdapter());

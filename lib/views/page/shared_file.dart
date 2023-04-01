@@ -217,7 +217,7 @@ class _SharedFilePageState extends State<SharedFilePage> {
                 ),
               ),
               Text(
-                sharedFile.updateDateTime.toLocal().toDetailString(),
+                sharedFile.updateDateTime.toLocal().toDateTimeString(),
                 style: Theme.of(context).textTheme.bodySmall,
                 overflow: TextOverflow.ellipsis,
               ),

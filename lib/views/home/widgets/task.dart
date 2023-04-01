@@ -130,7 +130,7 @@ class TaskWidget extends StatelessWidget {
                 ),
               ),
               Text(
-                quiz.endDateTime.toLocal().toDetailString(),
+                quiz.endDateTime.toLocal().toDateTimeString(),
                 style: Theme.of(context).textTheme.bodySmall,
               ),
             ],
@@ -202,7 +202,7 @@ class TaskWidget extends StatelessWidget {
                 ),
               ),
               Text(
-                report.endDateTime.toLocal().toDetailString(),
+                report.endDateTime.toLocal().toDateTimeString(),
                 style: Theme.of(context).textTheme.bodySmall,
               ),
             ],

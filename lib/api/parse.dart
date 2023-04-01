@@ -5,11 +5,15 @@ import 'package:crypto/crypto.dart';
 import 'package:html/dom.dart';
 import 'package:html_unescape/html_unescape.dart';
 import 'package:intl/intl.dart';
+import 'package:timeago/timeago.dart' as timeago;
 
 extension DateTimeParsing on DateTime {
-  String toDetailString() => DateFormat('yyyy/MM/dd HH:mm', 'ja').format(this);
+  String toDateTimeString() =>
+      DateFormat('yyyy/MM/dd HH:mm', 'ja').format(this);
 
   String toDateString() => DateFormat('yyyy/MM/dd', 'ja').format(this);
+
+  String toAgoString() => timeago.format(this, locale: 'ja');
 }
 
 extension DocumentParsing on Document {

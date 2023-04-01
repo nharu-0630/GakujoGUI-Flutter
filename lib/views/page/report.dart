@@ -230,7 +230,7 @@ class _ReportPageState extends State<ReportPage> {
                 ),
               ),
               Text(
-                report.endDateTime.toLocal().toDetailString(),
+                report.endDateTime.toLocal().toDateTimeString(),
                 style: Theme.of(context).textTheme.bodySmall!.copyWith(
                   color: (() {
                     if (!report.isSubmitted &&
@@ -279,7 +279,7 @@ Widget buildReportModal(Report report) {
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
               Text(
-                report.startDateTime.toLocal().toDetailString(),
+                report.startDateTime.toLocal().toDateTimeString(),
                 style: Theme.of(context).textTheme.bodySmall,
               ),
               Text(
@@ -287,7 +287,7 @@ Widget buildReportModal(Report report) {
                 style: Theme.of(context).textTheme.bodySmall,
               ),
               Text(
-                report.endDateTime.toLocal().toDetailString(),
+                report.endDateTime.toLocal().toDateTimeString(),
                 style: Theme.of(context).textTheme.bodySmall,
               ),
             ],
@@ -300,7 +300,7 @@ Widget buildReportModal(Report report) {
             children: [
               buildRadiusBadge(report.status),
               buildRadiusBadge(report.isSubmitted
-                  ? '提出済 ${report.submittedDateTime.toLocal().toDetailString()}'
+                  ? '提出済 ${report.submittedDateTime.toLocal().toDateTimeString()}'
                   : '未提出'),
               Visibility(
                 visible: report.isArchived,

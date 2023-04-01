@@ -6,10 +6,10 @@ import 'package:test/test.dart';
 
 void main() {
   group('DateTimeParsing', () {
-    test('toDetailString', () {
+    test('toDateTimeString', () {
       initializeDateFormatting('ja');
       expect(
-          DateTime(2022, 10, 13, 19, 0).toDetailString(), '2022/10/13 19:00');
+          DateTime(2022, 10, 13, 19, 0).toDateTimeString(), '2022/10/13 19:00');
     });
 
     test('toDateString', () {

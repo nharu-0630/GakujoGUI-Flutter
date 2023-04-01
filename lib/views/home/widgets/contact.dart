@@ -93,7 +93,7 @@ class ContactWidget extends StatelessWidget {
             ),
             Text(
               contacts.isNotEmpty
-                  ? contacts.first.contactDateTime.toLocal().toDetailString()
+                  ? contacts.first.contactDateTime.toLocal().toAgoString()
                   : '',
               style: Theme.of(context).textTheme.bodySmall,
             )

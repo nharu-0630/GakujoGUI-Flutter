@@ -230,7 +230,7 @@ class _QuizPageState extends State<QuizPage> {
                 ),
               ),
               Text(
-                quiz.endDateTime.toLocal().toDetailString(),
+                quiz.endDateTime.toLocal().toDateTimeString(),
                 style: Theme.of(context).textTheme.bodySmall!.copyWith(
                   color: (() {
                     if (!quiz.isSubmitted &&
@@ -279,7 +279,7 @@ Widget buildQuizModal(Quiz quiz) {
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
               Text(
-                quiz.startDateTime.toLocal().toDetailString(),
+                quiz.startDateTime.toLocal().toDateTimeString(),
                 style: Theme.of(context).textTheme.bodySmall,
               ),
               Text(
@@ -287,7 +287,7 @@ Widget buildQuizModal(Quiz quiz) {
                 style: Theme.of(context).textTheme.bodySmall,
               ),
               Text(
-                quiz.endDateTime.toLocal().toDetailString(),
+                quiz.endDateTime.toLocal().toDateTimeString(),
                 style: Theme.of(context).textTheme.bodySmall,
               ),
             ],

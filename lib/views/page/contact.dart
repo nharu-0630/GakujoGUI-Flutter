@@ -191,7 +191,7 @@ class _ContactPageState extends State<ContactPage> {
                 ),
               ),
               Text(
-                contact.contactDateTime.toLocal().toDetailString(),
+                contact.contactDateTime.toLocal().toDateTimeString(),
                 style: Theme.of(context).textTheme.bodySmall,
               ),
             ],
@@ -247,7 +247,7 @@ class _ContactPageState extends State<ContactPage> {
             child: Align(
               alignment: Alignment.centerRight,
               child: Text(
-                contact.contactDateTime.toLocal().toDetailString(),
+                contact.contactDateTime.toLocal().toDateTimeString(),
                 style: Theme.of(context).textTheme.bodySmall,
               ),
             ),
