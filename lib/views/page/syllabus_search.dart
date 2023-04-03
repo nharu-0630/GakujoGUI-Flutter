@@ -424,53 +424,27 @@ class _SyllabusSearchPageState extends State<SyllabusSearchPage> {
                       ),
                     ],
                   ),
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Theme.of(context).colorScheme.primary,
-                        foregroundColor:
-                            Theme.of(context).colorScheme.onPrimary,
-                      ),
-                      onPressed: () async {
-                        Navigator.of(context).push(
-                          MaterialPageRoute(
-                            builder: (context) => SyllabusResultPage(
-                              academicYear: academicYear,
-                              syllabusTitleID: syllabusTitleID,
-                              indexID: indexID,
-                              targetGrade: targetGrade,
-                              semester: semester,
-                              week: week,
-                              hour: hour,
-                              kamokuName: kamokuName,
-                              editorName: editorName,
-                              freeWord: freeWord,
-                            ),
+                  buildElevatedButton(
+                    onPressed: () async {
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (context) => SyllabusResultPage(
+                            academicYear: academicYear,
+                            syllabusTitleID: syllabusTitleID,
+                            indexID: indexID,
+                            targetGrade: targetGrade,
+                            semester: semester,
+                            week: week,
+                            hour: hour,
+                            kamokuName: kamokuName,
+                            editorName: editorName,
+                            freeWord: freeWord,
                           ),
-                        );
-                      },
-                      child: Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(KIcons.search),
-                            const SizedBox(width: 8.0),
-                            Text(
-                              '検索',
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .bodyLarge!
-                                  .copyWith(
-                                      color: Theme.of(context)
-                                          .colorScheme
-                                          .onPrimary),
-                            ),
-                          ],
                         ),
-                      ),
-                    ),
+                      );
+                    },
+                    text: '検索',
+                    iconData: KIcons.search,
                   ),
                 ],
               ),

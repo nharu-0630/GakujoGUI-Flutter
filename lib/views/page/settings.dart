@@ -15,10 +15,12 @@ import 'package:gakujo_gui/models/settings.dart';
 import 'package:gakujo_gui/models/shared_file.dart';
 import 'package:gakujo_gui/models/subject.dart';
 import 'package:gakujo_gui/views/common/widget.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:line_icons/line_icons.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:provider/provider.dart';
 import 'package:sticky_headers/sticky_headers.dart';
+import 'package:url_launcher/url_launcher_string.dart';
 
 class SettingsPage extends StatefulWidget {
   const SettingsPage({Key? key}) : super(key: key);
@@ -141,52 +143,25 @@ class _SettingsPageState extends State<SettingsPage> {
                                 ),
                               ],
                             ),
-                            Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: ElevatedButton(
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor:
-                                      Theme.of(context).colorScheme.primary,
-                                  foregroundColor:
-                                      Theme.of(context).colorScheme.onPrimary,
-                                ),
-                                onPressed: () async {
-                                  context
-                                      .read<SettingsRepository>()
-                                      .setUsername(_usernameController.text);
-                                  context
-                                      .read<SettingsRepository>()
-                                      .setPassword(_passwordController.text);
-                                  showFlash(
-                                    context: App.navigatorKey.currentState!
-                                        .overlay!.context,
-                                    duration: const Duration(seconds: 3),
-                                    builder: (context, controller) =>
-                                        buildInfoFlashBar(context, controller,
-                                            content: 'ログイン情報を保存しました'),
-                                  );
-                                },
-                                child: Padding(
-                                  padding: const EdgeInsets.all(8.0),
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      const Icon(LineIcons.save),
-                                      const SizedBox(width: 8.0),
-                                      Text(
-                                        '保存',
-                                        style: Theme.of(context)
-                                            .textTheme
-                                            .bodyLarge!
-                                            .copyWith(
-                                                color: Theme.of(context)
-                                                    .colorScheme
-                                                    .onPrimary),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
+                            buildElevatedButton(
+                              onPressed: () async {
+                                context
+                                    .read<SettingsRepository>()
+                                    .setUsername(_usernameController.text);
+                                context
+                                    .read<SettingsRepository>()
+                                    .setPassword(_passwordController.text);
+                                showFlash(
+                                  context: App.navigatorKey.currentState!
+                                      .overlay!.context,
+                                  duration: const Duration(seconds: 3),
+                                  builder: (context, controller) =>
+                                      buildInfoFlashBar(context, controller,
+                                          content: 'ログイン情報を保存しました'),
+                                );
+                              },
+                              text: '保存',
+                              iconData: LineIcons.save,
                             ),
                             const Padding(
                               padding: EdgeInsets.all(4.0),
@@ -337,118 +312,85 @@ class _SettingsPageState extends State<SettingsPage> {
                               padding: EdgeInsets.all(4.0),
                               child: Divider(thickness: 2.0),
                             ),
-                            Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: ElevatedButton(
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor:
-                                      Theme.of(context).colorScheme.primary,
-                                  foregroundColor:
-                                      Theme.of(context).colorScheme.onPrimary,
-                                ),
-                                onPressed: () async {
-                                  await showOkCancelAlertDialog(
-                                            context: context,
-                                            message: '実行しますか？',
-                                            okLabel: '実行',
-                                            cancelLabel: 'キャンセル',
-                                          ) ==
-                                          OkCancelResult.ok
-                                      ? context
-                                          .read<ApiRepository>()
-                                          .fetchLogin()
-                                      : null;
-                                },
-                                child: Padding(
-                                  padding: const EdgeInsets.all(8.0),
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      const Icon(LineIcons.alternateSignIn),
-                                      const SizedBox(width: 8.0),
-                                      Text(
-                                        'ログイン',
-                                        style: Theme.of(context)
-                                            .textTheme
-                                            .bodyLarge!
-                                            .copyWith(
-                                                color: Theme.of(context)
-                                                    .colorScheme
-                                                    .onPrimary),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
+                            buildElevatedButton(
+                              onPressed: () async {
+                                await showOkCancelAlertDialog(
+                                          context: context,
+                                          message: '実行しますか？',
+                                          okLabel: '実行',
+                                          cancelLabel: 'キャンセル',
+                                        ) ==
+                                        OkCancelResult.ok
+                                    ? context.read<ApiRepository>().fetchLogin()
+                                    : null;
+                              },
+                              text: 'ログイン',
+                              iconData: LineIcons.alternateSignIn,
                             ),
-                            Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: ElevatedButton(
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor:
-                                      Theme.of(context).colorScheme.error,
-                                  foregroundColor:
-                                      Theme.of(context).colorScheme.onError,
-                                ),
-                                onPressed: () async {
-                                  var result = await showOkCancelAlertDialog(
-                                    isDestructiveAction: true,
-                                    context: context,
-                                    title: '初期化するとすべてのデータが削除されます。',
-                                    message: '初期化しますか？',
-                                    okLabel: '初期化',
-                                    cancelLabel: 'キャンセル',
-                                  );
-                                  if (result == OkCancelResult.ok) {
-                                    {
-                                      App.navigatorKey.currentContext
-                                          ?.read<ContactRepository>()
-                                          .deleteAll();
-                                      App.navigatorKey.currentContext
-                                          ?.read<SubjectRepository>()
-                                          .deleteAll();
-                                      App.navigatorKey.currentContext
-                                          ?.read<SettingsRepository>()
-                                          .delete();
-                                      App.navigatorKey.currentContext
-                                          ?.read<ReportRepository>()
-                                          .deleteAll();
-                                      App.navigatorKey.currentContext
-                                          ?.read<QuizRepository>()
-                                          .deleteAll();
-                                      App.navigatorKey.currentContext
-                                          ?.read<GradeRepository>()
-                                          .deleteAll();
-                                      App.navigatorKey.currentContext
-                                          ?.read<SharedFileRepository>()
-                                          .deleteAll();
-                                      App.navigatorKey.currentContext
-                                          ?.read<ClassLinkRepository>()
-                                          .deleteAll();
-                                    }
+                            buildElevatedButton(
+                              onPressed: () async {
+                                var result = await showOkCancelAlertDialog(
+                                  isDestructiveAction: true,
+                                  context: context,
+                                  title: '初期化するとすべてのデータが削除されます。',
+                                  message: '初期化しますか？',
+                                  okLabel: '初期化',
+                                  cancelLabel: 'キャンセル',
+                                );
+                                if (result == OkCancelResult.ok) {
+                                  {
+                                    App.navigatorKey.currentContext
+                                        ?.read<ContactRepository>()
+                                        .deleteAll();
+                                    App.navigatorKey.currentContext
+                                        ?.read<SubjectRepository>()
+                                        .deleteAll();
+                                    App.navigatorKey.currentContext
+                                        ?.read<SettingsRepository>()
+                                        .delete();
+                                    App.navigatorKey.currentContext
+                                        ?.read<ReportRepository>()
+                                        .deleteAll();
+                                    App.navigatorKey.currentContext
+                                        ?.read<QuizRepository>()
+                                        .deleteAll();
+                                    App.navigatorKey.currentContext
+                                        ?.read<GradeRepository>()
+                                        .deleteAll();
+                                    App.navigatorKey.currentContext
+                                        ?.read<SharedFileRepository>()
+                                        .deleteAll();
+                                    App.navigatorKey.currentContext
+                                        ?.read<ClassLinkRepository>()
+                                        .deleteAll();
                                   }
-                                },
-                                child: Padding(
-                                  padding: const EdgeInsets.all(8.0),
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      const Icon(LineIcons.trash),
-                                      const SizedBox(width: 8.0),
-                                      Text(
-                                        '初期化',
-                                        style: Theme.of(context)
-                                            .textTheme
-                                            .bodyLarge!
-                                            .copyWith(
-                                                color: Theme.of(context)
-                                                    .colorScheme
-                                                    .onError),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
+                                }
+                              },
+                              text: '初期化',
+                              iconData: LineIcons.trash,
+                              isDestructiveAction: true,
+                            ),
+                            buildElevatedButton(
+                              onPressed: () async {
+                                var result = await showOkCancelAlertDialog(
+                                  isDestructiveAction: true,
+                                  context: context,
+                                  title: 'Cookiesを削除すると環境登録が解除されます。',
+                                  message: '削除しますか？',
+                                  okLabel: '削除',
+                                  cancelLabel: 'キャンセル',
+                                );
+                                if (result == OkCancelResult.ok) {
+                                  {
+                                    App.navigatorKey.currentContext
+                                        ?.read<ApiRepository>()
+                                        .clearCookies();
+                                  }
+                                }
+                              },
+                              text: 'Cookiesを削除',
+                              iconData: LineIcons.trash,
+                              isDestructiveAction: true,
                             ),
                           ],
                         ),
@@ -488,13 +430,12 @@ class _SettingsPageState extends State<SettingsPage> {
                                   const EdgeInsets.symmetric(horizontal: 8.0),
                               child: Text(
                                 'Client Version: ${packageInfo.version}\nGakujoAPI Version: ${GakujoApi.version}\nGakujoAPI User-Agent: ${GakujoApi.userAgent}\nSyllabusAPI Version: ${SyllabusApi.version}\nSyllabusAPI User-Agent: ${SyllabusApi.userAgent}',
-                                style: Theme.of(context).textTheme.bodySmall,
+                                style: GoogleFonts.roboto(
+                                    textStyle:
+                                        Theme.of(context).textTheme.bodySmall),
                               ),
                             ),
-                            const Padding(
-                              padding: EdgeInsets.all(4.0),
-                              child: Divider(thickness: 2.0),
-                            ),
+                            const SizedBox(height: 8.0),
                             Padding(
                               padding:
                                   const EdgeInsets.symmetric(horizontal: 8.0),
@@ -508,55 +449,21 @@ class _SettingsPageState extends State<SettingsPage> {
                                   const EdgeInsets.symmetric(horizontal: 8.0),
                               child: Text(
                                 'Token: ${context.read<ApiRepository>().token}\nAccessEnvironment Name: ${settings.accessEnvironmentName}\nAccessEnvironment Key: ${settings.accessEnvironmentKey}\nAccessEnvironment Value: ${settings.accessEnvironmentValue}',
-                                style: Theme.of(context).textTheme.bodySmall,
+                                style: GoogleFonts.roboto(
+                                    textStyle:
+                                        Theme.of(context).textTheme.bodySmall),
                               ),
                             ),
-                            Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: ElevatedButton(
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor:
-                                      Theme.of(context).colorScheme.error,
-                                  foregroundColor:
-                                      Theme.of(context).colorScheme.onError,
+                            const SizedBox(height: 8.0),
+                            Center(
+                              child: IconButton(
+                                iconSize: 32.0,
+                                icon: const Icon(
+                                  LineIcons.github,
                                 ),
-                                onPressed: () async {
-                                  var result = await showOkCancelAlertDialog(
-                                    isDestructiveAction: true,
-                                    context: context,
-                                    title: 'Cookiesを削除すると環境登録が解除されます。',
-                                    message: '削除しますか？',
-                                    okLabel: '削除',
-                                    cancelLabel: 'キャンセル',
-                                  );
-                                  if (result == OkCancelResult.ok) {
-                                    {
-                                      App.navigatorKey.currentContext
-                                          ?.read<ApiRepository>()
-                                          .clearCookies();
-                                    }
-                                  }
-                                },
-                                child: Padding(
-                                  padding: const EdgeInsets.all(8.0),
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      const Icon(LineIcons.trash),
-                                      const SizedBox(width: 8.0),
-                                      Text(
-                                        'Cookiesを削除',
-                                        style: Theme.of(context)
-                                            .textTheme
-                                            .bodyLarge!
-                                            .copyWith(
-                                                color: Theme.of(context)
-                                                    .colorScheme
-                                                    .onError),
-                                      ),
-                                    ],
-                                  ),
-                                ),
+                                onPressed: () => launchUrlString(
+                                    'https://github.com/xyzyxJP/GakujoGUI-Flutter',
+                                    mode: LaunchMode.inAppWebView),
                               ),
                             ),
                           ],
