@@ -3,7 +3,7 @@ description: GakujoGUI
 
 publish_to: "none"
 
-version: 1.2.0
+version: 1.2.1
 
 environment:
   sdk: ">=2.17.6 <3.0.0"
