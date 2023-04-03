@@ -454,7 +454,7 @@ class _SettingsPageState extends State<SettingsPage> {
                                         Theme.of(context).textTheme.bodySmall),
                               ),
                             ),
-                            const SizedBox(height: 8.0),
+                            const SizedBox(height: 16.0),
                             Center(
                               child: IconButton(
                                 iconSize: 32.0,
@@ -466,6 +466,14 @@ class _SettingsPageState extends State<SettingsPage> {
                                     mode: LaunchMode.inAppWebView),
                               ),
                             ),
+                            Center(
+                              child: Text(
+                                'Copyright © 2022 xyzyxJP. All rights reserved.',
+                                style: GoogleFonts.roboto(
+                                    textStyle:
+                                        Theme.of(context).textTheme.bodySmall),
+                              ),
+                            )
                           ],
                         ),
                       ),

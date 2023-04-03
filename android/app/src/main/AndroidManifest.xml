@@ -1,5 +1,5 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.gakujo_gui">
+    package="com.xyzyxJP.GakujoGUI">
    <application
         android:label="GakujoGUI"
         android:name="${applicationName}"

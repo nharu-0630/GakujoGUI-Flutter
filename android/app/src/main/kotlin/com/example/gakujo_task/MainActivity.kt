@@ -1,4 +1,4 @@
-package com.example.gakujo_gui
+package com.xyzyxJP.GakujoGUI
 
 import io.flutter.embedding.android.FlutterActivity
 
