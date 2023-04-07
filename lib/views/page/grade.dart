@@ -69,6 +69,7 @@ class _GradePageState extends State<GradePage> {
         child: _grades.isEmpty
             ? buildCenterItemLayoutBuilder(KIcons.grade, '成績情報はありません')
             : ListView.builder(
+                controller: ScrollController(),
                 padding: const EdgeInsets.only(top: 8),
                 itemCount:
                     _searchStatus ? _suggestGrades.length : _grades.length,
@@ -107,6 +108,7 @@ class _GradePageState extends State<GradePage> {
       return RefreshIndicator(
         onRefresh: () async => context.read<ApiRepository>().fetchGrades(),
         child: ListView(
+          controller: ScrollController(),
           padding: const EdgeInsets.all(16.0),
           physics: const AlwaysScrollableScrollPhysics(),
           children: [
