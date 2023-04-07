@@ -57,6 +57,7 @@ dependencies:
   google_fonts: ^4.0.3
   timeago: ^3.3.0
   icons_launcher: ^2.1.0
+  dynamic_color: ^1.6.3
 
 dev_dependencies:
   flutter_test:

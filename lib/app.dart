@@ -1,5 +1,6 @@
 import 'package:badges/badges.dart' as badges;
 import 'package:cached_memory_image/provider/cached_memory_image_provider.dart';
+import 'package:dynamic_color/dynamic_color.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:gakujo_gui/api/parse.dart';
@@ -47,99 +48,139 @@ class _AppState extends State<App> {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      scaffoldMessengerKey: App.scaffoldMessengerKey,
-      navigatorKey: App.navigatorKey,
-      themeMode: ThemeMode.system,
-      theme: ThemeData(
-        useMaterial3: true,
-        brightness: Brightness.light,
-        textTheme: GoogleFonts.bizUDPGothicTextTheme(
-          ThemeData(brightness: Brightness.light).textTheme,
-        ),
-      ),
-      darkTheme: ThemeData(
-        useMaterial3: true,
-        brightness: Brightness.dark,
-        textTheme: GoogleFonts.bizUDPGothicTextTheme(
-          ThemeData(brightness: Brightness.dark).textTheme,
-        ),
-      ),
-      debugShowCheckedModeBanner: false,
-      title: 'GakujoGUI',
-      home: Scaffold(
-        floatingActionButton: SpeedDial(
-          childMargin: const EdgeInsets.all(8.0),
-          animatedIcon: AnimatedIcons.menu_close,
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(16.0)),
-          children: [
-            SpeedDialChild(
-              child: const Icon(LineIcons.alternateSignIn),
-              label: 'ログイン',
-              onTap: () async => context.read<ApiRepository>().fetchLogin(),
-            ),
-            SpeedDialChild(
-              child: Icon(KIcons.update),
-              label: '更新',
-              onTap: () async => showDialog(
-                context: App.navigatorKey.currentState!.overlay!.context,
-                builder: (_) => SimpleDialog(
-                  children: [
-                    SimpleDialogOption(
-                      onPressed: () async =>
-                          context.read<ApiRepository>().fetchSubjects(),
-                      child: const Text('授業科目'),
-                    ),
-                    SimpleDialogOption(
-                      onPressed: () async =>
-                          context.read<ApiRepository>().fetchContacts(),
-                      child: const Text('授業連絡'),
-                    ),
-                    SimpleDialogOption(
-                      onPressed: () async =>
-                          context.read<ApiRepository>().fetchReports(),
-                      child: const Text('レポート'),
-                    ),
-                    SimpleDialogOption(
-                      onPressed: () async =>
-                          context.read<ApiRepository>().fetchQuizzes(),
-                      child: const Text('小テスト'),
-                    ),
-                    SimpleDialogOption(
-                      onPressed: () async =>
-                          context.read<ApiRepository>().fetchSharedFiles(),
-                      child: const Text('授業共有ファイル'),
-                    ),
-                    SimpleDialogOption(
-                      onPressed: () async =>
-                          context.read<ApiRepository>().fetchClassLinks(),
-                      child: const Text('授業リンク'),
-                    ),
-                    SimpleDialogOption(
-                      onPressed: () async =>
-                          context.read<ApiRepository>().fetchGrades(),
-                      child: const Text('成績情報'),
-                    ),
-                    SimpleDialogOption(
-                      onPressed: () async =>
-                          context.read<ApiRepository>().fetchTimetables(),
-                      child: const Text('個人時間割'),
-                    ),
-                  ],
+    return DynamicColorBuilder(
+      builder: (
+        ColorScheme? lightDynamic,
+        ColorScheme? darkDynamic,
+      ) =>
+          MaterialApp(
+        scaffoldMessengerKey: App.scaffoldMessengerKey,
+        navigatorKey: App.navigatorKey,
+        themeMode: ThemeMode.system,
+        theme: buildThemeData(lightDynamic),
+        darkTheme: buildDarkTheme(darkDynamic),
+        debugShowCheckedModeBanner: false,
+        title: 'GakujoGUI',
+        home: Scaffold(
+          floatingActionButton: SpeedDial(
+            childMargin: const EdgeInsets.all(8.0),
+            animatedIcon: AnimatedIcons.menu_close,
+            shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16.0)),
+            children: [
+              SpeedDialChild(
+                child: const Icon(LineIcons.alternateSignIn),
+                label: 'ログイン',
+                onTap: () async => context.read<ApiRepository>().fetchLogin(),
+              ),
+              SpeedDialChild(
+                child: Icon(KIcons.update),
+                label: '更新',
+                onTap: () async => showDialog(
+                  context: App.navigatorKey.currentState!.overlay!.context,
+                  builder: (_) => SimpleDialog(
+                    children: [
+                      SimpleDialogOption(
+                        onPressed: () async =>
+                            context.read<ApiRepository>().fetchSubjects(),
+                        child: const Text('授業科目'),
+                      ),
+                      SimpleDialogOption(
+                        onPressed: () async =>
+                            context.read<ApiRepository>().fetchContacts(),
+                        child: const Text('授業連絡'),
+                      ),
+                      SimpleDialogOption(
+                        onPressed: () async =>
+                            context.read<ApiRepository>().fetchReports(),
+                        child: const Text('レポート'),
+                      ),
+                      SimpleDialogOption(
+                        onPressed: () async =>
+                            context.read<ApiRepository>().fetchQuizzes(),
+                        child: const Text('小テスト'),
+                      ),
+                      SimpleDialogOption(
+                        onPressed: () async =>
+                            context.read<ApiRepository>().fetchSharedFiles(),
+                        child: const Text('授業共有ファイル'),
+                      ),
+                      SimpleDialogOption(
+                        onPressed: () async =>
+                            context.read<ApiRepository>().fetchClassLinks(),
+                        child: const Text('授業リンク'),
+                      ),
+                      SimpleDialogOption(
+                        onPressed: () async =>
+                            context.read<ApiRepository>().fetchGrades(),
+                        child: const Text('成績情報'),
+                      ),
+                      SimpleDialogOption(
+                        onPressed: () async =>
+                            context.read<ApiRepository>().fetchTimetables(),
+                        child: const Text('個人時間割'),
+                      ),
+                    ],
+                  ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
+          key: App.scaffoldKey,
+          drawer: _buildDrawer(),
+          appBar: _buildAppBar(),
+          body: const [
+            HomeWidget(),
+            TimetablePage(),
+          ][_index],
+          bottomNavigationBar: _buildBottomNavigationBar(),
         ),
-        key: App.scaffoldKey,
-        drawer: _buildDrawer(),
-        appBar: _buildAppBar(),
-        body: const [
-          HomeWidget(),
-          TimetablePage(),
-        ][_index],
-        bottomNavigationBar: _buildBottomNavigationBar(),
+      ),
+    );
+  }
+
+  ThemeData buildThemeData(ColorScheme? lightDynamic) {
+    return ThemeData(
+      useMaterial3: true,
+      brightness: Brightness.light,
+      colorScheme: lightDynamic ??
+          ColorScheme.fromSeed(
+            seedColor: const Color(0xFF3B66B1),
+            brightness: Brightness.light,
+          ),
+      textTheme: GoogleFonts.bizUDPGothicTextTheme(
+        ThemeData(
+          useMaterial3: true,
+          brightness: Brightness.light,
+          colorScheme: lightDynamic ??
+              ColorScheme.fromSeed(
+                seedColor: const Color(0xFF3B66B1),
+                brightness: Brightness.light,
+              ),
+        ).textTheme,
+      ),
+    );
+  }
+
+  ThemeData buildDarkTheme(ColorScheme? darkDynamic) {
+    return ThemeData(
+      useMaterial3: true,
+      brightness: Brightness.dark,
+      colorScheme: darkDynamic ??
+          ColorScheme.fromSeed(
+            seedColor: const Color(0xFF3B66B1),
+            brightness: Brightness.dark,
+          ),
+      textTheme: GoogleFonts.bizUDPGothicTextTheme(
+        ThemeData(
+          useMaterial3: true,
+          brightness: Brightness.dark,
+          colorScheme: darkDynamic ??
+              ColorScheme.fromSeed(
+                seedColor: const Color(0xFF3B66B1),
+                brightness: Brightness.dark,
+              ),
+        ).textTheme,
       ),
     );
   }
