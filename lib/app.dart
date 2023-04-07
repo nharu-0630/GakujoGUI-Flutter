@@ -85,7 +85,6 @@ class _AppState extends State<App> {
               onTap: () async => showDialog(
                 context: App.navigatorKey.currentState!.overlay!.context,
                 builder: (_) => SimpleDialog(
-                  title: const Text('更新'),
                   children: [
                     SimpleDialogOption(
                       onPressed: () async =>

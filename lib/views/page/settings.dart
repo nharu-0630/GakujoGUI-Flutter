@@ -193,7 +193,6 @@ class _SettingsPageState extends State<SettingsPage> {
                                         context: context,
                                         builder: (BuildContext context) =>
                                             AlertDialog(
-                                          title: const Text('取得年度'),
                                           content: SizedBox(
                                             width: 360,
                                             height: 360,
@@ -262,7 +261,6 @@ class _SettingsPageState extends State<SettingsPage> {
                                       onPressed: () async => showDialog(
                                         context: context,
                                         builder: (context) => SimpleDialog(
-                                          title: const Text('取得学期'),
                                           children: [
                                             SimpleDialogOption(
                                               onPressed: () async {

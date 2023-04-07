@@ -67,7 +67,7 @@ extension StringParsing on String {
         return DateFormat('y/M/d').parse(this);
       } on FormatException {
         try {
-          return DateFormat('y年 MM月 dd日').parse(this);
+          return DateFormat('y年 M月 d日').parse(this);
         } on FormatException {
           return DateTime.fromMicrosecondsSinceEpoch(0);
         }

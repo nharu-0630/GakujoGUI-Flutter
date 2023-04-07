@@ -27,7 +27,7 @@ import 'package:uuid/uuid.dart';
 import 'package:version/version.dart';
 
 class GakujoApi {
-  static final version = Version(1, 6, 0);
+  static final version = Version(1, 6, 1);
   static final userAgent =
       'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/111.0.0.0 Safari/537.36 GakujoAPI/$version';
   static const _interval = Duration(milliseconds: 250);
@@ -1330,9 +1330,12 @@ class GakujoApi {
     return classLink;
   }
 
-  Future<bool> fetchAcademicSystem() async {
+  Future<bool> fetchAcademicSystem({
+    String? mainMenuCode,
+    String? parentMenuCode,
+  }) async {
     _setProgress(0 / 7);
-    await _client.postUri<dynamic>(
+    await _client.getUri<dynamic>(
       Uri.https(
         'gakujo.shizuoka.ac.jp',
         '/kyoumu/preLogin.do',
@@ -1464,11 +1467,18 @@ class GakujoApi {
       }
     }
     _setProgress(7 / 7);
-    return true;
+    return mainMenuCode == null || parentMenuCode == null
+        ? true
+        : response.data.toString().contains(
+              'mainMenuCode=$mainMenuCode&parentMenuCode=$parentMenuCode',
+            );
   }
 
   Future<void> fetchGrades() async {
-    await fetchAcademicSystem();
+    if (!await fetchAcademicSystem(
+        mainMenuCode: '008', parentMenuCode: '007')) {
+      throw Exception('Failed due to out of validity period.');
+    }
 
     _setProgress(0 / 5);
     await Future.delayed(_interval);
@@ -1560,18 +1570,18 @@ class GakujoApi {
         document.querySelectorAll('table.txt12').first.querySelectorAll('tr');
     gpa.departmentGrade = rows[0].children[1].text.trimWhiteSpace();
     gpa.departmentGpa = double.parse(rows[1].children[1].text.trimWhiteSpace());
-    gpa.departmentCalculationDate = rows.reversed
-        .skip(2)
-        .last
-        .children[1]
-        .text
-        .trimWhiteSpace()
-        .toDateTime();
     gpa.departmentGpas = {};
     rows.skip(2).toList().reversed.skip(3).forEach((e) {
       gpa.departmentGpas[e.children[0].text.trimWhiteSpace()] =
           double.parse(e.children[1].text.trimWhiteSpace());
     });
+    gpa.departmentCalculationDate = rows.reversed
+        .skip(2)
+        .first
+        .children[1]
+        .text
+        .trimWhiteSpace()
+        .toDateTime();
     gpa.departmentRankNumber = int.parse(rows.reversed
         .toList()[1]
         .children[1]
@@ -1631,7 +1641,10 @@ class GakujoApi {
   }
 
   Future<void> fetchTimetables() async {
-    await fetchAcademicSystem();
+    if (!await fetchAcademicSystem(
+        mainMenuCode: '005', parentMenuCode: '004')) {
+      throw Exception('Failed due to out of validity period.');
+    }
 
     await Future.delayed(_interval);
     var response = await _client.getUri<dynamic>(
