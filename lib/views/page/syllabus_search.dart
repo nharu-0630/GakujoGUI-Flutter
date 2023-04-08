@@ -70,7 +70,6 @@ class _SyllabusSearchPageState extends State<SyllabusSearchPage> {
                             onPressed: () async => showDialog(
                               context: context,
                               builder: (context) => AlertDialog(
-                                title: const Text('開講年度'),
                                 content: SizedBox(
                                   width: 360,
                                   height: 360,
@@ -135,7 +134,6 @@ class _SyllabusSearchPageState extends State<SyllabusSearchPage> {
                             onPressed: () async => showDialog(
                               context: context,
                               builder: (context) => SimpleDialog(
-                                title: const Text('タイトル'),
                                 children: parameters!.syllabusTitleIDMap.entries
                                     .map(
                                       (e) => SimpleDialogOption(
@@ -193,7 +191,6 @@ class _SyllabusSearchPageState extends State<SyllabusSearchPage> {
                             onPressed: () async => showDialog(
                               context: context,
                               builder: (context) => SimpleDialog(
-                                title: const Text('フォルダ'),
                                 children: parameters!.indexIDMap?.entries
                                         .map(
                                           (e) => SimpleDialogOption(
@@ -243,7 +240,6 @@ class _SyllabusSearchPageState extends State<SyllabusSearchPage> {
                             onPressed: () async => showDialog(
                               context: context,
                               builder: (context) => SimpleDialog(
-                                title: const Text('対象学年'),
                                 children: parameters!.targetGradeMap.entries
                                     .map(
                                       (e) => SimpleDialogOption(
@@ -291,7 +287,6 @@ class _SyllabusSearchPageState extends State<SyllabusSearchPage> {
                             onPressed: () async => showDialog(
                               context: context,
                               builder: (context) => SimpleDialog(
-                                title: const Text('曜日'),
                                 children: parameters!.weekMap.entries
                                     .map(
                                       (e) => SimpleDialogOption(
@@ -339,7 +334,6 @@ class _SyllabusSearchPageState extends State<SyllabusSearchPage> {
                             onPressed: () async => showDialog(
                               context: context,
                               builder: (context) => SimpleDialog(
-                                title: const Text('時限'),
                                 children: parameters!.hourMap.entries
                                     .map(
                                       (e) => SimpleDialogOption(

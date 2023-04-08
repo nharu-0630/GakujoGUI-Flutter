@@ -81,8 +81,8 @@ class TaskWidget extends StatelessWidget {
             } else {
               await showOkCancelAlertDialog(
                         context: context,
-                        title: '未取得の小テストです。',
-                        message: '取得しますか？',
+                        title: '取得しますか？',
+                        message: '未取得の小テストです。取得するためにはログイン状態である必要があります。',
                         okLabel: '取得',
                         cancelLabel: 'キャンセル',
                       ) ==
@@ -153,8 +153,8 @@ class TaskWidget extends StatelessWidget {
             } else {
               await showOkCancelAlertDialog(
                         context: context,
-                        title: '未取得のレポートです。',
-                        message: '取得しますか？',
+                        title: '取得しますか？',
+                        message: '未取得のレポートです。取得するためにはログイン状態である必要があります。',
                         okLabel: '取得',
                         cancelLabel: 'キャンセル',
                       ) ==

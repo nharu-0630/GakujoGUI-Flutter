@@ -41,7 +41,7 @@ class _SettingsPageState extends State<SettingsPage> {
   }
 
   void initValue() {
-    App.navigatorKey.currentContext?.watch<SettingsRepository>().load().then(
+    App.navigatorKey.currentContext?.read<SettingsRepository>().load().then(
       (value) {
         setState(
           () {
@@ -314,7 +314,7 @@ class _SettingsPageState extends State<SettingsPage> {
                               onPressed: () async {
                                 await showOkCancelAlertDialog(
                                           context: context,
-                                          message: '実行しますか？',
+                                          title: '実行しますか？',
                                           okLabel: '実行',
                                           cancelLabel: 'キャンセル',
                                         ) ==
@@ -330,8 +330,8 @@ class _SettingsPageState extends State<SettingsPage> {
                                 var result = await showOkCancelAlertDialog(
                                   isDestructiveAction: true,
                                   context: context,
-                                  title: '初期化するとすべてのデータが削除されます。',
-                                  message: '初期化しますか？',
+                                  title: '初期化しますか？',
+                                  message: '初期化するとすべてのデータが削除されます。',
                                   okLabel: '初期化',
                                   cancelLabel: 'キャンセル',
                                 );
@@ -361,6 +361,7 @@ class _SettingsPageState extends State<SettingsPage> {
                                     App.navigatorKey.currentContext
                                         ?.read<ClassLinkRepository>()
                                         .deleteAll();
+                                    initValue();
                                   }
                                 }
                               },
@@ -373,8 +374,8 @@ class _SettingsPageState extends State<SettingsPage> {
                                 var result = await showOkCancelAlertDialog(
                                   isDestructiveAction: true,
                                   context: context,
-                                  title: 'Cookiesを削除すると環境登録が解除されます。',
-                                  message: '削除しますか？',
+                                  title: '削除しますか？',
+                                  message: 'Cookiesを削除すると環境登録が解除されます。',
                                   okLabel: '削除',
                                   cancelLabel: 'キャンセル',
                                 );

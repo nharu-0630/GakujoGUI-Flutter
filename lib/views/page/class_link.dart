@@ -162,8 +162,8 @@ class _ClassLinkPageState extends State<ClassLinkPage> {
             } else {
               await showOkCancelAlertDialog(
                         context: context,
-                        title: '未取得の授業リンクです。',
-                        message: '取得しますか？',
+                        title: '取得しますか？',
+                        message: '未取得の授業リンクです。取得するためにはログイン状態である必要があります。',
                         okLabel: '取得',
                         cancelLabel: 'キャンセル',
                       ) ==

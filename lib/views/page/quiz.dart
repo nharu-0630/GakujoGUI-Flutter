@@ -165,8 +165,8 @@ class _QuizPageState extends State<QuizPage> {
             } else {
               await showOkCancelAlertDialog(
                         context: context,
-                        title: '未取得の小テストです。',
-                        message: '取得しますか？',
+                        title: '取得しますか？',
+                        message: '未取得の小テストです。取得するためにはログイン状態である必要があります。',
                         okLabel: '取得',
                         cancelLabel: 'キャンセル',
                       ) ==
