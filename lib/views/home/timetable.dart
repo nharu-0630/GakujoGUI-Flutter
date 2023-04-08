@@ -62,10 +62,8 @@ class _TimetablePageState extends State<TimetablePage> {
                                   alignment: Alignment.center,
                                   child: Text(
                                     '月火水木金'[i],
-                                    style: Theme.of(context)
-                                        .textTheme
-                                        .titleMedium
-                                        ?.copyWith(fontWeight: FontWeight.bold),
+                                    style:
+                                        Theme.of(context).textTheme.titleMedium,
                                   ),
                                 ),
                               ),
@@ -80,10 +78,8 @@ class _TimetablePageState extends State<TimetablePage> {
                                 padding: const EdgeInsets.all(8.0),
                                 child: Text(
                                   '${i + 1}',
-                                  style: Theme.of(context)
-                                      .textTheme
-                                      .titleMedium
-                                      ?.copyWith(fontWeight: FontWeight.bold),
+                                  style:
+                                      Theme.of(context).textTheme.titleMedium,
                                 ),
                               ),
                             ),

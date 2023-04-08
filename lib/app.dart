@@ -37,6 +37,7 @@ class App extends StatefulWidget {
 
 class _AppState extends State<App> {
   int _index = 0;
+  final PageController _pageController = PageController();
 
   @override
   void initState() {
@@ -129,10 +130,14 @@ class _AppState extends State<App> {
           key: App.scaffoldKey,
           drawer: _buildDrawer(),
           appBar: _buildAppBar(),
-          body: const [
-            HomeWidget(),
-            TimetablePage(),
-          ][_index],
+          body: PageView(
+            controller: _pageController,
+            children: const [
+              HomeWidget(),
+              TimetablePage(),
+            ],
+            onPageChanged: (index) => setState(() => _index = index),
+          ),
           bottomNavigationBar: _buildBottomNavigationBar(),
         ),
       ),
@@ -494,7 +499,10 @@ class _AppState extends State<App> {
 
   Widget _buildBottomNavigationBar() {
     return NavigationBar(
-      onDestinationSelected: (int value) => setState(() => _index = value),
+      onDestinationSelected: (int index) {
+        setState(() => _index = index);
+        _pageController.jumpToPage(index);
+      },
       selectedIndex: _index,
       labelBehavior: NavigationDestinationLabelBehavior.onlyShowSelected,
       destinations: const [
