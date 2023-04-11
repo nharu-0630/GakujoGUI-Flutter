@@ -73,16 +73,53 @@ class _TimetablePageState extends State<TimetablePage> {
                       for (var i = 0; i < 5; i++)
                         TableRow(
                           children: [
-                            TableCell(
-                              child: Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: Text(
-                                  '${i + 1}',
-                                  style:
-                                      Theme.of(context).textTheme.titleMedium,
+                            Builder(builder: (context) {
+                              return TableCell(
+                                child: SizedBox(
+                                  height: max(
+                                      MediaQuery.of(context).size.height *
+                                          .8 /
+                                          5,
+                                      120.0),
+                                  child: Column(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceAround,
+                                    children: [
+                                      Text(
+                                        [
+                                          '8:40',
+                                          '10:20',
+                                          '12:45',
+                                          '14:25',
+                                          '16:05'
+                                        ][i],
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .labelSmall,
+                                      ),
+                                      Text(
+                                        '${i + 1}',
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .titleMedium,
+                                      ),
+                                      Text(
+                                        [
+                                          '10:10',
+                                          '11:50',
+                                          '14:15',
+                                          '15:55',
+                                          '17:35'
+                                        ][i],
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .labelSmall,
+                                      ),
+                                    ],
+                                  ),
                                 ),
-                              ),
-                            ),
+                              );
+                            }),
                             for (var j = 0; j < 5; j++)
                               timetables.any(
                                       (e) => e.weekday == j && e.period == i)

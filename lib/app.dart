@@ -63,70 +63,7 @@ class _AppState extends State<App> {
         debugShowCheckedModeBanner: false,
         title: 'GakujoGUI',
         home: Scaffold(
-          floatingActionButton: SpeedDial(
-            childMargin: const EdgeInsets.all(8.0),
-            animatedIcon: AnimatedIcons.menu_close,
-            shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(16.0)),
-            children: [
-              SpeedDialChild(
-                child: const Icon(LineIcons.alternateSignIn),
-                label: 'ログイン',
-                onTap: () async => context.read<ApiRepository>().fetchLogin(),
-              ),
-              SpeedDialChild(
-                child: Icon(KIcons.update),
-                label: '更新',
-                onTap: () async => showDialog(
-                  context: App.navigatorKey.currentState!.overlay!.context,
-                  builder: (_) => SimpleDialog(
-                    children: [
-                      SimpleDialogOption(
-                        onPressed: () async =>
-                            context.read<ApiRepository>().fetchSubjects(),
-                        child: const Text('授業科目'),
-                      ),
-                      SimpleDialogOption(
-                        onPressed: () async =>
-                            context.read<ApiRepository>().fetchContacts(),
-                        child: const Text('授業連絡'),
-                      ),
-                      SimpleDialogOption(
-                        onPressed: () async =>
-                            context.read<ApiRepository>().fetchReports(),
-                        child: const Text('レポート'),
-                      ),
-                      SimpleDialogOption(
-                        onPressed: () async =>
-                            context.read<ApiRepository>().fetchQuizzes(),
-                        child: const Text('小テスト'),
-                      ),
-                      SimpleDialogOption(
-                        onPressed: () async =>
-                            context.read<ApiRepository>().fetchSharedFiles(),
-                        child: const Text('授業共有ファイル'),
-                      ),
-                      SimpleDialogOption(
-                        onPressed: () async =>
-                            context.read<ApiRepository>().fetchClassLinks(),
-                        child: const Text('授業リンク'),
-                      ),
-                      SimpleDialogOption(
-                        onPressed: () async =>
-                            context.read<ApiRepository>().fetchGrades(),
-                        child: const Text('成績情報'),
-                      ),
-                      SimpleDialogOption(
-                        onPressed: () async =>
-                            context.read<ApiRepository>().fetchTimetables(),
-                        child: const Text('個人時間割'),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ],
-          ),
+          floatingActionButton: _buildFloatingActionButton(),
           key: App.scaffoldKey,
           drawer: _buildDrawer(),
           appBar: _buildAppBar(),
@@ -141,6 +78,72 @@ class _AppState extends State<App> {
           bottomNavigationBar: _buildBottomNavigationBar(),
         ),
       ),
+    );
+  }
+
+  Widget _buildFloatingActionButton() {
+    return SpeedDial(
+      childMargin: const EdgeInsets.all(8.0),
+      animatedIcon: AnimatedIcons.menu_close,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16.0)),
+      children: [
+        SpeedDialChild(
+          child: const Icon(LineIcons.alternateSignIn),
+          label: 'ログイン',
+          onTap: () async => context.read<ApiRepository>().fetchLogin(),
+        ),
+        SpeedDialChild(
+          child: Icon(KIcons.update),
+          label: '更新',
+          onTap: () async => showDialog(
+            context: App.navigatorKey.currentState!.overlay!.context,
+            builder: (_) => SimpleDialog(
+              children: [
+                SimpleDialogOption(
+                  onPressed: () async =>
+                      context.read<ApiRepository>().fetchSubjects(),
+                  child: const Text('授業科目'),
+                ),
+                SimpleDialogOption(
+                  onPressed: () async =>
+                      context.read<ApiRepository>().fetchContacts(),
+                  child: const Text('授業連絡'),
+                ),
+                SimpleDialogOption(
+                  onPressed: () async =>
+                      context.read<ApiRepository>().fetchReports(),
+                  child: const Text('レポート'),
+                ),
+                SimpleDialogOption(
+                  onPressed: () async =>
+                      context.read<ApiRepository>().fetchQuizzes(),
+                  child: const Text('小テスト'),
+                ),
+                SimpleDialogOption(
+                  onPressed: () async =>
+                      context.read<ApiRepository>().fetchSharedFiles(),
+                  child: const Text('授業共有ファイル'),
+                ),
+                SimpleDialogOption(
+                  onPressed: () async =>
+                      context.read<ApiRepository>().fetchClassLinks(),
+                  child: const Text('授業リンク'),
+                ),
+                SimpleDialogOption(
+                  onPressed: () async =>
+                      context.read<ApiRepository>().fetchGrades(),
+                  child: const Text('成績情報'),
+                ),
+                SimpleDialogOption(
+                  onPressed: () async =>
+                      context.read<ApiRepository>().fetchTimetables(),
+                  child: const Text('個人時間割'),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ],
     );
   }
 
@@ -280,7 +283,7 @@ class _AppState extends State<App> {
                           KIcons.contact,
                           color: Theme.of(context).iconTheme.color,
                         ),
-                        const SizedBox(width: 8.0),
+                        const SizedBox(width: 16.0),
                         Text(
                           '授業連絡',
                           style: Theme.of(context).textTheme.titleMedium,
@@ -306,7 +309,7 @@ class _AppState extends State<App> {
                             color: Theme.of(context).iconTheme.color,
                           ),
                         ),
-                        const SizedBox(width: 8.0),
+                        const SizedBox(width: 16.0),
                         Text(
                           'レポート',
                           style: Theme.of(context).textTheme.titleMedium,
@@ -332,7 +335,7 @@ class _AppState extends State<App> {
                             color: Theme.of(context).iconTheme.color,
                           ),
                         ),
-                        const SizedBox(width: 8.0),
+                        const SizedBox(width: 16.0),
                         Text(
                           '小テスト',
                           style: Theme.of(context).textTheme.titleMedium,
@@ -352,7 +355,7 @@ class _AppState extends State<App> {
                           KIcons.sharedFile,
                           color: Theme.of(context).iconTheme.color,
                         ),
-                        const SizedBox(width: 8.0),
+                        const SizedBox(width: 16.0),
                         Text(
                           '授業共有ファイル',
                           style: Theme.of(context).textTheme.titleMedium,
@@ -372,7 +375,7 @@ class _AppState extends State<App> {
                           KIcons.classLink,
                           color: Theme.of(context).iconTheme.color,
                         ),
-                        const SizedBox(width: 8.0),
+                        const SizedBox(width: 16.0),
                         Text(
                           '授業リンク',
                           style: Theme.of(context).textTheme.titleMedium,
@@ -392,7 +395,7 @@ class _AppState extends State<App> {
                           KIcons.grade,
                           color: Theme.of(context).iconTheme.color,
                         ),
-                        const SizedBox(width: 8.0),
+                        const SizedBox(width: 16.0),
                         Text(
                           '成績情報',
                           style: Theme.of(context).textTheme.titleMedium,
@@ -412,7 +415,7 @@ class _AppState extends State<App> {
                           KIcons.syllabus,
                           color: Theme.of(context).iconTheme.color,
                         ),
-                        const SizedBox(width: 8.0),
+                        const SizedBox(width: 16.0),
                         Text(
                           'シラバス',
                           style: Theme.of(context).textTheme.titleMedium,
@@ -432,7 +435,7 @@ class _AppState extends State<App> {
                           KIcons.settings,
                           color: Theme.of(context).iconTheme.color,
                         ),
-                        const SizedBox(width: 8.0),
+                        const SizedBox(width: 16.0),
                         Text(
                           '設定',
                           style: Theme.of(context).textTheme.titleMedium,
@@ -499,12 +502,13 @@ class _AppState extends State<App> {
 
   Widget _buildBottomNavigationBar() {
     return NavigationBar(
+      height: 54.0,
       onDestinationSelected: (int index) {
         setState(() => _index = index);
         _pageController.jumpToPage(index);
       },
       selectedIndex: _index,
-      labelBehavior: NavigationDestinationLabelBehavior.onlyShowSelected,
+      labelBehavior: NavigationDestinationLabelBehavior.alwaysHide,
       destinations: const [
         NavigationDestination(
           icon: Icon(LineIcons.home),
