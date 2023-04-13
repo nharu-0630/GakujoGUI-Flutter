@@ -1,6 +1,5 @@
-import 'dart:math';
-
 import 'package:badges/badges.dart' as badges;
+import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:gakujo_gui/api/parse.dart';
 import 'package:gakujo_gui/models/quiz.dart';
@@ -24,202 +23,178 @@ class _TimetablePageState extends State<TimetablePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: ListView(
-        physics: const AlwaysScrollableScrollPhysics(),
-        children: [
-          FutureBuilder(
-            future: Future.wait([
-              context.watch<TimetableRepository>().getAll(),
-              context.watch<ReportRepository>().getSubmittable(),
-              context.watch<QuizRepository>().getSubmittable()
-            ]),
-            builder: (_, AsyncSnapshot<List<dynamic>> snapshot) {
-              if (snapshot.hasData) {
-                var timetables = snapshot.data![0] as List<Timetable>;
-                _reports = snapshot.data![1] as List<Report>;
-                _quizzes = snapshot.data![2] as List<Quiz>;
-                return Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 4.0),
-                  child: Table(
-                    columnWidths: const {
-                      0: IntrinsicColumnWidth(),
-                      1: FlexColumnWidth(1.0),
-                      2: FlexColumnWidth(1.0),
-                      3: FlexColumnWidth(1.0),
-                      4: FlexColumnWidth(1.0),
-                      5: FlexColumnWidth(1.0),
-                    },
-                    defaultVerticalAlignment: TableCellVerticalAlignment.middle,
+      body: FutureBuilder(
+        future: Future.wait([
+          context.watch<TimetableRepository>().getAll(),
+          context.watch<ReportRepository>().getSubmittable(),
+          context.watch<QuizRepository>().getSubmittable()
+        ]),
+        builder: (_, AsyncSnapshot<List<dynamic>> snapshot) {
+          if (snapshot.hasData) {
+            var timetables = snapshot.data![0] as List<Timetable>;
+            _reports = snapshot.data![1] as List<Report>;
+            _quizzes = snapshot.data![2] as List<Quiz>;
+            return Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 4.0),
+              child: Row(
+                children: [
+                  Column(
                     children: [
-                      TableRow(
-                        children: [
-                          const TableCell(child: SizedBox()),
-                          for (var i = 0; i < 5; i++)
-                            TableCell(
-                              child: Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: Align(
-                                  alignment: Alignment.center,
-                                  child: Text(
-                                    '月火水木金'[i],
-                                    style:
-                                        Theme.of(context).textTheme.titleMedium,
-                                  ),
-                                ),
-                              ),
-                            ),
-                        ],
-                      ),
+                      const SizedBox(height: 24.0),
                       for (var i = 0; i < 5; i++)
-                        TableRow(
-                          children: [
-                            Builder(builder: (context) {
-                              return TableCell(
-                                child: SizedBox(
-                                  height: max(
-                                      MediaQuery.of(context).size.height *
-                                          .8 /
-                                          5,
-                                      120.0),
-                                  child: Column(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceAround,
-                                    children: [
-                                      Text(
-                                        [
-                                          '8:40',
-                                          '10:20',
-                                          '12:45',
-                                          '14:25',
-                                          '16:05'
-                                        ][i],
-                                        style: Theme.of(context)
-                                            .textTheme
-                                            .labelSmall,
-                                      ),
-                                      Text(
-                                        '${i + 1}',
-                                        style: Theme.of(context)
-                                            .textTheme
-                                            .titleMedium,
-                                      ),
-                                      Text(
-                                        [
-                                          '10:10',
-                                          '11:50',
-                                          '14:15',
-                                          '15:55',
-                                          '17:35'
-                                        ][i],
-                                        style: Theme.of(context)
-                                            .textTheme
-                                            .labelSmall,
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              );
-                            }),
-                            for (var j = 0; j < 5; j++)
-                              timetables.any(
-                                      (e) => e.weekday == j && e.period == i)
-                                  ? _buildCell(timetables.firstWhere(
-                                      (e) => e.weekday == j && e.period == i))
-                                  : const TableCell(child: SizedBox()),
-                          ],
+                        Expanded(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.spaceAround,
+                            children: [
+                              Text(
+                                ['8:40', '10:20', '12:45', '14:25', '16:05'][i],
+                                style: Theme.of(context).textTheme.labelSmall,
+                              ),
+                              Text(
+                                '${i + 1}',
+                                style: Theme.of(context).textTheme.titleMedium,
+                              ),
+                              Text(
+                                [
+                                  '10:10',
+                                  '11:50',
+                                  '14:15',
+                                  '15:55',
+                                  '17:35'
+                                ][i],
+                                style: Theme.of(context).textTheme.labelSmall,
+                              ),
+                            ],
+                          ),
                         ),
                     ],
                   ),
-                );
-              } else {
-                return const Center(
-                  child: Padding(
-                    padding: EdgeInsets.all(8.0),
-                    child: CircularProgressIndicator(),
-                  ),
-                );
-              }
-            },
-          ),
-        ],
+                  for (var i = 0; i < 5; i++)
+                    Expanded(
+                      child: Column(
+                        children: [
+                          SizedBox(
+                            height: 24.0,
+                            child: Align(
+                              alignment: Alignment.center,
+                              child: Text(
+                                '月火水木金'[i],
+                                style: Theme.of(context).textTheme.titleMedium,
+                              ),
+                            ),
+                          ),
+                          ..._buildColumn(timetables, i)
+                        ],
+                      ),
+                    ),
+                ],
+              ),
+            );
+          } else {
+            return const Center(
+              child: Padding(
+                padding: EdgeInsets.all(8.0),
+                child: CircularProgressIndicator(),
+              ),
+            );
+          }
+        },
       ),
     );
   }
 
+  List<Widget> _buildColumn(List<Timetable> timetables, int weekday) {
+    var widgets = <Widget>[];
+    var period = 0;
+    while (period < 5) {
+      var flex = 1;
+      if (!timetables.any((e) => e.weekday == weekday && e.period == period)) {
+        widgets.add(const Expanded(child: SizedBox()));
+      } else {
+        var timetable = timetables
+            .firstWhere((e) => e.weekday == weekday && e.period == period);
+        while (timetables.firstWhereOrNull(
+                (e) => e.weekday == weekday && e.period == period + flex) ==
+            timetable) {
+          flex++;
+        }
+        widgets.add(
+          Expanded(
+            flex: flex,
+            child: _buildCell(timetable),
+          ),
+        );
+      }
+      period += flex;
+    }
+    return widgets;
+  }
+
   Widget _buildCell(Timetable timetable) {
     return Builder(builder: (context) {
-      return TableCell(
-        child: badges.Badge(
-          showBadge:
-              (_reports.where((e) => e.subject == timetable.subject).length +
-                      _quizzes
-                          .where((e) => e.subject == timetable.subject)
-                          .length) >
-                  0,
-          ignorePointer: true,
-          position: badges.BadgePosition.topEnd(top: 0, end: 0),
-          badgeContent: Text(
-            (_reports.where((e) => e.subject == timetable.subject).length +
-                    _quizzes
-                        .where((e) => e.subject == timetable.subject)
-                        .length)
-                .toString(),
+      return badges.Badge(
+        showBadge: (_reports
+                    .where((e) => e.subject == timetable.subject)
+                    .length +
+                _quizzes.where((e) => e.subject == timetable.subject).length) >
+            0,
+        ignorePointer: true,
+        position: badges.BadgePosition.topEnd(top: 0, end: 0),
+        badgeContent: Text(
+          (_reports.where((e) => e.subject == timetable.subject).length +
+                  _quizzes.where((e) => e.subject == timetable.subject).length)
+              .toString(),
+        ),
+        child: Card(
+          color: Color.lerp(
+              timetable.subject.toColor(), Theme.of(context).cardColor, 0.7),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12.0),
           ),
-          child: SizedBox(
-            height: max(MediaQuery.of(context).size.height * .8 / 5, 120.0),
-            width: double.infinity,
-            child: Card(
-              color: Color.lerp(timetable.subject.toColor(),
-                  Theme.of(context).cardColor, 0.7),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12.0),
-              ),
-              child: InkWell(
-                borderRadius: BorderRadius.circular(12.0),
-                onTap: () =>
-                    showModalOnTap(context, buildTimetableModal(timetable)),
-                child: Padding(
-                  padding: const EdgeInsets.all(2.0),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Text(
-                        timetable.subject,
-                        style: Theme.of(context)
-                            .textTheme
-                            .titleSmall
-                            ?.copyWith(fontWeight: FontWeight.bold),
-                        overflow: TextOverflow.visible,
-                        textAlign: TextAlign.center,
-                      ),
-                      Flexible(
-                        child: Text(
-                          timetable.className,
-                          style: Theme.of(context).textTheme.bodySmall,
-                          overflow: TextOverflow.ellipsis,
-                          textAlign: TextAlign.center,
-                        ),
-                      ),
-                      Flexible(
-                        child: Text(
-                          timetable.classRoom,
-                          style: Theme.of(context).textTheme.bodySmall,
-                          overflow: TextOverflow.ellipsis,
-                          textAlign: TextAlign.center,
-                        ),
-                      ),
-                      Flexible(
-                        child: Text(
-                          timetable.teacher,
-                          style: Theme.of(context).textTheme.bodySmall,
-                          overflow: TextOverflow.ellipsis,
-                          textAlign: TextAlign.center,
-                        ),
-                      ),
-                    ],
+          child: InkWell(
+            borderRadius: BorderRadius.circular(12.0),
+            onTap: () =>
+                showModalOnTap(context, buildTimetableModal(timetable)),
+            child: Padding(
+              padding: const EdgeInsets.all(2.0),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Text(
+                    timetable.subject,
+                    style: Theme.of(context)
+                        .textTheme
+                        .titleSmall
+                        ?.copyWith(fontWeight: FontWeight.bold),
+                    overflow: TextOverflow.visible,
+                    textAlign: TextAlign.center,
                   ),
-                ),
+                  Flexible(
+                    child: Text(
+                      timetable.className,
+                      style: Theme.of(context).textTheme.bodySmall,
+                      overflow: TextOverflow.ellipsis,
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                  Flexible(
+                    child: Text(
+                      timetable.classRoom,
+                      style: Theme.of(context).textTheme.bodySmall,
+                      overflow: TextOverflow.ellipsis,
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                  Flexible(
+                    child: Text(
+                      timetable.teacher,
+                      style: Theme.of(context).textTheme.bodySmall,
+                      overflow: TextOverflow.ellipsis,
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                ],
               ),
             ),
           ),

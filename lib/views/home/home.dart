@@ -52,7 +52,7 @@ class _HomeWidgetState extends State<HomeWidget> {
           content: const TaskWidget(),
         ),
         StickyHeader(
-          header: _buildHeader(KIcons.contact, 'メッセージ'),
+          header: _buildHeader(KIcons.contact, '授業連絡'),
           content: const ContactWidget(),
         ),
       ],
