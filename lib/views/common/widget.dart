@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:better_open_file/better_open_file.dart';
 import 'package:flash/flash.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_linkify/flutter_linkify.dart';
 import 'package:gakujo_gui/api/provide.dart';
 import 'package:gakujo_gui/app.dart';
 import 'package:gakujo_gui/constants/kicons.dart';
@@ -10,8 +11,6 @@ import 'package:line_icons/line_icons.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
-import 'package:selectable_autolink_text/selectable_autolink_text.dart';
-import 'package:share_plus/share_plus.dart';
 import 'package:side_sheet/side_sheet.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
@@ -341,14 +340,12 @@ Icon _buildExtIcon(String ext) {
 
 Widget buildAutoLinkText(String text) {
   return Builder(builder: (context) {
-    return SelectableAutoLinkText(
-      text,
+    return SelectableLinkify(
+      text: text,
       style: Theme.of(context).textTheme.bodyMedium,
       linkStyle: TextStyle(color: Theme.of(context).colorScheme.primary),
-      onTap: (url) => launchUrlString(url, mode: LaunchMode.inAppWebView),
-      onLongPress: (url) => Share.share(url),
-      linkRegExpPattern:
-          r'https?:\/\/(?:www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b(?:[-a-zA-Z0-9()@:%_\+.~#?&\/=]*)',
+      onOpen: (link) =>
+          launchUrlString(link.url, mode: LaunchMode.inAppWebView),
     );
   });
 }
