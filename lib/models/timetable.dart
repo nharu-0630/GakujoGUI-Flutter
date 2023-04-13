@@ -205,7 +205,8 @@ class Timetable implements Comparable<Timetable> {
   }
 
   @override
-  int get hashCode => kamokuCode.hashCode ^ classCode.hashCode ^ weekday ^ period;
+  int get hashCode =>
+      kamokuCode.hashCode ^ classCode.hashCode ^ weekday ^ period;
 
   @override
   int compareTo(Timetable other) {
