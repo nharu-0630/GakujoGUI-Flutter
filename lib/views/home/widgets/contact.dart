@@ -26,7 +26,9 @@ class ContactWidget extends StatelessWidget {
                 contacts.firstWhereOrNull((e) => e.subject == a.subject);
             var bContact =
                 contacts.firstWhereOrNull((e) => e.subject == b.subject);
-            if (aContact == null || bContact == null) return 0;
+            if (aContact == null && bContact == null) return 0;
+            if (aContact == null) return 1;
+            if (bContact == null) return -1;
             return bContact.contactDateTime.compareTo(aContact.contactDateTime);
           });
           return Padding(
