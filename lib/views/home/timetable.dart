@@ -45,48 +45,26 @@ class _TimetablePageState extends State<TimetablePage> {
                         Expanded(
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.spaceAround,
-                            children: MediaQuery.of(context).orientation ==
-                                    Orientation.portrait
-                                ? [
-                                    Text(
-                                      [
-                                        '8:40',
-                                        '10:20',
-                                        '12:45',
-                                        '14:25',
-                                        '16:05'
-                                      ][i],
-                                      style: Theme.of(context)
-                                          .textTheme
-                                          .labelSmall,
-                                    ),
-                                    Text(
-                                      '${i + 1}',
-                                      style: Theme.of(context)
-                                          .textTheme
-                                          .titleMedium,
-                                    ),
-                                    Text(
-                                      [
-                                        '10:10',
-                                        '11:50',
-                                        '14:15',
-                                        '15:55',
-                                        '17:35'
-                                      ][i],
-                                      style: Theme.of(context)
-                                          .textTheme
-                                          .labelSmall,
-                                    ),
-                                  ]
-                                : [
-                                    Text(
-                                      '${i + 1}',
-                                      style: Theme.of(context)
-                                          .textTheme
-                                          .titleMedium,
-                                    ),
-                                  ],
+                            children: [
+                              Text(
+                                ['8:40', '10:20', '12:45', '14:25', '16:05'][i],
+                                style: Theme.of(context).textTheme.labelSmall,
+                              ),
+                              Text(
+                                '${i + 1}',
+                                style: Theme.of(context).textTheme.titleMedium,
+                              ),
+                              Text(
+                                [
+                                  '10:10',
+                                  '11:50',
+                                  '14:15',
+                                  '15:55',
+                                  '17:35'
+                                ][i],
+                                style: Theme.of(context).textTheme.labelSmall,
+                              ),
+                            ],
                           ),
                         ),
                     ],
@@ -170,6 +148,7 @@ class _TimetablePageState extends State<TimetablePage> {
         ),
         child: SizedBox(
           width: double.infinity,
+          height: double.infinity,
           child: Card(
             color: Color.lerp(
                 timetable.subject.toColor(), Theme.of(context).cardColor, 0.7),
@@ -182,58 +161,36 @@ class _TimetablePageState extends State<TimetablePage> {
                   showModalOnTap(context, buildTimetableModal(timetable)),
               child: Padding(
                 padding: const EdgeInsets.all(2.0),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children:
-                      MediaQuery.of(context).orientation == Orientation.portrait
-                          ? [
-                              Text(
-                                timetable.subject,
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .titleSmall
-                                    ?.copyWith(fontWeight: FontWeight.bold),
-                                overflow: TextOverflow.visible,
-                                textAlign: TextAlign.center,
-                              ),
-                              Flexible(
-                                child: Text(
-                                  timetable.className,
-                                  style: Theme.of(context).textTheme.bodySmall,
-                                  overflow: TextOverflow.ellipsis,
-                                  textAlign: TextAlign.center,
-                                ),
-                              ),
-                              Flexible(
-                                child: Text(
-                                  timetable.classRoom,
-                                  style: Theme.of(context).textTheme.bodySmall,
-                                  overflow: TextOverflow.ellipsis,
-                                  textAlign: TextAlign.center,
-                                ),
-                              ),
-                              Flexible(
-                                child: Text(
-                                  timetable.teacher,
-                                  style: Theme.of(context).textTheme.bodySmall,
-                                  overflow: TextOverflow.ellipsis,
-                                  textAlign: TextAlign.center,
-                                ),
-                              ),
-                            ]
-                          : [
-                              Text(
-                                timetable.subject,
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .titleSmall
-                                    ?.copyWith(fontWeight: FontWeight.bold),
-                                overflow: TextOverflow.ellipsis,
-                                textAlign: TextAlign.center,
-                              ),
-                            ],
-                ),
+                child: LayoutBuilder(builder: (context, constraints) {
+                  return SingleChildScrollView(
+                    child: ConstrainedBox(
+                      constraints:
+                          BoxConstraints(minHeight: constraints.maxHeight),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Text(
+                            timetable.subject,
+                            style: Theme.of(context)
+                                .textTheme
+                                .titleSmall
+                                ?.copyWith(fontWeight: FontWeight.bold),
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 1,
+                          ),
+                          Text(
+                            '${timetable.className}\n${timetable.classRoom}\n${timetable.teacher}',
+                            style: Theme.of(context).textTheme.bodySmall,
+                            overflow: TextOverflow.ellipsis,
+                            textAlign: TextAlign.center,
+                            maxLines: 3,
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
+                }),
               ),
             ),
           ),
