@@ -176,15 +176,14 @@ class _TimetablePageState extends State<TimetablePage> {
                                 .textTheme
                                 .titleSmall
                                 ?.copyWith(fontWeight: FontWeight.bold),
-                            overflow: TextOverflow.ellipsis,
-                            maxLines: 1,
+                            overflow: TextOverflow.clip,
+                            textAlign: TextAlign.center,
                           ),
                           Text(
                             '${timetable.className}\n${timetable.classRoom}\n${timetable.teacher}',
                             style: Theme.of(context).textTheme.bodySmall,
-                            overflow: TextOverflow.ellipsis,
+                            overflow: TextOverflow.clip,
                             textAlign: TextAlign.center,
-                            maxLines: 3,
                           ),
                         ],
                       ),
