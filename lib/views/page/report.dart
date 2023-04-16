@@ -50,7 +50,7 @@ class _ReportPageState extends State<ReportPage> {
                 child: filteredReports.isEmpty
                     ? buildCenterItemLayoutBuilder(KIcons.report, 'レポートはありません')
                     : ListView.builder(
-                        padding: const EdgeInsets.only(top: 8),
+                        padding: const EdgeInsets.only(top: 8.0),
                         itemCount: _searchStatus
                             ? _suggestReports.length
                             : filteredReports.length,

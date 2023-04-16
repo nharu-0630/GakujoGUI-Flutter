@@ -31,40 +31,36 @@ class ContactWidget extends StatelessWidget {
             if (bContact == null) return -1;
             return bContact.contactDateTime.compareTo(aContact.contactDateTime);
           });
-          return Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0),
-            child: subjects.isEmpty
-                ? Center(
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Icon(
-                            KIcons.contact,
-                            size: 32.0,
-                          ),
+          return subjects.isEmpty
+              ? Center(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Icon(
+                          KIcons.contact,
+                          size: 32.0,
                         ),
-                        Text(
-                          '授業連絡はありません',
-                          style: Theme.of(context).textTheme.titleMedium,
-                        ),
-                      ],
-                    ),
-                  )
-                : ListView.builder(
-                    shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
-                    itemCount: subjects.length,
-                    itemBuilder: ((_, index) => _buildTile(
-                          subjects[index],
-                          contacts
-                              .where(
-                                  (e) => e.subject == subjects[index].subject)
-                              .toList(),
-                        )),
+                      ),
+                      Text(
+                        '授業連絡はありません',
+                        style: Theme.of(context).textTheme.titleMedium,
+                      ),
+                    ],
                   ),
-          );
+                )
+              : ListView.builder(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  itemCount: subjects.length,
+                  itemBuilder: ((_, index) => _buildTile(
+                        subjects[index],
+                        contacts
+                            .where((e) => e.subject == subjects[index].subject)
+                            .toList(),
+                      )),
+                );
         } else {
           return const Center(
             child: Padding(

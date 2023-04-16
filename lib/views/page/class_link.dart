@@ -47,7 +47,7 @@ class _ClassLinkPageState extends State<ClassLinkPage> {
                     ? buildCenterItemLayoutBuilder(
                         KIcons.classLink, '授業リンクはありません')
                     : ListView.builder(
-                        padding: const EdgeInsets.only(top: 8),
+                        padding: const EdgeInsets.only(top: 8.0),
                         itemCount: _searchStatus
                             ? _suggestClassLinks.length
                             : _classLinks.length,

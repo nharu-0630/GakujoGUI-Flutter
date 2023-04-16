@@ -68,7 +68,7 @@ class _SyllabusResultPageState extends State<SyllabusResultPage> {
               headerSliverBuilder: (_, __) => [_buildAppBar()],
               body: result!.isNotEmpty
                   ? ListView.builder(
-                      padding: const EdgeInsets.only(top: 8),
+                      padding: const EdgeInsets.only(top: 8.0),
                       itemCount: result!.length,
                       itemBuilder: (_, index) => _buildCard(result![index]),
                     )

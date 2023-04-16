@@ -51,7 +51,7 @@ class _QuestionnairePageState extends State<QuestionnairePage> {
                     ? buildCenterItemLayoutBuilder(
                         KIcons.questionnaire, '授業アンケートはありません')
                     : ListView.builder(
-                        padding: const EdgeInsets.only(top: 8),
+                        padding: const EdgeInsets.only(top: 8.0),
                         itemCount: _searchStatus
                             ? _suggestQuestionnaires.length
                             : _questionnaires.length,

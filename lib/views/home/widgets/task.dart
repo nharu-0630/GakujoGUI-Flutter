@@ -26,36 +26,33 @@ class TaskWidget extends StatelessWidget {
           var quizzes = snapshot.data![1] as List<Quiz>;
           List<dynamic> tasks = [...reports, ...quizzes];
           tasks.sort((a, b) => b.endDateTime.compareTo(a.endDateTime));
-          return Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0),
-            child: tasks.isEmpty
-                ? Center(
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Icon(
-                            KIcons.task,
-                            size: 32.0,
-                          ),
+          return tasks.isEmpty
+              ? Center(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Icon(
+                          KIcons.task,
+                          size: 32.0,
                         ),
-                        Text(
-                          'タスクはありません',
-                          style: Theme.of(context).textTheme.titleMedium,
-                        ),
-                      ],
-                    ),
-                  )
-                : ListView.builder(
-                    shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
-                    itemCount: tasks.length,
-                    itemBuilder: ((_, index) => tasks[index] is Report
-                        ? _buildReportCard(tasks[index] as Report)
-                        : _buildQuizCard(tasks[index] as Quiz)),
+                      ),
+                      Text(
+                        'タスクはありません',
+                        style: Theme.of(context).textTheme.titleMedium,
+                      ),
+                    ],
                   ),
-          );
+                )
+              : ListView.builder(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  itemCount: tasks.length,
+                  itemBuilder: ((_, index) => tasks[index] is Report
+                      ? _buildReportCard(tasks[index] as Report)
+                      : _buildQuizCard(tasks[index] as Quiz)),
+                );
         } else {
           return const Center(
             child: Padding(

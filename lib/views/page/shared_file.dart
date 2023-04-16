@@ -47,7 +47,7 @@ class _SharedFilePageState extends State<SharedFilePage> {
                     ? buildCenterItemLayoutBuilder(
                         KIcons.sharedFile, '授業共有ファイルはありません')
                     : ListView.builder(
-                        padding: const EdgeInsets.only(top: 8),
+                        padding: const EdgeInsets.only(top: 8.0),
                         itemCount: _searchStatus
                             ? _suggestSharedFiles.length
                             : _sharedFiles.length,

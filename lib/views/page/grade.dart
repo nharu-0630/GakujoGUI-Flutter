@@ -70,7 +70,7 @@ class _GradePageState extends State<GradePage> {
             ? buildCenterItemLayoutBuilder(KIcons.grade, '成績情報はありません')
             : ListView.builder(
                 controller: ScrollController(),
-                padding: const EdgeInsets.only(top: 8),
+                padding: const EdgeInsets.only(top: 8.0),
                 itemCount:
                     _searchStatus ? _suggestGrades.length : _grades.length,
                 itemBuilder: (_, index) => _searchStatus
