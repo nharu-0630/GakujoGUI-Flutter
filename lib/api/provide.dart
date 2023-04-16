@@ -7,6 +7,7 @@ import 'package:gakujo_gui/api/syllabus_api.dart';
 import 'package:gakujo_gui/app.dart';
 import 'package:gakujo_gui/models/class_link.dart';
 import 'package:gakujo_gui/models/contact.dart';
+import 'package:gakujo_gui/models/questionnaire.dart';
 import 'package:gakujo_gui/models/quiz.dart';
 import 'package:gakujo_gui/models/report.dart';
 import 'package:gakujo_gui/models/shared_file.dart';
@@ -228,6 +229,30 @@ class ApiRepository extends ChangeNotifier {
       await _gakujoApi.fetchDetailClassLink(classLink);
       _setStatus(false);
       _onSuccess('授業リンク詳細の取得');
+    } catch (e) {
+      _onError(e);
+    }
+  }
+
+  void fetchQuestionnaires() async {
+    if (isLoading) return;
+    _setStatus(true);
+    try {
+      await _gakujoApi.fetchQuestionnaires();
+      _setStatus(false);
+      _onSuccess('授業アンケート一覧の取得');
+    } catch (e) {
+      _onError(e);
+    }
+  }
+
+  void fetchDetailQuestionnaire(Questionnaire questionnaire) async {
+    if (isLoading) return;
+    _setStatus(true);
+    try {
+      await _gakujoApi.fetchDetailQuestionnaire(questionnaire);
+      _setStatus(false);
+      _onSuccess('授業アンケート詳細の取得');
     } catch (e) {
       _onError(e);
     }

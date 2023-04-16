@@ -8,6 +8,7 @@ import 'package:gakujo_gui/models/class_link.dart';
 import 'package:gakujo_gui/models/contact.dart';
 import 'package:gakujo_gui/models/gpa.dart';
 import 'package:gakujo_gui/models/grade.dart';
+import 'package:gakujo_gui/models/questionnaire.dart';
 import 'package:gakujo_gui/models/quiz.dart';
 import 'package:gakujo_gui/models/report.dart';
 import 'package:gakujo_gui/models/settings.dart';
@@ -43,6 +44,7 @@ void main() async {
   Hive.registerAdapter(GradeAdapter());
   Hive.registerAdapter(SharedFileAdapter());
   Hive.registerAdapter(ClassLinkAdapter());
+  Hive.registerAdapter(QuestionnaireAdapter());
   Hive.registerAdapter(TimetableAdapter());
   Hive.registerAdapter(GpaAdapter());
   Hive.registerAdapter(SyllabusResultAdapter());
@@ -79,6 +81,8 @@ class _MyAppState extends State<MyApp> {
             create: (_) => SharedFileRepository(SharedFileBox())),
         ChangeNotifierProvider(
             create: (_) => ClassLinkRepository(ClassLinkBox())),
+        ChangeNotifierProvider(
+            create: (_) => QuestionnaireRepository(QuestionnaireBox())),
         ChangeNotifierProvider(
             create: (_) => TimetableRepository(TimetableBox())),
         ChangeNotifierProvider(create: (_) => GpaRepository(GpaBox())),

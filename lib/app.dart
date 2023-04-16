@@ -15,6 +15,7 @@ import 'package:gakujo_gui/views/home/timetable.dart';
 import 'package:gakujo_gui/views/page/class_link.dart';
 import 'package:gakujo_gui/views/page/contact.dart';
 import 'package:gakujo_gui/views/page/grade.dart';
+import 'package:gakujo_gui/views/page/questionaire.dart';
 import 'package:gakujo_gui/views/page/quiz.dart';
 import 'package:gakujo_gui/views/page/report.dart';
 import 'package:gakujo_gui/views/page/settings.dart';
@@ -128,6 +129,11 @@ class _AppState extends State<App> {
                   onPressed: () async =>
                       context.read<ApiRepository>().fetchClassLinks(),
                   child: const Text('授業リンク'),
+                ),
+                SimpleDialogOption(
+                  onPressed: () async =>
+                      context.read<ApiRepository>().fetchQuestionnaires(),
+                  child: const Text('授業アンケート'),
                 ),
                 SimpleDialogOption(
                   onPressed: () async =>
@@ -386,6 +392,26 @@ class _AppState extends State<App> {
                       Navigator.of(context).pop();
                       Navigator.of(context).push(MaterialPageRoute(
                           builder: (_) => const ClassLinkPage()));
+                    },
+                  ),
+                  ListTile(
+                    title: Row(
+                      children: [
+                        Icon(
+                          KIcons.questionnaire,
+                          color: Theme.of(context).iconTheme.color,
+                        ),
+                        const SizedBox(width: 16.0),
+                        Text(
+                          '授業アンケート',
+                          style: Theme.of(context).textTheme.titleMedium,
+                        ),
+                      ],
+                    ),
+                    onTap: () {
+                      Navigator.of(context).pop();
+                      Navigator.of(context).push(MaterialPageRoute(
+                          builder: (_) => const QuestionnairePage()));
                     },
                   ),
                   ListTile(

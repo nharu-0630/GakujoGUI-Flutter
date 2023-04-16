@@ -13,6 +13,7 @@ import 'package:gakujo_gui/models/class_link.dart';
 import 'package:gakujo_gui/models/contact.dart';
 import 'package:gakujo_gui/models/gpa.dart';
 import 'package:gakujo_gui/models/grade.dart';
+import 'package:gakujo_gui/models/questionnaire.dart';
 import 'package:gakujo_gui/models/quiz.dart';
 import 'package:gakujo_gui/models/report.dart';
 import 'package:gakujo_gui/models/settings.dart';
@@ -1328,6 +1329,181 @@ class GakujoApi {
     _context?.read<ClassLinkRepository>().add(classLink, overwrite: true);
     _setProgress(3 / 3);
     return classLink;
+  }
+
+  Future<void> fetchQuestionnaires() async {
+    _setProgress(0 / 2);
+    var response = await _client.postUri<dynamic>(
+      Uri.https(
+        'gakujo.shizuoka.ac.jp',
+        '/portal/common/generalPurpose/',
+      ),
+      data: {
+        'org.apache.struts.taglib.html.TOKEN': _token,
+        'headTitle': '授業アンケート一覧',
+        'menuCode': 'A05',
+        'nextPath': '/classenq/student/searchList/initialize'
+      },
+    );
+    _updateToken(response.data, required: true);
+
+    _setProgress(1 / 2);
+    await Future.delayed(_interval);
+    response = await _client.postUri<dynamic>(
+      Uri.https(
+        'gakujo.shizuoka.ac.jp',
+        '/portal/classenq/student/searchList/search',
+      ),
+      data: {
+        'org.apache.struts.taglib.html.TOKEN': _token,
+        'classEnqId': '',
+        'hidSchoolYear': '',
+        'hidSemesterCode': '',
+        'hidSubjectCode': '',
+        'hidClassCode': '',
+        'backPath': '',
+        'submitStatusCode': '',
+        'entranceDiv': '',
+        'listSchoolYear': '',
+        'listSubjectCode': '',
+        'listClassCode': '',
+        'schoolYear': await _schoolYear,
+        'semesterCode': await _semesterCode,
+        'subjectDispCode': '',
+        'conditionMsg': '',
+        'searchList_length': '-1',
+      },
+    );
+    _updateToken(response.data, required: true);
+
+    _context?.read<QuestionnaireRepository>().addAll(parse(response.data)
+        .querySelectorAll('#searchList > tbody > tr')
+        .map(Questionnaire.fromElement)
+        .toList());
+    _setProgress(2 / 2);
+  }
+
+  Future<Questionnaire> fetchDetailQuestionnaire(Questionnaire questionnaire,
+      {bool bypass = false}) async {
+    _setProgress(0 / 3);
+    if (!bypass) {
+      var response = await _client.postUri<dynamic>(
+        Uri.https(
+          'gakujo.shizuoka.ac.jp',
+          '/portal/common/generalPurpose/',
+        ),
+        data: {
+          'org.apache.struts.taglib.html.TOKEN': _token,
+          'headTitle': '授業アンケート一覧',
+          'menuCode': 'A05',
+          'nextPath': '/classenq/student/searchList/initialize'
+        },
+      );
+      _updateToken(response.data, required: true);
+
+      _setProgress(1 / 3);
+      await Future.delayed(_interval);
+      response = await _client.postUri<dynamic>(
+        Uri.https(
+          'gakujo.shizuoka.ac.jp',
+          '/portal/report/student/searchList/search',
+        ),
+        data: {
+          'org.apache.struts.taglib.html.TOKEN': _token,
+          'classEnqId': '',
+          'hidSchoolYear': '',
+          'hidSemesterCode': '',
+          'hidSubjectCode': '',
+          'hidClassCode': '',
+          'backPath': '',
+          'submitStatusCode': '',
+          'entranceDiv': '',
+          'listSchoolYear': '',
+          'listSubjectCode': '',
+          'listClassCode': '',
+          'schoolYear': await _schoolYear,
+          'semesterCode': await _semesterCode,
+          'subjectDispCode': '',
+          'conditionMsg': '',
+          'searchList_length': '-1',
+        },
+      );
+      _updateToken(response.data, required: true);
+
+      // if (parse(response.data)
+      //     .querySelectorAll('#searchList > tbody > tr')
+      //     .map(Questionnaire.fromElement)
+      //     .where((e) => e == questionnaire)
+      //     .isEmpty) return questionnaire;
+    }
+
+    _setProgress(2 / 3);
+    await Future.delayed(_interval);
+    var response = await _client.postUri<dynamic>(
+      Uri.https(
+        'gakujo.shizuoka.ac.jp',
+        '/portal/classenq/student/searchList/countingResultReference',
+      ),
+      data: {
+        'org.apache.struts.taglib.html.TOKEN': _token,
+        'classEnqId': questionnaire.id,
+        'hidSchoolYear': '',
+        'hidSemesterCode': '',
+        'hidSubjectCode': '',
+        'hidClassCode': '',
+        'backPath': '',
+        'submitStatusCode': '',
+        'entranceDiv': '',
+        'listSchoolYear': await _schoolYear,
+        'listSubjectCode': questionnaire.subjectCode,
+        'listClassCode': questionnaire.classCode,
+        'schoolYear': await _schoolYear,
+        'semesterCode': await _semesterCode,
+        'subjectDispCode': '',
+        'conditionMsg': '',
+        'searchList_length': '-1',
+      },
+    );
+    _updateToken(response.data, required: true);
+    var document = parse(response.data);
+    questionnaire.fileNames = [];
+    var dir = await getApplicationDocumentsDirectory();
+
+    for (var node in document
+        .querySelectorAll('table.ttb_entry > tbody > tr > td')[5]
+        .querySelectorAll('a')) {
+      if (node.attributes['onclick']!.contains('fileAllDownload')) {
+        continue;
+      }
+      var selectedKey = node.attributes['onclick']!
+          .trimJsArgs(0)
+          .replaceAll('fileDownload', '');
+      var prefix = node.attributes['onclick']!.trimJsArgs(1);
+      await Future.delayed(_interval);
+      var response = await _client.postUri<dynamic>(
+        Uri.https(
+          'gakujo.shizuoka.ac.jp',
+          '/portal/classenq/fileDownload/temporaryFileDownload',
+        ),
+        data: {
+          'org.apache.struts.taglib.html.TOKEN': _token,
+          'selectedKey': selectedKey,
+          'prefix': prefix,
+          'EXCLUDE_SET': '',
+        },
+        options: Options(responseType: ResponseType.bytes),
+      );
+      var file = File(join(dir.path, basename(node.text.trim())));
+      file.writeAsBytes(response.data);
+      questionnaire.fileNames?.add(basename(node.text.trim()));
+    }
+
+    questionnaire.toDetail(document);
+    _context
+        ?.read<QuestionnaireRepository>()
+        .add(questionnaire, overwrite: true);
+    _setProgress(3 / 3);
+    return questionnaire;
   }
 
   Future<bool> fetchAcademicSystem({
