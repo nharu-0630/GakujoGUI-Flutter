@@ -109,7 +109,7 @@ class Quiz implements Comparable<Quiz> {
     );
   }
 
-  bool get isSubmitted => submissionStatus != '未提出';
+  bool get isSubmitted => submissionStatus == '提出済';
 
   void toRefresh(Quiz quiz) {
     title = quiz.title;

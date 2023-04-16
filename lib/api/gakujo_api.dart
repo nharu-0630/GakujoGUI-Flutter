@@ -1406,7 +1406,7 @@ class GakujoApi {
       response = await _client.postUri<dynamic>(
         Uri.https(
           'gakujo.shizuoka.ac.jp',
-          '/portal/report/student/searchList/search',
+          '/portal/classenq/student/searchList/search',
         ),
         data: {
           'org.apache.struts.taglib.html.TOKEN': _token,
@@ -1430,11 +1430,11 @@ class GakujoApi {
       );
       _updateToken(response.data, required: true);
 
-      // if (parse(response.data)
-      //     .querySelectorAll('#searchList > tbody > tr')
-      //     .map(Questionnaire.fromElement)
-      //     .where((e) => e == questionnaire)
-      //     .isEmpty) return questionnaire;
+      if (parse(response.data)
+          .querySelectorAll('#searchList > tbody > tr')
+          .map(Questionnaire.fromElement)
+          .where((e) => e == questionnaire)
+          .isEmpty) return questionnaire;
     }
 
     _setProgress(2 / 3);
