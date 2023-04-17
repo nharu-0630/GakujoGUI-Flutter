@@ -158,13 +158,7 @@ class _ContactPageState extends State<ContactPage> {
             if (contact.isAcquired) {
               showModalOnTap(context, buildContactModal(contact));
             } else {
-              await showOkCancelAlertDialog(
-                        context: context,
-                        title: '取得しますか？',
-                        message: '未取得の授業連絡です。取得するためにはログイン状態である必要があります。',
-                        okLabel: '取得',
-                        cancelLabel: 'キャンセル',
-                      ) ==
+              await showFetchDialog(context: context, value: '授業連絡') ==
                       OkCancelResult.ok
                   ? context.read<ApiRepository>().fetchDetailContact(contact)
                   : showModalOnTap(context, buildContactModal(contact));

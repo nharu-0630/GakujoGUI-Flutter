@@ -45,26 +45,48 @@ class _TimetablePageState extends State<TimetablePage> {
                         Expanded(
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.spaceAround,
-                            children: [
-                              Text(
-                                ['8:40', '10:20', '12:45', '14:25', '16:05'][i],
-                                style: Theme.of(context).textTheme.labelSmall,
-                              ),
-                              Text(
-                                '${i + 1}',
-                                style: Theme.of(context).textTheme.titleMedium,
-                              ),
-                              Text(
-                                [
-                                  '10:10',
-                                  '11:50',
-                                  '14:15',
-                                  '15:55',
-                                  '17:35'
-                                ][i],
-                                style: Theme.of(context).textTheme.labelSmall,
-                              ),
-                            ],
+                            children: MediaQuery.of(context).orientation ==
+                                    Orientation.portrait
+                                ? [
+                                    Text(
+                                      [
+                                        '8:40',
+                                        '10:20',
+                                        '12:45',
+                                        '14:25',
+                                        '16:05'
+                                      ][i],
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .labelSmall,
+                                    ),
+                                    Text(
+                                      '${i + 1}',
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .titleMedium,
+                                    ),
+                                    Text(
+                                      [
+                                        '10:10',
+                                        '11:50',
+                                        '14:15',
+                                        '15:55',
+                                        '17:35'
+                                      ][i],
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .labelSmall,
+                                    ),
+                                  ]
+                                : [
+                                    Text(
+                                      '${i + 1}',
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .titleMedium,
+                                    ),
+                                  ],
                           ),
                         ),
                     ],

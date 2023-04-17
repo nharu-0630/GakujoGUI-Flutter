@@ -162,13 +162,7 @@ class _SharedFilePageState extends State<SharedFilePage> {
             if (sharedFile.isAcquired) {
               showModalOnTap(context, buildSharedFileModal(sharedFile));
             } else {
-              await showOkCancelAlertDialog(
-                        context: context,
-                        title: '取得しますか？',
-                        message: '未取得の授業共有ファイルです。取得するためにはログイン状態である必要があります。',
-                        okLabel: '取得',
-                        cancelLabel: 'キャンセル',
-                      ) ==
+              await showFetchDialog(context: context, value: '授業共有ファイル') ==
                       OkCancelResult.ok
                   ? context
                       .read<ApiRepository>()

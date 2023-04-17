@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:adaptive_dialog/adaptive_dialog.dart';
 import 'package:better_open_file/better_open_file.dart';
 import 'package:flash/flash.dart';
 import 'package:flutter/material.dart';
@@ -13,6 +14,19 @@ import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:side_sheet/side_sheet.dart';
 import 'package:url_launcher/url_launcher_string.dart';
+
+Future<OkCancelResult> showFetchDialog({
+  required BuildContext context,
+  required String value,
+}) async {
+  return showOkCancelAlertDialog(
+    context: context,
+    title: '取得しますか？',
+    message: '未取得の$valueです。取得するためにはログイン状態である必要があります。',
+    okLabel: '取得',
+    cancelLabel: 'キャンセル',
+  );
+}
 
 Widget? buildFloatingActionButton({
   required Function() onPressed,

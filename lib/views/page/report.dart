@@ -163,13 +163,7 @@ class _ReportPageState extends State<ReportPage> {
             if (report.isAcquired) {
               showModalOnTap(context, buildReportModal(report));
             } else {
-              await showOkCancelAlertDialog(
-                        context: context,
-                        title: '未取得のレポートです。',
-                        message: '取得しますか？',
-                        okLabel: '取得',
-                        cancelLabel: 'キャンセル',
-                      ) ==
+              await showFetchDialog(context: context, value: 'レポート') ==
                       OkCancelResult.ok
                   ? context.read<ApiRepository>().fetchDetailReport(report)
                   : showModalOnTap(context, buildReportModal(report));

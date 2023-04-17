@@ -3,9 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:gakujo_gui/api/parse.dart';
 import 'package:gakujo_gui/api/provide.dart';
 import 'package:gakujo_gui/constants/kicons.dart';
+import 'package:gakujo_gui/models/questionnaire.dart';
 import 'package:gakujo_gui/models/quiz.dart';
 import 'package:gakujo_gui/models/report.dart';
 import 'package:gakujo_gui/views/common/widget.dart';
+import 'package:gakujo_gui/views/page/questionnaire.dart';
 import 'package:gakujo_gui/views/page/quiz.dart';
 import 'package:gakujo_gui/views/page/report.dart';
 import 'package:provider/provider.dart';
@@ -18,13 +20,15 @@ class TaskWidget extends StatelessWidget {
     return FutureBuilder(
       future: Future.wait([
         context.watch<ReportRepository>().getSubmittable(),
-        context.watch<QuizRepository>().getSubmittable()
+        context.watch<QuizRepository>().getSubmittable(),
+        context.watch<QuestionnaireRepository>().getSubmittable(),
       ]),
       builder: (_, AsyncSnapshot<List<dynamic>> snapshot) {
         if (snapshot.hasData) {
           var reports = snapshot.data![0] as List<Report>;
           var quizzes = snapshot.data![1] as List<Quiz>;
-          List<dynamic> tasks = [...reports, ...quizzes];
+          var questionnaires = snapshot.data![2] as List<Questionnaire>;
+          List<dynamic> tasks = [...reports, ...quizzes, ...questionnaires];
           tasks.sort((a, b) => b.endDateTime.compareTo(a.endDateTime));
           return tasks.isEmpty
               ? Center(
@@ -45,13 +49,14 @@ class TaskWidget extends StatelessWidget {
                     ],
                   ),
                 )
-              : ListView.builder(
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  itemCount: tasks.length,
-                  itemBuilder: ((_, index) => tasks[index] is Report
-                      ? _buildReportCard(tasks[index] as Report)
-                      : _buildQuizCard(tasks[index] as Quiz)),
+              : Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                  child: ListView.builder(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    itemCount: tasks.length,
+                    itemBuilder: ((_, index) => _buildCard(tasks[index])),
+                  ),
                 );
         } else {
           return const Center(
@@ -65,6 +70,19 @@ class TaskWidget extends StatelessWidget {
     );
   }
 
+  Widget _buildCard(dynamic task) {
+    switch (task.runtimeType) {
+      case Report:
+        return _buildReportCard(task as Report);
+      case Quiz:
+        return _buildQuizCard(task as Quiz);
+      case Questionnaire:
+        return _buildQuestionnaireCard(task as Questionnaire);
+      default:
+        return Container();
+    }
+  }
+
   Widget _buildQuizCard(Quiz quiz) {
     return Builder(builder: (context) {
       return Card(
@@ -76,13 +94,7 @@ class TaskWidget extends StatelessWidget {
             if (quiz.isAcquired) {
               showModalOnTap(context, buildQuizModal(quiz));
             } else {
-              await showOkCancelAlertDialog(
-                        context: context,
-                        title: '取得しますか？',
-                        message: '未取得の小テストです。取得するためにはログイン状態である必要があります。',
-                        okLabel: '取得',
-                        cancelLabel: 'キャンセル',
-                      ) ==
+              await showFetchDialog(context: context, value: '小テスト') ==
                       OkCancelResult.ok
                   ? context.read<ApiRepository>().fetchDetailQuiz(quiz)
                   : showModalOnTap(context, buildQuizModal(quiz));
@@ -148,13 +160,7 @@ class TaskWidget extends StatelessWidget {
             if (report.isAcquired) {
               showModalOnTap(context, buildReportModal(report));
             } else {
-              await showOkCancelAlertDialog(
-                        context: context,
-                        title: '取得しますか？',
-                        message: '未取得のレポートです。取得するためにはログイン状態である必要があります。',
-                        okLabel: '取得',
-                        cancelLabel: 'キャンセル',
-                      ) ==
+              await showFetchDialog(context: context, value: 'レポート') ==
                       OkCancelResult.ok
                   ? context.read<ApiRepository>().fetchDetailReport(report)
                   : showModalOnTap(context, buildReportModal(report));
@@ -200,6 +206,75 @@ class TaskWidget extends StatelessWidget {
               ),
               Text(
                 report.endDateTime.toLocal().toDateTimeString(),
+                style: Theme.of(context).textTheme.bodySmall,
+              ),
+            ],
+          ),
+        ),
+      );
+    });
+  }
+
+  Widget _buildQuestionnaireCard(Questionnaire questionnaire) {
+    return Builder(builder: (context) {
+      return Card(
+        child: ListTile(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12.0),
+          ),
+          onTap: () async {
+            if (questionnaire.isAcquired) {
+              showModalOnTap(context, buildQuestionnaireModal(questionnaire));
+            } else {
+              await showFetchDialog(context: context, value: '授業アンケート') ==
+                      OkCancelResult.ok
+                  ? context
+                      .read<ApiRepository>()
+                      .fetchDetailQuestionnaire(questionnaire)
+                  : showModalOnTap(
+                      context, buildQuestionnaireModal(questionnaire));
+            }
+          },
+          leading: Icon(KIcons.report),
+          title: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Expanded(
+                child: Text(
+                  questionnaire.title,
+                  style: Theme.of(context).textTheme.titleMedium,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+              Visibility(
+                visible: questionnaire.fileNames?.isNotEmpty ?? false,
+                child: Text(
+                  '${questionnaire.fileNames?.length ?? ''}',
+                  style: Theme.of(context).textTheme.bodyMedium,
+                ),
+              ),
+              Visibility(
+                visible: questionnaire.fileNames?.isNotEmpty ?? false,
+                child: Icon(KIcons.attachment),
+              ),
+              Visibility(
+                visible: questionnaire.isArchived,
+                child: Icon(KIcons.archive),
+              )
+            ],
+          ),
+          subtitle: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Expanded(
+                child: Text(
+                  questionnaire.subject,
+                  style: Theme.of(context).textTheme.bodySmall,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+              Text(
+                questionnaire.endDateTime.toLocal().toDateTimeString(),
                 style: Theme.of(context).textTheme.bodySmall,
               ),
             ],

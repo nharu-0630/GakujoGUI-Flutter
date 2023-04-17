@@ -108,6 +108,7 @@ class _SettingsPageState extends State<SettingsPage> {
                                     controller: _usernameController,
                                     style:
                                         Theme.of(context).textTheme.titleSmall,
+                                    autofillHints: const [AutofillHints.email],
                                   ),
                                 ),
                               ],
@@ -139,6 +140,9 @@ class _SettingsPageState extends State<SettingsPage> {
                                     ),
                                     style:
                                         Theme.of(context).textTheme.titleSmall,
+                                    autofillHints: const [
+                                      AutofillHints.password
+                                    ],
                                   ),
                                 ),
                               ],

@@ -16,11 +16,9 @@ class _HomeWidgetState extends State<HomeWidget> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        body: OrientationBuilder(
-            builder: (context, orientation) =>
-                orientation == Orientation.portrait
-                    ? _buildVertical(context)
-                    : _buildHorizontal(context)));
+        body: MediaQuery.of(context).orientation == Orientation.portrait
+            ? _buildVertical(context)
+            : _buildHorizontal(context));
   }
 
   Widget _buildHeader(IconData icon, String title) {

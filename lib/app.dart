@@ -6,6 +6,7 @@ import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:gakujo_gui/api/parse.dart';
 import 'package:gakujo_gui/api/provide.dart';
 import 'package:gakujo_gui/constants/kicons.dart';
+import 'package:gakujo_gui/models/questionnaire.dart';
 import 'package:gakujo_gui/models/quiz.dart';
 import 'package:gakujo_gui/models/report.dart';
 import 'package:gakujo_gui/models/settings.dart';
@@ -15,7 +16,7 @@ import 'package:gakujo_gui/views/home/timetable.dart';
 import 'package:gakujo_gui/views/page/class_link.dart';
 import 'package:gakujo_gui/views/page/contact.dart';
 import 'package:gakujo_gui/views/page/grade.dart';
-import 'package:gakujo_gui/views/page/questionaire.dart';
+import 'package:gakujo_gui/views/page/questionnaire.dart';
 import 'package:gakujo_gui/views/page/quiz.dart';
 import 'package:gakujo_gui/views/page/report.dart';
 import 'package:gakujo_gui/views/page/settings.dart';
@@ -205,12 +206,14 @@ class _AppState extends State<App> {
           future: Future.wait([
             context.watch<SettingsRepository>().load(),
             context.watch<ReportRepository>().getSubmittable(),
-            context.watch<QuizRepository>().getSubmittable()
+            context.watch<QuizRepository>().getSubmittable(),
+            context.watch<QuestionnaireRepository>().getSubmittable(),
           ]),
           builder: (_, AsyncSnapshot<List<dynamic>> snapshot) {
             var settings = snapshot.data?[0] as Settings?;
             var reportCount = (snapshot.data?[1] ?? []).length;
             var quizCount = (snapshot.data?[2] ?? []).length;
+            var questionnaireCount = (snapshot.data?[3] ?? []).length;
             return Drawer(
               shape: const RoundedRectangleBorder(
                 borderRadius: BorderRadius.all(Radius.zero),
@@ -234,7 +237,7 @@ class _AppState extends State<App> {
                                     Row(
                                       children: [
                                         const Icon(LineIcons.userClock),
-                                        const SizedBox(width: 8.0),
+                                        const SizedBox(width: 16.0),
                                         Text(
                                           settings.lastLoginTime
                                               .toLocal()
@@ -251,7 +254,7 @@ class _AppState extends State<App> {
                                       children: [
                                         const Icon(
                                             LineIcons.identificationBadge),
-                                        const SizedBox(width: 8.0),
+                                        const SizedBox(width: 16.0),
                                         Text(
                                           settings.username ?? '',
                                           style: GoogleFonts.roboto(
@@ -265,7 +268,7 @@ class _AppState extends State<App> {
                                     Row(
                                       children: [
                                         const Icon(LineIcons.userShield),
-                                        const SizedBox(width: 8.0),
+                                        const SizedBox(width: 16.0),
                                         Text(
                                           settings.accessEnvironmentName ?? '',
                                           style: GoogleFonts.roboto(
@@ -309,6 +312,10 @@ class _AppState extends State<App> {
                           showBadge: reportCount > 0,
                           ignorePointer: true,
                           badgeContent: Text(reportCount.toString()),
+                          badgeStyle: const badges.BadgeStyle(
+                            padding: EdgeInsets.symmetric(
+                                horizontal: 4.0, vertical: 2.0),
+                          ),
                           position: badges.BadgePosition.bottomEnd(end: -6.0),
                           child: Icon(
                             KIcons.report,
@@ -335,6 +342,10 @@ class _AppState extends State<App> {
                           showBadge: quizCount > 0,
                           ignorePointer: true,
                           badgeContent: Text(quizCount.toString()),
+                          badgeStyle: const badges.BadgeStyle(
+                            padding: EdgeInsets.symmetric(
+                                horizontal: 4.0, vertical: 2.0),
+                          ),
                           position: badges.BadgePosition.bottomEnd(end: -6.0),
                           child: Icon(
                             KIcons.quiz,
@@ -397,9 +408,19 @@ class _AppState extends State<App> {
                   ListTile(
                     title: Row(
                       children: [
-                        Icon(
-                          KIcons.questionnaire,
-                          color: Theme.of(context).iconTheme.color,
+                        badges.Badge(
+                          showBadge: questionnaireCount > 0,
+                          ignorePointer: true,
+                          badgeContent: Text(questionnaireCount.toString()),
+                          badgeStyle: const badges.BadgeStyle(
+                            padding: EdgeInsets.symmetric(
+                                horizontal: 4.0, vertical: 2.0),
+                          ),
+                          position: badges.BadgePosition.bottomEnd(end: -6.0),
+                          child: Icon(
+                            KIcons.questionnaire,
+                            color: Theme.of(context).iconTheme.color,
+                          ),
                         ),
                         const SizedBox(width: 16.0),
                         Text(

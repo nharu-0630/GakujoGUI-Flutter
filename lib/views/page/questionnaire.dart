@@ -166,13 +166,7 @@ class _QuestionnairePageState extends State<QuestionnairePage> {
             if (questionnaire.isAcquired) {
               showModalOnTap(context, buildQuestionnaireModal(questionnaire));
             } else {
-              await showOkCancelAlertDialog(
-                        context: context,
-                        title: '取得しますか？',
-                        message: '未取得の授業アンケートです。取得するためにはログイン状態である必要があります。',
-                        okLabel: '取得',
-                        cancelLabel: 'キャンセル',
-                      ) ==
+              await showFetchDialog(context: context, value: '授業アンケート') ==
                       OkCancelResult.ok
                   ? context
                       .read<ApiRepository>()
