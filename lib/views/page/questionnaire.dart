@@ -164,7 +164,7 @@ class _QuestionnairePageState extends State<QuestionnairePage> {
         child: ListTile(
           onTap: () async {
             if (questionnaire.isAcquired) {
-              showModalOnTap(context, buildQuestionnaireModal(questionnaire));
+              showQuestionnaireModal(context, questionnaire);
             } else {
               await showFetchConfirmDialog(
                         context: context,
@@ -174,8 +174,7 @@ class _QuestionnairePageState extends State<QuestionnairePage> {
                   ? context
                       .read<ApiRepository>()
                       .fetchDetailQuestionnaire(questionnaire)
-                  : showModalOnTap(
-                      context, buildQuestionnaireModal(questionnaire));
+                  : showQuestionnaireModal(context, questionnaire);
             }
           },
           leading: Icon(
@@ -261,7 +260,26 @@ class _QuestionnairePageState extends State<QuestionnairePage> {
   }
 }
 
-Widget buildQuestionnaireModal(Questionnaire questionnaire) {
+void showQuestionnaireModal(BuildContext context, Questionnaire questionnaire) {
+  showModalOnTap(
+    context,
+    buildQuestionnaireModal(questionnaire),
+    scrollableWidget: DraggableScrollableSheet(
+      initialChildSize: 0.6,
+      maxChildSize: 0.8,
+      expand: false,
+      builder: (_, controller) => buildQuestionnaireModal(
+        questionnaire,
+        controller: controller,
+      ),
+    ),
+  );
+}
+
+Widget buildQuestionnaireModal(
+  Questionnaire questionnaire, {
+  ScrollController? controller,
+}) {
   return Builder(
     builder: (context) => ListView(
       padding: const EdgeInsets.all(16.0),

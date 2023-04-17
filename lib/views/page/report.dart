@@ -161,7 +161,7 @@ class _ReportPageState extends State<ReportPage> {
         child: ListTile(
           onTap: () async {
             if (report.isAcquired) {
-              showModalOnTap(context, buildReportModal(report));
+              showReportModal(context, report);
             } else {
               await showFetchConfirmDialog(
                         context: context,
@@ -169,7 +169,7 @@ class _ReportPageState extends State<ReportPage> {
                       ) ==
                       OkCancelResult.ok
                   ? context.read<ApiRepository>().fetchDetailReport(report)
-                  : showModalOnTap(context, buildReportModal(report));
+                  : showReportModal(context, report);
             }
           },
           leading: Icon(
@@ -255,9 +255,29 @@ class _ReportPageState extends State<ReportPage> {
   }
 }
 
-Widget buildReportModal(Report report) {
+void showReportModal(BuildContext context, Report report) {
+  showModalOnTap(
+    context,
+    buildReportModal(report),
+    scrollableWidget: DraggableScrollableSheet(
+      initialChildSize: 0.6,
+      maxChildSize: 0.8,
+      expand: false,
+      builder: (_, controller) => buildReportModal(
+        report,
+        controller: controller,
+      ),
+    ),
+  );
+}
+
+Widget buildReportModal(
+  Report report, {
+  ScrollController? controller,
+}) {
   return Builder(
     builder: (context) => ListView(
+      controller: controller,
       padding: const EdgeInsets.all(16.0),
       children: [
         Padding(

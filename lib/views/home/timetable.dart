@@ -43,50 +43,54 @@ class _TimetablePageState extends State<TimetablePage> {
                       const SizedBox(height: 24.0),
                       for (var i = 0; i < 5; i++)
                         Expanded(
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.spaceAround,
-                            children: MediaQuery.of(context).orientation ==
-                                    Orientation.portrait
-                                ? [
-                                    Text(
-                                      [
-                                        '8:40',
-                                        '10:20',
-                                        '12:45',
-                                        '14:25',
-                                        '16:05'
-                                      ][i],
-                                      style: Theme.of(context)
-                                          .textTheme
-                                          .labelSmall,
-                                    ),
-                                    Text(
-                                      '${i + 1}',
-                                      style: Theme.of(context)
-                                          .textTheme
-                                          .titleMedium,
-                                    ),
-                                    Text(
-                                      [
-                                        '10:10',
-                                        '11:50',
-                                        '14:15',
-                                        '15:55',
-                                        '17:35'
-                                      ][i],
-                                      style: Theme.of(context)
-                                          .textTheme
-                                          .labelSmall,
-                                    ),
-                                  ]
-                                : [
-                                    Text(
-                                      '${i + 1}',
-                                      style: Theme.of(context)
-                                          .textTheme
-                                          .titleMedium,
-                                    ),
-                                  ],
+                          child: LayoutBuilder(
+                            builder: (context, constraints) {
+                              return SingleChildScrollView(
+                                child: ConstrainedBox(
+                                  constraints: BoxConstraints(
+                                      minHeight: constraints.maxHeight),
+                                  child: Column(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceAround,
+                                    children: [
+                                      Text(
+                                        [
+                                          '8:40',
+                                          '10:20',
+                                          '12:45',
+                                          '14:25',
+                                          '16:05'
+                                        ][i],
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .labelSmall,
+                                        maxLines: 1,
+                                      ),
+                                      Text(
+                                        '${i + 1}',
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .titleMedium,
+                                      ),
+                                      Text(
+                                        [
+                                          '10:10',
+                                          '11:50',
+                                          '14:15',
+                                          '15:55',
+                                          '17:35'
+                                        ][i],
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .labelSmall,
+                                        overflow: TextOverflow.clip,
+                                        maxLines: 1,
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              );
+                            },
                           ),
                         ),
                     ],
@@ -179,8 +183,7 @@ class _TimetablePageState extends State<TimetablePage> {
             ),
             child: InkWell(
               borderRadius: BorderRadius.circular(12.0),
-              onTap: () =>
-                  showModalOnTap(context, buildTimetableModal(timetable)),
+              onTap: () => showTimetableModal(context, timetable),
               child: Padding(
                 padding: const EdgeInsets.all(2.0),
                 child: LayoutBuilder(builder: (context, constraints) {
@@ -221,9 +224,29 @@ class _TimetablePageState extends State<TimetablePage> {
   }
 }
 
-Widget buildTimetableModal(Timetable timetable) {
+void showTimetableModal(BuildContext context, Timetable timetable) {
+  showModalOnTap(
+    context,
+    buildTimetableModal(timetable),
+    scrollableWidget: DraggableScrollableSheet(
+      initialChildSize: 0.6,
+      maxChildSize: 0.8,
+      expand: false,
+      builder: (_, controller) => buildTimetableModal(
+        timetable,
+        controller: controller,
+      ),
+    ),
+  );
+}
+
+Widget buildTimetableModal(
+  Timetable timetable, {
+  ScrollController? controller,
+}) {
   return Builder(
     builder: (context) => ListView(
+      controller: controller,
       padding: const EdgeInsets.all(16.0),
       children: [
         Padding(

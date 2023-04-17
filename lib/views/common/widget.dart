@@ -85,15 +85,19 @@ Widget buildElevatedButton({
   );
 }
 
-void showModalOnTap(BuildContext context, Widget widget) {
+void showModalOnTap(
+  BuildContext context,
+  Widget widget, {
+  Widget? scrollableWidget,
+}) {
   MediaQuery.of(context).orientation == Orientation.portrait
       ? showModalBottomSheet(
           backgroundColor: Theme.of(context).colorScheme.surface,
-          isScrollControlled: false,
+          isScrollControlled: true,
           shape: const RoundedRectangleBorder(
               borderRadius: BorderRadius.vertical(top: Radius.zero)),
           context: context,
-          builder: (_) => widget,
+          builder: (_) => scrollableWidget ?? widget,
         )
       : SideSheet.right(
           sheetColor: Theme.of(context).colorScheme.surface,
@@ -359,7 +363,7 @@ Widget buildAutoLinkText(String text) {
       style: Theme.of(context).textTheme.bodyMedium,
       linkStyle: TextStyle(color: Theme.of(context).colorScheme.primary),
       onOpen: (link) =>
-          launchUrlString(link.url, mode: LaunchMode.inAppWebView),
+          launchUrlString(link.url, mode: LaunchMode.externalApplication),
     ),
   );
 }

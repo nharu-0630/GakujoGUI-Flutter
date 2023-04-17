@@ -158,7 +158,7 @@ class _ClassLinkPageState extends State<ClassLinkPage> {
         child: ListTile(
           onTap: () async {
             if (classLink.isAcquired) {
-              showModalOnTap(context, buildClassLinkModal(classLink));
+              showClassLinkModal(context, classLink);
             } else {
               await showOkCancelAlertDialog(
                         context: context,
@@ -171,7 +171,7 @@ class _ClassLinkPageState extends State<ClassLinkPage> {
                   ? context
                       .read<ApiRepository>()
                       .fetchDetailClassLink(classLink)
-                  : showModalOnTap(context, buildClassLinkModal(classLink));
+                  : showClassLinkModal(context, classLink);
             }
           },
           title: Column(
@@ -205,9 +205,29 @@ class _ClassLinkPageState extends State<ClassLinkPage> {
   }
 }
 
-Widget buildClassLinkModal(ClassLink classLink) {
+void showClassLinkModal(BuildContext context, ClassLink classLink) {
+  showModalOnTap(
+    context,
+    buildClassLinkModal(classLink),
+    scrollableWidget: DraggableScrollableSheet(
+      initialChildSize: 0.6,
+      maxChildSize: 0.8,
+      expand: false,
+      builder: (_, controller) => buildClassLinkModal(
+        classLink,
+        controller: controller,
+      ),
+    ),
+  );
+}
+
+Widget buildClassLinkModal(
+  ClassLink classLink, {
+  ScrollController? controller,
+}) {
   return Builder(
     builder: (context) => ListView(
+      controller: controller,
       padding: const EdgeInsets.all(16.0),
       children: [
         Padding(

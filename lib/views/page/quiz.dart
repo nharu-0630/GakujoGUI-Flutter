@@ -161,7 +161,7 @@ class _QuizPageState extends State<QuizPage> {
         child: ListTile(
           onTap: () async {
             if (quiz.isAcquired) {
-              showModalOnTap(context, buildQuizModal(quiz));
+              showQuizModal(context, quiz);
             } else {
               await showOkCancelAlertDialog(
                         context: context,
@@ -172,7 +172,7 @@ class _QuizPageState extends State<QuizPage> {
                       ) ==
                       OkCancelResult.ok
                   ? context.read<ApiRepository>().fetchDetailQuiz(quiz)
-                  : showModalOnTap(context, buildQuizModal(quiz));
+                  : showQuizModal(context, quiz);
             }
           },
           leading: Icon(
@@ -258,9 +258,29 @@ class _QuizPageState extends State<QuizPage> {
   }
 }
 
-Widget buildQuizModal(Quiz quiz) {
+void showQuizModal(BuildContext context, Quiz quiz) {
+  showModalOnTap(
+    context,
+    buildQuizModal(quiz),
+    scrollableWidget: DraggableScrollableSheet(
+      initialChildSize: 0.6,
+      maxChildSize: 0.8,
+      expand: false,
+      builder: (_, controller) => buildQuizModal(
+        quiz,
+        controller: controller,
+      ),
+    ),
+  );
+}
+
+Widget buildQuizModal(
+  Quiz quiz, {
+  ScrollController? controller,
+}) {
   return Builder(
     builder: (context) => ListView(
+      controller: controller,
       padding: const EdgeInsets.all(16.0),
       children: [
         Padding(

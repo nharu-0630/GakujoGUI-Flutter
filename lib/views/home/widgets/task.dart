@@ -92,7 +92,7 @@ class TaskWidget extends StatelessWidget {
           ),
           onTap: () async {
             if (quiz.isAcquired) {
-              showModalOnTap(context, buildQuizModal(quiz));
+              showQuizModal(context, quiz);
             } else {
               await showFetchConfirmDialog(
                         context: context,
@@ -100,7 +100,7 @@ class TaskWidget extends StatelessWidget {
                       ) ==
                       OkCancelResult.ok
                   ? context.read<ApiRepository>().fetchDetailQuiz(quiz)
-                  : showModalOnTap(context, buildQuizModal(quiz));
+                  : showQuizModal(context, quiz);
             }
           },
           leading: Icon(KIcons.quiz),
@@ -161,7 +161,7 @@ class TaskWidget extends StatelessWidget {
           ),
           onTap: () async {
             if (report.isAcquired) {
-              showModalOnTap(context, buildReportModal(report));
+              showReportModal(context, report);
             } else {
               await showFetchConfirmDialog(
                         context: context,
@@ -169,7 +169,7 @@ class TaskWidget extends StatelessWidget {
                       ) ==
                       OkCancelResult.ok
                   ? context.read<ApiRepository>().fetchDetailReport(report)
-                  : showModalOnTap(context, buildReportModal(report));
+                  : showReportModal(context, report);
             }
           },
           leading: Icon(KIcons.report),
@@ -230,7 +230,7 @@ class TaskWidget extends StatelessWidget {
           ),
           onTap: () async {
             if (questionnaire.isAcquired) {
-              showModalOnTap(context, buildQuestionnaireModal(questionnaire));
+              showQuestionnaireModal(context, questionnaire);
             } else {
               await showFetchConfirmDialog(
                         context: context,
@@ -240,8 +240,7 @@ class TaskWidget extends StatelessWidget {
                   ? context
                       .read<ApiRepository>()
                       .fetchDetailQuestionnaire(questionnaire)
-                  : showModalOnTap(
-                      context, buildQuestionnaireModal(questionnaire));
+                  : showQuestionnaireModal(context, questionnaire);
             }
           },
           leading: Icon(KIcons.report),

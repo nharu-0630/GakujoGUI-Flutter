@@ -156,7 +156,7 @@ class _ContactPageState extends State<ContactPage> {
         child: ListTile(
           onTap: () async {
             if (contact.isAcquired) {
-              showModalOnTap(context, buildContactModal(contact));
+              showContactModal(context, contact);
             } else {
               await showFetchConfirmDialog(
                         context: context,
@@ -164,7 +164,7 @@ class _ContactPageState extends State<ContactPage> {
                       ) ==
                       OkCancelResult.ok
                   ? context.read<ApiRepository>().fetchDetailContact(contact)
-                  : showModalOnTap(context, buildContactModal(contact));
+                  : showContactModal(context, contact);
             }
           },
           title: Row(
@@ -224,9 +224,29 @@ class _ContactPageState extends State<ContactPage> {
     );
   }
 
-  Widget buildContactModal(Contact contact) {
+  void showContactModal(BuildContext context, Contact contact) {
+    showModalOnTap(
+      context,
+      buildContactModal(contact),
+      scrollableWidget: DraggableScrollableSheet(
+        initialChildSize: 0.6,
+        maxChildSize: 0.8,
+        expand: false,
+        builder: (_, controller) => buildContactModal(
+          contact,
+          controller: controller,
+        ),
+      ),
+    );
+  }
+
+  Widget buildContactModal(
+    Contact contact, {
+    ScrollController? controller,
+  }) {
     return Builder(
       builder: (context) => ListView(
+        controller: controller,
         padding: const EdgeInsets.all(16.0),
         children: [
           Padding(

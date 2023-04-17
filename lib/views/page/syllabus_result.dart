@@ -104,8 +104,7 @@ class _SyllabusResultPageState extends State<SyllabusResultPage> {
   Widget _buildCard(SyllabusResult syllabus) {
     return Builder(
       builder: (context) => ListTile(
-        onTap: () async =>
-            showModalOnTap(context, buildSyllabusModal(syllabus)),
+        onTap: () async => showSyllabusModal(context, syllabus),
         title: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
@@ -151,7 +150,26 @@ class _SyllabusResultPageState extends State<SyllabusResultPage> {
   }
 }
 
-Widget buildSyllabusModal(SyllabusResult query) {
+void showSyllabusModal(BuildContext context, SyllabusResult query) {
+  showModalOnTap(
+    context,
+    buildSyllabusModal(query),
+    scrollableWidget: DraggableScrollableSheet(
+      initialChildSize: 0.6,
+      maxChildSize: 0.8,
+      expand: false,
+      builder: (_, controller) => buildSyllabusModal(
+        query,
+        controller: controller,
+      ),
+    ),
+  );
+}
+
+Widget buildSyllabusModal(
+  SyllabusResult query, {
+  ScrollController? controller,
+}) {
   return Builder(
     builder: (context) => FutureBuilder(
       future: context.read<ApiRepository>().fetchSyllabusDetail(query),
@@ -159,6 +177,7 @@ Widget buildSyllabusModal(SyllabusResult query) {
         var syllabus = snapshot.data;
         return syllabus != null
             ? ListView(
+                controller: controller,
                 padding: const EdgeInsets.all(16.0),
                 children: [
                   Padding(

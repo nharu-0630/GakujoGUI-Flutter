@@ -160,7 +160,7 @@ class _SharedFilePageState extends State<SharedFilePage> {
         child: ListTile(
           onTap: () async {
             if (sharedFile.isAcquired) {
-              showModalOnTap(context, buildSharedFileModal(sharedFile));
+              showSharedFileModal(context, sharedFile);
             } else {
               await showFetchConfirmDialog(
                         context: context,
@@ -170,7 +170,7 @@ class _SharedFilePageState extends State<SharedFilePage> {
                   ? context
                       .read<ApiRepository>()
                       .fetchDetailSharedFile(sharedFile)
-                  : showModalOnTap(context, buildSharedFileModal(sharedFile));
+                  : showSharedFileModal(context, sharedFile);
             }
           },
           title: Column(
@@ -226,9 +226,29 @@ class _SharedFilePageState extends State<SharedFilePage> {
   }
 }
 
-Widget buildSharedFileModal(SharedFile sharedFile) {
+void showSharedFileModal(BuildContext context, SharedFile sharedFile) {
+  showModalOnTap(
+    context,
+    buildSharedFileModal(sharedFile),
+    scrollableWidget: DraggableScrollableSheet(
+      initialChildSize: 0.6,
+      maxChildSize: 0.8,
+      expand: false,
+      builder: (_, controller) => buildSharedFileModal(
+        sharedFile,
+        controller: controller,
+      ),
+    ),
+  );
+}
+
+Widget buildSharedFileModal(
+  SharedFile sharedFile, {
+  ScrollController? controller,
+}) {
   return Builder(
     builder: (context) => ListView(
+      controller: controller,
       padding: const EdgeInsets.all(16.0),
       children: [
         Padding(
