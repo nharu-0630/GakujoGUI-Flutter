@@ -193,9 +193,6 @@ class Timetable implements Comparable<Timetable> {
       classCode.toLowerCase().contains(value.toLowerCase());
 
   @override
-  String toString() => '$subject $className';
-
-  @override
   bool operator ==(Object other) {
     if (identical(this, other)) return true;
     if (other is Timetable) {

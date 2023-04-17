@@ -90,8 +90,8 @@ class _ContactPageState extends State<ContactPage> {
   }
 
   Widget _buildAppBar() {
-    return Builder(builder: (context) {
-      return SliverAppBar(
+    return Builder(
+      builder: (context) => SliverAppBar(
         centerTitle: true,
         floating: true,
         leading: Padding(
@@ -132,13 +132,13 @@ class _ContactPageState extends State<ContactPage> {
                 ),
               ],
         bottom: buildAppBarBottom(),
-      );
-    });
+      ),
+    );
   }
 
   Widget _buildCard(Contact contact) {
-    return Builder(builder: (context) {
-      return Slidable(
+    return Builder(
+      builder: (context) => Slidable(
         key: Key(contact.hashCode.toString()),
         endActionPane: ActionPane(
           motion: const DrawerMotion(),
@@ -158,7 +158,10 @@ class _ContactPageState extends State<ContactPage> {
             if (contact.isAcquired) {
               showModalOnTap(context, buildContactModal(contact));
             } else {
-              await showFetchDialog(context: context, value: '授業連絡') ==
+              await showFetchConfirmDialog(
+                        context: context,
+                        value: '授業連絡',
+                      ) ==
                       OkCancelResult.ok
                   ? context.read<ApiRepository>().fetchDetailContact(contact)
                   : showModalOnTap(context, buildContactModal(contact));
@@ -217,13 +220,13 @@ class _ContactPageState extends State<ContactPage> {
             ],
           ),
         ),
-      );
-    });
+      ),
+    );
   }
 
   Widget buildContactModal(Contact contact) {
-    return Builder(builder: (context) {
-      return ListView(
+    return Builder(
+      builder: (context) => ListView(
         padding: const EdgeInsets.all(16.0),
         children: [
           Padding(
@@ -299,7 +302,7 @@ class _ContactPageState extends State<ContactPage> {
           ),
           const SizedBox(height: 8.0),
         ],
-      );
-    });
+      ),
+    );
   }
 }

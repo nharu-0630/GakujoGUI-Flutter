@@ -71,8 +71,8 @@ class _ReportPageState extends State<ReportPage> {
   }
 
   Widget _buildAppBar() {
-    return Builder(builder: (context) {
-      return SliverAppBar(
+    return Builder(
+      builder: (context) => SliverAppBar(
         centerTitle: true,
         floating: true,
         leading: Padding(
@@ -122,13 +122,13 @@ class _ReportPageState extends State<ReportPage> {
                 ),
               ],
         bottom: buildAppBarBottom(),
-      );
-    });
+      ),
+    );
   }
 
   Widget _buildCard(Report report) {
-    return Builder(builder: (context) {
-      return Slidable(
+    return Builder(
+      builder: (context) => Slidable(
         key: Key(report.id),
         startActionPane: ActionPane(
           motion: const DrawerMotion(),
@@ -163,7 +163,10 @@ class _ReportPageState extends State<ReportPage> {
             if (report.isAcquired) {
               showModalOnTap(context, buildReportModal(report));
             } else {
-              await showFetchDialog(context: context, value: 'レポート') ==
+              await showFetchConfirmDialog(
+                        context: context,
+                        value: 'レポート',
+                      ) ==
                       OkCancelResult.ok
                   ? context.read<ApiRepository>().fetchDetailReport(report)
                   : showModalOnTap(context, buildReportModal(report));
@@ -247,14 +250,14 @@ class _ReportPageState extends State<ReportPage> {
             ],
           ),
         ),
-      );
-    });
+      ),
+    );
   }
 }
 
 Widget buildReportModal(Report report) {
-  return Builder(builder: (context) {
-    return ListView(
+  return Builder(
+    builder: (context) => ListView(
       padding: const EdgeInsets.all(16.0),
       children: [
         Padding(
@@ -374,6 +377,6 @@ Widget buildReportModal(Report report) {
         ),
         const SizedBox(height: 8.0),
       ],
-    );
-  });
+    ),
+  );
 }

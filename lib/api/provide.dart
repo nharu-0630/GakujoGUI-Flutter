@@ -67,9 +67,8 @@ class ApiRepository extends ChangeNotifier {
     });
     showFlash(
       context: App.navigatorKey.currentState!.overlay!.context,
-      builder: (context, controller) {
-        return buildErrorFlashBar(context, controller, e);
-      },
+      builder: (context, controller) =>
+          buildErrorFlashBar(context, controller, e),
     );
   }
 

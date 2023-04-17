@@ -84,8 +84,8 @@ class _SyllabusResultPageState extends State<SyllabusResultPage> {
   }
 
   Widget _buildAppBar() {
-    return Builder(builder: (context) {
-      return SliverAppBar(
+    return Builder(
+      builder: (context) => SliverAppBar(
         centerTitle: true,
         floating: true,
         leading: Padding(
@@ -97,13 +97,13 @@ class _SyllabusResultPageState extends State<SyllabusResultPage> {
         ),
         title: const Text('シラバス'),
         bottom: buildAppBarBottom(),
-      );
-    });
+      ),
+    );
   }
 
   Widget _buildCard(SyllabusResult syllabus) {
-    return Builder(builder: (context) {
-      return ListTile(
+    return Builder(
+      builder: (context) => ListTile(
         onTap: () async =>
             showModalOnTap(context, buildSyllabusModal(syllabus)),
         title: Row(
@@ -146,14 +146,14 @@ class _SyllabusResultPageState extends State<SyllabusResultPage> {
             ),
           ],
         ),
-      );
-    });
+      ),
+    );
   }
 }
 
 Widget buildSyllabusModal(SyllabusResult query) {
-  return Builder(builder: (context) {
-    return FutureBuilder(
+  return Builder(
+    builder: (context) => FutureBuilder(
       future: context.read<ApiRepository>().fetchSyllabusDetail(query),
       builder: (_, AsyncSnapshot<SyllabusDetail?> snapshot) {
         var syllabus = snapshot.data;
@@ -238,6 +238,6 @@ Widget buildSyllabusModal(SyllabusResult query) {
                 ),
               );
       },
-    );
-  });
+    ),
+  );
 }

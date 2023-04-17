@@ -72,8 +72,8 @@ class _QuestionnairePageState extends State<QuestionnairePage> {
   }
 
   Widget _buildAppBar() {
-    return Builder(builder: (context) {
-      return SliverAppBar(
+    return Builder(
+      builder: (context) => SliverAppBar(
         centerTitle: true,
         floating: true,
         leading: Padding(
@@ -123,13 +123,13 @@ class _QuestionnairePageState extends State<QuestionnairePage> {
                 ),
               ],
         bottom: buildAppBarBottom(),
-      );
-    });
+      ),
+    );
   }
 
   Widget _buildCard(Questionnaire questionnaire) {
-    return Builder(builder: (context) {
-      return Slidable(
+    return Builder(
+      builder: (context) => Slidable(
         key: Key(questionnaire.id),
         startActionPane: ActionPane(
           motion: const DrawerMotion(),
@@ -166,7 +166,10 @@ class _QuestionnairePageState extends State<QuestionnairePage> {
             if (questionnaire.isAcquired) {
               showModalOnTap(context, buildQuestionnaireModal(questionnaire));
             } else {
-              await showFetchDialog(context: context, value: '授業アンケート') ==
+              await showFetchConfirmDialog(
+                        context: context,
+                        value: '授業アンケート',
+                      ) ==
                       OkCancelResult.ok
                   ? context
                       .read<ApiRepository>()
@@ -253,14 +256,14 @@ class _QuestionnairePageState extends State<QuestionnairePage> {
             ],
           ),
         ),
-      );
-    });
+      ),
+    );
   }
 }
 
 Widget buildQuestionnaireModal(Questionnaire questionnaire) {
-  return Builder(builder: (context) {
-    return ListView(
+  return Builder(
+    builder: (context) => ListView(
       padding: const EdgeInsets.all(16.0),
       children: [
         Padding(
@@ -380,6 +383,6 @@ Widget buildQuestionnaireModal(Questionnaire questionnaire) {
         ),
         const SizedBox(height: 8.0),
       ],
-    );
-  });
+    ),
+  );
 }

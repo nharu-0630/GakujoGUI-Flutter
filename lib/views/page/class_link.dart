@@ -68,8 +68,8 @@ class _ClassLinkPageState extends State<ClassLinkPage> {
   }
 
   Widget _buildAppBar() {
-    return Builder(builder: (context) {
-      return SliverAppBar(
+    return Builder(
+      builder: (context) => SliverAppBar(
         centerTitle: true,
         floating: true,
         leading: Padding(
@@ -119,13 +119,13 @@ class _ClassLinkPageState extends State<ClassLinkPage> {
                 ),
               ],
         bottom: buildAppBarBottom(),
-      );
-    });
+      ),
+    );
   }
 
   Widget _buildCard(ClassLink classLink) {
-    return Builder(builder: (context) {
-      return Slidable(
+    return Builder(
+      builder: (context) => Slidable(
         key: Key(classLink.id),
         startActionPane: ActionPane(
           motion: const DrawerMotion(),
@@ -200,14 +200,14 @@ class _ClassLinkPageState extends State<ClassLinkPage> {
             overflow: TextOverflow.ellipsis,
           ),
         ),
-      );
-    });
+      ),
+    );
   }
 }
 
 Widget buildClassLinkModal(ClassLink classLink) {
-  return Builder(builder: (context) {
-    return ListView(
+  return Builder(
+    builder: (context) => ListView(
       padding: const EdgeInsets.all(16.0),
       children: [
         Padding(
@@ -289,6 +289,6 @@ Widget buildClassLinkModal(ClassLink classLink) {
         ),
         const SizedBox(height: 8.0),
       ],
-    );
-  });
+    ),
+  );
 }

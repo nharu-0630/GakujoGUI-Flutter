@@ -71,8 +71,8 @@ class _QuizPageState extends State<QuizPage> {
   }
 
   Widget _buildAppBar() {
-    return Builder(builder: (context) {
-      return SliverAppBar(
+    return Builder(
+      builder: (context) => SliverAppBar(
         centerTitle: true,
         floating: true,
         leading: Padding(
@@ -122,13 +122,13 @@ class _QuizPageState extends State<QuizPage> {
                 ),
               ],
         bottom: buildAppBarBottom(),
-      );
-    });
+      ),
+    );
   }
 
   Widget _buildCard(Quiz quiz) {
-    return Builder(builder: (context) {
-      return Slidable(
+    return Builder(
+      builder: (context) => Slidable(
         key: Key(quiz.id),
         startActionPane: ActionPane(
           motion: const DrawerMotion(),
@@ -253,14 +253,14 @@ class _QuizPageState extends State<QuizPage> {
             ],
           ),
         ),
-      );
-    });
+      ),
+    );
   }
 }
 
 Widget buildQuizModal(Quiz quiz) {
-  return Builder(builder: (context) {
-    return ListView(
+  return Builder(
+    builder: (context) => ListView(
       padding: const EdgeInsets.all(16.0),
       children: [
         Padding(
@@ -377,6 +377,6 @@ Widget buildQuizModal(Quiz quiz) {
         ),
         const SizedBox(height: 8.0),
       ],
-    );
-  });
+    ),
+  );
 }

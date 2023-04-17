@@ -450,8 +450,8 @@ class _SyllabusSearchPageState extends State<SyllabusSearchPage> {
   }
 
   Widget _buildAppBar() {
-    return Builder(builder: (context) {
-      return SliverAppBar(
+    return Builder(
+      builder: (context) => SliverAppBar(
         centerTitle: true,
         floating: true,
         leading: Padding(
@@ -463,7 +463,7 @@ class _SyllabusSearchPageState extends State<SyllabusSearchPage> {
         ),
         title: const Text('シラバス'),
         bottom: buildAppBarBottom(),
-      );
-    });
+      ),
+    );
   }
 }

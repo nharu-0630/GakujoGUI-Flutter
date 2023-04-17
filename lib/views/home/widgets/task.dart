@@ -84,8 +84,8 @@ class TaskWidget extends StatelessWidget {
   }
 
   Widget _buildQuizCard(Quiz quiz) {
-    return Builder(builder: (context) {
-      return Card(
+    return Builder(
+      builder: (context) => Card(
         child: ListTile(
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12.0),
@@ -94,7 +94,10 @@ class TaskWidget extends StatelessWidget {
             if (quiz.isAcquired) {
               showModalOnTap(context, buildQuizModal(quiz));
             } else {
-              await showFetchDialog(context: context, value: '小テスト') ==
+              await showFetchConfirmDialog(
+                        context: context,
+                        value: '小テスト',
+                      ) ==
                       OkCancelResult.ok
                   ? context.read<ApiRepository>().fetchDetailQuiz(quiz)
                   : showModalOnTap(context, buildQuizModal(quiz));
@@ -145,13 +148,13 @@ class TaskWidget extends StatelessWidget {
             ],
           ),
         ),
-      );
-    });
+      ),
+    );
   }
 
   Widget _buildReportCard(Report report) {
-    return Builder(builder: (context) {
-      return Card(
+    return Builder(
+      builder: (context) => Card(
         child: ListTile(
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12.0),
@@ -160,7 +163,10 @@ class TaskWidget extends StatelessWidget {
             if (report.isAcquired) {
               showModalOnTap(context, buildReportModal(report));
             } else {
-              await showFetchDialog(context: context, value: 'レポート') ==
+              await showFetchConfirmDialog(
+                        context: context,
+                        value: 'レポート',
+                      ) ==
                       OkCancelResult.ok
                   ? context.read<ApiRepository>().fetchDetailReport(report)
                   : showModalOnTap(context, buildReportModal(report));
@@ -211,13 +217,13 @@ class TaskWidget extends StatelessWidget {
             ],
           ),
         ),
-      );
-    });
+      ),
+    );
   }
 
   Widget _buildQuestionnaireCard(Questionnaire questionnaire) {
-    return Builder(builder: (context) {
-      return Card(
+    return Builder(
+      builder: (context) => Card(
         child: ListTile(
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12.0),
@@ -226,7 +232,10 @@ class TaskWidget extends StatelessWidget {
             if (questionnaire.isAcquired) {
               showModalOnTap(context, buildQuestionnaireModal(questionnaire));
             } else {
-              await showFetchDialog(context: context, value: '授業アンケート') ==
+              await showFetchConfirmDialog(
+                        context: context,
+                        value: '授業アンケート',
+                      ) ==
                       OkCancelResult.ok
                   ? context
                       .read<ApiRepository>()
@@ -280,7 +289,7 @@ class TaskWidget extends StatelessWidget {
             ],
           ),
         ),
-      );
-    });
+      ),
+    );
   }
 }

@@ -68,8 +68,8 @@ class _SharedFilePageState extends State<SharedFilePage> {
   }
 
   Widget _buildAppBar() {
-    return Builder(builder: (context) {
-      return SliverAppBar(
+    return Builder(
+      builder: (context) => SliverAppBar(
         centerTitle: true,
         floating: true,
         leading: Padding(
@@ -119,13 +119,13 @@ class _SharedFilePageState extends State<SharedFilePage> {
                 ),
               ],
         bottom: buildAppBarBottom(),
-      );
-    });
+      ),
+    );
   }
 
   Widget _buildCard(SharedFile sharedFile) {
-    return Builder(builder: (context) {
-      return Slidable(
+    return Builder(
+      builder: (context) => Slidable(
         key: Key(sharedFile.hashCode.toString()),
         startActionPane: ActionPane(
           motion: const DrawerMotion(),
@@ -162,7 +162,10 @@ class _SharedFilePageState extends State<SharedFilePage> {
             if (sharedFile.isAcquired) {
               showModalOnTap(context, buildSharedFileModal(sharedFile));
             } else {
-              await showFetchDialog(context: context, value: '授業共有ファイル') ==
+              await showFetchConfirmDialog(
+                        context: context,
+                        value: '授業共有ファイル',
+                      ) ==
                       OkCancelResult.ok
                   ? context
                       .read<ApiRepository>()
@@ -218,14 +221,14 @@ class _SharedFilePageState extends State<SharedFilePage> {
             ],
           ),
         ),
-      );
-    });
+      ),
+    );
   }
 }
 
 Widget buildSharedFileModal(SharedFile sharedFile) {
-  return Builder(builder: (context) {
-    return ListView(
+  return Builder(
+    builder: (context) => ListView(
       padding: const EdgeInsets.all(16.0),
       children: [
         Padding(
@@ -328,6 +331,6 @@ Widget buildSharedFileModal(SharedFile sharedFile) {
         ),
         const SizedBox(height: 8.0),
       ],
-    );
-  });
+    ),
+  );
 }

@@ -74,8 +74,8 @@ class ContactWidget extends StatelessWidget {
   }
 
   Widget _buildTile(Subject subject, List<Contact> contacts) {
-    return Builder(builder: (context) {
-      return ListTile(
+    return Builder(
+      builder: (context) => ListTile(
         onTap: () => Navigator.of(context).push(
             MaterialPageRoute(builder: (context) => ContactPage(subject))),
         title: Row(
@@ -107,7 +107,7 @@ class ContactWidget extends StatelessWidget {
           overflow: TextOverflow.ellipsis,
           style: Theme.of(context).textTheme.bodySmall,
         ),
-      );
-    });
+      ),
+    );
   }
 }

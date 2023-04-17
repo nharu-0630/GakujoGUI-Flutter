@@ -154,8 +154,8 @@ class _TimetablePageState extends State<TimetablePage> {
   }
 
   Widget _buildCell(Timetable timetable) {
-    return Builder(builder: (context) {
-      return badges.Badge(
+    return Builder(
+      builder: (context) => badges.Badge(
         showBadge: (_reports
                     .where((e) => e.subject == timetable.subject)
                     .length +
@@ -216,14 +216,14 @@ class _TimetablePageState extends State<TimetablePage> {
             ),
           ),
         ),
-      );
-    });
+      ),
+    );
   }
 }
 
 Widget buildTimetableModal(Timetable timetable) {
-  return Builder(builder: (context) {
-    return ListView(
+  return Builder(
+    builder: (context) => ListView(
       padding: const EdgeInsets.all(16.0),
       children: [
         Padding(
@@ -294,6 +294,6 @@ Widget buildTimetableModal(Timetable timetable) {
         ...buildLongItem('在宅授業形態', timetable.syllabusHomeClassStyle),
         ...buildLongItem('在宅授業形態（詳細）', timetable.syllabusHomeClassStyleDetail),
       ],
-    );
-  });
+    ),
+  );
 }

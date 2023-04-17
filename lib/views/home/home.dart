@@ -22,8 +22,8 @@ class _HomeWidgetState extends State<HomeWidget> {
   }
 
   Widget _buildHeader(IconData icon, String title) {
-    return Builder(builder: (context) {
-      return Container(
+    return Builder(
+      builder: (context) => Container(
         color: Theme.of(context).scaffoldBackgroundColor,
         padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
         child: Row(
@@ -37,8 +37,8 @@ class _HomeWidgetState extends State<HomeWidget> {
             const Spacer(),
           ],
         ),
-      );
-    });
+      ),
+    );
   }
 
   Widget _buildVertical(BuildContext context) {

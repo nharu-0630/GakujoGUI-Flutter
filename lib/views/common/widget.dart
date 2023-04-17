@@ -15,7 +15,7 @@ import 'package:provider/provider.dart';
 import 'package:side_sheet/side_sheet.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
-Future<OkCancelResult> showFetchDialog({
+Future<OkCancelResult> showFetchConfirmDialog({
   required BuildContext context,
   required String value,
 }) async {
@@ -29,7 +29,7 @@ Future<OkCancelResult> showFetchDialog({
 }
 
 Widget? buildFloatingActionButton({
-  required Function() onPressed,
+  required Function onPressed,
   required IconData iconData,
 }) {
   return (Platform.isLinux || Platform.isMacOS || Platform.isWindows)
@@ -46,8 +46,8 @@ Widget buildElevatedButton({
   required IconData iconData,
   bool isDestructiveAction = false,
 }) {
-  return Builder(builder: (context) {
-    return Padding(
+  return Builder(
+    builder: (context) => Padding(
       padding: const EdgeInsets.all(8.0),
       child: ElevatedButton(
         style: isDestructiveAction
@@ -81,8 +81,8 @@ Widget buildElevatedButton({
           ),
         ),
       ),
-    );
-  });
+    ),
+  );
 }
 
 void showModalOnTap(BuildContext context, Widget widget) {
@@ -106,8 +106,8 @@ void showModalOnTap(BuildContext context, Widget widget) {
 }
 
 Widget buildIconItem(IconData iconData, String text) {
-  return Builder(builder: (context) {
-    return Column(
+  return Builder(
+    builder: (context) => Column(
       children: [
         Icon(iconData),
         const SizedBox(width: 8.0),
@@ -116,13 +116,13 @@ Widget buildIconItem(IconData iconData, String text) {
           style: Theme.of(context).textTheme.bodyMedium,
         ),
       ],
-    );
-  });
+    ),
+  );
 }
 
 Widget buildShortItem(String title, String body) {
-  return Builder(builder: (context) {
-    return Column(
+  return Builder(
+    builder: (context) => Column(
       children: [
         Text(
           title,
@@ -133,14 +133,14 @@ Widget buildShortItem(String title, String body) {
           style: Theme.of(context).textTheme.bodyMedium,
         ),
       ],
-    );
-  });
+    ),
+  );
 }
 
 List<Widget> buildLongItem(String title, String body) {
   return [
-    Builder(builder: (context) {
-      return Align(
+    Builder(
+      builder: (context) => Align(
         alignment: Alignment.centerLeft,
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 8.0),
@@ -149,24 +149,24 @@ List<Widget> buildLongItem(String title, String body) {
             style: Theme.of(context).textTheme.titleMedium,
           ),
         ),
-      );
-    }),
-    Builder(builder: (context) {
-      return Align(
+      ),
+    ),
+    Builder(
+      builder: (context) => Align(
         alignment: Alignment.centerLeft,
         child: Padding(
           padding: const EdgeInsets.all(4.0),
           child: buildAutoLinkText(body),
         ),
-      );
-    }),
+      ),
+    ),
     const SizedBox(height: 8.0)
   ];
 }
 
 Widget buildRadiusBadge(String text) {
-  return Builder(builder: (context) {
-    return Padding(
+  return Builder(
+    builder: (context) => Padding(
       padding: const EdgeInsets.symmetric(horizontal: 4.0),
       child: Container(
         padding: const EdgeInsets.symmetric(
@@ -185,8 +185,8 @@ Widget buildRadiusBadge(String text) {
           style: Theme.of(context).textTheme.bodyMedium,
         ),
       ),
-    );
-  });
+    ),
+  );
 }
 
 LayoutBuilder buildCenterItemLayoutBuilder(IconData iconData, String text) {
@@ -353,15 +353,15 @@ Icon _buildExtIcon(String ext) {
 }
 
 Widget buildAutoLinkText(String text) {
-  return Builder(builder: (context) {
-    return SelectableLinkify(
+  return Builder(
+    builder: (context) => SelectableLinkify(
       text: text,
       style: Theme.of(context).textTheme.bodyMedium,
       linkStyle: TextStyle(color: Theme.of(context).colorScheme.primary),
       onOpen: (link) =>
           launchUrlString(link.url, mode: LaunchMode.inAppWebView),
-    );
-  });
+    ),
+  );
 }
 
 PreferredSize buildAppBarBottom() {

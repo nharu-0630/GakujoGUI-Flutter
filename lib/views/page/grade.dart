@@ -63,8 +63,8 @@ class _GradePageState extends State<GradePage> {
   }
 
   Widget _buildGrade() {
-    return Builder(builder: (context) {
-      return RefreshIndicator(
+    return Builder(
+      builder: (context) => RefreshIndicator(
         onRefresh: () async => context.read<ApiRepository>().fetchGrades(),
         child: _grades.isEmpty
             ? buildCenterItemLayoutBuilder(KIcons.grade, '成績情報はありません')
@@ -77,13 +77,13 @@ class _GradePageState extends State<GradePage> {
                     ? _buildCard(_suggestGrades[index])
                     : _buildCard(_grades[index]),
               ),
-      );
-    });
+      ),
+    );
   }
 
   Widget _buildImageItem(String title, String key, String? image) {
-    return Builder(builder: (context) {
-      return Column(
+    return Builder(
+      builder: (context) => Column(
         children: [
           Text(
             title,
@@ -99,13 +99,13 @@ class _GradePageState extends State<GradePage> {
                 )
               : const SizedBox.shrink(),
         ],
-      );
-    });
+      ),
+    );
   }
 
   Widget _buildGpas() {
-    return Builder(builder: (context) {
-      return RefreshIndicator(
+    return Builder(
+      builder: (context) => RefreshIndicator(
         onRefresh: () async => context.read<ApiRepository>().fetchGrades(),
         child: ListView(
           controller: ScrollController(),
@@ -149,8 +149,8 @@ class _GradePageState extends State<GradePage> {
             )
           ],
         ),
-      );
-    });
+      ),
+    );
   }
 
   Widget _buildGpaChart(Map<String, double> gpas) {
@@ -263,8 +263,8 @@ class _GradePageState extends State<GradePage> {
   }
 
   Widget _buildAppBar() {
-    return Builder(builder: (context) {
-      return SliverAppBar(
+    return Builder(
+      builder: (context) => SliverAppBar(
         centerTitle: true,
         floating: true,
         leading: Padding(
@@ -320,14 +320,13 @@ class _GradePageState extends State<GradePage> {
             ],
           ),
         ),
-      );
-    });
+      ),
+    );
   }
 
   Widget _buildCard(Grade grade) {
-    return Builder(builder: (context) {
-      return ListTile(
-        onTap: () {},
+    return Builder(
+      builder: (context) => ListTile(
         title: Row(
           children: [
             Expanded(
@@ -383,7 +382,7 @@ class _GradePageState extends State<GradePage> {
             ),
           ],
         ),
-      );
-    });
+      ),
+    );
   }
 }
