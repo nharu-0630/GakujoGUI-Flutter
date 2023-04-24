@@ -21,6 +21,7 @@ class ContactWidget extends StatelessWidget {
         if (snapshot.hasData) {
           var subjects = snapshot.data![0] as List<Subject>;
           var contacts = snapshot.data![1] as List<Contact>;
+          contacts.sort(((a, b) => b.compareTo(a)));
           subjects.sort((a, b) {
             var aContact =
                 contacts.firstWhereOrNull((e) => e.subject == a.subject);
