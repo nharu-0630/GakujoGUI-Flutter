@@ -300,24 +300,24 @@ Widget buildFileList(List<String>? fileNames,
                 p.basename(fileNames[index]),
                 style: Theme.of(context).textTheme.bodyMedium,
               ),
-              onTap: () async => _openFile(fileNames[index]),
+              onTap: () async {
+                getApplicationDocumentsDirectory().then((value) {
+                  var path = p.join(value.path, fileNames[index]);
+                  if (File(path).existsSync()) {
+                    OpenFile.open(path);
+                  } else {
+                    showFlash(
+                      context: App.navigatorKey.currentState!.overlay!.context,
+                      builder: (context, controller) => buildErrorFlashBar(
+                          context, controller, 'ファイルが存在しません'),
+                    );
+                  }
+                });
+              },
             ),
           ),
         )
       : const SizedBox.shrink();
-}
-
-void _openFile(String filename) async {
-  var path = p.join((await getApplicationDocumentsDirectory()).path, filename);
-  if (File(path).existsSync()) {
-    OpenFile.open(path);
-  } else {
-    showFlash(
-      context: App.navigatorKey.currentState!.overlay!.context,
-      builder: (context, controller) =>
-          buildErrorFlashBar(context, controller, 'ファイルが存在しません'),
-    );
-  }
 }
 
 Icon _buildExtIcon(String ext) {
