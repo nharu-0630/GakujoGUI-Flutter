@@ -24,17 +24,19 @@ class _HomeWidgetState extends State<HomeWidget> {
   Widget _buildHeader(IconData icon, String title) {
     return Builder(
       builder: (context) => Container(
-        color: Theme.of(context).scaffoldBackgroundColor,
         padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
         child: Row(
           children: [
             Icon(icon),
             const SizedBox(width: 8.0),
-            Text(
-              title,
-              style: Theme.of(context).textTheme.titleLarge,
+            Expanded(
+              child: Text(
+                title,
+                style: Theme.of(context).textTheme.titleLarge,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
             ),
-            const Spacer(),
           ],
         ),
       ),
