@@ -226,10 +226,9 @@ Flash buildErrorFlashBar(
     BuildContext context, FlashController<Object?> controller, Object? e) {
   return Flash(
     controller: controller,
-    behavior: FlashBehavior.floating,
     position: FlashPosition.bottom,
-    backgroundColor: Theme.of(context).colorScheme.onError,
     child: FlashBar(
+      controller: controller,
       icon: Icon(
         LineIcons.exclamationTriangle,
         color: Theme.of(context).colorScheme.error,
@@ -258,10 +257,9 @@ Flash buildInfoFlashBar(
     {String? title, required String content}) {
   return Flash(
     controller: controller,
-    behavior: FlashBehavior.floating,
     position: FlashPosition.bottom,
-    backgroundColor: Theme.of(context).colorScheme.onSecondary,
     child: FlashBar(
+      controller: controller,
       icon: Icon(
         LineIcons.infoCircle,
         color: Theme.of(context).colorScheme.secondary,
