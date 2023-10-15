@@ -771,256 +771,50 @@ class GakujoApi {
               },
             );
 
-            print(response.data);
+            flowtoken = null;
+            flowtoken = RegExp(r'(?<="FlowToken":").*?(?=")')
+                .firstMatch(response.data.toString())
+                ?.group(0);
+            if (flowtoken == null) {
+              throw Exception('Failed to get FlowToken.');
+            }
+
+            _setProgress(15 / 15);
+            await Future.delayed(_interval);
+            response = await _client.postUri(
+              Uri.https(
+                'login.microsoftonline.com',
+                '/common/SAS/ProcessAuth',
+              ),
+              options: Options(
+                headers: {
+                  'Accept':
+                      'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
+                  'Referer': 'https://login.microsoftonline.com/$guid/login',
+                  'Cookie':
+                      'x-ms-gateway-slice=estsfd; stsservicecookie=estsfd; AADSSO=NA|NoExtension; SSOCOOKIEPULLED=1; brcap=0; wlidperf=FR=L&ST=$st; ESTSAUTHPERSISTENT=$estsauthpersistent; ESTSAUTH=$estsauth; ESTSAUTHLIGHT=$estsauthlight; buid=$buid; esctx=$esctx; fpc=$fpc',
+                },
+              ),
+              data: {
+                "type": 19,
+                "GeneralVerify": false,
+                "request": ctx,
+                "mfaLastPollStart": 1697384904051,
+                "mfaLastPollEnd": 1697384904895,
+                "mfaAuthMethod": "PhoneAppOTP",
+                "otc": 889896,
+                "login": username,
+                "flowToken": flowtoken,
+                "hpgrequestid": hpgrequestid,
+                "sacxt": "",
+                "hideSmsInMfaProofs": false,
+                "canary": canary2,
+                "i19": 9941,
+              },
+            );
           }
         }
       }
-
-      //   var samlResponse = Uri.decodeFull(
-      //     RegExp(r'(?<=SAMLResponse" value=").*(?=")')
-      //             .firstMatch(response.data.toString())
-      //             ?.group(0) ??
-      //         '',
-      //   );
-      //   var relayState = Uri.decodeFull(
-      //     RegExp(r'(?<=RelayState" value=").*(?=")')
-      //             .firstMatch(response.data.toString())
-      //             ?.group(0) ??
-      //         '',
-      //   ).replaceAll('&#x3a;', ':');
-
-      //   if (samlResponse.isEmpty || relayState.isEmpty) {
-      //     throw Exception('Failed to get SAMLResponse or RelayState.');
-      //   }
-
-      //   if (kDebugMode) {
-      //     print('SAMLResponse: ${samlResponse.substring(0, 10)} ...');
-      //     print('RelayState: ${relayState.substring(0, 10)} ...');
-      //   }
-
-      //   _setProgress(6 / 15);
-      //   await Future.delayed(_interval);
-      //   await _client.postUri<dynamic>(
-      //     Uri.https(
-      //       'gakujo.shizuoka.ac.jp',
-      //       '/Shibboleth.sso/SAML2/POST',
-      //     ),
-      //     data: {
-      //       'RelayState': relayState,
-      //       'SAMLResponse': samlResponse,
-      //     },
-      //     options: Options(
-      //       headers: {
-      //         'Accept':
-      //             'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
-      //         'Origin': 'https://idp.shizuoka.ac.jp',
-      //         'Referer': 'https://idp.shizuoka.ac.jp/',
-      //       },
-      //       validateStatus: (status) => status == 302,
-      //     ),
-      //   );
-
-      //   _setProgress(7 / 15);
-      //   await Future.delayed(_interval);
-      //   response = await _client.getUri<dynamic>(
-      //     Uri.https(
-      //       'gakujo.shizuoka.ac.jp',
-      //       '/portal/shibbolethlogin/shibbolethLogin/initLogin/sso',
-      //     ),
-      //     options: Options(
-      //       headers: {
-      //         'Accept':
-      //             'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
-      //         'Referer': 'https://idp.shizuoka.ac.jp/',
-      //       },
-      //       validateStatus: (status) => status == 302 || status == 200,
-      //     ),
-      //   );
-
-      //   if (response.statusCode == 302) {
-      //     if (response.headers.value('location') == null) {
-      //       throw Exception('Failed to get location header.');
-      //     }
-
-      //     _setProgress(8 / 15);
-      //     await Future.delayed(_interval);
-      //     response = await _client.get<dynamic>(
-      //       response.headers.value('location')!,
-      //     );
-      //   }
-
-      //   _updateToken(response.data);
-
-      //   samlResponse = Uri.decodeFull(
-      //     RegExp(r'(?<=SAMLResponse" value=").*(?=")')
-      //             .firstMatch(response.data.toString())
-      //             ?.group(0) ??
-      //         '',
-      //   );
-      //   relayState = Uri.decodeFull(
-      //     RegExp(r'(?<=RelayState" value=").*(?=")')
-      //             .firstMatch(response.data.toString())
-      //             ?.group(0) ??
-      //         '',
-      //   ).replaceAll('&#x3a;', ':');
-      //   if (samlResponse.isNotEmpty && relayState.isNotEmpty) {
-      //     if (kDebugMode) {
-      //       print('SAMLResponse: ${samlResponse.substring(0, 10)} ...');
-      //       print('RelayState: ${relayState.substring(0, 10)} ...');
-      //     }
-
-      //     _setProgress(9 / 15);
-      //     await Future.delayed(_interval);
-      //     await _client.postUri<dynamic>(
-      //       Uri.https(
-      //         'gakujo.shizuoka.ac.jp',
-      //         '/Shibboleth.sso/SAML2/POST',
-      //       ),
-      //       data: {
-      //         'RelayState': relayState,
-      //         'SAMLResponse': samlResponse,
-      //       },
-      //       options: Options(
-      //         headers: {
-      //           'Accept':
-      //               'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
-      //           'Origin': 'https://idp.shizuoka.ac.jp',
-      //           'Referer': 'https://idp.shizuoka.ac.jp/',
-      //         },
-      //         validateStatus: (status) => status == 302,
-      //       ),
-      //     );
-
-      //     _setProgress(10 / 15);
-      //     await Future.delayed(_interval);
-      //     response = await _client.getUri<dynamic>(
-      //       Uri.https(
-      //         'gakujo.shizuoka.ac.jp',
-      //         '/portal/shibbolethlogin/shibbolethLogin/initLogin/sso',
-      //       ),
-      //       options: Options(
-      //         headers: {
-      //           'Accept':
-      //               'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
-      //         },
-      //         validateStatus: (status) => status == 302 || status == 200,
-      //       ),
-      //     );
-      //     if (response.statusCode == 302) {
-      //       if (response.headers.value('location') == null) {
-      //         throw Exception('Failed to get location header.');
-      //       }
-
-      //       _setProgress(11 / 15);
-      //       await Future.delayed(_interval);
-      //       response = await _client.get<dynamic>(
-      //         response.headers.value('location')!,
-      //       );
-      //     }
-      //   }
-      // }
-
-      // if (parse(response.data).querySelector('title')?.text == 'アクセス環境登録') {
-      //   _updateToken(response.data, required: true);
-      //   var accessEnvName =
-      //       'GakujoGUI Flutter ${(const Uuid()).v4().substring(0, 8)}';
-      //   // settings.accessEnvironmentName = accessEnvName;
-
-      //   _setProgress(12 / 15);
-      //   await Future.delayed(_interval);
-      //   response = await _client.postUri<dynamic>(
-      //     Uri.https(
-      //       'gakujo.shizuoka.ac.jp',
-      //       '/portal/common/accessEnvironmentRegist/goHome/',
-      //     ),
-      //     data: {
-      //       'org.apache.struts.taglib.html.TOKEN': _token,
-      //       'accessEnvName': accessEnvName,
-      //       'newAccessKey': '',
-      //     },
-      //     options: Options(
-      //       headers: {
-      //         'Accept':
-      //             'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
-      //         'Origin': 'https://gakujo.shizuoka.ac.jp',
-      //         'Referer':
-      //             'https://gakujo.shizuoka.ac.jp/portal/shibbolethlogin/shibbolethLogin/initLogin/sso',
-      //       },
-      //     ),
-      //   );
-
-      //   if (response.headers.value('set-cookie') != null) {
-      //     var cookies =
-      //         response.headers.value('set-cookie')!.split(';')[0].split('=');
-      //     // settings.accessEnvironmentKey = cookies[0];
-      //     // settings.accessEnvironmentValue = cookies[1];
-      //   }
-
-      //   _setProgress(13 / 15);
-      //   await Future.delayed(_interval);
-      //   response = await _client.postUri<dynamic>(
-      //     Uri.https(
-      //       'gakujo.shizuoka.ac.jp',
-      //       '/portal/home/home/initialize',
-      //       {'EXCLUDE_SET': ''},
-      //     ),
-      //     data: {'EXCLUDE_SET': ''},
-      //     options: Options(
-      //       headers: {
-      //         'Accept':
-      //             'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
-      //         'Origin': 'https://gakujo.shizuoka.ac.jp',
-      //         'Referer':
-      //             'https://gakujo.shizuoka.ac.jp/portal/common/accessEnvironmentRegist/goHome/',
-      //       },
-      //     ),
-      //   );
-      // } else {
-      //   _setProgress(13 / 15);
-      //   await Future.delayed(_interval);
-      //   response = await _client.postUri<dynamic>(
-      //     Uri.https(
-      //       'gakujo.shizuoka.ac.jp',
-      //       '/portal/home/home/initialize',
-      //       {'EXCLUDE_SET': ''},
-      //     ),
-      //     data: {'EXCLUDE_SET': ''},
-      //     options: Options(
-      //       headers: {
-      //         'Accept':
-      //             'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
-      //         'Origin': 'https://gakujo.shizuoka.ac.jp',
-      //         'Referer':
-      //             'https://gakujo.shizuoka.ac.jp/portal/shibbolethlogin/shibbolethLogin/initLogin/sso',
-      //       },
-      //     ),
-      //   );
-      // }
-
-      // _updateToken(response.data, required: true);
-
-      // var name = parse(response.data)
-      //     .querySelector('#header-cog > li > a > span > span')
-      //     ?.text;
-      // // settings.fullName =
-      // //     name?.substring(0, name.indexOf('さん')).replaceAll('　', '');
-
-      // _setProgress(14 / 15);
-      // await Future.delayed(_interval);
-      // response = await _client.getUri<dynamic>(
-      //   Uri.https(
-      //     'gakujo.shizuoka.ac.jp',
-      //     '/portal/common/fileDownload/downloadFavoriteImage',
-      //     {
-      //       'org.apache.struts.taglib.html.TOKEN=': _token,
-      //     },
-      //   ),
-      //   options: Options(responseType: ResponseType.bytes),
-      // );
-      // // settings.profileImage = base64.encode(response.data);
-      // // settings.lastLoginTime = DateTime.now();
-      // // _context?.read<SettingsRepository>().save(settings);
-      // _setProgress(15 / 15);
     }
   }
 
