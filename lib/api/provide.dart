@@ -10,6 +10,7 @@ import 'package:gakujo_gui/models/contact.dart';
 import 'package:gakujo_gui/models/questionnaire.dart';
 import 'package:gakujo_gui/models/quiz.dart';
 import 'package:gakujo_gui/models/report.dart';
+import 'package:gakujo_gui/models/settings.dart';
 import 'package:gakujo_gui/models/shared_file.dart';
 import 'package:gakujo_gui/models/syllabus_detail.dart';
 import 'package:gakujo_gui/models/syllabus_parameters.dart';
@@ -18,7 +19,7 @@ import 'package:gakujo_gui/views/common/widget.dart';
 import 'package:windows_taskbar/windows_taskbar.dart';
 
 class ApiRepository extends ChangeNotifier {
-  final _gakujoApi = GakujoApi();
+  late GakujoApi _gakujoApi;
   String get token => _gakujoApi.token;
 
   final _syllabusApi = SyllabusApi();
@@ -31,7 +32,14 @@ class ApiRepository extends ChangeNotifier {
   double _progress = -1;
 
   void initialize() {
-    _gakujoApi.initialize();
+    var settings = Settings.init();
+    _gakujoApi = GakujoApi(
+      username: settings.username ?? '',
+      password: settings.password ?? '',
+      year: settings.year ?? 2023,
+      semester: settings.semester ?? 3,
+    );
+    _gakujoApi.initialize(null);
   }
 
   void setProgress(double value) {
@@ -92,13 +100,13 @@ class ApiRepository extends ChangeNotifier {
   void fetchLogin() async {
     if (isLoading) return;
     _setStatus(true);
-    try {
-      await _gakujoApi.fetchLogin();
-      _setStatus(false);
-      _onSuccess('ログイン');
-    } catch (e) {
-      _onError(e);
-    }
+    // try {
+    await _gakujoApi.fetchLogin();
+    _setStatus(false);
+    _onSuccess('ログイン');
+    // } catch (e) {
+    //   _onError(e);
+    // }
   }
 
   void fetchSubjects() async {
