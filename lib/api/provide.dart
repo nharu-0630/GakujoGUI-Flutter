@@ -36,6 +36,7 @@ class ApiRepository extends ChangeNotifier {
     _gakujoApi = GakujoApi(
       username: settings.username ?? '',
       password: settings.password ?? '',
+      secret: '',
       year: settings.year ?? 2023,
       semester: settings.semester ?? 3,
     );

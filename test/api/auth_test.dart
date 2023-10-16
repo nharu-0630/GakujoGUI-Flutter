@@ -1,5 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:gakujo_gui/api/gakujo_api.dart';
+import 'package:otp/otp.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -8,6 +9,7 @@ void main() {
     final api = GakujoApi(
       username: '',
       password: '',
+      secret: '',
       year: 2023,
       semester: 3,
     );

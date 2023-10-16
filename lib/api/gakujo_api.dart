@@ -20,6 +20,7 @@ import 'package:gakujo_gui/models/shared_file.dart';
 import 'package:gakujo_gui/models/subject.dart';
 import 'package:gakujo_gui/models/timetable.dart';
 import 'package:html/parser.dart' show parse;
+import 'package:otp/otp.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
@@ -40,6 +41,7 @@ class GakujoApi {
 
   final String username;
   final String password;
+  final String secret;
   final int year;
   final int semester;
 
@@ -66,6 +68,7 @@ class GakujoApi {
   GakujoApi({
     required this.username,
     required this.password,
+    required this.secret,
     required this.year,
     required this.semester,
   });
@@ -168,6 +171,8 @@ class GakujoApi {
         ),
       );
 
+      String? jsessionid;
+
       if (response.statusCode == 302) {
         if (response.headers.value('set-cookie') == null) {
           throw Exception('Failed to get set-cookie header.');
@@ -199,10 +204,25 @@ class GakujoApi {
           ),
         );
 
-        var csrfToken = RegExp(r'(?<=csrf_token" value=").*(?=")')
-                .firstMatch(response.data.toString())
-                ?.group(0) ??
-            '';
+        var csrftoken = RegExp(r'(?<=csrf_token" value=").*(?=")')
+            .firstMatch(response.data.toString())
+            ?.group(0);
+        if (csrftoken == null) {
+          throw Exception('Failed to get csrf_token.');
+        }
+
+        // jsessionid = null;
+        // for (var element in response.headers['set-cookie']!) {
+        //   if (element.contains('JSESSIONID')) {
+        //     jsessionid = RegExp(r'(?<=JSESSIONID=).*?(?=;)')
+        //         .firstMatch(element)!
+        //         .group(0)!;
+        //   }
+        // }
+        // if (jsessionid == null) {
+        //   throw Exception('Failed to get JSESSIONID.');
+        // }
+        jsessionid = idpSession;
 
         _setProgress(5 / 15);
         await Future.delayed(_interval);
@@ -213,7 +233,7 @@ class GakujoApi {
             {'execution': 'e1s1'},
           ),
           data: {
-            'csrf_token': csrfToken,
+            'csrf_token': csrftoken,
             'shib_idp_ls_exception.shib_idp_session_ss': '',
             'shib_idp_ls_success.shib_idp_session_ss': true,
             'shib_idp_ls_value.shib_idp_session_ss': '',
@@ -537,8 +557,6 @@ class GakujoApi {
               },
             );
 
-            print(response.data);
-
             hpgrequestid = null;
             hpgrequestid = response.headers.value('x-ms-request-id');
             if (hpgrequestid == null) {
@@ -559,6 +577,14 @@ class GakujoApi {
                 ?.group(0);
             if (canary == null) {
               throw Exception('Failed to get apiCanary.');
+            }
+
+            String? instrumentationkey;
+            instrumentationkey = RegExp(r'(?<="instrumentationKey":").*?(?=")')
+                .firstMatch(response.data.toString())
+                ?.group(0);
+            if (instrumentationkey == null) {
+              throw Exception('Failed to get instrumentationKey.');
             }
 
             String? estsauthpersistent;
@@ -741,6 +767,13 @@ class GakujoApi {
               throw Exception('Failed to get Ctx.');
             }
 
+            var epoch = DateTime.now().millisecondsSinceEpoch;
+            var otc = OTP.generateTOTPCode(secret, epoch,
+                length: 6,
+                interval: 30,
+                algorithm: Algorithm.SHA1,
+                isGoogle: true);
+
             _setProgress(15 / 15);
             await Future.delayed(_interval);
             response = await _client.postUri(
@@ -766,7 +799,7 @@ class GakujoApi {
                 "FlowToken": flowtoken,
                 "Ctx": ctx,
                 "AuthMethodId": "PhoneAppOTP",
-                "AdditionalAuthData": "758098",
+                "AdditionalAuthData": otc,
                 "PollCount": 1
               },
             );
@@ -778,6 +811,30 @@ class GakujoApi {
             if (flowtoken == null) {
               throw Exception('Failed to get FlowToken.');
             }
+
+            fpc = null;
+            for (var element in response.headers['set-cookie']!) {
+              if (element.contains('fpc')) {
+                fpc =
+                    RegExp(r'(?<=fpc=).*?(?=;)').firstMatch(element)!.group(0)!;
+              }
+            }
+            if (fpc == null) {
+              throw Exception('Failed to get fpc.');
+            }
+
+            String? timestamp = null;
+            timestamp = RegExp(r'(?<="Timestamp":").*?(?=")')
+                .firstMatch(response.data.toString())
+                ?.group(0);
+            if (timestamp == null) {
+              throw Exception('Failed to get Timestamp.');
+            }
+            // convert iso8601 to unix timestamp
+            timestamp = DateTime.parse(timestamp)
+                .millisecondsSinceEpoch
+                .toString()
+                .substring(0, 10);
 
             _setProgress(15 / 15);
             await Future.delayed(_interval);
@@ -791,18 +848,18 @@ class GakujoApi {
                   'Accept':
                       'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
                   'Referer': 'https://login.microsoftonline.com/$guid/login',
-                  'Cookie':
-                      'x-ms-gateway-slice=estsfd; stsservicecookie=estsfd; AADSSO=NA|NoExtension; SSOCOOKIEPULLED=1; brcap=0; wlidperf=FR=L&ST=$st; ESTSAUTHPERSISTENT=$estsauthpersistent; ESTSAUTH=$estsauth; ESTSAUTHLIGHT=$estsauthlight; buid=$buid; esctx=$esctx; fpc=$fpc',
+                  // 'Cookie':
+                  //     'x-ms-gateway-slice=estsfd; stsservicecookie=estsfd; AADSSO=NA|NoExtension; SSOCOOKIEPULLED=1; brcap=0; wlidperf=FR=L&ST=$st; ESTSAUTHPERSISTENT=$estsauthpersistent; ESTSAUTH=$estsauth; ESTSAUTHLIGHT=$estsauthlight; buid=$buid; esctx=$esctx; fpc=$fpc',
                 },
               ),
               data: {
                 "type": 19,
                 "GeneralVerify": false,
                 "request": ctx,
-                "mfaLastPollStart": 1697384904051,
-                "mfaLastPollEnd": 1697384904895,
+                "mfaLastPollStart": epoch,
+                "mfaLastPollEnd": '${timestamp}000',
                 "mfaAuthMethod": "PhoneAppOTP",
-                "otc": 889896,
+                "otc": otc,
                 "login": username,
                 "flowToken": flowtoken,
                 "hpgrequestid": hpgrequestid,
@@ -812,6 +869,327 @@ class GakujoApi {
                 "i19": 9941,
               },
             );
+
+            print(response.data);
+
+            hpgrequestid = null;
+            hpgrequestid = response.headers.value('x-ms-request-id');
+            if (hpgrequestid == null) {
+              throw Exception('Failed to get x-ms-request-id.');
+            }
+
+            flowtoken = null;
+            flowtoken = RegExp(r'(?<="sFT":").*?(?=")')
+                .firstMatch(response.data.toString())
+                ?.group(0);
+            if (flowtoken == null) {
+              throw Exception('Failed to get sFT.');
+            }
+
+            canary = null;
+            canary = RegExp(r'(?<="canary":").*?(?=")')
+                .firstMatch(response.data.toString())
+                ?.group(0);
+            if (canary == null) {
+              throw Exception('Failed to get canary.');
+            }
+
+            _setProgress(15 / 15);
+            await Future.delayed(_interval);
+            response = await _client.getUri<dynamic>(
+              Uri.https(
+                'login.live.com',
+                '/Me.htm',
+                {'v': '3'},
+              ),
+              options: Options(
+                headers: {
+                  'Accept':
+                      'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
+                  'Referer': 'https://login.microsoftonline.com/',
+                  'Cookie': 'uaid=$uaid; MSPRequ=$msprequ',
+                },
+              ),
+            );
+
+            uaid = null;
+            for (var element in response.headers['set-cookie']!) {
+              if (element.contains('uaid')) {
+                uaid = RegExp(r'(?<=uaid=).*?(?=;)')
+                    .firstMatch(element)!
+                    .group(0)!;
+              }
+            }
+            if (uaid == null) {
+              throw Exception('Failed to get uaid.');
+            }
+
+            msprequ = null;
+            for (var element in response.headers['set-cookie']!) {
+              if (element.contains('MSPRequ')) {
+                msprequ = RegExp(r'(?<=MSPRequ=).*?(?=;)')
+                    .firstMatch(element)!
+                    .group(0)!;
+              }
+            }
+            if (msprequ == null) {
+              throw Exception('Failed to get MSPRequ.');
+            }
+
+            _setProgress(15 / 15);
+            await Future.delayed(_interval);
+            response = await _client.postUri(
+              Uri.https(
+                'login.microsoftonline.com',
+                '/kmsi',
+              ),
+              options: Options(
+                headers: {
+                  'Accept':
+                      'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
+                  'Referer':
+                      'https://login.microsoftonline.com/common/SAS/ProcessAuth',
+                },
+              ),
+              data: {
+                "LoginOptions": 1,
+                "type": 28,
+                "ctx": ctx,
+                "hpgrequestid": hpgrequestid,
+                "flowToken": flowtoken,
+                "DontShowAgain": true,
+                "canary": canary,
+                "i19": 4840,
+              },
+            );
+
+            var samlresponse = RegExp(r'(?<=SAMLResponse" value=").*?(?=")')
+                .firstMatch(response.data.toString())
+                ?.group(0);
+            if (samlresponse == null) {
+              throw Exception('Failed to get SAMLResponse.');
+            }
+
+            _setProgress(15 / 15);
+            await Future.delayed(_interval);
+            response = await _client.postUri(
+              Uri.https(
+                'idp.shizuoka.ac.jp',
+                '/idp/profile/Authn/SAML2/POST/SSO ',
+              ),
+              options: Options(
+                headers: {
+                  'Accept':
+                      'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
+                  'Cookie': 'JSESSIONID=$jsessionid',
+                  'Origin': 'https://login.microsoftonline.com',
+                },
+                validateStatus: (status) => status == 302,
+              ),
+              data: {
+                'SAMLResponse': samlresponse,
+                'RelayState': "e1s2",
+              },
+            );
+
+            _setProgress(15 / 15);
+            await Future.delayed(_interval);
+            response = await _client.getUri(
+              Uri.https(
+                'idp.shizuoka.ac.jp',
+                '/idp/profile/SAML2/Redirect/SSO',
+                {
+                  'execution': 'e1s2',
+                  '_eventId_proceed': 1,
+                },
+              ),
+              options: Options(
+                headers: {
+                  'Accept':
+                      'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
+                  'Cookie': 'JSESSIONID=$jsessionid',
+                  'Referer': 'https://login.microsoftonline.com/',
+                },
+                validateStatus: (status) => status == 302,
+              ),
+            );
+
+            String? shibidpsession;
+            for (var element in response.headers['set-cookie']!) {
+              if (element.contains('shib_idp_session')) {
+                shibidpsession = RegExp(r'(?<=shib_idp_session=).*?(?=;)')
+                    .firstMatch(element)!
+                    .group(0)!;
+              }
+            }
+            if (shibidpsession == null) {
+              throw Exception('Failed to get shib_idp_session.');
+            }
+
+            _setProgress(15 / 15);
+            await Future.delayed(_interval);
+            response = await _client.getUri(
+              Uri.https(
+                'idp.shizuoka.ac.jp',
+                '/idp/profile/SAML2/Redirect/SSO',
+                {
+                  'execution': 'e1s3',
+                },
+              ),
+              options: Options(
+                headers: {
+                  'Accept':
+                      'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
+                  'Cookie':
+                      'JSESSIONID=$jsessionid; shib_idp_session=$shibidpsession',
+                  'Referer': 'https://login.microsoftonline.com/',
+                },
+              ),
+            );
+
+            var csrftoken = RegExp(r'(?<=csrf_token" value=").*?(?=")')
+                .firstMatch(response.data.toString())
+                ?.group(0);
+            if (csrftoken == null) {
+              throw Exception('Failed to get csrf_token.');
+            }
+
+            _setProgress(15 / 15);
+            await Future.delayed(_interval);
+            response = await _client.postUri(
+              Uri.https(
+                'idp.shizuoka.ac.jp',
+                '/idp/profile/SAML2/Redirect/SSO',
+                {
+                  'execution': 'e1s3',
+                },
+              ),
+              options: Options(
+                headers: {
+                  'Accept':
+                      'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,',
+                  'Cookie':
+                      'JSESSIONID=$jsessionid; shib_idp_session=$shibidpsession',
+                  'Referer':
+                      'https://idp.shizuoka.ac.jp/idp/profile/SAML2/Redirect/SSO?execution=e1s3',
+                },
+                validateStatus: (status) => status == 302,
+              ),
+              data:
+                  'csrf_token=$csrftoken&_shib_idp_consentIds=displayName&_shib_idp_consentIds=eduPersonAffiliation&_shib_idp_consentIds=eduPersonEntitlement&_shib_idp_consentIds=eduPersonPrincipalName&_shib_idp_consentIds=eduPersonScopedAffiliation&_shib_idp_consentIds=eduPersonTargetedID&_shib_idp_consentIds=employeeNumber&_shib_idp_consentIds=givenName&_shib_idp_consentIds=jaDisplayName&_shib_idp_consentIds=jaGivenName&_shib_idp_consentIds=jaOrganizationName&_shib_idp_consentIds=jaSurname&_shib_idp_consentIds=jaorganizationalUnit&_shib_idp_consentIds=mail&_shib_idp_consentIds=organizationName&_shib_idp_consentIds=organizationalUnitName&_shib_idp_consentIds=surname&_shib_idp_consentIds=uid&_shib_idp_consentOptions=_shib_idp_globalConsent&_eventId_proceed=',
+            );
+
+            _setProgress(15 / 15);
+            await Future.delayed(_interval);
+            response = await _client.getUri(
+              Uri.https(
+                'idp.shizuoka.ac.jp',
+                '/idp/profile/SAML2/Redirect/SSO',
+                {
+                  'execution': 'e1s4',
+                },
+              ),
+              options: Options(
+                headers: {
+                  'Accept':
+                      'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,',
+                  'Cookie':
+                      'JSESSIONID=$jsessionid; shib_idp_session=$shibidpsession',
+                  'Referer':
+                      'https://idp.shizuoka.ac.jp/idp/profile/SAML2/Redirect/SSO?execution=e1s3',
+                },
+              ),
+            );
+
+            csrftoken = null;
+            csrftoken = RegExp(r'(?<=csrf_token" value=").*?(?=")')
+                .firstMatch(response.data.toString())
+                ?.group(0);
+            if (csrftoken == null) {
+              throw Exception('Failed to get csrf_token.');
+            }
+
+            _setProgress(15 / 15);
+            await Future.delayed(_interval);
+            response = await _client.postUri(
+              Uri.https(
+                'idp.shizuoka.ac.jp',
+                '/idp/profile/SAML2/Redirect/SSO',
+                {
+                  'execution': 'e1s4',
+                },
+              ),
+              options: Options(
+                headers: {
+                  'Accept':
+                      'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,',
+                  'Cookie':
+                      'JSESSIONID=$jsessionid; shib_idp_session=$shibidpsession',
+                  'Referer':
+                      'https://idp.shizuoka.ac.jp/idp/profile/SAML2/Redirect/SSO?execution=e1s4',
+                },
+              ),
+              data:
+                  'csrf_token=$csrftoken&shib_idp_ls_exception.shib_idp_session_ss=&shib_idp_ls_success.shib_idp_session_ss=true&shib_idp_ls_exception.shib_idp_persistent_ss=&shib_idp_ls_success.shib_idp_persistent_ss=true&_eventId_proceed=',
+            );
+
+            var relaystate = RegExp(r'(?<=RelayState" value=").*?(?=")')
+                .firstMatch(response.data.toString())
+                ?.group(0);
+            if (relaystate == null) {
+              throw Exception('Failed to get RelayState.');
+            }
+
+            samlresponse = null;
+            samlresponse = RegExp(r'(?<=SAMLResponse" value=").*?(?=")')
+                .firstMatch(response.data.toString())
+                ?.group(0);
+            if (samlresponse == null) {
+              throw Exception('Failed to get SAMLResponse.');
+            }
+
+            _setProgress(15 / 15);
+            await Future.delayed(_interval);
+            response = await _client.postUri(
+              Uri.https(
+                'gakujo.shizuoka.ac.jp',
+                '/Shibboleth.sso/SAML2/POST',
+              ),
+              options: Options(
+                headers: {
+                  'Accept':
+                      'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,',
+                  // 'Cookie':
+                  // 'JSESSIONID=$jsessionid',
+                  'Referer': 'https://idp.shizuoka.ac.jp/',
+                },
+                validateStatus: (status) => status == 302,
+              ),
+              data: {
+                'RelayState': relaystate,
+                'SAMLResponse': samlresponse,
+              },
+            );
+
+            _setProgress(15 / 15);
+            await Future.delayed(_interval);
+            response = await _client.getUri(
+              Uri.https(
+                'gakujo.shizuoka.ac.jp',
+                '/portal/shibbolethlogin/shibbolethLogin/initLogin/sso',
+              ),
+              options: Options(
+                headers: {
+                  'Accept':
+                      'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,',
+                  // 'Cookie':
+                  // 'JSESSIONID=$jsessionid',
+                  'Referer': 'https://idp.shizuoka.ac.jp/',
+                },
+              ),
+            );
+
+            print(response.data);
           }
         }
       }
