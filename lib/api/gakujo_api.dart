@@ -500,13 +500,13 @@ class GakujoApi {
             );
 
             var guid = msurl.replaceFirst('https://', '').split('/')[1];
-            var st =
-                DateTime.now().microsecondsSinceEpoch % (1000 * 1000) * 1000;
+            var st = DateTime.now().microsecondsSinceEpoch;
 
-            var flowtoken2 = RegExp(r'(?<="FlowToken":").*?(?=")')
+            flowtoken = null;
+            flowtoken = RegExp(r'(?<="FlowToken":").*?(?=")')
                 .firstMatch(response.data.toString())
                 ?.group(0);
-            if (flowtoken2 == null) {
+            if (flowtoken == null) {
               throw Exception('Failed to get FlowToken.');
             }
 
@@ -544,7 +544,7 @@ class GakujoApi {
                 'canary': canary2,
                 'ctx': originalrequest,
                 'hpgrequestid': hpgrequestid,
-                'flowToken': flowtoken2,
+                'flowToken': flowtoken,
                 'PPSX': '',
                 'NewUser': 1,
                 'FoundMSAs': '',
@@ -553,7 +553,7 @@ class GakujoApi {
                 'CookieDisclosure': 0,
                 'IsFidoSupported': 1,
                 'isSignupPost': 0,
-                'i19': 19047,
+                'i19': 1000,
               },
             );
 
@@ -799,7 +799,7 @@ class GakujoApi {
                 "FlowToken": flowtoken,
                 "Ctx": ctx,
                 "AuthMethodId": "PhoneAppOTP",
-                "AdditionalAuthData": otc,
+                "AdditionalAuthData": otc.toString(),
                 "PollCount": 1
               },
             );
@@ -823,6 +823,10 @@ class GakujoApi {
               throw Exception('Failed to get fpc.');
             }
 
+            print('==========================');
+            print(response.data);
+            print('==========================');
+
             String? timestamp = null;
             timestamp = RegExp(r'(?<="Timestamp":").*?(?=")')
                 .firstMatch(response.data.toString())
@@ -830,7 +834,6 @@ class GakujoApi {
             if (timestamp == null) {
               throw Exception('Failed to get Timestamp.');
             }
-            // convert iso8601 to unix timestamp
             timestamp = DateTime.parse(timestamp)
                 .millisecondsSinceEpoch
                 .toString()
@@ -848,8 +851,8 @@ class GakujoApi {
                   'Accept':
                       'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
                   'Referer': 'https://login.microsoftonline.com/$guid/login',
-                  // 'Cookie':
-                  //     'x-ms-gateway-slice=estsfd; stsservicecookie=estsfd; AADSSO=NA|NoExtension; SSOCOOKIEPULLED=1; brcap=0; wlidperf=FR=L&ST=$st; ESTSAUTHPERSISTENT=$estsauthpersistent; ESTSAUTH=$estsauth; ESTSAUTHLIGHT=$estsauthlight; buid=$buid; esctx=$esctx; fpc=$fpc',
+                  'Cookie':
+                      'AADSSO=NA|NoExtension; SSOCOOKIEPULLED=1; brcap=0; wlidperf=FR=L&ST=$st',
                 },
               ),
               data: {
@@ -866,11 +869,9 @@ class GakujoApi {
                 "sacxt": "",
                 "hideSmsInMfaProofs": false,
                 "canary": canary2,
-                "i19": 9941,
+                "i19": 1000,
               },
             );
-
-            print(response.data);
 
             hpgrequestid = null;
             hpgrequestid = response.headers.value('x-ms-request-id');
@@ -959,9 +960,11 @@ class GakujoApi {
                 "flowToken": flowtoken,
                 "DontShowAgain": true,
                 "canary": canary,
-                "i19": 4840,
+                "i19": 1000,
               },
             );
+
+            print(response.data);
 
             var samlresponse = RegExp(r'(?<=SAMLResponse" value=").*?(?=")')
                 .firstMatch(response.data.toString())
