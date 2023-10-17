@@ -773,6 +773,8 @@ class GakujoApi {
                 interval: 30,
                 algorithm: Algorithm.SHA1,
                 isGoogle: true);
+            await Future.delayed(_interval);
+            var epoch2 = DateTime.now().millisecondsSinceEpoch;
 
             _setProgress(15 / 15);
             await Future.delayed(_interval);
@@ -800,7 +802,9 @@ class GakujoApi {
                 "Ctx": ctx,
                 "AuthMethodId": "PhoneAppOTP",
                 "AdditionalAuthData": otc.toString(),
-                "PollCount": 1
+                "PollCount": 1,
+                "LastPollStart": epoch,
+                "LastPollEnd": epoch2,
               },
             );
 
@@ -827,17 +831,17 @@ class GakujoApi {
             print(response.data);
             print('==========================');
 
-            String? timestamp = null;
-            timestamp = RegExp(r'(?<="Timestamp":").*?(?=")')
-                .firstMatch(response.data.toString())
-                ?.group(0);
-            if (timestamp == null) {
-              throw Exception('Failed to get Timestamp.');
-            }
-            timestamp = DateTime.parse(timestamp)
-                .millisecondsSinceEpoch
-                .toString()
-                .substring(0, 10);
+            // String? timestamp = null;
+            // timestamp = RegExp(r'(?<="Timestamp":").*?(?=")')
+            //     .firstMatch(response.data.toString())
+            //     ?.group(0);
+            // if (timestamp == null) {
+            //   throw Exception('Failed to get Timestamp.');
+            // }
+            // timestamp = DateTime.parse(timestamp)
+            //     .millisecondsSinceEpoch
+            //     .toString()
+            //     .substring(0, 10);
 
             _setProgress(15 / 15);
             await Future.delayed(_interval);
@@ -854,13 +858,14 @@ class GakujoApi {
                   'Cookie':
                       'AADSSO=NA|NoExtension; SSOCOOKIEPULLED=1; brcap=0; wlidperf=FR=L&ST=$st',
                 },
+                validateStatus: (_) => true,
               ),
               data: {
                 "type": 19,
                 "GeneralVerify": false,
                 "request": ctx,
                 "mfaLastPollStart": epoch,
-                "mfaLastPollEnd": '${timestamp}000',
+                "mfaLastPollEnd": epoch2,
                 "mfaAuthMethod": "PhoneAppOTP",
                 "otc": otc,
                 "login": username,
@@ -872,6 +877,8 @@ class GakujoApi {
                 "i19": 1000,
               },
             );
+
+            print(response.data);
 
             hpgrequestid = null;
             hpgrequestid = response.headers.value('x-ms-request-id');
